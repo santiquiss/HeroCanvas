@@ -1,0 +1,154 @@
+/* The body behind the frame (the frame is above it, z 1), centered on the frame's slot. */
+.body {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* The stage around the device turns it (CaptureStage): a hand to grab it with. */
+:global([data-capture]) {
+  cursor: grab;
+}
+
+/* The file's crop: its background (a checkerboard when transparent), its size in pixels under it. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.backdrop[data-transparent] {
+  background: repeating-conic-gradient(#f7f8f9 0 25%, #ffffff 0 50%) 0 0 / 16px 16px;
+}
+/* What isn't exported, veiled as a modal's backdrop, subtly: the stage with the crop cut out (CaptureStage). */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(15, 20, 30, 0.07);
+}
+/* The device's layer, over the crop: the stage's size, so the frame keeps its place. */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+/* The crop's corners: a short line along each edge, on the crop's own edges (a viewfinder's marks); their color
+   reads on the background (CaptureStage). */
+.corners {
+  --l: 18px;
+  --w: 1.5px;
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) top left / var(--w) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--w) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--w) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--w) var(--l) no-repeat;
+}
+/* The moving part of the stage: the stage's size, its middle the origin of a refit's scale. */
+.view {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transform-origin: 50% 50%;
+}
+/* A recorded interaction playing over the device's screen (the video's preview): the frame's whole box, its corners,
+   above everything in it (the screen's own layers go up to 97: DeviceScreen's Z); the live screen stays under it,
+   untouched. */
+.screenPlayback {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* While an interaction records: a pill at the canvas's top, outside the device. */
+.recording {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--ui-float);
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(15, 20, 30, 0.14), 0 0 0 1px var(--ui-float-line);
+  pointer-events: none;
+}
+.recDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ui-red-text);
+  animation: recBlink 1.2s ease-in-out infinite;
+}
+@keyframes recBlink {
+  50% {
+    opacity: 0.3;
+  }
+}
+.recSep {
+  width: 1px;
+  height: 12px;
+  background: var(--ui-line);
+}
+.kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 4px;
+  background: var(--ui-bg);
+  font: inherit;
+  font-size: 11px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .recDot {
+    animation: none;
+  }
+}
+
+.recTime {
+  display: inline-block;
+  min-width: 4.2ch;
+  font-variant-numeric: tabular-nums;
+}
+/* Stop, in the pill too (the panel has its own): the one thing in it that takes a click. */
+.recStop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  margin: -2px -6px -2px 2px;
+  padding: 0 10px 0 8px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ui-red-text);
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.recStop:hover {
+  filter: brightness(1.1);
+}

@@ -1,0 +1,80 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-s);
+  height: 48px;
+  padding: 0 var(--app-space-xl);
+  border: none;
+  border-radius: var(--app-radius-full);
+  font: var(--app-font-label);
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.small {
+  height: 36px;
+  padding: 0 var(--app-space-l);
+}
+.block {
+  display: flex;
+  width: 100%;
+}
+.primary {
+  background: var(--app-primary);
+  color: var(--app-on-primary);
+}
+.secondary {
+  background: var(--app-secondary);
+  color: var(--app-on-secondary);
+}
+.tertiary {
+  background: var(--app-surface);
+  color: var(--app-text);
+  box-shadow: inset 0 0 0 1px var(--app-border);
+}
+.danger {
+  background: var(--app-danger);
+  color: #ffffff;
+}
+.link {
+  background: none;
+  color: var(--app-primary);
+  padding: 0 var(--app-space-s);
+}
+.button:not(:disabled):active,
+.iconButton:not(:disabled):active {
+  opacity: 0.7;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  padding: 0;
+  border: none;
+  border-radius: var(--app-radius-full);
+  cursor: pointer;
+}
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.iconButton.tertiary {
+  box-shadow: none;
+}
+.icon_medium {
+  width: 40px;
+  height: 40px;
+}
+.icon_small {
+  width: 32px;
+  height: 32px;
+}
+.elevated {
+  box-shadow: var(--app-elevation);
+}

@@ -1,0 +1,71 @@
+/* Highlight changes: hot pink (design/changes HIGHLIGHT; --hc-hl below must match it). The layer and its note let
+   touches through: the prototype works as usual. */
+:global(:root) {
+  --hc-hl: #ff2d95;
+  /* A new component: the color of new (CHANGE.new). */
+  --hc-hl-new: #06b6d4;
+}
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* A changed component, marked where it is (so it scrolls with it): solid pink edge, diagonal pink stripes over it; a
+   new one in cyan. */
+:global([data-hl='new']) {
+  --hc-hl: var(--hc-hl-new);
+}
+:global([data-hl]) {
+  outline: 2px solid var(--hc-hl) !important;
+  outline-offset: 3px;
+}
+:global([data-hl])::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  z-index: 50;
+  border-radius: 10px;
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--hc-hl) 34%, transparent) 0 6px,
+    color-mix(in srgb, var(--hc-hl) 12%, transparent) 6px 12px
+  );
+  pointer-events: none;
+}
+/* A new or changed page: the whole screen, dashed, following its corners. */
+.frame {
+  position: absolute;
+  inset: 0;
+  border: 3px dashed var(--hl);
+}
+/* What changed in a component: a small card, the app's type, pink accent. */
+.note {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #15181c;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 3px 0 0 var(--hl);
+  color: #ffffff;
+  font-family: Inter, system-ui, sans-serif;
+  pointer-events: none;
+}
+.noteName {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.noteScope {
+  color: var(--hl);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 15px;
+}
+.noteText {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+  line-height: 17px;
+}

@@ -1,0 +1,42 @@
+/* Shot mode (ShotShell): the devices side by side on a transparent page, in black frames, without a shadow. */
+.stage {
+  display: inline-flex;
+  align-items: center;
+  --hc-device: #000000;
+}
+.slot {
+  position: relative;
+  flex: none;
+}
+.frame {
+  box-shadow: none;
+  transition: none;
+}
+
+/* The page behind them: transparent, so the PNG keeps only the devices. */
+:global(html[data-shot]),
+:global(html[data-shot] body),
+:global(html[data-shot] #root) {
+  background: transparent !important;
+}
+
+/* Before and after: each version is its label over its frames. */
+.version {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.frames {
+  display: flex;
+  align-items: center;
+}
+/* Subtle, and legible on a white or a dark page alike (the PNG is transparent). */
+.label {
+  /* The designer's own type (Figtree), inherited. */
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: #8a9099;
+}

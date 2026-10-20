@@ -1,0 +1,149 @@
+/* System chrome sits above every app layer, sheets and dialogs included (app overlays use 90–91): bars and home
+   indicator 95, camera cutouts 96. */
+.ios,
+.iosHome,
+.android,
+.ipad {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 95;
+  color: var(--tx);
+  pointer-events: none;
+}
+.ios {
+  height: 54px;
+  padding: 0 30px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.iosHome {
+  /* Time centered on the screen whatever the sides' widths: two equal columns around it. */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.android {
+  height: 48px;
+  padding-left: 24px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.ipad {
+  height: 24px;
+  padding: 0 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.icons {
+  display: flex;
+  align-items: center;
+}
+.iosHome > :last-child {
+  justify-self: end;
+}
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  /* Its width per device (layout.islandW): 124, the 18 Pros' 82. */
+  height: 36px;
+  border-radius: 20px;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+/* The notch of the iPhones before the Dynamic Island (16e): 162×34 hanging from the top edge (layout NOTCH_W). */
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -81px;
+  width: 162px;
+  height: 34px;
+  border-radius: 0 0 20px 20px;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+.landNotch {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -81px;
+  width: 34px;
+  height: 162px;
+  border-radius: 0 20px 20px 0;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+.punch {
+  position: absolute;
+  top: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+.landIsland {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  /* Its length per device (layout.islandW). */
+  width: 36px;
+  border-radius: 20px;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+.landPunch {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  margin-top: -11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+.home {
+  position: absolute;
+  left: 50%;
+  background: var(--tx);
+  z-index: 95;
+  pointer-events: none;
+}
+
+/* Always-visible camera (display `camera`); size and position from the layout. */
+.camera {
+  position: absolute;
+  border-radius: 50%;
+  background: #000000;
+  z-index: 96;
+  pointer-events: none;
+}
+
+/* A full-screen system view over the app that hides the status bar (the camera: sim/SystemCamera) marks itself
+   data-status-bar="hidden": the bar (or the iPhone Duo's corner status) goes and the home indicator turns white over it, as iOS and Android do. */
+:global([data-theme]):has([data-status-bar='hidden']) > :is(.ios, .iosHome, .android, .ipad, .cornerStatus) {
+  opacity: 0;
+}
+:global([data-theme]):has([data-status-bar='hidden']) > .home {
+  background: #ffffff;
+}
+
+.cornerStatus {
+  transition: opacity 200ms ease;
+}

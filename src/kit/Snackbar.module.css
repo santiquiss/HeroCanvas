@@ -1,0 +1,46 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-s);
+  padding: var(--app-space-m);
+  border-radius: var(--app-radius-m);
+  background: var(--app-surface);
+  color: var(--app-text);
+  box-shadow: inset 0 0 0 1px var(--app-border);
+}
+.text {
+  flex: 1;
+  min-width: 0;
+  font: var(--app-font-body);
+}
+.floating {
+  box-shadow:
+    inset 0 0 0 2px var(--alert-accent),
+    var(--app-elevation);
+}
+
+/* The snackbar: 16 in from the sides and 24 over the bottom (plus the screen's inset, inline), at most its largest
+   width, centered; in, a fade while it rises; out, a fade. */
+.snackbar {
+  position: absolute;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--app-space-l) var(--app-space-xl);
+  opacity: 0;
+  transform: translateY(var(--app-space-xl));
+  transition:
+    opacity 250ms ease-out,
+    transform 250ms cubic-bezier(0.2, 0, 0, 1);
+  pointer-events: none;
+}
+/* Only the alert takes taps: the page under the margins stays usable. */
+.snackbar > * {
+  flex: 1;
+  max-width: var(--snackbar-max);
+  pointer-events: auto;
+}
+.on {
+  opacity: 1;
+  transform: none;
+}

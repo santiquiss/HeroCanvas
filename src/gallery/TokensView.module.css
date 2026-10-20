@@ -1,0 +1,221 @@
+/* Components › Tokens: a group's tokens as tables — what it looks like, its names, its values. */
+/* On the canvas ground, so it follows the theme (the text does). */
+.ground {
+  min-height: 100%;
+  background: var(--hc-canvas-base);
+}
+.page {
+  max-width: 1200px;
+  padding: 28px 32px 64px;
+  color: var(--hc-canvas-text);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+.count {
+  color: var(--hc-canvas-muted);
+  font-size: 14px;
+}
+.note {
+  margin: 4px 0 24px;
+  color: var(--hc-canvas-muted);
+  line-height: 18px;
+}
+.missingNote {
+  color: var(--ui-red-text);
+}
+.section {
+  margin-bottom: 24px;
+}
+.sub {
+  margin: 0 0 8px 2px;
+  color: var(--hc-canvas-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* The table: a card with a header row; rows separated by hairlines, tinted on hover. */
+.table {
+  width: 100%;
+  table-layout: fixed;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  background: var(--hc-canvas-chip-solid);
+  box-shadow:
+    0 0 0 1px var(--hc-canvas-chip-line),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.table th {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--hc-canvas-chip-line);
+  color: var(--hc-canvas-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.table td {
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+.table tbody tr + tr td {
+  border-top: 1px solid var(--hc-canvas-chip-line);
+}
+.table tbody tr:hover td {
+  background: color-mix(in srgb, var(--hc-canvas-text) 3%, transparent);
+}
+/* Found by the search. */
+.table tbody tr.marked td {
+  background: color-mix(in srgb, #0d99ff 12%, transparent);
+}
+.table tbody tr.marked td:first-child {
+  box-shadow: inset 3px 0 0 #0d99ff;
+}
+
+/* Previews */
+.preview {
+  white-space: nowrap;
+}
+.swatches {
+  display: flex;
+  gap: 4px;
+}
+.swatch {
+  width: 36px;
+  height: 28px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc-canvas-text) 12%, transparent);
+}
+.bar {
+  display: block;
+  height: 12px;
+  border-radius: 2px;
+  background: #0d99ff;
+}
+.radius {
+  display: block;
+  width: 36px;
+  height: 28px;
+  border: 2px solid #0d99ff;
+  border-right: none;
+  border-bottom: none;
+}
+.stroke {
+  display: block;
+  width: 64px;
+  min-height: 0.5px;
+  background: var(--hc-canvas-text);
+}
+.sample {
+  max-width: 240px;
+  overflow: hidden;
+  color: var(--hc-canvas-text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.shadowBox {
+  display: block;
+  width: 56px;
+  height: 36px;
+  margin: 6px;
+  border-radius: 8px;
+  background: var(--ui-bg);
+}
+.shadowDark {
+  background: var(--ui-strong);
+}
+
+/* Names */
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.names {
+  min-width: 0;
+}
+.figma {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* A name to copy: the icon shows on hover. */
+.copy {
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: -6px;
+  padding: 1px 6px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--hc-canvas-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.copy .mono {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.copy > :last-child {
+  flex: none;
+  opacity: 0;
+}
+.copy:hover {
+  background: color-mix(in srgb, var(--hc-canvas-text) 7%, transparent);
+  color: var(--hc-canvas-text);
+}
+.copy:hover > :last-child {
+  opacity: 1;
+}
+.missing {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: color-mix(in srgb, #e5484d 12%, transparent);
+  color: var(--ui-red-text);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Values: the value, and the primitive it points to under it. */
+.valueCell {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.valueCell > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.valueCell > span {
+  display: block;
+}
+.mono {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+}
+.alias {
+  margin-top: 2px;
+  color: var(--hc-canvas-muted);
+  font-size: 11px;
+}

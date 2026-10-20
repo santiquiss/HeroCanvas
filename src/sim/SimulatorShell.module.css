@@ -1,0 +1,474 @@
+/* The window: the mode rail, then the app (toolbar over the workspace). */
+.window {
+  height: 100vh;
+  display: flex;
+  overflow: clip;
+}
+.app {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+}
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.stage {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  /* clip, not hidden: hidden boxes can still be scrolled by scrollIntoView, which would shift the device. */
+  overflow: clip;
+  /* Local: zoomed past Fit the stage scrolls, and the dots with it. */
+  background: var(--hc-canvas);
+  background-attachment: local;
+}
+.frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+  background: var(--hc-device);
+  box-shadow: 0 30px 70px rgba(15, 20, 30, 0.3), 0 6px 18px rgba(15, 20, 30, 0.2);
+}
+
+/* Touch pointer (prototype): the fingertip replaces the cursor over the device. */
+.frame[data-touch],
+.frame[data-touch] * {
+  cursor: none !important;
+}
+.touch {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(120, 120, 128, 0.32);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.18);
+  /* Moved with transform only (compositor), never animated, so it never lags the mouse. */
+  will-change: transform;
+  transition:
+    opacity 120ms ease,
+    background 120ms ease;
+}
+.touchDown {
+  background: rgba(90, 90, 98, 0.45);
+}
+
+/* Frame-rate meter (F). */
+.fps {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 6;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(20, 22, 26, 0.82);
+  color: #7ee787;
+  font: 500 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.fps[data-level='warn'] {
+  color: #f2cc60;
+}
+.fps[data-level='bad'] {
+  color: #ff7b72;
+}
+
+/* All devices: every device and display at one scale, wrapping, scrollable. */
+.allDevices {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  background: var(--hc-canvas);
+  background-attachment: local;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  align-content: flex-start;
+  justify-content: center;
+}
+/* One row: all devices centered on one line, scrolling sideways (centered when they fit). */
+.allRow {
+  flex-wrap: nowrap;
+  align-items: safe center;
+  justify-content: safe center;
+  align-content: center;
+}
+.allItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  /* Never shrink: under content-visibility the content no longer sets a minimum width, so a row would squeeze. */
+  flex: none;
+  content-visibility: auto;
+  /* content-visibility contains paint: room for the frame's shadow inside the box, given back by the margins. */
+  padding: 0 32px 44px;
+  margin: 0 -32px -44px;
+}
+/* Fourteen frames: a tighter shadow is much cheaper to paint while the canvas scrolls. */
+/* A frame's forehead and chin (display `ends`, the iPhone SE): `--end` is their thickness. Turned, they're the left
+   and right ends, the Home button on the right. */
+.hardware {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.earpiece,
+.frontCamera,
+.homeButton {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--end) / 2);
+  transform: translate(-50%, -50%);
+  background: #050607;
+}
+.earpiece {
+  width: 52px;
+  height: 6px;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+}
+.frontCamera {
+  margin-left: -46px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #15181c;
+}
+.homeButton {
+  top: auto;
+  bottom: calc(var(--end) / 2);
+  transform: translate(-50%, 50%);
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #15181c, #0b0c0e);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+/* Over the screen's edge where the notch meets the bezel (DeviceFrame notchCap); above the notch (96). */
+.notchCap {
+  position: absolute;
+  z-index: 97;
+  background: #000000;
+}
+.hardware[data-turned] .earpiece,
+.hardware[data-turned] .frontCamera {
+  left: calc(var(--end) / 2);
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.hardware[data-turned] .frontCamera {
+  margin-left: 0;
+  margin-top: 46px;
+}
+.hardware[data-turned] .homeButton {
+  left: auto;
+  right: calc(var(--end) / 2);
+  top: 50%;
+  bottom: auto;
+  transform: translate(50%, -50%);
+}
+
+.allItem .frame {
+  box-shadow: 0 10px 28px rgba(15, 20, 30, 0.22);
+}
+.allLabel {
+  height: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--hc-canvas-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  cursor: pointer;
+}
+.allLabel:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.allSub {
+  font-weight: 500;
+  color: var(--hc-canvas-muted);
+}
+
+/* The middle of the workspace: the mode's canvas with the view bar floating over its bottom. */
+.canvas {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+
+/* Custom device sets (`?devices=`): a centered row, scrolling sideways when it doesn't fit. */
+.multi {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  background: var(--hc-canvas);
+  background-attachment: local;
+}
+.multiRow {
+  position: relative;
+  min-width: 100%;
+  min-height: 100%;
+  width: max-content;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.multiFrames {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.multiItem {
+  flex: none;
+  position: relative;
+}
+/* + at both ends, beside the first and last frame. */
+.multiEnd {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+}
+.multiEndL {
+  right: calc(100% + 24px);
+}
+.multiEndR {
+  left: calc(100% + 24px);
+}
+/* Each device's header: device menu, display, rotate, remove. */
+.devHead {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--hc-canvas-chip);
+  box-shadow: 0 0 0 1px var(--hc-canvas-chip-line);
+  opacity: 0.75;
+  transition: opacity 150ms ease;
+}
+.multiItem:hover .devHead {
+  opacity: 1;
+}
+/* The active device of a set (the last one touched: the one the panels describe and Inspect reads): its header is
+   fully visible, with a border. */
+.multiActive .devHead {
+  opacity: 1;
+  background: var(--hc-canvas-chip-solid);
+  box-shadow: 0 0 0 1.5px var(--hc-canvas-muted);
+}
+/* The single device's header: above its frame (`top` is the frame's top edge), always fully shown. */
+.singleHead {
+  bottom: auto;
+  z-index: 3;
+  transform: translate(-50%, calc(-100% - 12px));
+  opacity: 1;
+  background: var(--hc-canvas-chip-solid);
+}
+/* Drag to reorder: the dragged device rides above, the others slide to make room. */
+.devGrip {
+  height: 28px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  color: #8a9099;
+  cursor: grab;
+  touch-action: none;
+}
+.devGrip:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: var(--hc-canvas-icon);
+}
+.multiDragging {
+  position: relative;
+  z-index: 2;
+  opacity: 0.9;
+}
+.multiDragging,
+.multiDragging .devGrip {
+  cursor: grabbing;
+}
+.multiDragging .devHead {
+  opacity: 1;
+}
+.multiShifting {
+  transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.devName,
+.addDevice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.devName select,
+.addDevice select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.devName {
+  min-width: 0;
+  gap: 2px;
+  height: 28px;
+  padding: 0 6px 0 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hc-canvas-text);
+  white-space: nowrap;
+}
+.devNameText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.devHead > :not(.devName) {
+  flex: none;
+}
+.devName:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.devChip {
+  height: 28px;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--hc-canvas-icon);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.devChip:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.devChipOn,
+.devChipOn:hover {
+  background: var(--hc-canvas-text);
+  color: var(--hc-canvas-base);
+}
+/* + to add a device: beside the single device, or at both ends of a set. */
+.addSide {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+.addDevice {
+  flex: none;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--hc-canvas-chip-solid);
+  color: var(--hc-canvas-icon);
+  box-shadow:
+    0 2px 8px rgba(15, 20, 30, 0.12),
+    0 0 0 1px var(--hc-canvas-chip-line);
+  opacity: 0.7;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+.addDevice:hover {
+  opacity: 1;
+  transform: scale(1.06);
+}
+/* Between two devices of a set: a zero-width slot whose gap-wide hit area reveals a small +. */
+.gapSlot {
+  flex: none;
+  align-self: stretch;
+  width: 0;
+  position: relative;
+}
+.gapSlot[hidden] {
+  display: none;
+}
+.gapHit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.addDeviceSmall {
+  width: 28px;
+  height: 28px;
+  opacity: 0;
+  transform: scale(0.8);
+}
+.gapHit:hover .addDeviceSmall {
+  opacity: 0.85;
+  transform: none;
+}
+.gapHit .addDeviceSmall:hover {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+
+/* A device's own version (an override): its header stays visible; the version chip is on (.devChipOn). */
+.devHeadOwn {
+  opacity: 1;
+}
+/* The native select covers the chip, invisible: any click opens it. */
+.devDesign {
+  position: relative;
+}
+.devDesign select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* A region that dims and stops answering while an interaction records (inert in the markup), its box untouched:
+   the wrapper has none of its own. */
+.lockable {
+  display: contents;
+}
+.lockable[data-locked] > * {
+  opacity: 0.35;
+  transition: opacity 200ms ease;
+}

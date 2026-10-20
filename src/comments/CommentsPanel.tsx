@@ -1,0 +1,198 @@
+// The Comments panel, as Figma's: a search, the filters (this screen or every page, kinds, resolved) and the threads of
+// what's on screen (Live or the proposal), newest first. A thread opens beside its pin on the canvas and here, where it
+// unfolds with its replies; opening one left on another view takes the canvas there.
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { Icon } from '../components/Icon';
+import { findDevice } from '../devices/devices';
+import { useNavRoot } from '../nav/context';
+import { pageName } from '../nav/stack';
+import { useMode } from '../sim/modes';
+import { SearchField } from '../tools/SearchField';
+import { useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsContext';
+import { Avatar, EditField, KindTag, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
+import { commentsShared, refresh, useComments, useCommentsOf } from './store';
+import { commentLink, filterThreads, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
+import { KINDS, type Comment, type CommentKind } from './types';
+import { openSheetLink } from '../sim/sheetLinks';
+import panel from '../tools/Panel.module.css';
+import styles from './Comments.module.css';
+
+export default function CommentsPanel() {
+  const { design, variant } = useCommentScope();
+  // Loading and errors are the toolbar version's; the threads, every version's on the canvas (a set's devices).
+  const state = useComments(design, { fresh: true });
+  const comments = useCommentsOf(useCanvasDesigns(), { fresh: true });
+  const { selected, setSelected, commenting, setCommenting, showResolved: resolved, setShowResolved: setResolvedShown } = useCommentsUi();
+  const nav = useNavRoot();
+  const mode = useMode();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [scope, setScope] = useState<'page' | 'all'>('page');
+  const [kinds, setKinds] = useState<CommentKind[]>([]);
+  const [query, setQuery] = useState('');
+  // In Flow there's no page on screen: every page's.
+  const pageScope = mode === 'prototype' && scope === 'page';
+  const all = useMemo(() => threadsOf(comments), [comments]);
+  const numbers = useMemo(() => threadNumbers(all), [all]);
+  const onScreen = new Set(nav.stack.map((r) => r.id));
+  const label = (t: Thread) => pageName(nav.pages, t.root.page);
+  const threads = filterThreads(all, { kinds, resolved, variant }).filter((t) => (!pageScope || onScreen.has(t.root.page) || t.root.id === selected) && threadMatches(t, query, label(t)));
+  const toggleKind = (k: CommentKind) => setKinds((ks) => (ks.includes(k) ? ks.filter((x) => x !== k) : [...ks, k]));
+  const here = commentLink(location.pathname, location.search);
+  const open = (t: Thread) => {
+    if (t.root.id === selected) return setSelected(null);
+    setSelected(t.root.id);
+    // The canvas shows the view it was left on, where its pin is, and the sheet it's on (over its page: not under
+    // another one pushed over it).
+    const sheetElsewhere = !!t.root.anchor?.sheet && location.pathname !== t.root.link.split('?')[0];
+    if (mode !== 'prototype' || !onScreen.has(t.root.page) || sheetElsewhere) navigate(t.root.link);
+    openItsSheet(t.root);
+  };
+
+  return (
+    <>
+      <SearchField value={query} placeholder="Search comments" onChange={setQuery} />
+      {!commentsShared() && <div className={styles.notice}>Comments are saved in this browser only until the shared store is connected (src/comments/supabase.json).</div>}
+      <div className={styles.filters}>
+        <div className={styles.filterRow}>
+          {mode === 'prototype' ? (
+            <div className={styles.segmented} role="radiogroup" aria-label="Pages">
+              {(['page', 'all'] as const).map((s) => (
+                <button key={s} role="radio" aria-checked={scope === s} className={scope === s ? styles.segOn : ''} onClick={() => setScope(s)}>
+                  {s === 'page' ? 'This screen' : 'All pages'}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <span className={panel.muted}>All pages</span>
+          )}
+          <label className={styles.check}>
+            <input type="checkbox" checked={resolved} onChange={(e) => setResolvedShown(e.target.checked)} />
+            Resolved
+          </label>
+        </div>
+        <div className={styles.kinds}>
+          {KINDS.map((k) => (
+            <button key={k.id} className={`${styles.kind} ${kinds.includes(k.id) ? styles.kindOn : ''}`} style={{ '--k': k.color } as React.CSSProperties} onClick={() => toggleKind(k.id)} aria-pressed={kinds.includes(k.id)}>
+              {k.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {state.status === 'error' && (
+        <div className={`${panel.section} ${styles.error}`}>
+          Couldn't load the comments.{' '}
+          <button className={panel.link} onClick={() => void refresh(design)}>
+            Try again
+          </button>
+          <div className={panel.muted}>{state.error}</div>
+        </div>
+      )}
+      {state.status === 'loading' && !comments.length ? (
+        <div className={panel.section}>
+          <span className={panel.muted}>Loading…</span>
+        </div>
+      ) : threads.length ? (
+        <div className={styles.cards}>
+          {threads.map((t) => (
+            <ThreadCard key={t.root.id} thread={t} number={numbers.get(t.root.id) ?? 0} pageLabel={label(t)} open={t.root.id === selected} elsewhere={t.root.link !== here} onToggle={() => open(t)} />
+          ))}
+        </div>
+      ) : (
+        <div className={styles.empty}>
+          <Icon name="chat_bubble" size={20} />
+          <span>{all.length ? 'Nothing with these filters.' : 'No comments yet.'}</span>
+          {mode === 'prototype' && !commenting && (
+            <button className={panel.btn} onClick={() => setCommenting(true)}>
+              <Icon name="add_comment" size={14} />
+              Comment (C)
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+/** A thread in the list: who started it, where, the text, the replies' count; open, it unfolds with its replies. */
+function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { thread: Thread; number: number; pageLabel: string; open: boolean; elsewhere: boolean; onToggle: () => void }) {
+  const { root, replies } = thread;
+  const navigate = useNavigate();
+  const ref = useRef<HTMLDivElement>(null);
+  const mine = useMine(root);
+  const [editing, setEditing] = useState(false);
+  // Opened from its pin: brought into view in the list.
+  useEffect(() => {
+    if (open) ref.current?.scrollIntoView({ block: 'nearest' });
+  }, [open]);
+  return (
+    <div ref={ref} className={`${styles.card} ${open ? styles.cardOn : ''} ${root.resolvedAt ? styles.cardResolved : ''}`}>
+      <div className={styles.cardHit} role="button" tabIndex={0} onClick={onToggle} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onToggle())}>
+        <div className={styles.cardHead}>
+          <Avatar name={root.author} size={28} />
+          <span style={{ flex: 1 }} />
+          {mine && !editing && <OwnActions c={root} onEdit={() => setEditing(true)} />}
+          <ResolveButton thread={thread} />
+        </div>
+        <div className={styles.cardMeta}>
+          <span className={styles.number}>#{number}</span>
+          <KindTag kind={root.kind} />
+          <span className={styles.where}>
+            {pageLabel}
+            {root.variant ? ` · ${root.variant.toUpperCase()}` : ''}
+            {root.anchor?.device ? ` · ${deviceLabel(root.anchor.device, root.anchor.display)}` : ''}
+          </span>
+        </div>
+        <div className={styles.who}>
+          <span className={styles.author}>{root.author}</span>
+          <When c={root} />
+        </div>
+        {editing ? <EditField c={root} onDone={() => setEditing(false)} /> : <p className={`${styles.text} ${open ? '' : styles.clamp}`}>{root.body}</p>}
+        {!open && replies.length > 0 && (
+          <span className={styles.replies}>
+            {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+          </span>
+        )}
+      </div>
+      {open && (
+        <div className={styles.cardThread}>
+          {root.resolvedAt && (
+            <div className={styles.resolvedNote}>
+              <Icon name="check_circle" size={14} fill />
+              Resolved by {root.resolvedBy ?? 'someone'} · {timeAgo(root.resolvedAt)}
+            </div>
+          )}
+          {replies.map((r) => (
+            <Message key={r.id} c={r} />
+          ))}
+          <ReplyField thread={thread} />
+          {/* The view it was left on (page, state, device), when the canvas shows another. */}
+          {elsewhere && (
+            <button
+              className={panel.link}
+              onClick={() => {
+                navigate(root.link);
+                openItsSheet(root);
+              }}
+            >
+              Show where it was left
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** A comment left on a sheet opens it (once its page is on screen: sim/sheetLinks). */
+function openItsSheet(c: Comment) {
+  if (c.anchor?.sheet) openSheetLink(c.anchor.sheet, c.link.split('?')[0]);
+}
+
+/** The device a comment was left on: its name, and the display when it has several (Galaxy Z Fold7 · Inner). */
+function deviceLabel(id: string, display?: string | null): string {
+  const d = findDevice(id);
+  const x = d.displays.length > 1 ? d.displays.find((v) => v.key === display) : undefined;
+  return x ? `${d.name} · ${x.label.split(' ')[0]}` : d.name;
+}

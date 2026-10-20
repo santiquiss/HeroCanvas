@@ -1,0 +1,106 @@
+/* CheckDropdown: the designer's multi-select (its own UI, not the app's). */
+.root {
+  position: relative;
+  min-width: 0;
+}
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 28px;
+  padding: 0 6px 0 9px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.trigger:hover,
+.triggerOpen {
+  background: var(--ui-bg-subtle);
+}
+.label {
+  flex: none;
+  color: var(--ui-text-muted);
+}
+.dots {
+  display: flex;
+  gap: 2px;
+}
+.summary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+}
+.menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  background: var(--ui-bg);
+  box-shadow: 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
+}
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: var(--ui-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.option:hover {
+  background: var(--ui-hover);
+}
+.option input {
+  margin: 0;
+}
+.optionLabel {
+  flex: 1;
+  white-space: nowrap;
+}
+.count {
+  margin-left: 12px;
+  color: var(--ui-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.clear {
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: none;
+  border-top: 1px solid var(--ui-line-subtle);
+  border-radius: 0 0 6px 6px;
+  background: none;
+  color: var(--ui-text-2);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.clear:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.clear:disabled {
+  color: var(--ui-text-faint);
+  cursor: default;
+}

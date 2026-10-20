@@ -1,0 +1,28 @@
+.counts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.compact {
+  gap: 5px;
+  margin-left: 2px;
+  font-weight: 500;
+}
+.compact .count {
+  gap: 3px;
+}
+.compact .dot {
+  width: 6px;
+  height: 6px;
+}

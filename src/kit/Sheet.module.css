@@ -1,0 +1,157 @@
+/* The modal barrier: the dim behind a sheet or a dialog. */
+.barrier {
+  position: absolute;
+  inset: 0;
+  background: var(--app-scrim);
+}
+
+/* The sheet: on the surface, radius 32, lifted, min height 180; each layout places it over the barrier and sets where
+   it comes from (its off-screen state), eased like iOS. */
+.sheetRoot {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  overflow: hidden;
+}
+.sheetShim {
+  position: absolute;
+  inset: 0;
+  transition: opacity 300ms ease;
+}
+.sheet {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 180px;
+  overflow: auto;
+  scrollbar-width: none;
+  background: var(--app-surface);
+  color: var(--app-text);
+  box-shadow: var(--app-elevation);
+  transition:
+    transform 380ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 240ms ease,
+    translate 250ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+/* surface="page": the page's color, so the lists and cards in it read as on any page. */
+.sheetPage {
+  background: var(--app-page);
+}
+.sheetOn {
+  transform: none !important;
+  opacity: 1 !important;
+}
+.sheetSpacer {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Bottom Content: hugs its content at the bottom, at most 640 wide, top corners round. A column, so content that
+   fills it keeps its header and scrolls its body. */
+.sheet_bottomContent {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+.sheet_bottomContent .sheet {
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100% - 70px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 32px 32px 0 0;
+  transform: translateY(100%);
+}
+
+/* Bottom Expanded: the screen but 70 at the top; with a width preset, that wide at most and centered. */
+.sheet_bottomExpanded {
+  flex-direction: column;
+  align-items: center;
+  padding-top: 70px;
+}
+.sheet_bottomExpanded .sheet {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 32px 32px 0 0;
+  transform: translateY(100%);
+}
+
+/* Top Content: hugs its content at the top, bottom corners round. */
+.sheet_topContent {
+  flex-direction: column;
+  align-items: center;
+}
+.sheet_topContent .sheet {
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100% - 70px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 32px 32px;
+  transform: translateY(-100%);
+}
+
+/* Dialog: centered, 40 side margins, at most 640 × 600. */
+.sheet_dialog {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--app-space-xxxl);
+}
+.sheet_dialog .sheet {
+  width: 100%;
+  max-width: 640px;
+  max-height: min(600px, 100%);
+  display: flex;
+  flex-direction: column;
+  border-radius: 32px;
+  transform: scale(0.94);
+  opacity: 0;
+}
+
+/* Side Compact / Expanded: full height on the right (48 of barrier on the left), at most 390 / 580. */
+.sheet_sideCompact,
+.sheet_sideExpanded {
+  justify-content: flex-end;
+  padding-left: var(--app-space-huge);
+}
+.sheet_sideCompact .sheet,
+.sheet_sideExpanded .sheet {
+  flex: 1;
+  border-radius: 32px 0 0 32px;
+  transform: translateX(100%);
+}
+.sheet_sideCompact .sheet {
+  max-width: 390px;
+}
+.sheet_sideExpanded .sheet {
+  max-width: 580px;
+}
+
+/* Left / Right Pane: a floating full-height pane, 8 from the edges, at most 640. */
+.sheet_leftPane,
+.sheet_rightPane {
+  padding: var(--app-space-s);
+  gap: var(--app-space-l);
+}
+.sheet_leftPane .sheet,
+.sheet_rightPane .sheet {
+  flex: 1;
+  max-width: 640px;
+  border-radius: 32px;
+}
+.sheet_leftPane .sheet {
+  transform: translateX(calc(-100% - 8px));
+}
+.sheet_rightPane .sheet {
+  transform: translateX(calc(100% + 8px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheetShim {
+    transition: none;
+  }
+}

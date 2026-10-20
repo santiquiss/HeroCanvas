@@ -1,0 +1,183 @@
+/* Components › Overview › Usage: tiles, the most used, the unused and the only-nested. */
+.usage {
+  margin: 28px 0 8px;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ui-text-subtle);
+  font-size: 12px;
+}
+.rescan {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 7px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ui-fill);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.rescan:hover {
+  background: var(--ui-fill-strong);
+}
+.dim {
+  color: var(--ui-text-subtle);
+  font-weight: 400;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--ui-bg);
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.06);
+  font-size: 12px;
+}
+.tileValue {
+  color: var(--ui-text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.card {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--ui-bg);
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.06);
+}
+.cardTitle {
+  margin: 0 0 8px;
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 650;
+}
+.note {
+  margin: -4px 0 10px;
+  color: var(--ui-text-subtle);
+  font-size: 12px;
+}
+
+/* Most used: a ranked list with a bar each, relative to the first. */
+.rank {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -8px;
+}
+.rankRow {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.rankRow:hover {
+  background: var(--ui-blue-soft);
+}
+.pos {
+  color: var(--ui-text-faint);
+  font-size: 11.5px;
+  text-align: right;
+}
+.rankName {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ui-hover);
+}
+.bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: #7c3aed;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ui-hover);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chip:hover {
+  background: var(--ui-blue-soft);
+  color: var(--ui-blue-text);
+}
+.chipIn {
+  margin-left: 5px;
+  color: var(--ui-text-subtle);
+}

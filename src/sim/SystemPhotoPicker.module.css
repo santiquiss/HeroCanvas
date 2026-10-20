@@ -1,0 +1,331 @@
+/* The system's photo picker (iOS PHPicker, Android Photo Picker): the system's colors and type, not the app's tokens.
+   Over the app's sheets (90) and under the system chrome (95). */
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 92;
+  --sys-bg: #ffffff;
+  --sys-fg: #000000;
+  --sys-fill: rgba(120, 120, 128, 0.16);
+  --sys-tint: #0a84ff;
+}
+:global([data-theme='dark']) .root {
+  --sys-bg: #1c1c1e;
+  --sys-fg: #ffffff;
+  --sys-fill: rgba(120, 120, 128, 0.32);
+}
+.android {
+  --sys-bg: #f8f9fc;
+  --sys-fill: #e1e3ea;
+  --sys-tint: #3f5f91;
+}
+:global([data-theme='dark']) .android {
+  --sys-bg: #1d2024;
+  --sys-fill: #323538;
+  --sys-tint: #a8c8ff;
+}
+
+.shim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 340ms ease;
+}
+.sheet {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--sys-bg);
+  color: var(--sys-fg);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', Inter, sans-serif;
+  transform: translateY(100%);
+  transition: transform 340ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.android .sheet {
+  border-radius: 28px 28px 0 0;
+  font-family: Roboto, Inter, sans-serif;
+}
+/* Centered (600 wide or more): every corner round, it rises a little and fades in. */
+.form .sheet {
+  border-radius: 34px;
+  transform: translateY(40px);
+  opacity: 0;
+  transition:
+    transform 340ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 200ms ease;
+}
+/* The iPhone Duo's outer display: the grid and the segmented control, then the vertical bar on the right. */
+.sideBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.barTabs {
+  display: flex;
+  justify-content: center;
+  padding: 12px 8px 10px;
+}
+.vbar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+}
+.form .grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+.on .shim {
+  opacity: 1;
+}
+.on .sheet {
+  transform: none;
+  opacity: 1;
+}
+
+.handle {
+  align-self: center;
+  width: 32px;
+  height: 4px;
+  margin-top: 16px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.4;
+}
+.bar {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 10px;
+}
+.close,
+.done {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sys-fill);
+  color: var(--sys-fg);
+  cursor: pointer;
+  padding: 0;
+}
+.done {
+  justify-self: end;
+  background: var(--sys-tint);
+  color: #ffffff;
+  opacity: 0.35;
+}
+.android .close {
+  background: none;
+}
+.sym {
+  font-family: 'Material Symbols Rounded';
+  font-size: 22px;
+  line-height: 1;
+}
+.tabs {
+  justify-self: center;
+  display: flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--sys-fill);
+}
+.tab {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.tabOn {
+  background: var(--sys-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.android .tabs {
+  gap: 8px;
+  background: none;
+}
+.android .tab {
+  border: 1px solid var(--sys-fill);
+  font-weight: 500;
+}
+.android .tabOn {
+  background: var(--sys-fill);
+  box-shadow: none;
+}
+
+.grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: min-content;
+  gap: 2px;
+}
+.android .grid {
+  padding: 0 4px;
+  gap: 4px;
+}
+.cell {
+  aspect-ratio: 1;
+  border: none;
+  padding: 0;
+  background: var(--sys-fill);
+  cursor: pointer;
+  overflow: hidden;
+}
+.android .cell {
+  border-radius: 4px;
+}
+.cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* iPadOS's picker (centered, 600 wide or more): a sidebar in a panel of its own, then the title, the search, a grid of
+   five and the foot's options over a fade. */
+.split {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 12px 0 0 12px;
+}
+.sidebar {
+  flex: none;
+  width: 238px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 10px 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--sys-fill);
+}
+.sideClose {
+  width: 36px;
+  height: 36px;
+  margin: 0 0 14px 4px;
+  border: none;
+  background: none;
+  color: var(--sys-fg);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.sideClose .sym {
+  font-size: 28px;
+}
+.sideRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 17px;
+}
+.sideOn {
+  background: var(--sys-fill);
+  font-weight: 600;
+}
+.sideHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 12px 6px;
+  font-size: 17px;
+  font-weight: 600;
+  opacity: 0.4;
+}
+.content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.contentBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px 14px 20px;
+}
+.contentTitle {
+  font-size: 20px;
+  font-weight: 700;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  width: 190px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--sys-fill);
+}
+.searchHint {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  opacity: 0.45;
+}
+.form .content .grid {
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  padding-bottom: 64px;
+}
+.foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 20px 14px;
+  background: linear-gradient(transparent, var(--sys-bg) 60%);
+  pointer-events: none;
+}
+.footRound {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sys-bg);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+.footOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 17px;
+  font-weight: 600;
+}

@@ -1,0 +1,71 @@
+/* The tokens a connected app gives its screens (the app's theme writes them, src/app/theme.css): the kit's overlays
+   and the simulator read only these, so any app's look reaches them. Each screen root carries data-theme; these are
+   the defaults when an app leaves one out. Colors per theme; sizes and type for both. */
+
+[data-theme] {
+  /* Space: a 4-point scale. */
+  --app-space-xs: 4px;
+  --app-space-s: 8px;
+  --app-space-m: 12px;
+  --app-space-l: 16px;
+  --app-space-xl: 24px;
+  --app-space-xxl: 32px;
+  --app-space-xxxl: 40px;
+  --app-space-huge: 48px;
+  /* Corners. */
+  --app-radius-s: 8px;
+  --app-radius-m: 12px;
+  --app-radius-l: 16px;
+  --app-radius-xl: 24px;
+  --app-radius-xxl: 32px;
+  --app-radius-full: 999px;
+  /* Type: `font` shorthands. */
+  --app-font-title: 700 28px/34px Inter, system-ui, sans-serif;
+  --app-font-heading: 600 20px/26px Inter, system-ui, sans-serif;
+  --app-font-subheading: 600 17px/22px Inter, system-ui, sans-serif;
+  --app-font-body: 400 16px/22px Inter, system-ui, sans-serif;
+  --app-font-label: 500 15px/20px Inter, system-ui, sans-serif;
+  --app-font-caption: 400 13px/18px Inter, system-ui, sans-serif;
+  /* The dim behind a modal (sheets, dialogs). */
+  --app-scrim: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='light'] {
+  --app-page: #f2f2f7;
+  --app-surface: #ffffff;
+  --app-text: #111114;
+  --app-text-secondary: #3c3c43;
+  --app-text-muted: #8a8a8e;
+  --app-icon: #111114;
+  --app-border: #e3e3e8;
+  --app-primary: #3b5bfd;
+  --app-on-primary: #ffffff;
+  --app-secondary: #e8ecff;
+  --app-on-secondary: #2440d8;
+  --app-pressed: rgba(0, 0, 0, 0.06);
+  --app-danger: #e5383b;
+  --app-success: #1a9e55;
+  --app-info: #3b5bfd;
+  --app-handle: #c7c7cc;
+  --app-elevation: 0 2px 4px rgba(20, 20, 30, 0.08), 0 8px 24px rgba(20, 20, 30, 0.1);
+}
+
+[data-theme='dark'] {
+  --app-page: #000000;
+  --app-surface: #1c1c1e;
+  --app-text: #f5f5f7;
+  --app-text-secondary: #d1d1d6;
+  --app-text-muted: #8e8e93;
+  --app-icon: #f5f5f7;
+  --app-border: #38383a;
+  --app-primary: #6d86ff;
+  --app-on-primary: #ffffff;
+  --app-secondary: #23284a;
+  --app-on-secondary: #b7c3ff;
+  --app-pressed: rgba(255, 255, 255, 0.08);
+  --app-danger: #ff5a5f;
+  --app-success: #34c46c;
+  --app-info: #6d86ff;
+  --app-handle: #545458;
+  --app-elevation: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+}

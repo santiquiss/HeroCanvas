@@ -1,0 +1,1035 @@
+/* Designer chrome around the device: neutral, compact, Figma-like. */
+.panel {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-size: 12px;
+  line-height: 16px;
+}
+.left {
+  width: 248px;
+  border-right: 1px solid var(--ui-line);
+}
+.right {
+  width: 272px;
+  border-left: 1px solid var(--ui-line);
+}
+/* Resize handle on the panel's inner edge: a hairline shows on hover and while dragging. */
+.resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 9px;
+  z-index: 5;
+  cursor: col-resize;
+  touch-action: none;
+}
+.resizeL {
+  right: -5px;
+}
+.resizeR {
+  left: -5px;
+}
+.resize::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 1px;
+  background: #0d99ff;
+  opacity: 0;
+  transition: opacity 120ms ease 80ms;
+}
+.resize:hover::after,
+.resizing::after {
+  opacity: 1;
+}
+.tabs {
+  flex: none;
+  display: flex;
+  gap: 2px;
+  padding: 8px 6px 0;
+  /* Every tab shows its name: a panel dragged narrow scrolls them instead of cutting one. */
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--ui-line-subtle);
+}
+.tab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 6px 8px;
+  white-space: nowrap;
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.tabOn {
+  color: var(--ui-text);
+  border-bottom-color: var(--ui-strong);
+}
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Sections (inspector) */
+/* Sections are told apart by a line darker than the panel's own edge. */
+.section {
+  padding: 12px;
+  border-bottom: 1px solid var(--ui-line-strong);
+}
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ui-text);
+}
+/* A closed section (Inspect): its title alone. */
+.sectionClosed {
+  margin-bottom: 0;
+}
+.section:has(> .sectionClosed) > :not(.sectionTitle) {
+  display: none;
+}
+/* A section's icon (Components' Info and Props) and a note on the title's right (PanelSection). */
+.sectionIcon {
+  margin: 0 4px 0 2px;
+}
+.sectionAside {
+  color: var(--ui-text-subtle);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: right;
+}
+/* A section title that opens and closes its section (PanelSection: Inspect, Info, Props). */
+.sectionToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -4px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 6px 8px;
+  align-items: baseline;
+}
+.k {
+  color: var(--ui-text-muted);
+}
+/* A row's name with its picture (Inspect: a glyph or a Material Symbol of the value). */
+.kIcon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: start;
+  min-height: 16px;
+}
+.kIcon > :first-child {
+  flex: none;
+  width: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--ui-text-subtle);
+}
+/* Inspect's alignment diagram: a small flex box laid out as the inspected one. */
+.alignDiagram {
+  flex: none;
+  display: flex;
+  gap: 3px;
+  width: 56px;
+  height: 34px;
+  padding: 4px;
+  box-sizing: border-box;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 4px;
+  background: var(--ui-bg-subtle);
+}
+.alignRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Inspect's padding diagram: the values around a content box, as wide as the panel's value column. */
+.paddingDiagram {
+  display: grid;
+  grid-template: '. t .' auto 'l c r' 22px '. b .' auto / auto minmax(16px, 1fr) auto;
+  align-items: center;
+  justify-items: center;
+  gap: 2px 6px;
+  padding: 4px 6px;
+  border: 1px dashed var(--ui-line-strong);
+  border-radius: 4px;
+  font: 500 10px/14px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.paddingContent {
+  align-self: stretch;
+  justify-self: stretch;
+  border-radius: 2px;
+  background: var(--ui-blue-soft);
+  box-shadow: inset 0 0 0 1px #0d99ff;
+}
+.v {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+.muted {
+  color: var(--ui-text-subtle);
+}
+.badge {
+  flex: none;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: var(--ui-hover);
+  color: var(--ui-text-2);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--ui-bg-subtle);
+}
+/* A small icon-only button beside a control (Props: × clears a nullable prop). */
+.iconBtn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--ui-text-subtle);
+  cursor: pointer;
+}
+.iconBtn:hover {
+  background: var(--ui-hover);
+  color: var(--ui-text);
+}
+/* A button that's the current choice (a flow step's state). */
+.btnActive,
+.btnActive:hover {
+  border-color: var(--ui-strong);
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+/* Inspect: a size or position the layout works out (not set in the code), lighter than one that's set. */
+.computed {
+  color: var(--ui-text-subtle);
+}
+/* Which name a line of Inspect is (code, CSS), before it. */
+.nameTag {
+  display: inline-block;
+  min-width: 42px;
+  margin-right: 4px;
+  font: 600 9px/14px Inter, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ui-text-subtle);
+}
+/* A token's name in Inspect, opening it in Components › Tokens. */
+.tokenLink {
+  padding: 0;
+  border: none;
+  background: none;
+  font: 11px/16px ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ui-blue-text);
+  text-align: left;
+  cursor: pointer;
+}
+.tokenLink:hover {
+  text-decoration: underline;
+}
+/* Buttons for one choice among a few (Inspect's scope), sharing the row. */
+.segment {
+  display: flex;
+  gap: 4px;
+}
+.segment > .btn {
+  flex: 1;
+  justify-content: center;
+  height: 28px;
+}
+
+/* Tree rows (Pages) */
+/* The search stays at the top of its panel while the list scrolls under it. */
+.searchBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  background: var(--ui-bg);
+}
+.searchInput {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+/* A button of the list's own beside the search (Pages' Collapse all): the field's height, its border. */
+.searchAction {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: 8px 8px 4px -2px;
+  padding: 0;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.searchAction:hover:not(:disabled) {
+  background: var(--ui-bg-subtle);
+  color: var(--ui-text);
+}
+.searchAction:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.search {
+  margin: 8px 8px 4px;
+  height: 28px;
+  width: calc(100% - 16px);
+  padding: 0 26px 0 8px;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  font: inherit;
+  outline: none;
+}
+.search:focus {
+  border-color: var(--ui-strong);
+}
+.searchClear {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--ui-hover);
+  color: var(--ui-text-muted);
+  cursor: pointer;
+}
+.searchClear:hover {
+  background: var(--ui-fill);
+  color: var(--ui-text);
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding-right: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.row:hover {
+  background: var(--ui-bg-subtle);
+}
+.inStack {
+  background: var(--ui-hover);
+}
+.current,
+.current:hover {
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+.current .badge {
+  background: color-mix(in srgb, var(--ui-on-strong) 18%, transparent);
+  color: var(--ui-on-strong);
+}
+.current .muted {
+  color: color-mix(in srgb, var(--ui-on-strong) 60%, transparent);
+}
+.caret {
+  width: 16px;
+  flex: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+.crumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.crumb:hover {
+  background: var(--ui-bg-subtle);
+}
+
+/* A flow's step number in the Pages tree */
+.stepNum {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--ui-hover);
+  color: var(--ui-text-2);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* An inline text button (e.g. a flow step to jump to) */
+.link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--ui-blue-text);
+  text-align: left;
+  cursor: pointer;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Scenarios: a control and its options as chips */
+.controlLabel {
+  color: var(--ui-text-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Pages: a variant's (or a mode's) icon, softer than a page's. */
+.variantIcon {
+  display: flex;
+  color: var(--ui-text-subtle);
+}
+.current .variantIcon {
+  color: inherit;
+}
+
+/* Pages: a group of roots (Before the app, App) when there are boot pages. */
+.treeGroup {
+  margin: 10px 8px 2px;
+  color: var(--ui-text-subtle);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* Scenarios' settings: the name on the left, a dropdown or a switch on the right. */
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0;
+}
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+}
+.settingLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--ui-text-2);
+  font-size: 12px;
+}
+/* An override: not the persona's own value. */
+.overriddenDot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0d99ff;
+}
+.settingNote {
+  color: var(--ui-text-subtle);
+  font-size: 11px;
+  line-height: 15px;
+}
+/* A native select over the value and a caret: the browser's own list, our look. */
+.settingSelect {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 60%;
+  height: 26px;
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.settingSelect:hover {
+  border-color: var(--ui-line-strong);
+}
+.settingSelect select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.settingValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.switch {
+  position: relative;
+  flex: none;
+  width: 30px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: var(--ui-fill-strong);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ui-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 150ms ease;
+}
+.switchOn {
+  background: #0d99ff;
+}
+.switchOn::after {
+  transform: translateX(12px);
+}
+
+/* Scenarios: the persona in use, and a dropdown with the others (PersonaPicker) */
+.personaPicker {
+  position: relative;
+}
+.persona {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.personaTrigger {
+  border-color: var(--ui-line);
+  background: var(--ui-bg);
+}
+.personaTrigger:hover,
+.personaTriggerOpen {
+  border-color: var(--ui-line-strong);
+}
+/* A bit wider than the card it opens from; shadow only here, nothing under it scrolls or animates */
+.personaMenu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: -6px;
+  right: -6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: min(460px, 70vh);
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--ui-line);
+  border-radius: 14px;
+  background: var(--ui-bg);
+  box-shadow: 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
+}
+.personaMenu .persona:hover,
+.personaMenu .persona:focus-visible {
+  background: var(--ui-bg-subtle);
+  outline: none;
+}
+.personaOn,
+.personaMenu .personaOn:hover {
+  background: var(--ui-hover);
+}
+.personaAvatar {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(21, 24, 28, 0.06);
+}
+.personaInitial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-hover);
+  color: var(--ui-text-2);
+  font-size: 17px;
+  font-weight: 600;
+}
+.personaText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.personaHead {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.personaName {
+  margin-right: 2px;
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.personaBadge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: var(--ui-hover);
+  color: var(--ui-text-2);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 18px;
+}
+.personaBadgePlus {
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+.personaTagline {
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  line-height: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* The persona's own value, under an override */
+
+.figmaMap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  line-height: 16px;
+}
+.figmaMap + .figmaMap {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.statusChip {
+  padding: 0 6px;
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+}
+.todo {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--ui-text-2);
+  line-height: 16px;
+}
+.parts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.part {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.part:hover {
+  background: var(--ui-bg-subtle);
+}
+.apiHead {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+  line-height: 15px;
+}
+.params {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.param {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 16px;
+}
+/* A parameter the screen sets: a small mark in the selection's blue, beside its name in bold. */
+.setMark {
+  flex: none;
+  width: 3px;
+  height: 12px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background: #0d99ff;
+}
+/* A parameter at its default: the same mark, a light gray. */
+.defaultMark {
+  background: var(--ui-fill);
+}
+.review {
+  display: block;
+  margin: 1px 0 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--ui-amber-soft);
+  color: var(--ui-amber-text);
+  font-size: 11px;
+  line-height: 15px;
+}
+.version {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+.version:hover {
+  background: var(--ui-bg-subtle);
+}
+.versionOn,
+.versionOn:hover {
+  border-color: var(--ui-strong);
+  background: var(--ui-bg);
+}
+.versionKey {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--ui-hover);
+  font-size: 11px;
+  font-weight: 700;
+}
+.versionOn .versionKey {
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+
+/* A slider with a stop per step (the system's text size), between a small and a big A. */
+.stepSlider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  color: var(--ui-text-muted);
+  font-weight: 600;
+  line-height: 1;
+}
+.stepTrack {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  /* The empty track and the default's tick: a step stronger in dark, where the panel's fills barely show. */
+  --step-rest: var(--ui-fill-strong);
+  --step-tick: var(--ui-mid);
+}
+:global([data-ui='dark']) .stepTrack {
+  --step-rest: var(--ui-mid);
+  --step-tick: var(--ui-text-subtle);
+}
+.stepTrack input {
+  /* Drawn here, not the browser's (whose track turns dark against a light accent): filled up to the thumb (--at). */
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.stepTrack input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #0d99ff var(--at), var(--step-rest) var(--at));
+}
+.stepTrack input::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #0d99ff var(--at), var(--step-rest) var(--at));
+}
+.stepTrack input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: none;
+  border-radius: 50%;
+  /* White in both themes (as Figma's): the panel's own color vanished on the dark panel. */
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.12), 0 1px 3px rgba(15, 20, 30, 0.3);
+}
+.stepTrack input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 50%;
+  /* White in both themes (as Figma's): the panel's own color vanished on the dark panel. */
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.12), 0 1px 3px rgba(15, 20, 30, 0.3);
+}
+/* The default step: a tick under the track (7px: half the thumb, where the track's ends are). */
+.stepOwn {
+  position: absolute;
+  top: 100%;
+  width: 2px;
+  height: 4px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--step-tick);
+  pointer-events: none;
+}
+
+/* Layers: what the two component colors mean. */
+.layersLegend {
+  display: flex;
+  gap: 12px;
+  padding: 2px 12px 8px;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+}
+.layersLegend > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Props: a color from the theme's tokens, as a swatch and its name (TokenColorSelect). */
+.tokenSelect {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.tokenButton,
+.tokenOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: var(--ui-text);
+  cursor: pointer;
+}
+.tokenButton {
+  height: 26px;
+  padding: 0 4px 0 6px;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  background: var(--ui-bg);
+}
+.tokenButton > :last-child {
+  margin-left: auto;
+  color: var(--ui-text-subtle);
+}
+.tokenMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: max(100%, 220px);
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--ui-bg);
+  box-shadow:
+    0 0 0 1px rgba(15, 20, 30, 0.08),
+    0 6px 20px rgba(15, 20, 30, 0.14);
+}
+.tokenOption {
+  padding: 6px;
+  border-radius: 5px;
+}
+.tokenOption:hover {
+  background: var(--ui-blue-soft);
+}
+.tokenOptionOn {
+  background: var(--ui-blue-soft);
+}
+.swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(15, 20, 30, 0.14);
+}
+/* None: a struck-through empty swatch. */
+.swatchNone {
+  background: linear-gradient(to top right, transparent calc(50% - 0.75px), var(--ui-fill-strong) calc(50% - 0.75px), var(--ui-fill-strong) calc(50% + 0.75px), transparent calc(50% + 0.75px));
+}
+.tokenName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tokenGroup {
+  flex: none;
+  margin-left: auto;
+  color: var(--ui-text-subtle);
+  font-size: 11px;
+}
+.tokenButton .tokenGroup {
+  display: none;
+}
+
+/* Components list: the state filter (CheckDropdown) and Tiers / A–Z, side by side under the search. */
+.listTools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px 6px;
+}
+.listTools > :first-child {
+  flex: 1;
+}
+.listTools > .segment > .btn {
+  flex: none;
+}

@@ -1,0 +1,247 @@
+.wrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--hc-canvas-base);
+}
+/* The prototype's canvas (dots, dark with the interface's theme), scrolling with the content. */
+.scroll {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  background: var(--hc-canvas);
+  background-attachment: local;
+}
+.root {
+  min-height: 100%;
+  padding: 28px 32px 64px;
+  color: var(--hc-canvas-text);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/* Header */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: var(--hc-canvas-chip-solid);
+  color: var(--hc-canvas-icon);
+  box-shadow: 0 0 0 1px var(--hc-canvas-chip-line);
+}
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.note {
+  margin: 0 0 20px;
+  color: var(--hc-canvas-muted);
+  max-width: 640px;
+}
+
+/* The examples' theme, at the header's right. */
+/* Stories */
+.stories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 32px;
+  align-items: flex-start;
+}
+.story {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 120px;
+}
+.storyHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hc-canvas-icon);
+}
+.storyActive .storyHead {
+  color: #0d99ff;
+}
+.dim {
+  font-weight: 400;
+  color: var(--hc-canvas-muted);
+}
+.frame {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--pg);
+  color: var(--tx);
+  box-shadow: 0 1px 2px rgba(15, 20, 30, 0.08), 0 0 0 1px rgba(15, 20, 30, 0.06);
+  transition: background 200ms;
+}
+.storyActive .frame {
+  box-shadow: 0 0 0 2px #0d99ff;
+}
+.action {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+.storyNote {
+  max-width: 360px;
+  font-size: 12px;
+  color: var(--hc-canvas-muted);
+}
+
+/* Overview */
+.tier {
+  margin: 24px 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--hc-canvas-muted);
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--ui-bg);
+  text-align: left;
+  font: inherit;
+  color: var(--ui-text);
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.06);
+}
+.card:hover {
+  box-shadow: 0 0 0 1px #0d99ff;
+}
+.cardOff {
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.1);
+  color: var(--ui-text-subtle);
+}
+.cardName {
+  font-weight: 600;
+}
+.meter {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--ui-fill);
+  overflow: hidden;
+  max-width: 320px;
+  margin-top: 8px;
+}
+.meter > div {
+  height: 100%;
+  background: #16a34a;
+}
+
+/* In Figma */
+.figmaList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 24px;
+  max-width: 880px;
+}
+.figma {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  box-shadow: 0 0 0 1px rgba(15, 20, 30, 0.08);
+}
+.figmaHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.figmaTitle {
+  font-weight: 600;
+}
+.status {
+  padding: 1px 7px;
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+}
+.props {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+}
+.prop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+}
+.propName {
+  flex: 0 0 150px;
+  color: var(--ui-text-muted);
+}
+.propOptions {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chip {
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--ui-hover);
+  font-size: 12px;
+  line-height: 18px;
+}
+.figmaDiff {
+  margin: 10px 0 0;
+  color: var(--ui-text-2);
+}
+.todo {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--ui-text-2);
+}

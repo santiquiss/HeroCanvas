@@ -1,0 +1,464 @@
+/* A component's page, in the right panel's sections (tools/PanelSection: Info, Props). */
+/* Status: a note in its dot's color (the dot is on Info's tab). */
+.state {
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+  gap: 4px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--state);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--state) 8%, transparent);
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--ui-text-2);
+}
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.reasons > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 8px;
+}
+.reasons > li > span {
+  flex: 1;
+  min-width: 0;
+}
+/* The differences accepted as they are, under the state: quiet, with why, who and when. */
+.acceptedList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.acceptedItem {
+  display: flex;
+  gap: 6px;
+  color: #16a34a;
+  font-size: 12px;
+  line-height: 17px;
+}
+.acceptedItem > :first-child {
+  margin-top: 1px;
+}
+.acceptedText {
+  display: block;
+  color: var(--ui-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: rgba(107, 114, 128, 0.5);
+}
+.acceptedWhy {
+  display: block;
+  color: var(--ui-text-2);
+}
+.where {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+.whereHead {
+  color: var(--ui-text-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.proposalLink {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--state);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.proposalLink:hover {
+  text-decoration: underline;
+}
+.stateLabel {
+  color: var(--state);
+  font-weight: 650;
+}
+.mono {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11.5px;
+}
+.muted {
+  color: var(--ui-text-subtle);
+}
+
+/* Props */
+.ctors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.table th {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--ui-line-subtle);
+  color: var(--ui-text-subtle);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.table td {
+  padding: 7px 8px;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.table tbody tr + tr td {
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.table td:last-child {
+  width: 38%;
+}
+/* The parameter's type, under its name. */
+.type {
+  display: block;
+  margin-top: 1px;
+  color: var(--ui-text-subtle);
+  font-size: 11px;
+}
+.table .mono {
+  overflow-wrap: normal;
+}
+.req,
+.simOnly,
+.differs,
+.acceptedBadge,
+.proposed {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 15px;
+  vertical-align: 1px;
+}
+.req {
+  background: var(--ui-hover);
+  color: var(--ui-text-muted);
+}
+/* The simulator's alone: not a difference, so neutral. */
+.simOnly {
+  background: var(--ui-fill);
+  color: var(--ui-text-muted);
+}
+
+/* A parameter a proposal adds: the color of a change. */
+.proposed {
+  background: rgba(255, 45, 149, 0.14);
+  color: #c8006b;
+}
+.extra td {
+  background: var(--ui-amber-soft);
+}
+/* Which example the controls edit. */
+.editing {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ui-text-subtle);
+  font-size: 11.5px;
+}
+/* The Props tab's list: a prop's name and type on the left, its control or value on the right. */
+.params {
+  display: flex;
+  flex-direction: column;
+}
+.param {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(96px, 48%);
+  gap: 8px;
+  align-items: start;
+  padding: 7px 0;
+  font-size: 12px;
+}
+.param + .param {
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.paramWide {
+  grid-template-columns: minmax(0, 1fr);
+}
+.paramExtra {
+  margin: 0 -6px;
+  padding: 7px 6px;
+  background: var(--ui-amber-soft);
+}
+.paramName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.paramValue {
+  display: flex;
+  align-items: center;
+  min-height: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Parameters the simulator's component doesn't take yet: below the rest, quieter. */
+.paramsGroup {
+  display: block;
+  margin: 10px 0 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ui-line-subtle);
+  color: var(--ui-text-subtle);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.paramMuted .mono {
+  color: var(--ui-text-muted);
+}
+.acceptedBadge {
+  background: var(--ui-green-soft);
+  color: var(--ui-green-text);
+}
+.differs {
+  background: var(--ui-amber-soft);
+  color: var(--ui-amber-text);
+}
+.review {
+  display: block;
+  margin-top: 3px;
+  color: var(--ui-amber-text);
+  font-size: 11px;
+  line-height: 15px;
+}
+
+/* Chips: constructors, variants, use cases, options */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 7px;
+  border: none;
+  border-radius: 5px;
+  background: var(--ui-hover);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 11.5px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+button.chip,
+a.chip {
+  cursor: pointer;
+}
+button.chip:hover,
+a.chip:hover {
+  background: var(--ui-blue-soft);
+  color: var(--ui-blue-text);
+}
+.chipCount {
+  margin-left: 4px;
+  color: var(--ui-text-subtle);
+  font-size: 10.5px;
+}
+.chipOn {
+  background: #0d99ff;
+  color: #ffffff;
+}
+.more {
+  color: var(--ui-text-muted);
+}
+
+/* Used in */
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ui-text-muted);
+}
+.loading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Used in: two lists, the components it's inside and the pages it's on by itself. */
+.usedHead {
+  display: block;
+  margin: 4px 0 2px;
+  color: var(--ui-text-subtle);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.places + .usedHead,
+.places + .usedHead + .muted {
+  margin-top: 12px;
+}
+/* A row's kind: the component's tier icon (as the Components list), or the page's (as Pages). */
+.placeIcon {
+  flex: none;
+  color: var(--ui-text-muted);
+}
+.places {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -8px;
+}
+.placeGroup {
+  padding-bottom: 6px;
+}
+.place {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.place > :last-child {
+  color: var(--ui-text-faint);
+}
+.times {
+  margin-left: auto;
+  color: var(--ui-text-subtle);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.place:hover {
+  background: var(--ui-blue-soft);
+}
+.place:hover > :last-child {
+  color: #0d99ff;
+}
+.variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+/* Notes: each a label over its content (the panel is narrow). */
+.mapping {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  font-size: 12.5px;
+  line-height: 18px;
+}
+.mapping + .mapping {
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.label {
+  color: var(--ui-text-subtle);
+  font-size: 12px;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.option {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+.optionName {
+  color: var(--ui-text-2);
+}
+.about {
+  margin: 0;
+  color: var(--ui-text-2);
+}
+.bullets,
+.todo {
+  margin: 0;
+  padding-left: 16px;
+}
+.bullets li + li,
+.todo li + li {
+  margin-top: 3px;
+}
+.todo li::marker {
+  content: '☐  ';
+  color: var(--ui-text-subtle);
+}
+
+/* Links */
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 -8px;
+}
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.link > :first-child {
+  color: var(--ui-text-muted);
+}
+.link > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.link > :last-child {
+  color: var(--ui-text-faint);
+}
+.link:hover {
+  background: var(--ui-blue-soft);
+}
+.path {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Why a simulator prop is the simulator's (what the code does instead), under its row. */
+.paramNote {
+  display: block;
+  margin-top: 3px;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  line-height: 15px;
+}

@@ -1,0 +1,301 @@
+.wrap {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--hc-canvas);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.dragging {
+  cursor: grabbing;
+}
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+.edges {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.edgeLabel {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: var(--ui-bg);
+  box-shadow: 0 0 0 1px var(--ui-line-strong);
+  color: var(--ui-text-2);
+  font-size: 11px;
+  line-height: 15px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nodeHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  color: var(--hc-canvas-text);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.nodeHead .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.badge {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--ui-fill);
+  color: var(--ui-text-2);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+.thumb {
+  position: relative;
+  overflow: hidden;
+  /* Off screen (zoomed in), a thumbnail isn't laid out or painted. */
+  content-visibility: auto;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(15, 20, 30, 0.18), 0 0 0 1px rgba(15, 20, 30, 0.08);
+  transition: box-shadow 150ms;
+}
+.thumb:hover {
+  box-shadow: 0 10px 30px rgba(15, 20, 30, 0.18), 0 0 0 3px #0d99ff;
+}
+.thumbInner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.current {
+  box-shadow: 0 10px 30px rgba(15, 20, 30, 0.18), 0 0 0 3px var(--ui-strong);
+}
+.variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 46px;
+  overflow: hidden;
+}
+.variant {
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 9999px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.variantOn {
+  background: var(--ui-strong);
+  border-color: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+.zoom {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--ui-bg);
+  box-shadow: 0 4px 16px rgba(15, 20, 30, 0.15);
+  cursor: default;
+}
+.zoom button {
+  min-width: 30px;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.zoom button:hover {
+  background: var(--ui-hover);
+}
+.hint {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--ui-float);
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  pointer-events: none;
+}
+
+/* A flow's steps (FlowStrip) */
+.stripEdges {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+.step {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stepName {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 18px;
+  color: var(--hc-canvas-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.stepName .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stepNum {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--hc-canvas-text);
+  color: var(--hc-canvas-base);
+  font-size: 10px;
+  font-weight: 700;
+}
+.stepEdgeLabel {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: var(--ui-bg);
+  box-shadow: 0 0 0 1px var(--ui-line-strong);
+  color: var(--ui-text-2);
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* Over a straight arrow: left-aligned in the gap, wrapping */
+.stepEdgeSide {
+  transform: translate(0, -100%);
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  white-space: normal;
+  line-height: 13px;
+}
+.stepEdgeBelow {
+  transform: translate(-50%, 0);
+}
+
+/* A section's frame (a lane): its root and everything under it, its title at a constant size on screen (--inv). */
+.lane {
+  position: absolute;
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--hc-canvas-text) 4%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc-canvas-text) 8%, transparent);
+}
+.laneTitle {
+  position: absolute;
+  left: 56px;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  color: var(--hc-canvas-text);
+  font-size: calc(18px * var(--inv, 1));
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Far out (semantic zoom): a page's name at a constant size on screen, over its card; a card instead of the screen. */
+.farHead {
+  position: relative;
+  height: 30px;
+}
+.farHead .name {
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  max-width: calc(100% + 64px);
+  overflow: hidden;
+  color: var(--hc-canvas-text);
+  font-size: calc(12px * var(--inv, 1));
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* Far out, a page's open comments sit inside its card's top left corner (the status dot is on the right), at the
+   name's constant size. */
+.farCount {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% + 4px);
+  left: 4px;
+  display: flex;
+  transform: scale(var(--inv, 1));
+  transform-origin: left top;
+}
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hc-canvas-chip-solid);
+  color: var(--hc-canvas-icon);
+}
+.cardDot {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}

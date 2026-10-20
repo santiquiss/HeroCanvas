@@ -1,0 +1,116 @@
+/* Real mode (sim/RealShell): the app fills the window of the device in hand. The page itself doesn't scroll, bounce
+   or zoom; the app's own scroll areas do. */
+:global(html[data-real]),
+:global(html[data-real] body) {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+.screen {
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+/* A page that stays in portrait on a turned device: centered, turned with it. */
+.turned {
+  left: 50%;
+  top: 50%;
+}
+
+/* The designer's own controls over the app: a panel from the bottom. */
+.shim {
+  position: fixed;
+  inset: 0;
+  z-index: 2001;
+  background: rgba(10, 12, 16, 0.35);
+}
+.panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2002;
+  max-width: 480px;
+  max-height: 90%;
+  margin: 0 auto;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: 16px 16px 0 0;
+  background: #ffffff;
+  color: #15181c;
+  font: 14px/20px Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 -8px 30px rgba(15, 20, 30, 0.25);
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+}
+.info {
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 16px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+.row > span {
+  color: #6b7280;
+}
+/* 16px: under it iOS zooms the page when a field takes focus. */
+.select,
+.btn,
+.seg > button {
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #d2d6dc;
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+}
+.select {
+  width: 100%;
+  padding: 0 8px;
+}
+.seg {
+  display: flex;
+  gap: 6px;
+}
+.seg > button {
+  flex: 1;
+}
+.seg > button[aria-pressed='true'] {
+  border-color: #0072c8;
+  background: #e6f1fb;
+  color: #00518f;
+  font-weight: 600;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.btn {
+  flex: 1;
+  cursor: pointer;
+}
+.close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #f0f2f5;
+  display: grid;
+  place-items: center;
+  color: inherit;
+}

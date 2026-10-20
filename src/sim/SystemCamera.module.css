@@ -1,0 +1,220 @@
+/* The system's camera (sim/SystemCamera): black, edge to edge, the system's type. Over the app's sheets (90) and
+   under the system chrome (95), which hides its status bar over it (data-status-bar). Motion: transform and opacity. */
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 92;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+  color: #ffffff;
+  font-family: -apple-system, 'SF Pro Text', Inter, sans-serif;
+  transform: translateY(100%);
+  transition: transform 340ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.android {
+  font-family: Roboto, Inter, sans-serif;
+}
+.on {
+  transform: none;
+}
+
+.top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  box-sizing: content-box;
+  padding: 0 16px;
+}
+.topIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+}
+.sym {
+  font-family: 'Material Symbols Rounded';
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* The viewfinder: 3:4 on iOS under the top bar; Android's fills the rest. */
+.view {
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  max-height: 70%;
+  margin: 0 auto;
+}
+.android .view {
+  flex: 1;
+  aspect-ratio: auto;
+  max-height: none;
+  border-radius: 20px;
+  margin: 0 8px;
+  width: auto;
+}
+.feed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mirror {
+  scale: -1 1;
+}
+/* A hand-held phone: the picture drifts a few points. */
+.live {
+  animation: drift 6s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  from {
+    transform: scale(1.06) translate(-1%, -0.6%);
+  }
+  to {
+    transform: scale(1.06) translate(1%, 0.8%);
+  }
+}
+.flash {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  animation: flash 260ms ease-out;
+  pointer-events: none;
+}
+@keyframes flash {
+  from {
+    opacity: 0.9;
+  }
+}
+
+.bottom {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 12px 20px 0;
+}
+.android .bottom {
+  flex: none;
+  padding-top: 24px;
+}
+.mode {
+  align-self: center;
+  color: #ffd60a;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.row > :first-child {
+  justify-self: start;
+}
+.row > :last-child {
+  justify-self: end;
+}
+.text {
+  border: none;
+  background: none;
+  color: #ffffff;
+  font: inherit;
+  font-size: 17px;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+.shutter {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 3px #000000;
+  cursor: pointer;
+  padding: 0;
+  transition: scale 120ms ease;
+}
+.shutter:active {
+  scale: 0.92;
+}
+.android .shutter {
+  width: 76px;
+  height: 76px;
+}
+.round {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0;
+}
+.accept {
+  width: 72px;
+  height: 72px;
+  background: #ffffff;
+  color: #000000;
+}
+.slot {
+  width: 48px;
+}
+
+/* Turned, or beside the iPhone Duo's column: the viewfinder fills the screen and the controls stand in a column on
+   the right, the main one in the middle. */
+.aside {
+  flex-direction: row;
+}
+.aside .view {
+  flex: 1;
+  aspect-ratio: auto;
+  max-height: none;
+  width: auto;
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+}
+.viewIcon {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+.aside .bottom {
+  flex: none;
+  height: 100%;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  align-items: center;
+  justify-content: flex-start;
+}
+.aside .row {
+  flex: 1;
+  grid-template-columns: none;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
+}
+.aside .row > :first-child {
+  justify-self: center;
+  align-self: start;
+}
+.aside .row > :last-child {
+  justify-self: center;
+  align-self: end;
+}

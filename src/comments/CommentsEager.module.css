@@ -1,0 +1,36 @@
+/* What the comments plugin shows before its pins and panel load: the open counts and the comment cursor. */
+
+/* Open counts: the panel's tab, a Flow card. */
+.count {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #15181c;
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.flowCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #15181c;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+/* Comment mode (the page's root has data-hc-commenting): a comment cursor over every device on the canvas. */
+:global([data-hc-commenting]) :global([data-comment-device]),
+:global([data-hc-commenting]) :global([data-comment-device]) * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M2 22V12a10 10 0 1 1 10 10z' fill='%230d99ff' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E")
+      2 22,
+    crosshair !important;
+}

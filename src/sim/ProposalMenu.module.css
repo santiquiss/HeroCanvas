@@ -1,0 +1,279 @@
+/* ProposalMenu: the toolbar's design picker (the designer's own UI, as CheckDropdown). */
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+/* Back to Live: a small quiet button before the proposal's. */
+.back {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  padding: 0 8px 0 6px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.back:hover {
+  background: var(--ui-hover);
+  color: var(--ui-text);
+}
+/* As the toolbar's selects (Toolbar.module.css .select). */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  max-width: 320px;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.trigger:hover,
+.triggerOpen {
+  background: var(--ui-bg-subtle);
+}
+.triggerProposal,
+.triggerProposal:hover {
+  border-color: #f59e0b;
+  background: var(--ui-amber-soft);
+}
+.trigger:focus-visible {
+  outline: 2px solid #0d99ff;
+  outline-offset: 1px;
+}
+/* The picked proposal's code on the button: its reference, in figures of equal width. */
+.trigger .code {
+  padding: 0;
+  background: none;
+  color: var(--ui-amber-text);
+  font-family: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.triggerTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.code {
+  flex: none;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--ui-fill);
+  color: var(--ui-text-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 600px;
+  max-width: calc(100vw - 24px);
+  max-height: min(560px, calc(100vh - 80px));
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  background: var(--ui-bg);
+  box-shadow: 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
+}
+/* The table's columns: the check, code, the proposal (title over summary), status, who, when. */
+.cols {
+  display: grid;
+  grid-template-columns: 16px 44px minmax(0, 1fr) 100px 100px 46px;
+  align-items: start;
+  column-gap: 14px;
+}
+.colHead {
+  padding: 8px 8px 4px;
+  margin-top: 3px;
+  border-top: 1px solid var(--ui-line-subtle);
+  color: var(--ui-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.check {
+  display: flex;
+  height: 18px;
+  align-items: center;
+}
+/* Live's name and line across the proposal's columns. */
+.span {
+  grid-column: 3 / -1;
+}
+.row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.row:hover,
+.row:focus-visible {
+  background: var(--ui-hover);
+  outline: none;
+}
+/* Live: one line, centered (the icon, its name and its line level with each other). */
+.row.liveRow {
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.liveRow .check,
+.liveRow .codeCol {
+  height: 20px;
+}
+.liveText {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.liveText .title {
+  flex: none;
+}
+.liveLine {
+  overflow: hidden;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* A table row: the grid over the row's column. */
+.row.cols {
+  display: grid;
+  align-items: start;
+  /* .row's gap would set the columns' too: the header's, so they line up. */
+  gap: 0 14px;
+}
+.rowOn {
+  background: var(--ui-bg-subtle);
+}
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.statusCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+/* The ticket under its status, where the developers build it from. */
+.ticket {
+  padding-left: 14px;
+  color: var(--ui-text-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 18px;
+  color: var(--ui-text-2);
+  font-size: 11px;
+  white-space: nowrap;
+}
+/* The code, the column to scan: larger, figures of equal width. */
+.codeCol {
+  display: flex;
+  align-items: center;
+  min-height: 18px;
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.what {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.versions {
+  margin-left: 6px;
+  color: var(--ui-text-muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+.muted {
+  min-height: 18px;
+  overflow: hidden;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Under the title, aligned with it past the dot and the code. */
+.summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--ui-text-2);
+  font-size: 11px;
+  line-height: 15px;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  padding: 7px 8px;
+  border: none;
+  border-top: 1px solid var(--ui-line-subtle);
+  border-radius: 0 0 6px 6px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.footer:hover {
+  background: var(--ui-hover);
+}

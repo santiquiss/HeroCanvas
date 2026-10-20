@@ -1,0 +1,28 @@
+/* A located component (sim/locate): a striped violet overlay over it that pulses twice and fades. Over it, inside its box, so
+   no container clips it; touches go through. */
+[data-locate]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Over the component's content, not over what floats above it on the screen (a bar, a sheet). */
+  z-index: 1;
+  border-radius: inherit;
+  /* Violet, with diagonal stripes; no edge. */
+  background: repeating-linear-gradient(-45deg, rgba(124, 58, 237, 0.42) 0 5px, rgba(124, 58, 237, 0.2) 5px 10px);
+  pointer-events: none;
+  animation: hcLocate 2.6s ease-out forwards;
+}
+@keyframes hcLocate {
+  0%,
+  30%,
+  60% {
+    opacity: 1;
+  }
+  15%,
+  45% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+  }
+}

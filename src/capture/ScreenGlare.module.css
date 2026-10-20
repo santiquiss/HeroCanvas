@@ -1,0 +1,14 @@
+/* The glass's glare (ScreenGlare), above the app and the system's bars (z 95–97): a big square softbox mirrored in the
+   glass, as product shots light a screen. Two flat tones split by a crisp edge: where the softbox shows, a touch
+   lighter; past its edge, a touch darker, the edge softened as set (--glare-soft). Flat, so it reads on a light screen as on a
+   dark one. How strong it is (its opacity) follows where the screen faces: ScreenGlare's glareOpacity. */
+.glare {
+  position: absolute;
+  z-index: 98;
+  pointer-events: none;
+  background: linear-gradient(
+    var(--glare-angle),
+    rgba(255, 255, 255, 0.16) 0 calc(var(--glare) - var(--glare-soft)),
+    rgba(0, 0, 0, 0.1) calc(var(--glare) + var(--glare-soft)) 100%
+  );
+}

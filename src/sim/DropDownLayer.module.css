@@ -1,0 +1,29 @@
+/* An anchored sheet as a drop-down (sim/DropDownLayer): over the page with the app's sheets (90), no shim. */
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+}
+.catch {
+  position: absolute;
+  inset: 0;
+}
+.menu {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(var(--drop)) scale(0.97);
+  transition:
+    opacity 140ms ease,
+    transform 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.on {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    transition: none;
+  }
+}

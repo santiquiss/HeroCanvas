@@ -1,0 +1,55 @@
+/* The popover: one card + pointer shape (the page's color, a 1px outline, an outside shadow); it grows out of the
+   pointer on a spring (set inline from motion.spring), its content fading in just after. */
+.popoverRoot {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+}
+.popoverCatch {
+  position: absolute;
+  inset: 0;
+}
+.popover {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.15);
+  transition:
+    transform var(--pop-out-ms) var(--pop-out),
+    opacity 200ms ease-in 60ms;
+}
+.popoverOn {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform var(--pop-in-ms) var(--pop-in),
+    opacity 120ms ease-out;
+}
+.popoverShape {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+.popoverCard {
+  position: relative;
+  overflow: auto;
+  scrollbar-width: none;
+  padding: var(--app-space-l) var(--app-space-l) var(--app-space-m);
+  border-radius: var(--app-radius-xl);
+  color: var(--app-text);
+}
+/* The content shows once the card has started to grow, and goes first when it closes. */
+.popover .popoverCard {
+  opacity: 0;
+  transition: opacity 100ms ease-in;
+}
+.popoverOn .popoverCard {
+  opacity: 1;
+  transition: opacity 200ms ease-out 80ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover,
+  .popover .popoverCard {
+    transition: none;
+  }
+}

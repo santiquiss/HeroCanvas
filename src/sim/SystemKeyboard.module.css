@@ -1,0 +1,364 @@
+/* System keyboard per OS. Slides up from the bottom edge, over the page and its sheets, under the home indicator. */
+.kb {
+  --kb-bg: #d1d3d9;
+  --kb-key: #fcfcfe;
+  --kb-special: #abb0ba;
+  --kb-tx: #000000;
+  --kb-tx2: #3c3c43;
+  --kb-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  --kb-blue: #0a84ff;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 94;
+  display: flex;
+  flex-direction: column;
+  background: var(--kb-bg);
+  color: var(--kb-tx);
+  font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translateY(100%);
+  transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+}
+.open {
+  transform: none;
+  pointer-events: auto;
+}
+:global([data-theme='dark']) .kb {
+  --kb-bg: #2b2b2d;
+  --kb-key: #6b6b6e;
+  --kb-special: #464649;
+  --kb-tx: #ffffff;
+  --kb-tx2: #d7d7db;
+  --kb-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kb-row-gap);
+  padding: var(--kb-pad-top) var(--kb-pad-x) var(--kb-pad-bottom);
+}
+.row {
+  display: flex;
+  gap: var(--kb-gap);
+}
+.key {
+  position: relative;
+  min-width: 0;
+  height: var(--kb-key-h);
+  padding: 0;
+  border: none;
+  border-radius: var(--kb-radius);
+  background: var(--kb-key);
+  color: var(--kb-tx);
+  box-shadow: var(--kb-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: var(--kb-char-size);
+  cursor: pointer;
+  touch-action: none;
+}
+.special,
+.ret {
+  background: var(--kb-special);
+  font-size: var(--kb-special-size);
+}
+.space {
+  font-size: var(--kb-special-size);
+}
+.on {
+  background: var(--kb-key);
+}
+.blue {
+  background: var(--kb-blue);
+  color: #ffffff;
+}
+.key:active {
+  filter: brightness(0.86);
+}
+/* Key preview above the finger (iOS and Android). */
+.key[data-pop]:active::after {
+  content: attr(data-pop);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  min-width: 100%;
+  height: calc(var(--kb-key-h) * 1.15);
+  padding: 0 6px;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  border-radius: var(--kb-radius);
+  background: var(--kb-key);
+  color: var(--kb-tx);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--kb-char-size) * 1.4);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ---- iOS (iPhone, iOS 26; measured on an iPhone screenshot @3x): a panel with rounded top corners and a hairline
+   edge, no QuickType bar in search fields, flat white keys (specials too), the return key blue with a glyph, and the
+   globe / dictation band below the keys. */
+.ios {
+  --kb-bg: #e3e4e9;
+  --kb-special: var(--kb-key);
+  --kb-shadow: none;
+  --kb-blue: #3478f6;
+  --kb-key-h: 42.67px;
+  --kb-row-gap: 11.33px;
+  --kb-gap: 6.33px;
+  --kb-pad-top: 25px;
+  --kb-pad-x: 6.67px;
+  --kb-pad-bottom: 0px;
+  --kb-radius: 8.5px;
+  --kb-char-size: 24px;
+  --kb-special-size: 18px;
+  border-radius: 27px 27px 0 0;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.16);
+}
+:global([data-theme='dark']) .ios {
+  --kb-bg: #2c2c2e;
+  --kb-key: #6c6c70;
+  --kb-blue: #0a84ff;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12);
+}
+.ios.land {
+  --kb-key-h: 32px;
+  --kb-row-gap: 6px;
+  --kb-pad-top: 12px;
+  --kb-pad-x: 48px;
+}
+.suggest {
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+}
+.land .suggest {
+  height: 36px;
+}
+.suggestion {
+  flex: 1;
+  text-align: center;
+  color: var(--kb-tx2);
+}
+.suggestion + .suggestion {
+  border-left: 1px solid color-mix(in srgb, var(--kb-tx) 18%, transparent);
+}
+.below {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  /* Icons centered 31pt below the keys, 42pt in from each side. */
+  padding: 17.5px 29px 0;
+  box-sizing: border-box;
+  color: var(--kb-tx);
+}
+
+/* ---- Android (Gboard, Material 3) */
+.android {
+  --kb-bg: #e9eef6;
+  --kb-key: #ffffff;
+  --kb-special: #d3dbe8;
+  --kb-tx: #1b1b1f;
+  --kb-tx2: #44474e;
+  --kb-shadow: none;
+  --kb-blue: #c2e7ff;
+  --kb-key-h: 46px;
+  --kb-row-gap: 8px;
+  --kb-gap: 6px;
+  --kb-pad-top: 2px;
+  --kb-pad-x: 6px;
+  --kb-pad-bottom: 8px;
+  --kb-radius: 8px;
+  --kb-char-size: 22px;
+  --kb-special-size: 14px;
+  font-family: Roboto, 'Google Sans', system-ui, sans-serif;
+}
+:global([data-theme='dark']) .android {
+  --kb-bg: #1d1e22;
+  --kb-key: #3c3f46;
+  --kb-special: #2c3038;
+  --kb-tx: #e3e2e6;
+  --kb-tx2: #c4c6d0;
+  --kb-blue: #004a77;
+}
+.android.land {
+  --kb-key-h: 36px;
+  --kb-row-gap: 5px;
+  --kb-pad-x: 64px;
+}
+.android .blue {
+  color: var(--kb-tx);
+}
+.android .ret {
+  border-radius: 9999px;
+  background: var(--kb-blue);
+}
+.toolbar {
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  color: var(--kb-tx2);
+}
+.land .toolbar {
+  height: 36px;
+  padding: 0 64px;
+}
+.tool {
+  display: flex;
+}
+.hint {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 10px;
+  line-height: 10px;
+  color: var(--kb-tx2);
+}
+.hide {
+  position: absolute;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--kb-tx2);
+  display: flex;
+  cursor: pointer;
+}
+
+/* ---- iPadOS 26 (measured on an iPad screenshot): a glass panel with rounded top corners over the page (blurred
+   through it), a shortcuts + suggestions bar, light keys (specials too) with the flick character above each letter.
+   Sizes come from the screen width (inline vars). */
+.ipad {
+  --kb-bg: rgba(232, 233, 238, 0.78);
+  --kb-key: rgba(255, 255, 255, 0.92);
+  --kb-special: var(--kb-key);
+  --kb-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.12);
+  --kb-blue: #3478f6;
+  --kb-pad-top: 0px;
+  --kb-pad-bottom: 10px;
+  --kb-char-size: calc(var(--kb-key-h) * 0.3);
+  --kb-special-size: calc(var(--kb-key-h) * 0.24);
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  backdrop-filter: blur(28px) saturate(170%);
+}
+:global([data-theme='dark']) .ipad {
+  --kb-bg: rgba(44, 44, 46, 0.8);
+  --kb-key: rgba(120, 120, 128, 0.55);
+  --kb-blue: #0a84ff;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12);
+}
+.ipad .suggest {
+  height: var(--kb-bar-h);
+}
+.ipad .key {
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+/* The flick character, small and grey above the letter. */
+.ipadHint {
+  font-size: calc(var(--kb-key-h) * 0.17);
+  line-height: 1.2;
+  color: #8e8e93;
+}
+.shortcuts {
+  flex: none;
+  width: 26%;
+  box-sizing: border-box;
+  display: flex;
+  gap: calc(var(--kb-key-h) * 0.35);
+  padding: 0 calc(var(--kb-key-h) * 0.35);
+  color: var(--kb-tx);
+}
+
+/* ---- Number pads (inputMode numeric / decimal). iOS: 3 columns of tall white keys, the letters under each digit,
+   the empty slot and delete flat. Android (Gboard): 4 columns, specials in their gray, return in the accent. */
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px 6px;
+  padding: 7px 6px 8px;
+}
+.padAndroid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 8px 6px;
+}
+.padKey {
+  height: 46px;
+  flex-direction: column;
+  gap: 0;
+  font-size: 25px;
+  line-height: 28px;
+}
+.padKey small {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 12px;
+  letter-spacing: 2px;
+}
+.padAndroid .padKey {
+  height: 48px;
+  font-size: 22px;
+}
+.padBare {
+  background: transparent;
+  box-shadow: none;
+}
+/* Landscape: shorter keys (iOS 26's landscape pad), so the field and its button stay in view. */
+.land .pad {
+  gap: 5px 6px;
+  padding: 5px 6px 4px;
+}
+.land .padKey {
+  height: 32px;
+  font-size: 21px;
+  line-height: 24px;
+}
+.land .padKey small {
+  display: none;
+}
+
+/* The step's Continue as the keyboard's action key (the text field's continue input action): the app's primary
+   button (a pill, its primary color, white label) in the return key's place; dimmed as a disabled
+   Button until the step can go on. */
+.key.action {
+  border-radius: 9999px;
+  background: var(--background-interactive-primary-default);
+  color: var(--text-inverted-primary);
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.ipad .key.action {
+  border-radius: var(--kb-radius);
+  font-size: calc(var(--kb-key-h) * 0.3);
+}
+.key.actionOff {
+  opacity: 0.4;
+  cursor: default;
+}
+.key.actionOff:active {
+  filter: none;
+}

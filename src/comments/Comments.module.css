@@ -1,0 +1,574 @@
+/* The comments plugin: pins over the device, a thread beside its pin, a new comment, the panel. Figma's comments are
+   the model; designer chrome (Panel.module.css), not the app's tokens. */
+
+/* Over the stage, above the Inspect outlines; only the pins and the cards take the pointer. */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* A person's initials in their color. */
+.avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* A pin: the avatar in a white bubble whose corner (bottom left) is the point it's about. */
+.pin {
+  position: absolute;
+  display: flex;
+  padding: 2px;
+  border: none;
+  border-radius: 50% 50% 50% 0;
+  background: var(--ui-bg);
+  transform: translateY(-100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 120ms ease;
+}
+.pin:hover {
+  z-index: 1;
+  transform: translateY(-100%) scale(1.08);
+  transform-origin: left bottom;
+}
+.pinOn {
+  z-index: 2;
+  box-shadow: 0 0 0 2px #0d99ff, 0 1px 4px rgba(0, 0, 0, 0.28);
+}
+.pinResolved {
+  opacity: 0.55;
+}
+.pinDraft {
+  width: 30px;
+  height: 30px;
+  background: #0d99ff;
+}
+
+/* A card beside a pin: a thread, or (bare) a new comment. */
+.popover,
+.popBare {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  color: var(--ui-text);
+  font-size: 13px;
+  line-height: 18px;
+  pointer-events: auto;
+}
+.popover {
+  border-radius: 14px;
+  background: var(--ui-bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+.popHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 10px 10px 16px;
+  border-bottom: 1px solid var(--ui-line-subtle);
+  background: var(--ui-bg);
+}
+.popTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+.popBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px 4px;
+}
+.popFoot {
+  padding: 12px 16px 14px;
+}
+.number {
+  color: var(--ui-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A comment: the avatar, then who and when, the text under them. */
+.message {
+  display: flex;
+  gap: 10px;
+}
+.messageMain {
+  flex: 1;
+  min-width: 0;
+}
+.who {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.when {
+  flex: none;
+  color: var(--ui-text-subtle);
+}
+.text {
+  margin: 2px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Your comment's ⋯ and its menu (edit, delete). On a comment in a thread it shows while the pointer is over it. */
+.own {
+  position: relative;
+  margin-left: auto;
+  align-self: center;
+}
+.more {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--ui-text-muted);
+}
+.message .ownHover .more {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.message:hover .ownHover .more,
+.message .ownHover .more:focus-visible {
+  opacity: 1;
+}
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 168px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--ui-bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+  line-height: 18px;
+  cursor: default;
+}
+.menu [role='menuitem'] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.menu [role='menuitem']:hover {
+  background: var(--ui-hover);
+}
+.menu .danger {
+  color: var(--ui-red-text);
+}
+.menuNote {
+  padding: 6px 8px 2px;
+  font-weight: 500;
+}
+.menuBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px 4px 4px;
+}
+.plainBtn,
+.dangerBtn {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.plainBtn {
+  border: 1px solid var(--ui-line);
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+.dangerBtn {
+  border: none;
+  background: #c4262c;
+  color: #ffffff;
+}
+.dangerBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Editing your comment: its text in the reply field's look, and how to leave it. */
+.editBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  cursor: auto;
+}
+.editHint {
+  color: var(--ui-text-subtle);
+  font-size: 11px;
+}
+
+/* The reply field: your avatar, then a rounded field with its send button inside. */
+.replyRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.replyRow > .avatar {
+  margin-top: 6px;
+}
+.replyMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 4px 4px 4px 12px;
+  border: 1px solid var(--ui-line);
+  border-radius: 18px;
+  background: var(--ui-bg);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.field:focus-within {
+  border-color: #0d99ff;
+  box-shadow: 0 0 0 1px #0d99ff;
+}
+.fieldText {
+  flex: 1;
+  min-width: 0;
+  min-height: 28px;
+  max-height: 140px;
+  padding: 5px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  resize: none;
+  outline: none;
+  field-sizing: content;
+}
+.nameField {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--ui-line);
+  border-radius: 15px;
+  font: inherit;
+  color: inherit;
+  outline: none;
+}
+.nameField:focus {
+  border-color: #0d99ff;
+}
+.send {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #0d99ff;
+  color: #ffffff;
+  cursor: pointer;
+}
+.send:disabled {
+  background: var(--ui-fill);
+  color: #ffffff;
+  cursor: default;
+}
+
+/* An icon button in a header (resolve, close). */
+.iconBtn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.iconBtn:hover {
+  background: var(--ui-hover);
+}
+.resolved {
+  color: #16a34a;
+}
+.resolvedNote {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px 0;
+  color: var(--ui-green-text);
+  font-size: 12px;
+}
+
+/* A new comment, as in Figma: the field with a blue edge, the text, then the kinds and the round send button. */
+.composer {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #0d99ff;
+  border-radius: 14px;
+  background: var(--ui-bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.composerName {
+  margin: 10px 12px 0;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--ui-line);
+  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+  outline: none;
+}
+.composerName:focus {
+  border-color: #0d99ff;
+}
+.composerText {
+  min-height: 64px;
+  max-height: 200px;
+  padding: 12px 14px;
+  border: none;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  color: inherit;
+  resize: none;
+  outline: none;
+  field-sizing: content;
+}
+.composerBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.composerBar .kinds {
+  flex: 1;
+}
+.composerBar .send {
+  width: 32px;
+  height: 32px;
+}
+
+/* Kinds: a chip each, in its color when picked. */
+.kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.kind {
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line);
+  border-radius: 11px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+}
+.kind:hover {
+  border-color: var(--k);
+}
+.kindOn,
+.kindOn:hover {
+  border-color: var(--k);
+  background: var(--k);
+  color: #ffffff;
+}
+.tag {
+  flex: none;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--k) 14%, var(--ui-bg));
+  color: color-mix(in srgb, var(--k) 70%, var(--ui-text));
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+}
+.error {
+  color: var(--ui-red-text);
+  font-size: 12px;
+}
+
+/* Panel */
+.notice {
+  margin: 4px 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ui-amber-soft);
+  color: var(--ui-amber-text);
+  line-height: 16px;
+}
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 8px 10px;
+  border-bottom: 1px solid var(--ui-line-subtle);
+}
+.filterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.segmented {
+  display: flex;
+  padding: 2px;
+  border-radius: 6px;
+  background: var(--ui-hover);
+}
+.segmented button {
+  height: 22px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.segmented .segOn {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+/* A thread in the list, as Figma's: a soft card, blue while it's open. */
+.card {
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 17px;
+  transition: background 120ms ease;
+}
+.card:hover {
+  background: var(--ui-bg-subtle);
+}
+.cardOn,
+.cardOn:hover {
+  background: var(--ui-blue-soft);
+}
+.cardResolved .cardHit {
+  opacity: 0.6;
+}
+.cardHit {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 10px 10px 12px;
+  cursor: pointer;
+  outline: none;
+}
+.cardHit:focus-visible {
+  box-shadow: inset 0 0 0 2px #0d99ff;
+  border-radius: 10px;
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-top: 2px;
+}
+.where {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+}
+.replies {
+  color: var(--ui-blue-text);
+  font-weight: 500;
+}
+.cardThread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 2px 12px 12px;
+}
+.cardThread .resolvedNote {
+  padding: 0;
+}
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 12px;
+  color: var(--ui-text-subtle);
+  text-align: center;
+}

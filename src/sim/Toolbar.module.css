@@ -1,0 +1,415 @@
+.toolbar {
+  flex: none;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  /* The buttons 4 apart, as Back to Live and the proposal's (ProposalMenu). */
+  gap: 4px;
+  padding: 8px 16px;
+  background: var(--ui-bg);
+  border-bottom: 1px solid var(--ui-line);
+  flex-wrap: wrap;
+  color: rgb(22, 22, 22);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  min-height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--ui-line-strong);
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.active {
+  border-color: var(--ui-strong);
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+/* Highlight changes (ChangesMenu): in the highlight's color (--hl, set from design/changes), a checkbox inside. */
+.highlight {
+  border-color: var(--hl);
+  color: var(--hl-text);
+  padding-left: 8px;
+}
+.highlight:hover {
+  background: var(--hl-soft);
+}
+/* On the dark interface the change's text color is too deep to read: a lighter tint of it. */
+:global([data-ui='dark']) .highlight:not(.highlightOn) {
+  color: color-mix(in srgb, var(--hl) 65%, #ffffff);
+}
+:global([data-ui='dark']) .highlight:not(.highlightOn):hover {
+  background: color-mix(in srgb, var(--hl) 16%, transparent);
+}
+.highlightOn,
+.highlightOn:hover {
+  background: var(--hl);
+  color: #ffffff;
+}
+.check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid currentColor;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.highlightOn .check {
+  border-color: var(--ui-bg);
+  background: var(--ui-bg);
+  color: var(--hl);
+}
+.share {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 112px;
+  min-height: 30px;
+  padding: 6px 12px;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  /* The brand (herocanvas.config.ts, or its logo's color): the one place the tool wears it. */
+  background: var(--hc-brand);
+  color: var(--hc-on-brand);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share:hover {
+  background: var(--hc-brand-hover);
+}
+/* The panels' toggles: a chip's box (border, height, corners), an icon alone. */
+.panelBtn {
+  width: 32px;
+  height: 30px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.panelBtn:hover {
+  background: var(--ui-hover);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.select {
+  cursor: pointer;
+}
+.select > span {
+  color: var(--ui-text);
+  white-space: nowrap;
+}
+/* The native select covers the whole box (icon, label, chevron), invisible: any click opens it. */
+.select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+}
+.select:has(select:focus-visible) {
+  outline: 2px solid #0d99ff;
+  outline-offset: 1px;
+}
+
+.variantKey {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  background: var(--ui-strong);
+  font-size: 10px;
+  font-weight: 700;
+}
+/* Over .select > span's text color. */
+.select > .variantKey {
+  color: var(--ui-on-strong);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* ViewBar: floating at the top left of the canvas. */
+.viewBar {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 10;
+  /* Room for the screens' Light / Dark at the top right (ThemeSwitch, ~136 wide): past it, the bar scrolls. */
+  max-width: calc(100% - 24px - 148px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+  border-radius: 12px;
+  background: var(--ui-float);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 24px rgba(15, 20, 30, 0.14),
+    0 0 0 1px var(--ui-float-line);
+}
+.viewBar > * {
+  flex: none;
+}
+.segment {
+  display: flex;
+  gap: 2px;
+}
+.viewSep {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: var(--ui-fill);
+}
+
+/* ZoomBar: floating at the bottom right of the canvas. */
+.zoomBar {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--ui-float);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 24px rgba(15, 20, 30, 0.14),
+    0 0 0 1px var(--ui-float-line);
+}
+.zoomBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.zoomBtn:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.zoomBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.zoomSelect {
+  min-width: 104px;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The changes chip and its popover (ChangesMenu). Counts and badges in the colors of change (design/changes). */
+.changes {
+  position: relative;
+}
+.chipOpen {
+  border-color: var(--ui-strong);
+}
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: 420px;
+  max-height: min(560px, 70vh);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--ui-bg);
+  box-shadow: 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
+  font-size: 12px;
+  line-height: 16px;
+}
+.popHead {
+  margin-bottom: 4px;
+  color: var(--ui-text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+/* The proposal in one sentence, under the head. */
+.popSummary {
+  margin: 0 0 6px;
+  color: var(--ui-text-2);
+  font-size: 13px;
+  line-height: 18px;
+  text-wrap: pretty;
+}
+.popScan {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 2px 4px;
+  font-size: 11px;
+}
+.popSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.popTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 2px 0;
+  color: var(--ui-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.popTitleCount {
+  color: var(--ui-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+/* An item: a small card, its main action the card; a second one, a small button inside it. */
+.popRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  background: var(--ui-bg);
+  text-align: left;
+}
+.popRowAct {
+  cursor: pointer;
+}
+.popRowAct:hover {
+  background: var(--ui-bg-subtle);
+}
+.popRowAct:focus-visible {
+  outline: 2px solid #0d99ff;
+  outline-offset: 1px;
+}
+/* Where the card leads, and its chevron, at the right of the name. */
+.popMeta {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: var(--ui-text-2);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  align-self: center;
+}
+.popMeta > :last-child {
+  color: var(--ui-text-faint);
+}
+.popRowAct:hover .popMeta > :last-child {
+  color: var(--ui-text-muted);
+}
+.popSecondary {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  margin-top: 6px;
+  padding: 0 6px 0 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.popSecondary:hover {
+  border-color: var(--ui-mid);
+  background: var(--ui-bg-subtle);
+}
+/* The item's type (a page's own icon, a component's), in the color of its change. */
+.popIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+.popText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.popLine {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.popName {
+  overflow: hidden;
+  color: var(--ui-text);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.popKind {
+  flex: none;
+  font-size: 11px;
+  font-weight: 600;
+}
+.popMuted {
+  color: var(--ui-text-muted);
+}

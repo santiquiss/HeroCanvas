@@ -1,0 +1,172 @@
+/* Video's Motion: Loop or Once, then its rows (In, Middle, Out; each its motion's dropdown and its length's). The
+   designer's own UI. */
+.modes {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: 8px;
+  border-radius: 7px;
+  background: var(--ui-hover);
+}
+.mode {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 26px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mode.on {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 20, 30, 0.12);
+}
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 6px;
+}
+.rowLabel {
+  color: var(--ui-text-muted);
+  font-size: 11px;
+}
+.dropdown {
+  position: relative;
+  min-width: 0;
+}
+/* The motion's list opens across the whole row (label to length): the panel is narrow. */
+.across {
+  position: static;
+}
+.across .menu {
+  right: 0;
+  width: auto;
+}
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 32px;
+  padding: 0 4px 0 6px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.trigger:hover,
+.trigger.open {
+  background: var(--ui-bg-subtle);
+}
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.none {
+  color: var(--ui-text-faint);
+}
+.icon {
+  display: flex;
+  flex: none;
+  width: 32px;
+  justify-content: center;
+  color: var(--ui-text-2);
+}
+/* A length that isn't chosen here (none, or a recording's). */
+.length {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 8px;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+.menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  width: max(100%, 260px);
+  max-height: 340px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  background: var(--ui-bg);
+  box-shadow: 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
+}
+/* The length's list: as wide as its button, opening to the left (the panel's edge is on the right). */
+.narrow .menu {
+  left: auto;
+  right: 0;
+  width: max(100%, 96px);
+}
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.option:hover,
+.option:focus-visible {
+  background: var(--ui-hover);
+  outline: none;
+}
+.option.on {
+  background: var(--ui-bg-subtle);
+  font-weight: 600;
+}
+.short {
+  padding: 6px 8px;
+}
+.optionText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.note {
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+.hint {
+  margin: 6px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  line-height: 15px;
+}

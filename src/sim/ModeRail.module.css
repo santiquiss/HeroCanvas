@@ -1,0 +1,110 @@
+/* The mode rail: light like the toolbar, a hairline from the panels, 60 wide, the full height of the window. */
+.rail {
+  position: relative;
+  z-index: 40;
+  flex: none;
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  background: var(--ui-bg);
+  border-right: 1px solid var(--ui-line);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+.brand img {
+  border-radius: 7px;
+}
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+.item:hover {
+  background: var(--ui-hover);
+  color: var(--ui-text);
+}
+.item:focus-visible {
+  outline: 2px solid #0d99ff;
+  outline-offset: 1px;
+}
+/* Pushed to the rail's bottom. */
+.end {
+  margin-top: auto;
+}
+/* The current mode: black like the designer's other selections (the toolbar's), and a blue bar at the rail's edge. */
+.on,
+.on:hover {
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+.on::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #0d99ff;
+}
+/* The name, beside the icon, as soon as it's hovered or focused by keyboard. */
+.tip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--ui-strong);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 6px 16px rgba(0, 0, 0, 0.25);
+  color: var(--ui-on-strong);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+.item:hover .tip,
+.item:focus-visible .tip {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tip {
+    transition: none;
+  }
+}
