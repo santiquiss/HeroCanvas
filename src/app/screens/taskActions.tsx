@@ -6,7 +6,7 @@ import { Button } from '../../kit';
 import { useActionSheet } from '../../sim/actionSheet';
 import { useSim } from '../../sim/SimContext';
 import { TextField } from '../components';
-import type { Task } from '../data/tasks';
+import type { Task } from '../data/sample';
 import { useT, type T } from '../i18n';
 import { useTasks } from '../state';
 import styles from './screens.module.css';

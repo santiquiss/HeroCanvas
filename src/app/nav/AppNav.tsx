@@ -1,4 +1,4 @@
-// The demo app's navigation (AppNavigation): its tabs from the page manifest, as a glass bar at the bottom (phones), a
+// The sample app's navigation (AppNavigation): its tabs from the page manifest, as a glass bar at the bottom (phones), a
 // rail on the left (tablets, open foldables) and a column at the right (the iPhone Duo). The selected tab's pill slides
 // to the one you pick. The simulator places them per layout; this draws them.
 import type { CSSProperties } from 'react';

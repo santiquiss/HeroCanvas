@@ -1,11 +1,11 @@
 ---
 name: connect-app
-description: Connect someone's app to HeroCanvas for the first time - read its code (any stack), replace the demo in src/app with a mirror of it (settings, tokens, navigation, one page per screen as a placeholder), then mirror the first screens. Use when the person asks to connect, set up, onboard or "make HeroCanvas show" their app.
+description: Connect someone's app to HeroCanvas for the first time - read its code (any stack), replace the sample app in src/app with a mirror of it (settings, tokens, navigation, one page per screen as a placeholder), then mirror the first screens. Use when the person asks to connect, set up, onboard or "make HeroCanvas show" their app.
 ---
 
 # Connect an app
 
-The person has HeroCanvas running with the demo (`src/app`, a task manager) and wants it to show their app instead.
+The person has HeroCanvas running with the sample app (`src/app`, a task manager) and wants it to show their app instead.
 The result: `src/app` replaced by a **mirror** of their app — its settings, its look (tokens), its navigation and one
 page per screen — that the tool reads through the same boundary (`src/app/index.ts`). Screens start as placeholders
 and get mirrored one at a time (`mirror-screen`).
@@ -46,7 +46,7 @@ contract doesn't: add it as `--app-<name>` too; screens may read it.
 ## 4. Navigation (`src/app/nav/`)
 
 The app's tab bar (phones), and rail and side column (large screens) if it has them, as `AppNavigation` components,
-starting from the demo's `AppNav.tsx`. Same tabs, icons (Material Symbols names closest to the app's), labels and
+starting from the sample app's `AppNav.tsx`. Same tabs, icons (Material Symbols names closest to the app's), labels and
 look. If the app has no tabs, the components render nothing and every page is a push or a cover.
 
 ## 5. Pages (`src/app/pages.tsx`)
@@ -54,10 +54,10 @@ look. If the app has no tabs, the components render nothing and every page is a 
 One page per screen of the app, at its route, from its router (not from guessing): `level` (`tab`, `push`, `cover`,
 `boot` for what comes before the tabs: welcome, sign in, onboarding), `parent`, `tab` for tabs, `links` (where it
 navigates), `defaults` and `variants` for routes with params, `status: 'placeholder'` until mirrored. Each component a
-placeholder for now: the screen's title in the app's scaffold (`Scaffold` from the demo, restyled) and one line saying
+placeholder for now: the screen's title in the app's scaffold (`Scaffold` from the sample app, restyled) and one line saying
 it's not mirrored yet. Sheets, dialogs and links aren't pages. Flows (onboarding steps) are one page with `flow`.
 
-Delete what's left of the demo (its screens, components, data, texts) once nothing reads it.
+Delete what's left of the sample app (its screens, components, data, texts) once nothing reads it.
 
 ## 6. Check it and show it
 

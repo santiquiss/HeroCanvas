@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.2.0-3b6fd8"></a>
+<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.3.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -17,7 +17,7 @@ It's made to be used **with an AI coding agent** (Claude Code, or any agent that
 up by hand: you point the agent at your app and ask. The agent reads your app's code, builds the mirror, and keeps it
 honest; you look at the canvas, try the scenarios, and say what to change.
 
-> Early days. It ships with a demo app (a small task manager) so you can see everything working. Connecting your own
+> Early days. It ships with a sample app (a small task manager) so you can see everything working. Connecting your own
 > app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
 > per stack are next — see [Developer experience](docs/developer-experience.md).
 
@@ -52,7 +52,7 @@ npm install
 
 Your copy will hold your app's mirror and your proposals: it's where your team designs.
 
-### 2. See the demo
+### 2. See the sample app
 
 ```
 npm run dev
@@ -61,6 +61,9 @@ npm run dev
 Open the address it prints. Try it: switch devices in the toolbar, turn one, add more (All devices), tap through the
 Tasks app, pick another persona or language in **Scenarios**, open **Flow** to see every page and the welcome steps,
 press **Inspect** and point at a component.
+
+Tasks is a sample: a small task manager whose people, projects and tasks are made up (all in
+`src/app/data/sample.ts`). It's there to show what HeroCanvas does, and connecting your app replaces it.
 
 ### 3. Make it yours
 
@@ -78,7 +81,7 @@ claude
 ```
 
 The agent follows the `connect-app` skill: it detects your stack, reads your routes, theme, navigation and texts, and
-replaces the demo with your app's mirror — every screen as a placeholder page first. Then it mirrors the screens one
+replaces the sample app with your app's mirror — every screen as a placeholder page first. Then it mirrors the screens one
 at a time, starting with the one you pick, and shows you each before the next. Your app's code is only read, never
 changed.
 

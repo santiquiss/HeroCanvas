@@ -1,15 +1,15 @@
-// The demo app's pages: one per screen, at its route, with where it sits (level), its tab, what it links to, its
+// The sample app's pages: one per screen, at its route, with where it sits (level), its tab, what it links to, its
 // state, its flows and its scenario controls. The tools (Pages panel, Flow view, Scenarios, the inspector) read this;
 // no tool knows a page by name.
 import type { PageDef } from '../nav/types';
-import { PERSONAS, personaData } from './data/tasks';
+import { PERSONAS, personaData } from './data/sample';
 import { Project, Projects } from './screens/Projects';
 import { Profile } from './screens/Profile';
 import { TaskDetail } from './screens/TaskDetail';
 import { Today } from './screens/Today';
 import { Welcome, WELCOME_FLOW } from './screens/Welcome';
 
-const DEMO = personaData(PERSONAS[0].id);
+const SAMPLE = personaData(PERSONAS[0].id);
 
 export const BASE_PAGES: Record<string, PageDef> = {
   // ---------------------------------------------------------------- Before the tabs
@@ -64,7 +64,7 @@ export const BASE_PAGES: Record<string, PageDef> = {
     component: Project,
     parent: 'projects',
     defaults: { id: 'work' },
-    variants: () => DEMO.projects.map((p) => ({ label: p.name, params: { id: p.id } })),
+    variants: () => SAMPLE.projects.map((p) => ({ label: p.name, params: { id: p.id } })),
     status: 'done',
     links: [{ to: 'task', params: { id: 't1' }, label: 'A task' }],
   },
@@ -76,7 +76,7 @@ export const BASE_PAGES: Record<string, PageDef> = {
     component: TaskDetail,
     parent: 'today',
     defaults: { id: 't1' },
-    variants: () => DEMO.tasks.slice(0, 4).map((t) => ({ label: t.title, params: { id: t.id } })),
+    variants: () => SAMPLE.tasks.slice(0, 4).map((t) => ({ label: t.title, params: { id: t.id } })),
     status: 'done',
   },
 };

@@ -1,4 +1,4 @@
-// The demo app's small controls: a round checkbox, a text field, an avatar, a project's icon tile and an empty state.
+// The sample app's small controls: a round checkbox, a text field, an avatar, a project's icon tile and an empty state.
 // Pure: props in, callbacks out.
 import { useEffect, useRef } from 'react';
 import { Icon } from '../../components/Icon';

@@ -11,15 +11,16 @@ file). The README says what HeroCanvas is; this file is how to change it.
   the manifest instead.
 - **The kit** (`src/kit`): the overlays the simulator presents with, and their buttons. Styled only with `--app-*`
   tokens, so any app's look reaches them.
-- **The app** (`src/app`): the connected app, today a demo. Its screens, components, data, texts and tokens.
+- **The app** (`src/app`): the connected app, today a sample app (a task manager) with made-up data, all of it in
+  `src/app/data/sample.ts`. Its screens, components, data, texts and tokens.
 
 ## Procedures (skills)
 
 Step by step, in `.claude/skills/<name>/SKILL.md` (Claude Code loads them on its own; any other agent reads the file
 when the task is one of these):
 
-- **`connect-app`**: the person's app connected for the first time: its code read (any stack), the demo in `src/app`
-  replaced by its mirror (settings, tokens, navigation, one page per screen).
+- **`connect-app`**: the person's app connected for the first time: its code read (any stack), the sample app in
+  `src/app` replaced by its mirror (settings, tokens, navigation, one page per screen).
 - **`mirror-screen`**: one screen or component of the app, built or fixed to match its code.
 - **`new-proposal`**: a change to the app as a proposal (`src/proposals/<slug>`), with versions and a handoff.
 

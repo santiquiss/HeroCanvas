@@ -1,4 +1,4 @@
-// The demo app's app bar: back (or close) on the left, the title centered, actions on the right, all 40 tall so every
+// The sample app's app bar: back (or close) on the left, the title centered, actions on the right, all 40 tall so every
 // page's header buttons line up (layout.headerY). Pure: props in, callbacks out.
 import { useComponent } from '../../design/component';
 import { IconButton } from '../../kit';

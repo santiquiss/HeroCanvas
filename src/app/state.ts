@@ -1,8 +1,8 @@
-// The demo app's state: the tasks of whoever is using it (the persona, `?persona=`), changed in memory and shared by
+// The sample app's state: the tasks of whoever is using it (the persona, `?persona=`), changed in memory and shared by
 // every screen on the canvas (useSharedState), so ticking a task on one device ticks it on all.
 import { useMemo } from 'react';
 import { useSharedState, useUrlState } from '../sim/SimContext';
-import { PERSONA_PARAM, PERSONAS, personaData, type Task } from './data/tasks';
+import { PERSONA_PARAM, PERSONAS, personaData, type Task } from './data/sample';
 
 export function useTasks() {
   const [personaId] = useUrlState<string>(PERSONA_PARAM, PERSONAS[0].id);

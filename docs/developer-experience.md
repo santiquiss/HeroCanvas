@@ -1,6 +1,6 @@
 # Developer experience: connecting any app to HeroCanvas
 
-A first proposal to think through, not a decision. HeroCanvas today shows one app (the demo, `src/app`) built in its
+A first proposal to think through, not a decision. HeroCanvas today shows one app (the sample app, `src/app`) built in its
 own React. The goal: a team with an app in React, React Native, Flutter, SwiftUI or Jetpack Compose installs it,
 connects their app in minutes, and from then on designs, reviews and hands off on a canvas that matches their code.
 

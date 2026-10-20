@@ -13,7 +13,7 @@ interface IconProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'color'> {
 
 /**
  * Material Symbols Rounded glyph. `fill` toggles the selected state. The designer's own UI draws its icons with it, and
- * so do the demo app and the kit (src/app, src/kit); a connected app can draw its own icon component through it.
+ * so do the sample app and the kit (src/app, src/kit); a connected app can draw its own icon component through it.
  */
 export function Icon({ name, size = 24, box, fill, weight, color, style, ...rest }: IconProps) {
   const vars = [`'FILL' ${fill ? 1 : 0}`];

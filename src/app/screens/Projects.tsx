@@ -2,7 +2,7 @@
 import { useNav, useSplit } from '../../nav/context';
 import type { PageProps } from '../../nav/types';
 import { Checkbox, EmptyState, ListSection, ListTile, ProjectIcon, Scaffold } from '../components';
-import { projectTasks } from '../data/tasks';
+import { projectTasks } from '../data/sample';
 import { useT } from '../i18n';
 import { useTasks } from '../state';
 import { dueText, useNewTask } from './taskActions';

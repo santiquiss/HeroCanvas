@@ -5,6 +5,15 @@ HeroCanvas's versions. The number shows in the toolbar (package.json `version`);
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.3.0 — 2026-10-20
+
+- **Stories for the sample app**: AppBar, Avatar, Checkbox, EmptyState, ListSection, ListTile, ProjectIcon and
+  TextField, each with the variants the app uses (the gallery was empty). Their texts and data come from the app's.
+- **Sample data, said so**: the sample app's data lives in `src/app/data/sample.ts` (was `tasks.ts`), marked as made
+  up, with helpers for stories (`sampleTask`, `sampleProject`). "Demo" is "sample app" everywhere, and the README says
+  its data is invented.
+- **Gallery**: without a Figma inventory, the overview no longer shows an empty "0 of 0 Figma components" line.
+
 ## 0.2.0 — 2026-10-20
 
 - **Icons from the logo**: the favicon (and the rail's logo), the home-screen icons and the web app manifest are made

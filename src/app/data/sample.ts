@@ -1,5 +1,6 @@
-// The demo app's data: who's using it (personas) and their projects and tasks. One source of truth: screens derive
-// what they show from here, never write their own numbers.
+// SAMPLE DATA. Everything here is made up: the people, their projects and their tasks exist only so the sample app
+// (a small task manager) has something to show. Connecting your app replaces it with your app's own mock data.
+// One source of truth: screens and stories derive what they show from here, never write their own.
 import type { Persona } from '../types';
 
 export interface Task {
@@ -31,13 +32,13 @@ export const PERSONAS: Persona[] = [
   { id: 'sam', name: 'Sam', description: 'Just signed up: nothing yet' },
 ];
 
-const PROJECTS: Project[] = [
+export const SAMPLE_PROJECTS: Project[] = [
   { id: 'home', name: 'Home', icon: 'cottage', color: '#ff9f0a' },
   { id: 'work', name: 'Work', icon: 'work', color: '#3b5bfd' },
   { id: 'trip', name: 'Lisbon trip', icon: 'flight', color: '#1a9e55' },
 ];
 
-const ALEX: Task[] = [
+export const SAMPLE_TASKS: Task[] = [
   { id: 't1', title: 'Send the quarterly report', notes: 'Numbers from finance, then a short summary on top.', due: 0, done: false, project: 'work' },
   { id: 't2', title: 'Book the dentist', due: 0, done: false, project: 'home' },
   { id: 't3', title: 'Review the design proposal', due: 0, done: true, project: 'work' },
@@ -49,7 +50,7 @@ const ALEX: Task[] = [
 ];
 
 const DATA: Record<string, PersonaData> = {
-  alex: { projects: PROJECTS, tasks: ALEX },
+  alex: { projects: SAMPLE_PROJECTS, tasks: SAMPLE_TASKS },
   sam: { projects: [], tasks: [] },
 };
 
@@ -64,5 +65,12 @@ export const todayTasks = (tasks: Task[]): Task[] => tasks.filter((t) => t.due !
 
 /** Tasks due after today, soonest first. */
 export const upcomingTasks = (tasks: Task[]): Task[] => tasks.filter((t) => t.due != null && t.due > 0).sort((a, b) => a.due! - b.due!);
+
+/** A sample task or project by id (stories show these; a missing id is a typo, so it throws). */
+export const sampleTask = (id: string): Task => SAMPLE_TASKS.find((t) => t.id === id) ?? missing('task', id);
+export const sampleProject = (id: string): Project => SAMPLE_PROJECTS.find((p) => p.id === id) ?? missing('project', id);
+const missing = (what: string, id: string): never => {
+  throw new Error(`No sample ${what} "${id}"`);
+};
 
 export const projectTasks = (tasks: Task[], project: string): Task[] => tasks.filter((t) => t.project === project);

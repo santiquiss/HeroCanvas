@@ -3,7 +3,7 @@
 import { useNav } from '../../nav/context';
 import { useUrlState } from '../../sim/SimContext';
 import { Checkbox, EmptyState, ListSection, ListTile, Scaffold } from '../components';
-import { todayTasks, upcomingTasks, type Task } from '../data/tasks';
+import { todayTasks, upcomingTasks, type Task } from '../data/sample';
 import { useT } from '../i18n';
 import { useTasks } from '../state';
 import { dueText, useNewTask } from './taskActions';

@@ -4,7 +4,7 @@ import { Icon } from '../../components/Icon';
 import { useNav } from '../../nav/context';
 import { useSim } from '../../sim/SimContext';
 import { Avatar, ListSection, ListTile, Scaffold } from '../components';
-import { findPersona } from '../data/tasks';
+import { findPersona } from '../data/sample';
 import { useT } from '../i18n';
 import { useTasks } from '../state';
 import styles from './screens.module.css';

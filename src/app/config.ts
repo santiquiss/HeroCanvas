@@ -1,5 +1,5 @@
-// The demo app's settings (AppConfig): plain data, so the simulator can read them without loading the app's screens.
-import { PERSONAS } from './data/tasks';
+// The sample app's settings (AppConfig): plain data, so the simulator can read them without loading the app's screens.
+import { PERSONAS } from './data/sample';
 import type { AppConfig } from './types';
 
 export const appConfig: AppConfig = {

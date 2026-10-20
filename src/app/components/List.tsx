@@ -1,4 +1,4 @@
-// The demo app's lists: a section (an optional header over a card of rows) and its rows (leading, title, subtitle,
+// The sample app's lists: a section (an optional header over a card of rows) and its rows (leading, title, subtitle,
 // trailing; a tap). Pure: props in, callbacks out.
 import type { ReactNode } from 'react';
 import { Icon } from '../../components/Icon';

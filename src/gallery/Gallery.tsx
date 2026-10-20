@@ -138,12 +138,17 @@ function Overview() {
       <div className={styles.head}>
         <span className={styles.title}>Components</span>
       </div>
-      <p className={styles.note} style={{ marginBottom: 0 }}>
-        {built} of {figmaNames.length} Figma components built with stories · {FIGMA_FILE.name}, {FIGMA_FILE.exportedAt.slice(0, 10)}. Names and tiers follow Figma.
-      </p>
-      <div className={styles.meter}>
-        <div style={{ width: `${(built / figmaNames.length) * 100}%` }} />
-      </div>
+      {/* Coverage against Figma only with its inventory connected (src/app/connectors). */}
+      {figmaNames.length > 0 && (
+        <>
+          <p className={styles.note} style={{ marginBottom: 0 }}>
+            {built} of {figmaNames.length} Figma components built with stories · {FIGMA_FILE.name}, {FIGMA_FILE.exportedAt.slice(0, 10)}. Names and tiers follow Figma.
+          </p>
+          <div className={styles.meter}>
+            <div style={{ width: `${(built / figmaNames.length) * 100}%` }} />
+          </div>
+        </>
+      )}
       <UsageStats built={builtNames} />
       {proposalNames.size > 0 && (
         <div>

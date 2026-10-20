@@ -1,4 +1,4 @@
-// The demo app's texts, in its two languages. The simulator gives the screen's language (useLanguage); the app picks
+// The sample app's texts, in its two languages. The simulator gives the screen's language (useLanguage); the app picks
 // its texts by it. A real app brings its own translations (its ARB, strings, xcstrings or JSON files) here.
 import { useLanguage } from '../sim/language';
 
