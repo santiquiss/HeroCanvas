@@ -1,10 +1,11 @@
-// The tool's brand (herocanvas.config.ts) as CSS: `virtual:hc-brand.css` sets --hc-brand (and its hover and the
-// color on it) for the light and the dark interface. Colors the config doesn't give are taken from the logo: decoded
-// here (PNG, no dependency), its colors counted, the most vivid one that covers a good part of it picked.
-import { readFileSync } from 'node:fs';
+// The tool's brand (herocanvas.config.ts). As CSS: `virtual:hc-brand.css` sets --hc-brand (and its hover and the
+// color on it) for the light and the dark interface; colors the config doesn't give are taken from the logo, its
+// colors counted and the most vivid one that covers a good part of it picked. As files: the favicon, the home-screen
+// icons and the web app manifest, made from the logo (served by the dev server, written by the build).
+import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { inflateSync } from 'node:zlib';
 import type { Plugin } from 'vite';
+import { flatten, readPng, resize, writePng, type Image } from './png.ts';
 
 export interface HeroCanvasConfig {
   /** Shown in the browser's tab and the rail's logo. */
@@ -21,19 +22,74 @@ const ID = 'virtual:hc-brand.css';
 const RESOLVED = '\0' + ID;
 
 export function brand(config: HeroCanvasConfig, root = process.cwd()): Plugin {
+  const logo = resolve(root, config.logo);
+  // Made once per change of the logo: decoding and scaling a large PNG takes a moment.
+  let cache: { mtime: number; files: Map<string, Buffer | string> } | undefined;
+  const files = () => {
+    const mtime = statSync(logo).mtimeMs;
+    if (cache?.mtime !== mtime) cache = { mtime, files: brandFiles(config, readPng(readFileSync(logo))) };
+    return cache.files;
+  };
   return {
     name: 'hc-brand',
     resolveId: (id) => (id === ID ? RESOLVED : null),
-    // The browser tab's name.
-    transformIndexHtml: (html) => html.replace(/<title>[^<]*<\/title>/, `<title>${config.name}</title>`),
+    // The browser tab's name, and the name under the icon on a home screen.
+    transformIndexHtml: (html) =>
+      html
+        .replace(/<title>[^<]*<\/title>/, `<title>${escape(config.name)}</title>`)
+        .replace(/(name="apple-mobile-web-app-title" content=")[^"]*/, `$1${escape(config.name)}`),
     load(id) {
       if (id !== RESOLVED) return null;
-      const logo = resolve(root, config.logo);
       this.addWatchFile(logo);
-      return brandCss(config.brand ?? fromLogo(readFileSync(logo)));
+      return brandCss(config.brand ?? fromLogo(readPng(readFileSync(logo))));
+    },
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const path = (req.url ?? '').split('?')[0].slice(server.config.base.length);
+        const file = BRAND_FILES.includes(path) ? files().get(path) : undefined;
+        if (file === undefined) return next();
+        res.setHeader('Content-Type', path.endsWith('.png') ? 'image/png' : 'application/manifest+json');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.end(file);
+      });
+    },
+    generateBundle() {
+      for (const [fileName, source] of files()) this.emitFile({ type: 'asset', fileName, source });
     },
   };
 }
+
+// ---------------------------------------------------------------- the files
+
+/** Where the files made from the logo are served, from the site's root (index.html and the rail link to them). */
+export const BRAND_FILES = ['assets/logo-64.png', 'pwa/icon-180.png', 'pwa/icon-192.png', 'pwa/icon-512.png', 'manifest.webmanifest'];
+
+/** The favicon (also the rail's logo), the home-screen icons and the manifest, from the decoded logo. */
+export function brandFiles(config: HeroCanvasConfig, logo: Image): Map<string, Buffer | string> {
+  const { light } = config.brand ?? fromLogo(logo);
+  const manifest = {
+    name: config.name,
+    short_name: config.name,
+    description: "Your app's screens at the real size of this device.",
+    start_url: './',
+    scope: './',
+    display: 'standalone',
+    orientation: 'any',
+    background_color: light,
+    theme_color: '#f2f2f7',
+    icons: [192, 512].map((n) => ({ src: `pwa/icon-${n}.png`, sizes: `${n}x${n}`, type: 'image/png', purpose: 'any' })),
+  };
+  return new Map<string, Buffer | string>([
+    ['assets/logo-64.png', writePng(resize(logo, 64))],
+    // iOS draws a transparent icon on black: the logo goes over white instead.
+    ['pwa/icon-180.png', writePng(flatten(resize(logo, 180), [255, 255, 255]))],
+    ['pwa/icon-192.png', writePng(resize(logo, 192))],
+    ['pwa/icon-512.png', writePng(resize(logo, 512))],
+    ['manifest.webmanifest', JSON.stringify(manifest, null, 2) + '\n'],
+  ]);
+}
+
+const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 // ---------------------------------------------------------------- the CSS
 
@@ -47,8 +103,8 @@ export function brandCss({ light, dark }: { light: string; dark: string }): stri
 }
 
 /** The logo's brand color, as it should look on the light and the dark interface. */
-export function fromLogo(png: Buffer): { light: string; dark: string } {
-  const base = vividColor(decodePng(png));
+export function fromLogo(logo: Image): { light: string; dark: string } {
+  const base = vividColor(sample(logo));
   // Light: dark enough for white text (WCAG AA for its bold 12px label, 4.5). Dark: a step lighter, still under white.
   let light = base;
   for (let i = 0; i < 20 && contrast(light, [255, 255, 255]) < 4.5; i++) light = shade(light, -0.05);
@@ -87,60 +143,13 @@ export function vividColor(pixels: Iterable<RGB>): RGB {
   return best;
 }
 
-// ---------------------------------------------------------------- PNG
-
-/** Every 4th pixel of every 4th row of an 8-bit, non-interlaced RGB or RGBA PNG (enough to count colors). */
-export function* decodePng(b: Buffer): Generator<RGB> {
-  let o = 8;
-  let w = 0;
-  let h = 0;
-  let type = 0;
-  const idat: Buffer[] = [];
-  while (o < b.length) {
-    const len = b.readUInt32BE(o);
-    const t = b.toString('ascii', o + 4, o + 8);
-    const d = b.subarray(o + 8, o + 8 + len);
-    if (t === 'IHDR') {
-      w = d.readUInt32BE(0);
-      h = d.readUInt32BE(4);
-      if (d[8] !== 8 || d[12] !== 0 || (d[9] !== 2 && d[9] !== 6)) throw new Error('The logo must be an 8-bit RGB or RGBA PNG, not interlaced');
-      type = d[9];
+/** Every 4th pixel of every 4th row, leaving out the transparent ones (enough to count colors). */
+function* sample({ width, height, data }: Image): Generator<RGB> {
+  for (let y = 0; y < height; y += 4)
+    for (let x = 0; x < width; x += 4) {
+      const i = (y * width + x) * 4;
+      if (data[i + 3] >= 128) yield [data[i], data[i + 1], data[i + 2]];
     }
-    if (t === 'IDAT') idat.push(d);
-    o += 12 + len;
-  }
-  const bpp = type === 6 ? 4 : 3;
-  const stride = w * bpp;
-  const raw = inflateSync(Buffer.concat(idat));
-  let prev = Buffer.alloc(stride);
-  const row = Buffer.alloc(stride);
-  for (let y = 0; y < h; y++) {
-    const f = raw[y * (stride + 1)];
-    const at = y * (stride + 1) + 1;
-    for (let i = 0; i < stride; i++) {
-      const a = i >= bpp ? row[i - bpp] : 0;
-      const up = prev[i];
-      const c = i >= bpp ? prev[i - bpp] : 0;
-      let p = raw[at + i];
-      if (f === 1) p += a;
-      else if (f === 2) p += up;
-      else if (f === 3) p += (a + up) >> 1;
-      else if (f === 4) {
-        const pa = Math.abs(up - c);
-        const pb = Math.abs(a - c);
-        const pc = Math.abs(a + up - 2 * c);
-        p += pa <= pb && pa <= pc ? a : pb <= pc ? up : c;
-      }
-      row[i] = p & 255;
-    }
-    if (y % 4 === 0)
-      for (let x = 0; x < w; x += 4) {
-        const i = x * bpp;
-        if (bpp === 4 && row[i + 3] < 128) continue;
-        yield [row[i], row[i + 1], row[i + 2]];
-      }
-    prev = Buffer.from(row);
-  }
 }
 
 // ---------------------------------------------------------------- color math

@@ -49,7 +49,7 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
   }, [capture]);
   return (
     <nav className={styles.rail} aria-label="Modes">
-      {/* public/assets/logo-64.png, from brand/hc-logo.png: a square app icon, rounded like one. */}
+      {/* The logo (herocanvas.config.ts) at 64px, made by scripts/vite/brand.ts: a square app icon, rounded like one. */}
       <span className={styles.brand} title="HeroCanvas">
         <img src="/assets/logo-64.png" alt="HeroCanvas" width={28} height={28} style={{ borderRadius: 7 }} />
       </span>

@@ -1,8 +1,8 @@
-<p align="center"><img src="public/pwa/icon-192.png" width="96" alt="HeroCanvas"></p>
+<p align="center"><img src="brand/hc-logo.png" width="96" alt="HeroCanvas"></p>
 
 # HeroCanvas
 
-<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.1.0-3b6fd8"></a>
+<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.2.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -64,8 +64,9 @@ press **Inspect** and point at a component.
 
 ### 3. Make it yours
 
-`herocanvas.config.ts`, at the root: the tool's name and logo (a square PNG). Its brand color comes from the logo on
-its own, or set it there.
+`herocanvas.config.ts`, at the root: the tool's name and logo (a square PNG). The favicon, the home-screen icons and
+the brand color come from the logo on their own (set the color there if you want another); restart `npm run dev`
+after a change.
 
 ### 4. Connect your app
 

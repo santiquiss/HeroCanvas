@@ -5,6 +5,13 @@ HeroCanvas's versions. The number shows in the toolbar (package.json `version`);
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.2.0 — 2026-10-20
+
+- **Icons from the logo**: the favicon (and the rail's logo), the home-screen icons and the web app manifest are made
+  from `herocanvas.config.ts`'s logo, served by the dev server and written by the build (`scripts/vite/png.ts`: PNG
+  read, scaled and written, no dependency). Changing the logo changes them all; the hand-made ones in `public/` are
+  gone. The 512px icon is a fifth lighter.
+
 ## 0.1.0 — 2026-10-20
 
 - **The skeleton**: the canvas and its devices, the simulator (navigation, list–detail, sheets that become menus,
