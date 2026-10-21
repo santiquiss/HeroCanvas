@@ -2,10 +2,7 @@
 // without errors, and with every text in an element of its own (looseText.ts). Discovered from the manifest and the
 // stories, so a new page or story is covered without touching this file. It renders, it doesn't look: the look is
 // checked in the simulator.
-import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { NO_APP } from '../nav/pages';
-import { GetStartedPanel, WAYS } from '../tools/GetStartedPanel';
 import { STORIES } from '../design/stories';
 import { HOME } from '../nav/home';
 import { composePages } from '../nav/manifest';
@@ -45,15 +42,6 @@ function placesOf(pages: Manifest): { name: string; ref: PageRef }[] {
 }
 
 const live = composePages(null);
-
-// No app connected (it declares no pages): the designer in its empty mode, Get started listing the ways to begin.
-if (NO_APP)
-  describe('No app connected', () => {
-    it('Get started shows how to start', () => {
-      const html = renderToStaticMarkup(<GetStartedPanel />);
-      for (const way of WAYS) expect(html).toContain(way.title);
-    });
-  });
 
 // None without an app connected (an empty `each` is no test, which vitest fails).
 if (placesOf(live).length)

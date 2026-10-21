@@ -8,8 +8,7 @@ import { useSimQuery, type Mode } from '../sim/modes';
 import { TOOLS } from './registry';
 import styles from './Panel.module.css';
 
-// Apart with no app connected: Get started opens first there, whatever tab the viewer last had with an app.
-const KEY = NO_APP ? 'hc.panels.noApp' : 'hc.panels';
+const KEY = 'hc.panels';
 
 /** The last route each tool with routes had (the token group, the component), to go back to on its tab. */
 const lastRoute = new Map<string, string>();
@@ -68,7 +67,7 @@ export function PanelHost({
   only?: string[];
 }) {
   const { inspect } = useDesignRoot();
-  const onSide = TOOLS.filter((t) => t.side === side && (t.modes ?? ['prototype', 'components']).includes(mode) && (!only || only.includes(t.id)) && (!t.noAppOnly || NO_APP));
+  const onSide = TOOLS.filter((t) => t.side === side && (t.modes ?? ['prototype', 'components']).includes(mode) && (!only || only.includes(t.id)));
   const inspector = inspect ? onSide.filter((t) => t.whileInspecting) : [];
   // The tab that was active comes back when Inspect ends: the inspector never becomes the remembered tool.
   const tools = inspector.length ? inspector : onSide.filter((t) => !t.whileInspecting);

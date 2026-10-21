@@ -7,9 +7,9 @@ import type { PageDef } from './types';
 /** No app connected: the app declares no pages. The designer shows in its empty mode. */
 export const NO_APP = Object.keys(APP_PAGES).length === 0;
 
-/** The page that stands in for the app's while there's none: its screens' place on the devices. */
+/** The page that stands in for the app's while there's none: HeroCanvas's welcome, with the ways to begin. */
 const START: Record<string, PageDef> = {
-  start: { path: '/start', level: 'tab', title: 'Your app', component: NoAppScreen, status: 'placeholder' },
+  start: { path: '/start', level: 'tab', title: 'Welcome', component: NoAppScreen, status: 'placeholder' },
 };
 
 export const BASE_PAGES: Record<string, PageDef> = NO_APP ? START : APP_PAGES;

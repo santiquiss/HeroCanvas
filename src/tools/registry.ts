@@ -14,7 +14,6 @@ import { ProposalPanel } from './ProposalPanel';
 import { ScenariosPanel } from './ScenariosPanel';
 import { TokensPanel } from './TokensPanel';
 import { ComponentInfoPanel, ComponentStateBadge } from './ComponentInfoPanel';
-import { GetStartedPanel } from './GetStartedPanel';
 
 export interface ToolDef {
   id: string;
@@ -35,13 +34,9 @@ export interface ToolDef {
   badge?: ComponentType;
   /** With no app connected: what it shows once there is one, in its place (EmptyHint), so the interface explains itself. */
   empty?: string;
-  /** Only with no app connected (Get started). */
-  noAppOnly?: boolean;
 }
 
 export const TOOLS: ToolDef[] = [
-  // With no app connected: how to begin, first on the right in every mode.
-  { id: 'start', title: 'Get started', icon: 'rocket_launch', side: 'right', component: GetStartedPanel, modes: ['prototype', 'flow', 'components', 'tokens'], noAppOnly: true },
   { id: 'pages', title: 'Pages', icon: 'account_tree', side: 'left', component: PagesPanel, modes: ['prototype'], empty: 'Every screen of your app, one page each, the way its navigation has them: the tabs, what opens over them, what comes before the app. Pick one to see it on the devices.' },
   { id: 'components', title: 'Components', icon: 'widgets', side: 'left', component: ComponentsPanel, modes: ['components'], empty: 'Your app’s components, by the names its code uses, each with its stories.' },
   { id: 'tokens', title: 'Tokens', icon: 'palette', side: 'left', component: TokensPanel, modes: ['tokens'], empty: 'Your app’s design tokens by group: colors, spacing, radii, type.' },

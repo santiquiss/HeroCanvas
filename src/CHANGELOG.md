@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.10.0 — 2026-10-21
+
+- **The welcome is a screen**: with no app connected, the devices show HeroCanvas's welcome as an app screen (on the
+  app's tokens, so the device's theme and text size apply): the three ways to begin, each ready to copy. It replaces
+  the right panel's Get started tab, which took room from the panels.
+- **Flow and Capture work in empty mode**, on the welcome screen: try them, take images and videos, before there's an
+  app. Components and Tokens keep saying what they show.
+
 ## 0.9.0 — 2026-10-21
 
 - **Empty mode**: with no app connected, HeroCanvas shows its whole interface instead of a page of its own. The

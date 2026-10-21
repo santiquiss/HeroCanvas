@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.9.0-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.10.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -53,8 +53,9 @@ npm install
 Your copy will hold your app's mirror and your proposals: it's where your team designs.
 
 Two starting points, as branches: `main` comes with the sample app (a task manager) to look around; **`empty`** has no
-app at all: HeroCanvas opens in its empty mode, every part saying what it shows once your app is in, and **Get
-started** on the right guiding you to connect it (`git switch empty`, or copy the template with all its branches).
+app at all: HeroCanvas opens in its empty mode, the devices showing a welcome screen with the ways to connect your
+app, and every other part saying what it shows once your app is in. Flow and Capture work on the welcome screen
+already (`git switch empty`, or copy the template with all its branches).
 
 ### 2. See the sample app
 
