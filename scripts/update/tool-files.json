@@ -1,0 +1,15 @@
+{
+  "//": "What belongs to HeroCanvas in a team's copy: `npm run update` replaces it (merging what the team changed). Everything else (app/, proposals/, herocanvas.config.ts, brand/, README.md, CLAUDE.md) is the team's and never touched. Read from the version being installed, so a release can add paths.",
+  "dirs": [
+    "src",
+    "scripts",
+    "public/assets/devices",
+    "docs",
+    ".claude/skills/connect-app",
+    ".claude/skills/mirror-screen",
+    ".claude/skills/new-proposal",
+    ".claude/skills/update-herocanvas"
+  ],
+  "files": ["index.html", "vite.config.ts", "tsconfig.json", "tsconfig.app.json", "tsconfig.node.json", "AGENTS.md", "CHANGELOG.md", "LICENSE", ".gitignore"],
+  "merged": ["package.json"]
+}

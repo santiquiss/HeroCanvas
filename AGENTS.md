@@ -17,7 +17,9 @@ Two sides, as in Laravel's skeleton and framework:
   with `--app-*` tokens, so any app's look reaches them.
 
 **The contract** is what crosses between them: `src/index.ts` and what the tool reads from `app/`. While in 0.x it may
-change; each change goes in `CHANGELOG.md` under **Contract**, so a team knows what to adapt. At 1.0 it holds still.
+change; each change goes in `CHANGELOG.md` under **Contract**, saying what to adapt, so a team's agent can do it on
+update (`update-herocanvas`). At 1.0 it holds still. A new folder or file of the tool's goes in
+`scripts/update/tool-files.json`, or updates won't bring it.
 
 ## Procedures (skills)
 
@@ -28,6 +30,8 @@ when the task is one of these):
   `app/` replaced by its mirror (settings, tokens, navigation, one page per screen).
 - **`mirror-screen`**: one screen or component of the app, built or fixed to match its code.
 - **`new-proposal`**: a change to the app as a proposal (`proposals/<slug>`), with versions and a handoff.
+- **`update-herocanvas`**: a newer HeroCanvas into this copy (`npm run update`), its clashes resolved and the team's
+  code adapted to the contract's changes.
 
 The person's app's own repository is read, never edited: everything goes in HeroCanvas.
 

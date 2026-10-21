@@ -100,8 +100,9 @@ becomes "update HeroCanvas" to the agent.
 The sample app lives in the package (or `herocanvas init` writes it), never in the team's folder, so changing it never
 conflicts with their app.
 
-**Proposed path**: the update command and the skill now, while the repo is still private, so no one ends up with a
-copy that can't be updated; the package next (Order, step 1). The skill carries over unchanged.
+**Path**: the update command and the skill first (done in 0.5.0: `npm run update` and `update-herocanvas`, from git
+tags, so a copy made from the template updates as well as a clone); the package next (Order, step 1). The skill
+carries over unchanged.
 
 ### The model: Laravel
 

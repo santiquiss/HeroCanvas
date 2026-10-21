@@ -5,6 +5,16 @@ HeroCanvas's versions. The number shows in the toolbar (package.json `version`);
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.5.0 — 2026-10-21
+
+- **Updates**: `npm run update` brings a newer HeroCanvas into a copy, from the repository's tags with the git
+  credentials already set up. The tool's files (`scripts/update/tool-files.json`, read from the new version) are
+  replaced; those the team changed are merged three ways, and a clash is left marked; `package.json` is merged by
+  field; `app/`, `proposals/`, the config and `brand/` are never touched. `--dry-run` shows what it would do, and it
+  prints the changelog in between. Copies from before 0.5.0 lack the command: copy `scripts/update*` in once.
+- **The `update-herocanvas` skill**: runs it, resolves the clashes keeping both sides' intent, adapts `app/` and
+  `proposals/` to each **Contract** item, then checks and shows the result.
+
 ## 0.4.0 — 2026-10-21
 
 - **The team's code and the tool, apart** (as Laravel's skeleton and framework): `app/` and `proposals/` at the root

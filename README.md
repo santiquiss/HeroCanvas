@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.4.0-3b6fd8"></a>
+<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.5.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -151,6 +151,22 @@ docs/                  design notes (the developer experience)
 ```
 
 React 19, React Router and Vite; no other runtime dependency.
+
+## Updating
+
+When HeroCanvas has a new version, ask your agent to **"update HeroCanvas"** (the `update-herocanvas` skill), or run it
+yourself with your work committed:
+
+```
+npm run update -- --dry-run   # what it would change, and the changelog
+npm run update                # the latest version (or: npm run update -- 0.6.0)
+```
+
+It replaces the tool's files (`src/`, `scripts/`, the configs: the list is `scripts/update/tool-files.json`), merges
+any you changed with the new version and marks a clash for you to resolve, merges `package.json` keeping your own
+scripts and dependencies, and prints the changelog. `app/`, `proposals/`, `herocanvas.config.ts` and `brand/` are
+never touched; a **Contract** item in the changelog says what to adapt in them. Then `npm install` and the checks.
+Versions come from this repository's tags, fetched with your git credentials; a fork: `--from <git url>`.
 
 ## Deploy
 
