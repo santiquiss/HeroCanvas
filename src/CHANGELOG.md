@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.6.2 — 2026-10-21
+
+- **Authors**: HeroCanvas is made by Santiago Quiss and Agus Salas, both credited with their GitHub profiles on the
+  About page, in the README and in `LICENSE`'s required copyright notice.
+
 ## 0.6.1 — 2026-10-21
 
 - **HeroCanvas's page**: an ⓘ at the bottom of the left rail, over the light / dark switch, with HeroCanvas's version

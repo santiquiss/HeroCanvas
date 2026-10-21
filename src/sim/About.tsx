@@ -6,6 +6,11 @@ import styles from './About.module.css';
 
 const REPO = 'https://github.com/santiquiss/HeroCanvas';
 const LICENSE = 'https://polyformproject.org/licenses/shield/1.0.0';
+/** Who made it, with their GitHub profiles. */
+const AUTHORS = [
+  { name: 'Santiago Quiss', url: 'https://github.com/santiquiss' },
+  { name: 'Agus Salas', url: 'https://github.com/salasagustina-ds' },
+];
 const BODY = changelogBody(hcChangelog);
 
 export function About() {
@@ -21,7 +26,16 @@ export function About() {
         </header>
         <section className={styles.credits}>
           <p>
-            Made by Santiago Quiss ·{' '}
+            Made by{' '}
+            {AUTHORS.map((a, i) => (
+              <span key={a.url}>
+                {i > 0 && ' and '}
+                <a href={a.url} target="_blank" rel="noreferrer">
+                  {a.name}
+                </a>
+              </span>
+            ))}{' '}
+            ·{' '}
             <a href={REPO} target="_blank" rel="noreferrer">
               github.com/santiquiss/HeroCanvas
             </a>

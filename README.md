@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.6.1-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.6.2-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -186,6 +186,8 @@ proposals, at the top left of HeroCanvas. **HeroCanvas's** (`src/version.json`, 
 the tool's, under the ⓘ at the bottom of the left rail, which opens its page with the license; updates bring it.
 
 ## License
+
+Made by [Santiago Quiss](https://github.com/santiquiss) and [Agus Salas](https://github.com/salasagustina-ds).
 
 Source-available under the [PolyForm Shield License 1.0.0](LICENSE): use it, change it and share it freely, for
 yourself or your company, to design any app, commercial ones included. What it doesn't allow is offering a product that
