@@ -83,12 +83,23 @@ function AccessibilitySection() {
   const steps = TEXT_SIZES[system].map((s) => ({ value: s.id, label: s.label }));
   const size = textSizeFor(system, textSize);
   const normal = textSizeFor(system, DEFAULT_TEXT_SIZE).id;
+  // The scale is the device's system's: iOS's seven sizes, then the five it adds with Larger Accessibility Sizes on;
+  // Android's one slider, 85% to 200%.
+  const ax = TEXT_SIZES.ios.findIndex((s) => s.accessibility);
+  const ranges =
+    system === 'ios'
+      ? [
+          { from: 0, to: ax - 1, label: 'Standard' },
+          { from: ax, to: steps.length - 1, label: 'Accessibility' },
+        ]
+      : [{ from: 0, to: steps.length - 1, label: 'Android font size' }];
   return (
     <div className={styles.section}>
       <Title label="Accessibility" hint="system" params={Object.values(ACCESSIBILITY_PARAMS)} />
       <Row
         label="Text size"
-        below={<StepSlider label="Text size" value={size.id} own={normal} options={steps} onChange={(v) => patch({ [ACCESSIBILITY_PARAMS.textSize]: v === normal ? null : v })} />}
+        below={<StepSlider label="Text size" value={size.id} own={normal} options={steps} ranges={ranges} onChange={(v) => patch({ [ACCESSIBILITY_PARAMS.textSize]: v === normal ? null : v })} />}
+        note={system === 'ios' ? 'The device’s own sizes: iOS’s seven, then the five more it has under Accessibility › Larger Text.' : 'The device’s own sizes: Android’s font size, 85% to 200%.'}
       >
         <span className={styles.settingValue}>{size.id === normal ? `${size.label} · default` : size.label}</span>
       </Row>
@@ -231,10 +242,15 @@ function Select({ label, value, options, onChange }: { label: string; value: str
  * A value among ordered steps, as a slider with a stop on each (the system's text size: a small A and a big A at its
  * ends). The default step (`own`) is marked under the track. It moves step by step, so the URL is written once a step.
  */
-function StepSlider({ label, value, own, options, onChange }: { label: string; value: string; own: string; options: Option[]; onChange: (v: string) => void }) {
+/**
+ * A slider over named steps, the default's tick under the track. `ranges`: stretches of its steps named under it (the
+ * system each comes from), the one the value is in stronger.
+ */
+function StepSlider({ label, value, own, options, ranges = [], onChange }: { label: string; value: string; own: string; options: Option[]; ranges?: { from: number; to: number; label: string }[]; onChange: (v: string) => void }) {
   const last = options.length - 1;
   const at = (v: string) => Math.max(0, options.findIndex((o) => o.value === v));
-  return (
+  const x = (i: number) => `calc(7px + (100% - 14px) * ${last ? i / last : 0})`;
+  const slider = (
     <div className={styles.stepSlider}>
       <span style={{ fontSize: 10 }}>A</span>
       <span className={styles.stepTrack}>
@@ -243,6 +259,22 @@ function StepSlider({ label, value, own, options, onChange }: { label: string; v
       </span>
       <span style={{ fontSize: 16 }}>A</span>
     </div>
+  );
+  if (!ranges.length) return slider;
+  return (
+    <>
+      {slider}
+      {/* Under the track (between the A's): each range a bracket from its first step to its last, and its name. */}
+      <div className={styles.stepRanges}>
+        <span className={styles.stepRangesTrack}>
+          {ranges.map((r) => (
+            <span key={r.label} className={`${styles.stepRange} ${at(value) >= r.from && at(value) <= r.to ? styles.stepRangeOn : ''}`} style={{ left: x(r.from), width: `calc(${x(r.to)} - ${x(r.from)})` }}>
+              <span>{r.label}</span>
+            </span>
+          ))}
+        </span>
+      </div>
+    </>
   );
 }
 

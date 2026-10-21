@@ -1053,3 +1053,38 @@
   font-size: 12px;
   line-height: 17px;
 }
+
+/* Under a step slider: the ranges of its steps, named (iOS's sizes and its larger accessibility ones). Aligned with
+   the track between the two A's (10px + 8px gap on the left, 8px gap + 10px on the right). */
+.stepRanges {
+  display: flex;
+  padding: 2px 18px 0 16px;
+}
+.stepRangesTrack {
+  position: relative;
+  flex: 1;
+  height: 26px;
+}
+.stepRange {
+  position: absolute;
+  top: 0;
+  min-width: 1px;
+  height: 5px;
+  border: 1px solid var(--ui-line-strong);
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  color: var(--ui-text-subtle, var(--ui-text-muted));
+}
+.stepRange > span {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  translate: -50% 0;
+  font-size: 10px;
+  line-height: 12px;
+  white-space: nowrap;
+}
+.stepRangeOn {
+  border-color: var(--ui-text-muted);
+  color: var(--ui-text);
+}

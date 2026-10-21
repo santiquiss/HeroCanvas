@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.25.2 — 2026-10-21
+
+- **Text size says whose sizes they are**: the slider is the device's system's, and now shows it: under it, iOS's
+  seven Standard sizes and its five Accessibility ones (Larger Text, AX1–AX5) as named ranges, the current one
+  stronger; on Android, its one font size range, 85% to 200%; and a line saying so.
+
 ## 0.25.1 — 2026-10-21
 
 - **No personas: the picker all the same**: Scenarios › Persona shows "Anonymous user" in its usual dropdown, and
