@@ -74,7 +74,8 @@ export function DesignProvider({
   const [inspect, setInspectRaw] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelectedId] = useState<string | null>(null);
-  const [chosenScope, setScope] = useState<InspectScope>('components');
+  // Any element by default (a text, a shape, a container); Components picks whole components.
+  const [chosenScope, setScope] = useState<InspectScope>('all');
   const scope: InspectScope = allOnly ? 'all' : chosenScope;
   const [hoveredEl, setHoveredElRaw] = useState<Element | null>(null);
   const [selectedEl, setSelectedElRaw] = useState<Element | null>(null);

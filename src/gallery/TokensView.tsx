@@ -6,7 +6,7 @@ import { NO_APP } from '../nav/noApp';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
-import { CODE_TOKENS_COMMIT, findTokenGroup, groupSize, TOKEN_GROUPS, type ElevationToken, type Mode, type TextStyleToken, type Token, type TokenGroup } from '../design/tokenCatalog';
+import { CODE_TOKENS_COMMIT, findTokenGroup, groupSize, TOKEN_GROUPS, type ElevationToken, type Mode, type TextStyleToken, type Token, type TokenGroup, TOKENS_CODE_LINKED } from '../design/tokenCatalog';
 import type { CodeTextStyle } from '../design/textStyles';
 import styles from './TokensView.module.css';
 
@@ -72,8 +72,7 @@ export function TokensView({ group: id }: { group: string }) {
 }
 
 /** Groups of the system (the code has a name for each): the palette, the type scale and Other don't. */
-/** Whether a code connector says how the code names the tokens: until one does, no token is "not in the code". */
-const CODE_LINKED = TOKEN_GROUPS.some((g) => !!g.codeAccess || g.tokens.some((t) => t.code !== null));
+const CODE_LINKED = TOKENS_CODE_LINKED;
 
 /**
  * A token's name in the code. With a connector, it or "Not in the code"; without one, the tour's are Local (HeroCanvas's

@@ -11,6 +11,8 @@ function optional<T>(files: Record<string, unknown>, fallback: T): T {
 }
 
 const inventory = optional(import.meta.glob('@app/connectors/figma-components.json', { eager: true, import: 'default' }), { file: '', exportedAt: '', components: [] as unknown[] });
+/** Whether a Figma file is connected (its components exported): until one is, nothing is named "in Figma". */
+export const FIGMA_LINKED = !!inventory.file;
 const codeMap = optional(import.meta.glob('@app/connectors/code-map.json', { eager: true, import: 'default' }), { map: [] as unknown[] });
 
 export interface FigmaProp {

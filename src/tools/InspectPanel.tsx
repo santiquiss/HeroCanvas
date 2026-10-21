@@ -5,7 +5,7 @@ import { fitArgs } from '../design/storyArgs';
 import { isValidElement, useEffect, useState, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { CATALOG, figmaUrl, catalogUrl } from '../design/catalog';
-import { componentTier } from '../design/figma';
+import { componentTier, FIGMA_LINKED } from '../design/figma';
 import { apiContrast, APP_WIDGETS, builtFrom, figmaFor, radius, spacing, WORK, workFor, type Measure } from '../design/handoff';
 import { findProposal, proposalLabel } from '../proposals';
 import { useProposalParam } from './ProposalPanel';
@@ -19,7 +19,7 @@ import type { Args, StoryModule } from '../design/stories';
 import { colorTokens, isVisibleColor, type ColorRole } from '../design/tokens';
 import { colorSource, type ColorProp } from '../design/colorSource';
 import { declaredTextStyle, textStylesOf } from '../design/textStyles';
-import { findToken } from '../design/tokenCatalog';
+import { findToken, TOKENS_CODE_LINKED } from '../design/tokenCatalog';
 import { useGalleryNav, useStories } from '../gallery/route';
 import { useSim } from '../sim/SimContext';
 import { useMode } from '../sim/modes';
@@ -43,8 +43,8 @@ export function InspectPanel() {
 function ScopeBar() {
   const { scope, setScope } = useDesign();
   const options = [
-    { id: 'components', label: 'Components', icon: 'widgets', title: 'Select components' },
     { id: 'all', label: 'All', icon: 'select_all', title: 'Select any element: a text, a shape, a container' },
+    { id: 'components', label: 'Components', icon: 'widgets', title: 'Select components' },
   ] as const;
   return (
     <div className={styles.section}>
@@ -766,8 +766,9 @@ function ColorRow({ k, icon, el, prop, color, theme, role }: { k: string; icon?:
                   label={`${src.token.code?.replace(/^context\.commonColors\./, '') ?? src.token.figma}${src.alpha == null ? '' : src.token.code ? `.withValues(alpha: ${src.alpha})` : ` · ${Math.round(src.alpha * 100)}%`}`}
                   suffix={` (${value})`}
                 />
-                {src.kind === 'figma' && warn('Only in Figma', 'The code has no token for this variable yet: one to add')}
-                {src.token.code && (
+                {/* Only when a code connector says how the code names its tokens: without one, nothing is missing. */}
+                {src.kind === 'figma' && TOKENS_CODE_LINKED && warn('Not in the code', 'The code has no token for this one yet: one to add')}
+                {src.token.code && FIGMA_LINKED && (
                   <span className={`${styles.mono} ${styles.muted}`} style={{ display: 'block' }}>
                     <span className={styles.nameTag}>Figma</span>
                     {src.token.figma}
@@ -845,10 +846,13 @@ function TextStyleRow({ el, cs }: { el: Element; cs: CSSStyleDeclaration }) {
             = {same.map((x) => x.widget).join(', ')}
           </span>
         )}
-        <span className={`${styles.mono} ${styles.muted}`} style={{ display: 'block' }}>
-          <span className={styles.nameTag}>Figma</span>
-          {[s, ...same].map((x) => x.figma).join(', ')}
-        </span>
+        {/* Figma's name for it, a note: only with a Figma file connected. */}
+        {FIGMA_LINKED && (
+          <span className={`${styles.mono} ${styles.muted}`} style={{ display: 'block' }}>
+            <span className={styles.nameTag}>Figma</span>
+            {[s, ...same].map((x) => x.figma).join(', ')}
+          </span>
+        )}
         <span className={`${styles.mono} ${styles.muted}`} style={{ display: 'block' }}>
           {values}
         </span>

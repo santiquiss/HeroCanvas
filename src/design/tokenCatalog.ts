@@ -129,6 +129,8 @@ function build(): TokenGroup[] {
 }
 
 export const TOKEN_GROUPS: TokenGroup[] = build();
+/** Whether a code connector says how the code names the tokens: until one does, no token is "not in the code". */
+export const TOKENS_CODE_LINKED = TOKEN_GROUPS.some((g) => !!g.codeAccess || g.tokens.some((t) => t.code !== null));
 export const findTokenGroup = (id: string | null | undefined) => TOKEN_GROUPS.find((g) => g.id === id) ?? null;
 /** How many entries a group shows (tokens, text styles or elevations). */
 export const groupSize = (g: TokenGroup) => g.tokens.length + (g.textStyles?.length ?? 0) + (g.elevations?.length ?? 0);

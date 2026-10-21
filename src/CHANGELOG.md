@@ -6,6 +6,13 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.26.2 — 2026-10-21
+
+- **Inspect names Figma and the code only when they're connected**: a token without a code name no longer says
+  "Only in Figma" (now "Not in the code", and only with a code connector), and a style's Figma name shows only with
+  a Figma file connected.
+- **Inspect selects any element by default**: All first and on, Components second.
+
 ## 0.26.1 — 2026-10-21
 
 - **Layers speaks the components' states**: its legend and icons were still Library / In app / Local in their old
