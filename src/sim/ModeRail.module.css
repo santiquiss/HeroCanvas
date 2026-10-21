@@ -59,19 +59,6 @@
 .end {
   margin-top: auto;
 }
-/* HeroCanvas's ⓘ: its version under the icon, small. */
-.about {
-  flex-direction: column;
-  gap: 1px;
-  height: auto;
-  padding: 6px 0 5px;
-}
-.aboutVersion {
-  font-size: 10px;
-  line-height: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
 /* The current mode: black like the designer's other selections (the toolbar's), and a blue bar at the rail's edge. */
 .on,
 .on:hover {

@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.6.4 — 2026-10-21
+
+- **The rail's ⓘ** shows no version number (the rail is 60px wide: a version like 0.125.34 wouldn't fit). The version is
+  in its tooltip and on the About page.
+
 ## 0.6.3 — 2026-10-21
 
 - **About, a page of its own**: no toolbar over it (the versions, proposals and Share are the app's), a back arrow at
