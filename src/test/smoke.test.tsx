@@ -2,7 +2,9 @@
 // without errors, and with every text in an element of its own (looseText.ts). Discovered from the manifest and the
 // stories, so a new page or story is covered without touching this file. It renders, it doesn't look: the look is
 // checked in the simulator.
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
+import { GetStarted } from '../sim/GetStarted';
 import { STORIES } from '../design/stories';
 import { HOME } from '../nav/home';
 import { composePages } from '../nav/manifest';
@@ -43,11 +45,22 @@ function placesOf(pages: Manifest): { name: string; ref: PageRef }[] {
 
 const live = composePages(null);
 
-describe('Live pages render', () => {
-  it.each(placesOf(live).map((p) => [p.name, urlOf(live, p.ref)]))('%s', async (_, url) => {
-    expect(await problemsAt(url)).toEqual([]);
+// No app connected (it declares no pages): Get started shows instead of the simulator, with the ways to begin.
+if (!placesOf(live).length)
+  describe('No app connected', () => {
+    it('shows how to start', () => {
+      const html = renderToStaticMarkup(<GetStarted />);
+      for (const way of ['Connect your app’s code', 'Start from a Figma file', 'Look around first']) expect(html).toContain(way);
+    });
   });
-});
+
+// None without an app connected (an empty `each` is no test, which vitest fails).
+if (placesOf(live).length)
+  describe('Live pages render', () => {
+    it.each(placesOf(live).map((p) => [p.name, urlOf(live, p.ref)]))('%s', async (_, url) => {
+      expect(await problemsAt(url)).toEqual([]);
+    });
+  });
 
 for (const proposal of PROPOSALS) {
   const pages = composePages(proposal);

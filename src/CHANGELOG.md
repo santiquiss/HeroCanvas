@@ -6,6 +6,17 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.8.0 — 2026-10-21
+
+- **Get started**: with no app connected (it declares no pages), HeroCanvas opens on a page that guides the start
+  instead of failing: connect the app's code (recommended), start from a Figma file, or look at the sample app first,
+  each as a request to the agent, ready to copy. Light and dark.
+- **The `empty` branch**: HeroCanvas with no app at all, for a clean start; `main` keeps the sample app.
+- **`connect-app` from Figma**: with no code, or when the design leads, the skill builds the mirror from a Figma file
+  (frames, prototype links, variables, components), through the agent's Figma connection.
+- **Tests without the sample app**: the tool's tests that use the sample app's pages are skipped when another app,
+  or none, is connected; with none, a test checks Get started.
+
 ## 0.7.0 — 2026-10-21
 
 - **The `new-persona` skill**: one or several personas for the connected app. It reads the app for what about a user

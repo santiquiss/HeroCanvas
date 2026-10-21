@@ -1,12 +1,13 @@
 ---
 name: connect-app
-description: Connect someone's app to HeroCanvas for the first time - read its code (any stack), replace the sample app in app/ with a mirror of it (settings, tokens, navigation, one page per screen as a placeholder), then mirror the first screens. Use when the person asks to connect, set up, onboard or "make HeroCanvas show" their app.
+description: Connect someone's app to HeroCanvas for the first time - read its code (any stack), or a Figma file when there's no code, replace what's in app/ (the sample app, or nothing) with a mirror of it (settings, tokens, navigation, one page per screen as a placeholder), then mirror the first screens. Use when the person asks to connect, set up, onboard or "make HeroCanvas show" their app, or to build it from a Figma file.
 ---
 
 # Connect an app
 
-The person has HeroCanvas running with the sample app (`app/`, a task manager) and wants it to show their app instead.
-The result: `app/` replaced by a **mirror** of their app — its settings, its look (tokens), its navigation and one
+The person has HeroCanvas running with the sample app (`app/`, a task manager), or with no app at all (the `empty`
+branch: `app/` declares no pages and HeroCanvas shows Get started), and wants it to show their app. The result:
+`app/` replaced by a **mirror** of their app — its settings, its look (tokens), its navigation and one
 page per screen — that the tool reads through the same boundary (`app/index.ts`). Screens start as placeholders
 and get mirrored one at a time (`mirror-screen`).
 
@@ -28,6 +29,21 @@ Detect the stack from the root:
 | `build.gradle(.kts)` with Compose | Jetpack Compose | Navigation Compose `NavHost` | `MaterialTheme`, `ColorScheme` | `res/values*/strings.xml` |
 
 Tell the person what you found in two or three lines (stack, how many screens, tabs, languages) before writing.
+
+### From a Figma file instead
+
+When there's no code yet, or the design leads, the person gives a Figma file's link. It needs Figma connected to you
+(its MCP server); if it isn't, say so and how to connect it, and offer the code path. Then read, never edit, the file:
+
+- **Pages**: its screen frames (one per screen, by page or section), their names, and the prototype's links between
+  them for `links` and the levels (a frame reached from a tab bar is a tab; one over another, a push).
+- **Tokens**: its variables (colors per mode, spacing, radii) and text styles, for `app/theme.css`.
+- **Components**: its components and their properties: they name the mirror's, as the code's would.
+- **Texts**: the frames' copy in the base language; other languages only if the file has them.
+
+The steps below are the same; where they say "the code", read "the file". Say in `app/config.ts`'s comment that the
+mirror comes from Figma. When the code exists, connecting it (this skill again) makes the code the source: what
+differs from the file is then the file's to update, not the mirror's.
 
 ## 2. Settings (`app/config.ts`)
 
@@ -54,8 +70,9 @@ look. If the app has no tabs, the components render nothing and every page is a 
 One page per screen of the app, at its route, from its router (not from guessing): `level` (`tab`, `push`, `cover`,
 `boot` for what comes before the tabs: welcome, sign in, onboarding), `parent`, `tab` for tabs, `links` (where it
 navigates), `defaults` and `variants` for routes with params, `status: 'placeholder'` until mirrored. Each component a
-placeholder for now: the screen's title in the app's scaffold (`Scaffold` from the sample app, restyled) and one line
-saying it's not mirrored yet. Sheets, dialogs and links aren't pages. Flows (onboarding steps) are one page with `flow`.
+placeholder for now: the screen's title in the app's scaffold (`Scaffold` from the sample app, restyled; on the
+`empty` branch, write one) and one line saying it's not mirrored yet. Sheets, dialogs and links aren't pages.
+Flows (onboarding steps) are one page with `flow`.
 
 Delete what's left of the sample app (its screens, components, data, texts) once nothing reads it.
 

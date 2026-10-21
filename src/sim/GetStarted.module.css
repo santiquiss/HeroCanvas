@@ -1,0 +1,193 @@
+/* Get started: the whole window, a page to read in the interface's colors (light or dark, the switch at the top right). */
+.window {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+}
+.theme {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 10px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.theme:hover {
+  background: var(--ui-hover);
+}
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 32px 72px;
+  font-size: 14px;
+  line-height: 21px;
+}
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.logo {
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(15, 20, 30, 0.16);
+}
+.title {
+  margin: 20px 0 0;
+  color: var(--ui-text);
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.lead {
+  max-width: 520px;
+  margin: 10px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 15px;
+  line-height: 22px;
+}
+.how {
+  margin: 44px 0 14px;
+  color: var(--ui-text);
+  font-weight: 600;
+}
+.ways {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.way {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--ui-line);
+  border-radius: 14px;
+  background: var(--ui-bg);
+}
+/* The recommended way stands out: the brand's edge. */
+.first {
+  border-color: var(--hc-brand);
+  box-shadow: 0 0 0 1px var(--hc-brand);
+}
+.wayIcon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--ui-bg-subtle);
+  color: var(--ui-text);
+}
+.first .wayIcon {
+  background: var(--hc-brand);
+  color: var(--hc-on-brand);
+}
+.wayText {
+  flex: 1;
+  min-width: 0;
+}
+.wayText p {
+  margin: 4px 0 0;
+}
+.wayTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--ui-text);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 700;
+}
+.tag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ui-blue-soft);
+  color: var(--ui-blue-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+.prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 10px;
+  background: var(--ui-bg-subtle);
+}
+.prompt code {
+  flex: 1;
+  min-width: 0;
+  color: var(--ui-text);
+  font-size: 12.5px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+}
+.copy {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.copy:hover {
+  background: var(--ui-hover);
+}
+.how code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--ui-hover);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.next {
+  margin: 28px 0 0;
+  color: var(--ui-text-muted);
+}
+.foot {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ui-line-subtle);
+  color: var(--ui-text-subtle);
+  font-size: 12px;
+}
+.foot a {
+  color: var(--ui-blue-text);
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 56px 16px 56px;
+  }
+  .title {
+    font-size: 26px;
+    line-height: 32px;
+  }
+  .way {
+    flex-direction: column;
+  }
+}
