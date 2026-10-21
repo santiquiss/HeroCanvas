@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.33.0 — 2026-10-21
+
+- **SF Symbols on the screens**: `<Icon name="sf:box.truck" />`, beside Material Symbols. `npm run symbols -- <name>…`
+  renders the app's SF Symbols with the Mac's own copy (any weight: `trophy:semibold`), crisp masks in the text's
+  color; `npm run symbols -- --from <Assets.xcassets>` turns the app's own symbols (`.symbolset`) into vectors. They go
+  in `public/symbols/` and `app/symbols.json`, the team's. `fill` picks a symbol's `.fill` variant and `weight` its
+  weight, when made. HeroCanvas ships none: Apple's license lets them be used to design apps for its platforms.
+- `connect-app` and `mirror-screen` use the app's own icons: SF Symbols for an Apple app, Material otherwise.
+
+**Contract**
+
+- `Icon` takes `sf:<name>`; `app/symbols.json` and `public/symbols/` are new, the team's. Nothing to adapt.
+
 ## 0.32.3 — 2026-10-21
 
 - `mirror-screen`, from mirroring all of Food Truck: translations converted from the app's files into one JSON per

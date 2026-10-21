@@ -4,7 +4,7 @@
 
 ### Superpowers for Designers
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.32.3-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.33.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -193,6 +193,9 @@ Other agents can read the same files: they're plain Markdown.
   and a gallery of every component and its states.
 - **Comments** on the canvas (in the browser, or shared through a Supabase table: `src/comments/supabase.sql`), and
   **Capture**: images and videos of the screens in 3D, with light and motion.
+- **Icons as your app draws them**: Material Symbols, or your app's SF Symbols and its own `.symbolset`s, made on a
+  Mac with `npm run symbols` (`<Icon name="sf:box.truck" />`). HeroCanvas ships no SF Symbols: Apple's license lets
+  you use them to design apps for its platforms, from your Mac's own copy.
 - **Screenshots from the terminal**: `npm run shot -- "/today"` (light and dark, in device frames; `--device`,
   `--land`, `--compare` with a proposal) — what the agent uses to look at its own work.
 

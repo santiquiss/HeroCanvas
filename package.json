@@ -14,7 +14,8 @@
     "proposal:code": "node --experimental-strip-types --no-warnings scripts/proposal-code.mjs",
     "persona:avatar": "node --experimental-strip-types --no-warnings scripts/persona-avatar.mjs",
     "shot": "node scripts/shot.mjs",
-    "update": "node scripts/update.mjs"
+    "update": "node scripts/update.mjs",
+    "symbols": "node scripts/symbols.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

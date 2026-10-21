@@ -60,6 +60,10 @@ right, and flip only what points (a chevron, a back arrow) with `:dir(rtl)`.
 scales; screens reach them through `import.meta.env.BASE_URL` (`${import.meta.env.BASE_URL}<app>/…`), never from `/`.
 An asset catalog's colors are tokens (step 3), not images.
 
+**Icons**: an iOS or macOS app's SF Symbols, as the app has them: `npm run symbols -- <name>…` (every
+`systemName:` / `systemImage:` the screens use; on a Mac) and its own symbols, `npm run symbols -- --from
+<its .xcassets>`; then `<Icon name="sf:<name>" />`. Other apps: the closest Material Symbol by name.
+
 Name the copy after the app: `package.json`'s `name` (`<app>-herocanvas`, e.g. `food-truck-herocanvas`).
 
 ### The devices (`appConfig.devices`)

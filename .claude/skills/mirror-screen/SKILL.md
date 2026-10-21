@@ -37,7 +37,8 @@ language (`app/i18n.<lang>.json`), never retyped.
 
 **What only the platform draws** (a MapKit map, a Swift Charts chart, a video, a web view) is drawn here as close as
 the web allows: a chart's marks with SVG, a map as its colors and a pin. Say in the component's comment what it
-stands for. A custom symbol (an SF Symbol of the app's own, a `.symbolset`) takes the closest Material Symbol.
+stands for. Icons are the app's: an SF Symbol or an app's own symbol as `sf:<name>` (`npm run symbols` makes any that's missing:
+the console says which), else the closest Material Symbol.
 
 ## 4. The screen
 
