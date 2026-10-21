@@ -1,7 +1,10 @@
 // The tour's screens, three tabs after iOS: Welcome (what HeroCanvas is, its goal, how it works), Tour (a page per
 // part of HeroCanvas, to try around the device) and Get Started (how to connect an app: its code, or a Figma file).
-import type { ComponentType } from 'react';
+import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
+import { useStill } from '../kit/motion';
 import { useNav } from '../nav/context';
+import { useUrlState } from '../sim/SimContext';
+import { AppIcon, LaunchScreen, Reveal } from './Launch';
 import type { PageProps } from '../nav/types';
 import { STEPS, type TourStep } from './steps';
 import { CapsuleButton, Hero, IconTile, ListRow, PromptField, Screen, Section, TextCell } from './TourKit';
@@ -14,26 +17,56 @@ export const HOW = [
   { icon: 'send', tint: 'green', title: 'Hand them off', subtitle: 'A spec in your code’s own terms' },
 ] as const;
 
+/** Whether the launch already played since HeroCanvas loaded: by default once, not every time Welcome shows again. */
+let launched = false;
+
 export function WelcomeScreen() {
   const nav = useNav();
+  const still = useStill();
+  // Scenarios › Launch: once (the default) or every time Welcome opens; changing it plays it again.
+  const [launch] = useUrlState<string>('launch', 'once');
+  const [splash, setSplash] = useState(() => !still && !(launch === 'once' && launched));
+  const heroIcon = useRef<HTMLSpanElement>(null);
+  const done = useCallback(() => {
+    launched = true;
+    setSplash(false);
+  }, []);
+  // A change of the option plays it again (not its first value: that's the mount, decided above).
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) return void (first.current = false);
+    if (!still) setSplash(true);
+  }, [launch, still]);
+  let i = 0;
   return (
     <Screen title="Welcome">
-      <Hero icon={<img src="/pwa/icon-192.png" alt="" width={88} height={88} className={styles.appIcon} />} title="HeroCanvas" subtitle="Design your app’s screens in code, with an AI agent, on a canvas of real devices." />
-      <Section header="What it is">
-        <TextCell>A design tool built on your app’s code. Its screens aren’t drawings: they’re a mirror of your app, rebuilt from the code with the same components, props and tokens your developers use.</TextCell>
-      </Section>
-      <Section header="The goal">
-        <TextCell>Design where your app will live: on every phone and tablet at once, in light and dark, in every language, with its real navigation. Then hand off changes in the terms your code already speaks.</TextCell>
-      </Section>
-      <Section header="How it works">
-        {HOW.map((h) => (
-          <ListRow key={h.title} icon={h.icon} tint={h.tint} title={h.title} subtitle={h.subtitle} />
-        ))}
-      </Section>
-      <div className={styles.actions}>
-        <CapsuleButton title="Take the Tour" onPressed={() => nav.goTab('tour')} />
-        <CapsuleButton title="Get Started" filled={false} onPressed={() => nav.goTab('getStarted')} />
+      {splash && <LaunchScreen target={heroIcon} onDone={done} />}
+      <div data-tilt-area>
+        <Hero icon={<AppIcon iconRef={heroIcon} hidden={splash} />} title="HeroCanvas" subtitle="Design your app’s screens in code, with an AI agent, on a canvas of real devices." />
       </div>
+      <Reveal on={!splash} index={i++}>
+        <Section header="What it is">
+          <TextCell>A design tool built on your app’s code. Its screens aren’t drawings: they’re a mirror of your app, rebuilt from the code with the same components, props and tokens your developers use.</TextCell>
+        </Section>
+      </Reveal>
+      <Reveal on={!splash} index={i++}>
+        <Section header="The goal">
+          <TextCell>Design where your app will live: on every phone and tablet at once, in light and dark, in every language, with its real navigation. Then hand off changes in the terms your code already speaks.</TextCell>
+        </Section>
+      </Reveal>
+      <Reveal on={!splash} index={i++}>
+        <Section header="How it works">
+          {HOW.map((h) => (
+            <ListRow key={h.title} icon={h.icon} tint={h.tint} title={h.title} subtitle={h.subtitle} />
+          ))}
+        </Section>
+      </Reveal>
+      <Reveal on={!splash} index={i++}>
+        <div className={styles.actions}>
+          <CapsuleButton title="Take the Tour" onPressed={() => nav.goTab('tour')} />
+          <CapsuleButton title="Get Started" filled={false} onPressed={() => nav.goTab('getStarted')} />
+        </div>
+      </Reveal>
     </Screen>
   );
 }

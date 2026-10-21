@@ -13,7 +13,18 @@ export const TOUR_PAGES: Record<string, PageDef> = {
     component: WelcomeScreen,
     tab: { label: 'Welcome', short: 'Welcome', icon: 'home' },
     status: 'done',
-    note: 'What HeroCanvas is, its goal and how it works',
+    note: 'What HeroCanvas is, its goal and how it works; it opens with a launch animation',
+    controls: [
+      {
+        param: 'launch',
+        label: 'Launch',
+        note: 'The splash and its transition into the screen',
+        options: [
+          { value: 'once', label: 'Once' },
+          { value: 'always', label: 'Every time' },
+        ],
+      },
+    ],
     links: [
       { to: 'tour', label: 'Take the Tour' },
       { to: 'getStarted', label: 'Get Started' },

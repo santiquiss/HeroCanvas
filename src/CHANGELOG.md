@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.14.0 — 2026-10-21
+
+- **Welcome opens with a launch**, to show the motion a screen can have: a splash in the brand's blue where the app
+  icon springs in and a sheen sweeps it; the icon flies to its place in the hero (a shared element) while the blue
+  fades; the sections rise in one after another. Then the icon stays alive: it floats, tilts in 3D after the pointer
+  with a glare, and spins when tapped. Springs from `kit/motion`, transforms and opacity only; still in Flow and with
+  reduced motion.
+- **Scenarios › Launch**: once (the default) or every time Welcome opens; changing it plays it again.
+
 ## 0.13.0 — 2026-10-21
 
 - **A component against the code, in three words**: Matches code, Differs from code, or **Local** (only in
