@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.6.5 — 2026-10-21
+
+- **One surface for menus and popovers**: the version's changelog, Live, the dropdowns, the persona and token menus,
+  the comment popovers and Capture's menu share it (`src/theme/surface.module.css`): the same background, radius and
+  shadow, which in dark has a lighter edge and a deeper shadow so it no longer blends into the background.
+- **Live's empty state**: with no proposals, what one is and how to start it, instead of the table's headers alone (or,
+  with all of them archived, where they are).
+
 ## 0.6.4 — 2026-10-21
 
 - **The rail's ⓘ** shows no version number (the rail is 60px wide: a version like 0.125.34 wouldn't fit). The version is

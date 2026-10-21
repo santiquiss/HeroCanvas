@@ -7,6 +7,7 @@ import { Icon } from '../components/Icon';
 import { PROPOSALS } from '../proposals';
 import { STATUSES, type Proposal } from '../proposals/types';
 import { StatusDot, useProposalParam } from '../tools/ProposalPanel';
+import surface from '../theme/surface.module.css';
 import styles from './ProposalMenu.module.css';
 
 /** Live's icon: the app as it is on the phone today. */
@@ -97,14 +98,29 @@ export function ProposalMenu() {
               <span className={styles.liveLine}>What the app is today</span>
             </span>
           </button>
-          <div className={`${styles.cols} ${styles.colHead}`} aria-hidden>
-            <span />
-            <span>Code</span>
-            <span>Proposal · {shown.length}</span>
-            <span>Status</span>
-            <span>Created by</span>
-            <span>Date</span>
-          </div>
+          {/* No proposals to list: what one is and how to make it (or, all archived, where they are). */}
+          {shown.length === 0 ? (
+            <div className={surface.empty}>
+              <span className={surface.emptyIcon}>
+                <Icon name="lightbulb" size={24} />
+              </span>
+              <span className={surface.emptyTitle}>{archived.length ? 'No active proposals' : 'No proposals yet'}</span>
+              <span className={surface.emptyBody}>
+                {archived.length
+                  ? `${archived.length === 1 ? 'The only one is' : `All ${archived.length} are`} archived: show them below.`
+                  : 'A proposal is a change to the app, kept apart from it: new or changed screens, versions to compare, a handoff for whoever builds it. Start one in the Proposal panel, or ask your agent.'}
+              </span>
+            </div>
+          ) : (
+            <div className={`${styles.cols} ${styles.colHead}`} aria-hidden>
+              <span />
+              <span>Code</span>
+              <span>Proposal · {shown.length}</span>
+              <span>Status</span>
+              <span>Created by</span>
+              <span>Date</span>
+            </div>
+          )}
           {shown.map((p) => {
             const on = p.id === active?.id;
             const s = statusOf(p);

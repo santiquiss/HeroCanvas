@@ -25,6 +25,7 @@
   outline-offset: 1px;
 }
 .panel {
+  composes: surface from '../theme/surface.module.css';
   position: absolute;
   top: calc(100% + 10px);
   left: -8px;
@@ -34,12 +35,6 @@
   max-height: min(70vh, 640px);
   display: flex;
   flex-direction: column;
-  border-radius: 14px;
-  background: var(--ui-bg);
-  box-shadow:
-    0 0 0 1px rgba(15, 20, 30, 0.08),
-    0 10px 28px rgba(15, 20, 30, 0.18);
-  color: var(--ui-text);
   overflow: hidden;
 }
 .head {

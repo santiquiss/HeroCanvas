@@ -1,0 +1,35 @@
+/* What floats over the designer's interface (menus, dropdowns, popovers, the changelog): one surface, so they all
+   look alike and stand apart from what's under them in light and dark. A menu takes it with
+   `composes: surface from '…/theme/surface.module.css'` and adds only its own size, place and padding. */
+.surface {
+  background: var(--ui-bg);
+  border-radius: 12px;
+  box-shadow: var(--ui-pop-shadow);
+  color: var(--ui-text);
+}
+
+/* A menu with nothing to list: an icon, what's missing, and how to get it. */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 24px 22px;
+  text-align: center;
+}
+.emptyIcon {
+  display: flex;
+  margin-bottom: 4px;
+  color: var(--ui-text-subtle);
+}
+.emptyTitle {
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.emptyBody {
+  max-width: 340px;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  line-height: 17px;
+}

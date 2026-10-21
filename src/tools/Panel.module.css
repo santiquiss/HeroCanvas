@@ -627,6 +627,7 @@
 }
 /* A bit wider than the card it opens from; shadow only here, nothing under it scrolls or animates */
 .personaMenu {
+  composes: surface from '../theme/surface.module.css';
   position: absolute;
   z-index: 10;
   top: calc(100% + 6px);
@@ -638,10 +639,6 @@
   max-height: min(460px, 70vh);
   overflow-y: auto;
   padding: 6px;
-  border: 1px solid var(--ui-line);
-  border-radius: 14px;
-  background: var(--ui-bg);
-  box-shadow: 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
 }
 .personaMenu .persona:hover,
 .personaMenu .persona:focus-visible {
@@ -967,6 +964,7 @@
   color: var(--ui-text-subtle);
 }
 .tokenMenu {
+  composes: surface from '../theme/surface.module.css';
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
@@ -977,11 +975,6 @@
   max-height: 280px;
   overflow-y: auto;
   padding: 4px;
-  border-radius: 8px;
-  background: var(--ui-bg);
-  box-shadow:
-    0 0 0 1px rgba(15, 20, 30, 0.08),
-    0 6px 20px rgba(15, 20, 30, 0.14);
 }
 .tokenOption {
   padding: 6px;

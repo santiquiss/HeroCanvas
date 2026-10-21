@@ -101,6 +101,8 @@ button {
   --ui-on-strong: #ffffff;
   --ui-float: rgba(255, 255, 255, 0.92);
   --ui-float-line: rgba(15, 20, 30, 0.06);
+  /* What floats over the interface (menus, popovers, the changelog): a hairline and a soft shadow. */
+  --ui-pop-shadow: 0 0 0 1px rgba(15, 20, 30, 0.08), 0 12px 32px rgba(21, 24, 28, 0.14), 0 2px 6px rgba(21, 24, 28, 0.06);
   --ui-blue-soft: #e8f2ff;
   --ui-amber-soft: #fff4e0;
   --ui-green-soft: #dcfce7;
@@ -129,6 +131,8 @@ button {
   --ui-on-strong: #ffffff;
   --ui-float: rgba(44, 44, 44, 0.92);
   --ui-float-line: rgba(255, 255, 255, 0.08);
+  /* On dark a soft shadow vanishes into the background: a lighter edge and a deeper shadow set menus apart. */
+  --ui-pop-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 16px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
   --ui-blue-soft: rgba(13, 153, 255, 0.16);
   --ui-amber-soft: rgba(245, 158, 11, 0.15);
   --ui-green-soft: rgba(22, 163, 74, 0.18);

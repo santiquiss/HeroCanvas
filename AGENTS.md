@@ -43,6 +43,9 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **One source of truth for data**: an app's mock data lives in one module its screens derive from.
 - **Components are instrumented**: a component marks its root with `useComponent(name, props)` (from `herocanvas`)
   so Inspect and Layers find it, and has stories (`<Name>.stories.tsx`) for the gallery.
+- **One surface for what floats**: a menu, dropdown or popover of the designer composes `surface` from
+  `src/theme/surface.module.css` (its background, radius and the theme's `--ui-pop-shadow`, which sets it apart in
+  light and dark), and an empty list shows its `empty` state, never bare headers.
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done
