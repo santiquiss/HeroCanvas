@@ -7,13 +7,21 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { CATALOG } from '../design/catalog';
 import { useDesign } from '../design/DesignContext';
-import { COMPONENT_COLOR, componentIcon, componentKind, elementKind, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, textOf, type Corners } from '../design/element';
+import { componentIcon, elementKind, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, textOf, type Corners } from '../design/element';
 import { APP_WIDGETS } from '../design/handoff';
+import { COMPONENT_STATUSES, componentState, statusOf } from '../design/componentState';
+import { NO_APP } from '../nav/noApp';
 import { useLibrary } from '../design/library';
 import { componentHint, componentInstance } from '../design/component';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
+
+/** Layers' legend: the states a component on screen can be in (the app's own widgets' only when it has some). */
+const LEGEND = COMPONENT_STATUSES.filter((s) => (NO_APP ? s.key === 'build' : s.key === 'matches' || s.key === 'differs' || s.key === 'build' || (s.key === 'app' && Object.keys(APP_WIDGETS).length > 0)));
+
+/** The word beside a component's row when it doesn't match the code. */
+const ROW_WORD: Partial<Record<string, string>> = { differs: 'differs', app: 'in app', build: 'local', missing: 'missing', unreplicated: 'not replicated' };
 
 type LNode =
   | { type: 'page'; key: string; label: string; el: HTMLElement }
@@ -142,19 +150,14 @@ export function LayersPanel() {
         action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? 'Expand all' : 'Collapse all'} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />}
       />
       <div style={{ padding: '6px 0 12px' }}>
+        {/* The components' states, as the gallery has them: against the code. With no app, all are Local. */}
         <div className={styles.layersLegend}>
-          <span>
-            <span className={styles.dot} style={{ background: COMPONENT_COLOR.library }} />
-            Library
-          </span>
-          <span>
-            <span className={styles.dot} style={{ background: COMPONENT_COLOR.app }} />
-            In app
-          </span>
-          <span>
-            <span className={styles.dot} style={{ background: COMPONENT_COLOR.local }} />
-            Local
-          </span>
+          {LEGEND.map((s) => (
+            <span key={s.key}>
+              <span className={styles.dot} style={{ background: s.color }} />
+              {s.label}
+            </span>
+          ))}
         </div>
         {found
           ? found.map((f) => <LayerRow key={f.node.key} node={f.node} depth={0} path={path} found={f.kids} />)
@@ -191,11 +194,12 @@ function LayerRow({ node, depth, path, found }: { node: LNode; depth: number; pa
 
   const hint = node.type === 'component' ? componentHint(componentInstance(node.id)?.props ?? {}) : undefined;
   const entry = node.type === 'component' ? CATALOG.get(node.label) : undefined;
-  // In the component library (the code's API, or its catalog), or only here.
-  const inLibrary = !!entry || !!lib?.widget(node.label);
+  // Against the code, as the gallery says it (design/componentState): its icon's color, and a word when it isn't a match.
+  const status = node.type === 'component' && lib ? statusOf(componentState(node.label, true, lib)) : undefined;
+  const state = COMPONENT_STATUSES.find((s) => s.key === status);
   const icon = node.type === 'page' ? 'web_asset' : node.type === 'text' ? KIND_ICON.text : node.type === 'layer' ? (node.kind === 'group' ? GROUP_ICON[node.label] : undefined) ?? KIND_ICON[node.kind] : entry ? TIER_ICON[entry.tier] : componentIcon(node.label);
   // On the icon only: the name reads as every other row's.
-  const color = node.type === 'component' && !isSel ? COMPONENT_COLOR[componentKind(node.label, inLibrary)] : undefined;
+  const color = node.type === 'component' && !isSel ? state?.color : undefined;
 
   return (
     <>
@@ -233,7 +237,7 @@ function LayerRow({ node, depth, path, found }: { node: LNode; depth: number; pa
           {node.label}
           {hint && <span className={styles.muted}> · {hint}</span>}
         </span>
-        {node.type === 'component' && !inLibrary && <span className={styles.muted}>{node.label in APP_WIDGETS ? 'in app' : 'local'}</span>}
+        {state && status !== 'matches' && <span className={styles.muted}>{ROW_WORD[status!] ?? ''}</span>}
       </div>
       {found
         ? found.map((f) => <LayerRow key={f.node.key} node={f.node} depth={depth + 1} path={path} found={f.kids} />)

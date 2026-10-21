@@ -6,13 +6,13 @@ import { isValidElement, useEffect, useState, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { CATALOG, figmaUrl, catalogUrl } from '../design/catalog';
 import { componentTier } from '../design/figma';
-import { apiContrast, builtFrom, figmaFor, radius, spacing, WORK, workFor, type Measure } from '../design/handoff';
+import { apiContrast, APP_WIDGETS, builtFrom, figmaFor, radius, spacing, WORK, workFor, type Measure } from '../design/handoff';
 import { findProposal, proposalLabel } from '../proposals';
 import { useProposalParam } from './ProposalPanel';
 import { paramReview, widgetReview, type ReviewNote } from '../design/apiReview';
 import { useLibrary, type ApiWidget } from '../design/library';
 import { elementById, useDesign } from '../design/DesignContext';
-import { COMPONENT_COLOR, componentKind, elementSize, anchors, flexAlignment, codeSizing, textOverflowOf, kindLabel, layerKind, mixesText, shapeCorners, textOf } from '../design/element';
+import { elementSize, anchors, flexAlignment, codeSizing, textOverflowOf, kindLabel, layerKind, mixesText, shapeCorners, textOf } from '../design/element';
 import { AlignDiagram, PaddingDiagram, RadiusGlyph, SizingGlyph, SpacingGlyph } from './InspectGlyphs';
 import { closestComponent, componentInstance, parentComponent, type ComponentProps } from '../design/component';
 import type { Args, StoryModule } from '../design/stories';
@@ -114,7 +114,8 @@ function Selection() {
         )
       : codeCall(inst.name, inst.props);
   const figma = figmaFor(inst.name);
-  const kind = componentKind(inst.name, !!(widget || entry));
+  // Its tier (atom, molecule…) only when the code or Figma gives one: never a guess.
+  const tier = widget?.tier ?? entry?.tier ?? (inst.name in APP_WIDGETS ? componentTier(inst.name) : undefined);
   const parts = builtFrom(el);
   const figmaLink = figma.find((m) => m.url)?.url ?? (entry && figmaUrl(entry));
 
@@ -123,11 +124,7 @@ function Selection() {
       <div className={styles.section}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, lineHeight: '20px', overflowWrap: 'anywhere' }}>{inst.name}</span>
-          {/* Its tier in the component library (atom, molecule, organism); an app's own widget, its tier in the app's color; or
-              local: only in the simulator so far. The colors Layers uses. */}
-          <span className={styles.badge} style={{ background: COMPONENT_COLOR[kind], color: '#ffffff' }}>
-            {kind === 'library' ? (widget?.tier ?? entry?.tier) : kind === 'app' ? (componentTier(inst.name) ?? 'app') : 'local'}
-          </span>
+          {tier && <span className={styles.badge}>{tier}</span>}
           {/* Against the code: in the library, differs (a proposal changes it), new, in the app only, or not in code. */}
           <span className={styles.badge} style={{ background: work.color, color: '#ffffff' }} title={work.label}>
             {work.badge}

@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.26.1 — 2026-10-21
+
+- **Layers speaks the components' states**: its legend and icons were still Library / In app / Local in their old
+  colors; now they're the gallery's: Matches code, Differs from code, Local (and In the app when the app has widgets
+  of its own), each component's color and word from the same state. With no app connected, only Local.
+- **Inspect's tier only when given**: the component's tier (atom, molecule…) shows when the code or Figma names one,
+  never guessed, and no longer in the old colors; its state against the code is the colored badge.
+
 ## 0.26.0 — 2026-10-21
 
 - **An app says which devices it's for**: `appConfig.devices` (`DeviceTargets`: `platforms` iOS and/or Android,

@@ -1,7 +1,6 @@
 // An element picked on its own in Inspect (not a component instance): what kind of layer it is, named as a developer
 // would build it where there's a clear match (in the layout vocabulary of Row, Column, Expanded, Positioned…),
 // and the layers a component is made of (Layers' drill-down).
-import { APP_WIDGETS } from './appWidgets';
 import { CATALOG } from './catalog';
 import { componentTier } from './figma';
 
@@ -117,14 +116,6 @@ export const ownText = (el: Element) =>
     .filter(Boolean)
     .join(' ');
 
-/**
- * The colors that tell components apart (Layers, Inspect's badge): one of the component library (what the code builds),
- * one the app builds on its own (design/appWidgets: Inspect's "In app" blue), and one that's only in the simulator so far.
- */
-export const COMPONENT_COLOR = { library: '#8b5cf6', app: '#2563eb', local: '#d97706' } as const;
-
-/** Where a component lives: the component library (`inLibrary`: its API or its catalog), the app's own code, or only here. */
-export const componentKind = (name: string, inLibrary: boolean): keyof typeof COMPONENT_COLOR => (inLibrary ? 'library' : name in APP_WIDGETS ? 'app' : 'local');
 
 /** A component's kind (its catalog tier) as an icon: Layers' rows, the gallery's list. One not in the catalog: `widgets`. */
 export const TIER_ICON: Record<string, string> = { atom: 'radio_button_checked', molecule: 'hub', organism: 'grid_view', token: 'palette' };
