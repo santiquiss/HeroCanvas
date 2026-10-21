@@ -127,6 +127,8 @@ Flows (onboarding steps) are one page with `flow`.
 
 `npm run typecheck`, `npm run lint`, `npm test`, `npx vite build`. Then `npm run shot -- "/<home route>"` and look at
 the picture: the tabs, the colors in light and dark. Show it to the person, with the list of pages and their status.
+Then version the copy: `package.json`'s `version` to `0.1.0` and its first entry in the root `CHANGELOG.md` (the
+team's: what was connected, what's mirrored and what's a placeholder).
 
 ## 7. Mirror the first screens
 

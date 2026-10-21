@@ -33,6 +33,12 @@ export interface Layout {
   phoneLand: boolean;
   isTablet: boolean;
   isPhone: boolean;
+  /**
+   * iOS's horizontal size class (SwiftUI's `horizontalSizeClass`, UIKit's trait), for a screen that lays out by it:
+   * `regular` on a tablet and on a big phone turned (a Max, a Plus: 900 wide or more), `compact` otherwise. Android's
+   * window size classes go by width: `vw` (compact under 600, medium under 840, expanded from 840).
+   */
+  horizontalSizeClass: 'compact' | 'regular';
   /** Where navigation goes in this orientation (display `nav`, else bottom below 600px and rail from 600). */
   nav: NavPlacement;
   /** `nav === 'bottom'`: tab bar + floating search. */
@@ -299,6 +305,7 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
     phoneLand,
     isTablet,
     isPhone,
+    horizontalSizeClass: isTablet || vw >= 900 ? 'regular' : 'compact',
     nav,
     bottomNav,
     sideNav,

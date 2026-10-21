@@ -37,7 +37,8 @@ language the app has.
 ## 4. The screen
 
 In `app/screens/`, reading the layout from the simulator (`useSim().layout`, `usePadL`, `usePadR`), never a
-device's name or size. Sheets and dialogs through `useSim().openSheet` / `openDialog` / `useActionSheet` (they become
+device's name or size. A screen that changes by size class (SwiftUI's `horizontalSizeClass`: a List on iPhone, a
+Table on iPad) reads `layout.horizontalSizeClass`; one by Android's window size classes, `layout.vw`. Sheets and dialogs through `useSim().openSheet` / `openDialog` / `useActionSheet` (they become
 menus and dialogs on large screens by themselves). States the person can try go in the page's manifest entry as
 `controls` (Scenarios). Then `status: 'done'` in `app/pages.tsx`.
 

@@ -6,6 +6,18 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.31.0 — 2026-10-21
+
+- **The layout has iOS's size class**: `layout.horizontalSizeClass` (`compact` or `regular`), for a screen that lays
+  out by it (SwiftUI's `horizontalSizeClass`: a List on iPhone, a Table on iPad). Regular on tablets and on a big phone
+  turned (900 wide or more), as iOS has it. `mirror-screen` says so.
+- **Page's list–detail reads a root's split right**: it measured a sidebar app's root by the side panel's width and
+  said it stacked while it showed side by side.
+
+**Contract**
+
+- `Layout.horizontalSizeClass` (from `useSim().layout`): new, nothing to adapt.
+
 ## 0.30.0 — 2026-10-21
 
 From connecting a real app for the first time (Apple's Food Truck, SwiftUI):

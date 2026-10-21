@@ -249,8 +249,9 @@ function ScreenConfigSection({ id }: { id: string }) {
   const eff = splitFor(id, def, cfg);
   const o = cfg[id] ?? {};
   const on = o.split !== false;
-  // Covers and boot pages span the screen; pushed pages get the main area (or the tablet panel).
-  const width = isFullScreen(def.level) ? L.vw : L.split ? L.detailW : L.mainW;
+  // Covers and boot pages span the screen; a root (a sidebar app's) the base, beside the rail; pushed pages the main
+  // area (or the tablet panel).
+  const width = isFullScreen(def.level) ? L.vw : def.level === 'tab' ? L.baseW : L.split ? L.detailW : L.mainW;
   const active = !!eff && listDetailActive(L, width, eff.minWidth);
   const need = eff ? (L.bottomNav ? Math.max(eff.minWidth, LIST_DETAIL_BOTTOM_NAV_MIN) : eff.minWidth) : 0;
   const child = nav.def(base.defaultChild.id);
