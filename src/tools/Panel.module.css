@@ -482,6 +482,10 @@
 }
 
 /* Pages: a variant's (or a mode's) icon, softer than a page's. */
+/* A page's role icon (ROLE_ICONS): a box for its tooltip, the icon's color unchanged. */
+.roleIcon {
+  display: flex;
+}
 .variantIcon {
   display: flex;
   color: var(--ui-text-subtle);

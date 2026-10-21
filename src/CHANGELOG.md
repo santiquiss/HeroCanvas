@@ -6,6 +6,13 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.6.6 — 2026-10-21
+
+- **Page icons by role**: Pages, Flow, the changes menu and a component's places show each page by its role in the
+  navigation, from one vocabulary (`ROLE_ICONS`): a tab, a pushed page, a cover, before the app. No longer a tab's own
+  icon, which an app may not have, or may have one a Material Symbol can't draw (it showed as text). Hover names the
+  role.
+
 ## 0.6.5 — 2026-10-21
 
 - **One surface for menus and popovers**: the version's changelog, Live, the dropdowns, the persona and token menus,

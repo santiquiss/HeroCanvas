@@ -8,7 +8,7 @@ import { useNavRoot } from '../nav/context';
 import { stepOf, stepState } from '../nav/flow';
 import { ChangeBadge } from '../flow/FlowView';
 import type { Manifest } from '../nav/stack';
-import { pageIcon, pageName, sameRef } from '../nav/stack';
+import { pageIcon, pageName, ROLE_ICONS, sameRef } from '../nav/stack';
 import type { FlowStep, PageDef, PageRef, PageStatus } from '../nav/types';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
@@ -174,7 +174,10 @@ function Row({ depth, def, label, refOf, caret, onCaret, onClick, variant, count
           <Icon name="auto_awesome_motion" size={16} />
         </span>
       ) : (
-        <Icon name={pageIcon(def)} size={16} />
+        // Its role in the navigation (ROLE_ICONS: one vocabulary for every app), named on hover.
+        <span className={styles.roleIcon} title={ROLE_ICONS[def.level].label}>
+          <Icon name={pageIcon(def)} size={16} />
+        </span>
       )}
       <span className={styles.name}>{label}</span>
       {count != null && <span className={styles.muted}>{count}</span>}

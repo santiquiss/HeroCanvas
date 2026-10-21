@@ -6,7 +6,7 @@
 //   #/tasks/t1?stack=/projects,/projects/work    → [projects, project, task]
 //   #/tasks/t1                                   → [today, task] (its `parentOf`)
 import { SHOT_PARAMS } from '../capture/shot/params';
-import type { PageDef, PageRef, Params, StateParams } from './types';
+import type { Level, PageDef, PageRef, Params, StateParams } from './types';
 
 export type Manifest = Record<string, PageDef>;
 
@@ -154,14 +154,21 @@ export function pageName(pages: Manifest, id: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
-/** Tab icons that are the app's own glyphs, which the designer's own icons (Material Symbols) draw as their nearest Symbol. */
-const SYMBOL_FOR_GLYPH: Record<string, string> = {};
+/**
+ * A page's icon wherever the designer lists pages (Pages, Flow, the changes menu, a component's places): its role in
+ * the app's navigation, from one vocabulary, the same for any app. Never the app's own icons: an app may have none
+ * for a page, or ones a Material Symbol can't draw, and a page's name already tells pages apart. A flow's steps and a
+ * page's variants have their own (PagesPanel).
+ */
+export const ROLE_ICONS: Record<Level, { icon: string; label: string }> = {
+  tab: { icon: 'tab', label: 'Tab: a root of the app’s navigation' },
+  push: { icon: 'article', label: 'Pushed: opens over the page it comes from' },
+  cover: { icon: 'fullscreen', label: 'Cover: over the whole screen' },
+  boot: { icon: 'start', label: 'Before the app: welcome, sign-in, onboarding' },
+};
 
-/** A page's icon, as the Pages panel shows it: its tab's, else a boot page's, a cover's or a pushed page's. */
 export function pageIcon(def: PageDef | undefined): string {
-  const tab = def?.tab?.icon;
-  if (tab) return SYMBOL_FOR_GLYPH[tab] ?? tab;
-  return def?.level === 'boot' ? 'start' : def?.level === 'cover' ? 'fullscreen' : 'article';
+  return ROLE_ICONS[def?.level ?? 'push'].icon;
 }
 
 export function pageTitle(pages: Manifest, ref: PageRef): string {

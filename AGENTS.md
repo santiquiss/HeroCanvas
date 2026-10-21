@@ -46,6 +46,9 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **One surface for what floats**: a menu, dropdown or popover of the designer composes `surface` from
   `src/theme/surface.module.css` (its background, radius and the theme's `--ui-pop-shadow`, which sets it apart in
   light and dark), and an empty list shows its `empty` state, never bare headers.
+- **Pages by their role**: wherever the designer lists pages, a page's icon is its level's (`ROLE_ICONS`,
+  `src/nav/stack.ts`: tab, push, cover, boot), the same for every app; never the app's own icons, which may be
+  missing or not drawable.
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done
