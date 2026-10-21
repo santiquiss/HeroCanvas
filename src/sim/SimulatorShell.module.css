@@ -396,11 +396,11 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  /* At rest just its +, in a faint ring; pointed at, a solid button. */
+  /* At rest its + in a light ring (the icon's color, mostly see-through); pointed at, a solid button. */
   background: transparent;
   color: var(--hc-canvas-icon);
-  box-shadow: 0 0 0 1px var(--hc-canvas-chip-line);
-  opacity: 0.6;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--hc-canvas-icon) 30%, transparent);
+  opacity: 0.85;
   transition:
     opacity 150ms ease,
     background 150ms ease,
