@@ -1,6 +1,6 @@
 /* Welcome's motion: transforms and opacity only (the compositor's), each on a spring from kit/motion. */
 
-/* The icon in the hero: it floats, and its tilt and spin turn it in 3D. */
+/* The icon in the hero: it floats, its tilt turns it in 3D, a tap sweeps a sheen across it. */
 .icon {
   display: block;
   padding: 0;
@@ -26,8 +26,8 @@
   --glare: 0;
   display: block;
   transform-style: preserve-3d;
-  transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--spin)));
-  transition: transform var(--spin-ms) var(--spin-ease);
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform var(--tilt-ms) var(--tilt-ease);
 }
 .face {
   position: relative;
@@ -75,5 +75,33 @@
 @media (prefers-reduced-motion: reduce) {
   .float {
     animation: none;
+  }
+}
+
+/* A tap's band of light across the icon, clipped to its shape (masked by its image). */
+.sheenClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.sheen {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.75) 50%, transparent 68%);
+  transform: translateX(-120%);
+  animation: sweep 900ms cubic-bezier(0.45, 0, 0.35, 1) forwards;
+}
+@keyframes sweep {
+  to {
+    transform: translateX(120%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheen {
+    animation: none;
+    opacity: 0;
   }
 }

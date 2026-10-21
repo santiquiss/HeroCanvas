@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.16.2 — 2026-10-21
+
+- **Welcome's icon shines when tapped** instead of spinning: a band of light across it, in its shape. It still floats
+  and tilts after the pointer.
+
 ## 0.16.1 — 2026-10-21
 
 - **The launch settles instead of snapping**: flying to a component, the icon lands a little bigger and both shrink
