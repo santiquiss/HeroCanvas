@@ -1,4 +1,4 @@
-<p align="center"><img src="brand/hc-logo.png" width="96" alt="HeroCanvas"></p>
+<p align="center"><img src="brand/hc-readme.png" width="100%" alt="HeroCanvas: two people designing an app together, around the HeroCanvas icon"></p>
 
 # HeroCanvas
 
