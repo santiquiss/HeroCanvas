@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.32.2 — 2026-10-21
+
+- `mirror-screen`: a bar fixed at the top spans the screen's whole width (its side margins taken back), or the page
+  shows beside it as it scrolls under.
+
 ## 0.32.1 — 2026-10-21
 
 - **A sidebar app upright on a tablet**: when its list and detail show one at a time (an iPad upright), a section

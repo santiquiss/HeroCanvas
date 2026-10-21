@@ -38,7 +38,10 @@ language the app has.
 
 In `app/screens/`, reading the layout from the simulator (`useSim().layout`, `usePadL`, `usePadR`), never a
 device's name or size. A screen that changes by size class (SwiftUI's `horizontalSizeClass`: a List on iPhone, a
-Table on iPad) reads `layout.horizontalSizeClass`; one by Android's window size classes, `layout.vw`. Sheets and dialogs through `useSim().openSheet` / `openDialog` / `useActionSheet` (they become
+Table on iPad) reads `layout.horizontalSizeClass`; one by Android's window size classes, `layout.vw`. A bar fixed at the top
+(a navigation bar, sticky while the page scrolls) spans the screen's whole width: take the side margins back with
+negative margins and pad its content by them (the tour's `Screen`, `src/tour/TourKit.tsx`), or the page shows beside it
+as it scrolls under. Sheets and dialogs through `useSim().openSheet` / `openDialog` / `useActionSheet` (they become
 menus and dialogs on large screens by themselves). States the person can try go in the page's manifest entry as
 `controls` (Scenarios). Then `status: 'done'` in `app/pages.tsx`.
 
