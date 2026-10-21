@@ -155,16 +155,17 @@ export function pageName(pages: Manifest, id: string): string {
 }
 
 /**
- * A page's icon wherever the designer lists pages (Pages, Flow, the changes menu, a component's places): its role in
- * the app's navigation, from one vocabulary, the same for any app. Never the app's own icons: an app may have none
- * for a page, or ones a Material Symbol can't draw, and a page's name already tells pages apart. A flow's steps and a
- * page's variants have their own (PagesPanel).
+ * A page's icon wherever the designer lists pages (Pages, Flow, the changes menu, a component's places): a phone, a
+ * screen of the app, the same for every page and any app; its role in the navigation is the icon's tooltip (and the
+ * row's badge, its indent). Never the app's own icons: an app may have none for a page, or ones a Material Symbol
+ * can't draw, and a page's name already tells pages apart. A flow's steps and a page's variants have their own
+ * (PagesPanel).
  */
 export const ROLE_ICONS: Record<Level, { icon: string; label: string }> = {
-  tab: { icon: 'tab', label: 'Tab: a root of the app’s navigation' },
-  push: { icon: 'article', label: 'Pushed: opens over the page it comes from' },
-  cover: { icon: 'fullscreen', label: 'Cover: over the whole screen' },
-  boot: { icon: 'start', label: 'Before the app: welcome, sign-in, onboarding' },
+  tab: { icon: 'smartphone', label: 'Tab: a root of the app’s navigation' },
+  push: { icon: 'smartphone', label: 'Pushed: opens over the page it comes from' },
+  cover: { icon: 'smartphone', label: 'Cover: over the whole screen' },
+  boot: { icon: 'smartphone', label: 'Before the app: welcome, sign-in, onboarding' },
 };
 
 export function pageIcon(def: PageDef | undefined): string {

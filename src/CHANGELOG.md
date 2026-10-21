@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.25.4 — 2026-10-21
+
+- **A phone for every page** in the lists of pages (Pages, Flow, the changes menu), instead of an icon per role (a
+  tab, a document…) that didn't read: the role stays in its tooltip, badge and indent.
+
 ## 0.25.3 — 2026-10-21
 
 - **Swiping on past Welcome's last card opens the Tour**, as Take the Tour does; so does Next there, instead of

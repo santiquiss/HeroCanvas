@@ -48,9 +48,9 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **One surface for what floats**: a menu, dropdown or popover of the designer composes `surface` from
   `src/theme/surface.module.css` (its background, radius and the theme's `--ui-pop-shadow`, which sets it apart in
   light and dark), and an empty list shows its `empty` state, never bare headers.
-- **Pages by their role**: wherever the designer lists pages, a page's icon is its level's (`ROLE_ICONS`,
-  `src/nav/stack.ts`: tab, push, cover, boot), the same for every app; never the app's own icons, which may be
-  missing or not drawable.
+- **Pages, one icon**: wherever the designer lists pages, a page's icon is a phone (`ROLE_ICONS`, `src/nav/stack.ts`),
+  its role (tab, push, cover, boot) in its tooltip, badge and indent; the same for every app, never the app's own
+  icons, which may be missing or not drawable.
 - **The tour stands in for an app**: with none connected (`NO_APP`, `src/nav/noApp.ts`), HeroCanvas shows its own
   (`src/tour`): its pages, navigation, components with their stories, and its theme as `--app-*` tokens
   (`src/tour/theme.css`), so every mode has something real. A new part of the designer gets a step in
