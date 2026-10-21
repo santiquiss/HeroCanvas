@@ -1,4 +1,17 @@
 /* The tour's navigation, like an app's: liquid glass (theme.css's --glass-*), a sliding pill on the selected tab. */
+
+/* iOS's tab colors: the system blue for the selected tab, the label color for the rest (dark under the screen's
+   data-theme). */
+.bottomBar,
+.rail,
+.sideCol {
+  --tab-tint: #007aff;
+  --tab-label: #000000;
+}
+:global([data-theme='dark']) :is(.bottomBar, .rail, .sideCol) {
+  --tab-tint: #0a84ff;
+  --tab-label: #ffffff;
+}
 .glass {
   background: var(--glass-fill);
   box-shadow: var(--glass-box-shadow);
@@ -10,7 +23,7 @@
 .tabSel {
   position: absolute;
   border-radius: var(--app-radius-full);
-  background: var(--app-pressed);
+  background: rgba(120, 120, 128, 0.16);
   pointer-events: none;
   transition:
     left 420ms cubic-bezier(0.34, 1.32, 0.64, 1),
@@ -59,7 +72,7 @@
 .barLabel {
   position: relative;
   align-self: stretch;
-  font: 500 11px/13px Inter, system-ui, sans-serif;
+  font: 500 10px/12px -apple-system, 'SF Pro Text', system-ui, sans-serif;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;

@@ -1,58 +1,35 @@
-.hero {
+/* The app icon at iOS's corner ratio (about 22% of its side). */
+.appIcon {
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.actions {
+  margin-top: 28px;
+}
+.lead {
+  margin: 4px 0 0;
+  padding: 0 4px;
+  font-size: calc(17px * var(--text-scale, 1));
+  line-height: 1.3;
+  color: var(--ios-label-2);
+}
+.stepHead {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: var(--app-space-xl);
+  padding-top: 8px;
   text-align: center;
 }
-.logo {
-  border-radius: 15px;
-}
-.heroTitle {
-  margin: var(--app-space-l) 0 0;
-  font: var(--app-font-title);
-}
-.heroLead {
-  margin: var(--app-space-s) 0 0;
-  font: var(--app-font-body);
-  color: var(--app-text-muted);
-}
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-space-m);
-  margin-top: var(--app-space-xl);
-}
-.card {
-  margin-top: var(--app-space-m);
-  border-radius: var(--app-radius-l);
-  background: var(--app-surface);
-  overflow: hidden;
-}
-.card > * + * {
-  box-shadow: inset 0 1px 0 var(--app-border);
-}
-.intro {
-  margin: 0 0 var(--app-space-s);
-  font: var(--app-font-body);
-  color: var(--app-text-muted);
-}
-.stepIcon {
-  width: 72px;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  background: var(--app-primary);
-  color: var(--app-on-primary);
-}
 .stepTitle {
-  margin: var(--app-space-l) 0 0;
-  font: var(--app-font-title);
+  margin: 14px 0 0;
+  font-family: var(--ios-display);
+  font-size: calc(28px * var(--text-scale-display, 1));
+  line-height: 1.2;
+  font-weight: 700;
 }
-.stepBody {
-  margin: var(--app-space-m) 0 0;
-  font: var(--app-font-body);
-  color: var(--app-text-secondary);
+.stepLine {
+  margin: 6px 0 0;
+  font-size: calc(17px * var(--text-scale, 1));
+  line-height: 1.3;
+  color: var(--ios-label-2);
 }

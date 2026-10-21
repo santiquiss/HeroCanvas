@@ -20,7 +20,7 @@ function useTabs() {
 type Tab = ReturnType<typeof useTabs>[number];
 
 function TabIcon({ icon, sel }: { icon: string; sel: boolean }) {
-  return <Icon name={icon} size={24} fill={sel} color={sel ? 'var(--app-primary)' : 'var(--app-text)'} style={{ position: 'relative' }} />;
+  return <Icon name={icon} size={24} fill={sel} color={sel ? 'var(--tab-tint)' : 'var(--tab-label)'} style={{ position: 'relative' }} />;
 }
 
 function TabIndicator({ index, count, size }: { index: number; count?: number; size?: number }) {
@@ -42,7 +42,7 @@ function TabBar() {
         {tabs.map((t) => (
           <button key={t.id} className={styles.barTab} onClick={t.on}>
             <TabIcon icon={t.icon} sel={t.sel} />
-            <span className={styles.barLabel} style={{ color: t.sel ? 'var(--app-primary)' : 'var(--app-text)' }}>
+            <span className={styles.barLabel} style={{ color: t.sel ? 'var(--tab-tint)' : 'var(--tab-label)' }}>
               {t.label}
             </span>
           </button>

@@ -7,8 +7,8 @@ description: Create one or several personas for the connected app - read the app
 
 A **persona** is someone the app is tried as: picked in the Scenarios panel (`?persona=<id>`), every screen shows
 their data. HeroCanvas only carries the pick; the app declares them (`appConfig.personas`: `id`, `name`, a one-line
-`description`, an optional `avatar`) and its mock data module gives each one their data. The sample app shows the
-pattern: `app/data/sample.ts` (`PERSONAS`, and the data per persona id).
+`description`, an optional `avatar`) and its mock data module gives each one their data. One module holds it all:
+`PERSONAS` and the data per persona id (the `sample-tasks` tag has an example, its `app/data/sample.ts`).
 
 A persona is **who** someone is, lasting: a new user with nothing yet, a paying admin with a lot. What any user can
 run into for a moment (loading, an error, offline, a sheet open) is not a persona: it's a page's state or a scenario

@@ -1,15 +1,14 @@
 ---
 name: connect-app
-description: Connect someone's app to HeroCanvas for the first time - read its code (any stack), or a Figma file when there's no code, replace what's in app/ (the sample app, or nothing) with a mirror of it (settings, tokens, navigation, one page per screen as a placeholder), then mirror the first screens. Use when the person asks to connect, set up, onboard or "make HeroCanvas show" their app, or to build it from a Figma file.
+description: Connect someone's app to HeroCanvas for the first time - read its code (any stack), or a Figma file when there's no code, fill app/ (empty until then: HeroCanvas shows its own tour) with a mirror of it (settings, tokens, navigation, one page per screen as a placeholder), then mirror the first screens. Use when the person asks to connect, set up, onboard or "make HeroCanvas show" their app, or to build it from a Figma file.
 ---
 
 # Connect an app
 
-The person has HeroCanvas running with the sample app (`app/`, a task manager), or with no app at all (the `empty`
-branch: `app/` declares no pages and HeroCanvas shows Get started), and wants it to show their app. The result:
-`app/` replaced by a **mirror** of their app — its settings, its look (tokens), its navigation and one
-page per screen — that the tool reads through the same boundary (`app/index.ts`). Screens start as placeholders
-and get mirrored one at a time (`mirror-screen`).
+The person has HeroCanvas running with no app connected (`app/` declares no pages, so HeroCanvas shows its own tour,
+`src/tour`) and wants it to show their app. The result: `app/` holding a **mirror** of their app — its settings, its
+look (tokens), its navigation and one page per screen — that the tool reads through the same boundary
+(`app/index.ts`). Screens start as placeholders and get mirrored one at a time (`mirror-screen`).
 
 Talk to the person in their language; write code and comments in English.
 
@@ -62,7 +61,7 @@ contract doesn't: add it as `--app-<name>` too; screens may read it.
 ## 4. Navigation (`app/nav/`)
 
 The app's tab bar (phones), and rail and side column (large screens) if it has them, as `AppNavigation` components,
-starting from the sample app's `AppNav.tsx`. Same tabs, icons (Material Symbols names closest to the app's), labels and
+like the tour's (`src/tour/TourNav.tsx`, an example to start from). Same tabs, icons (Material Symbols names closest to the app's), labels and
 look. If the app has no tabs, the components render nothing and every page is a push or a cover.
 
 ## 5. Pages (`app/pages.tsx`)
@@ -70,11 +69,10 @@ look. If the app has no tabs, the components render nothing and every page is a 
 One page per screen of the app, at its route, from its router (not from guessing): `level` (`tab`, `push`, `cover`,
 `boot` for what comes before the tabs: welcome, sign in, onboarding), `parent`, `tab` for tabs, `links` (where it
 navigates), `defaults` and `variants` for routes with params, `status: 'placeholder'` until mirrored. Each component a
-placeholder for now: the screen's title in the app's scaffold (`Scaffold` from the sample app, restyled; on the
-`empty` branch, write one) and one line saying it's not mirrored yet. Sheets, dialogs and links aren't pages.
+placeholder for now: the screen's title in the app's scaffold (the tour's `Screen`, `src/tour/TourKit.tsx`, is
+an example; write the app's own) and one line saying it's not mirrored yet. Sheets, dialogs and links aren't pages.
 Flows (onboarding steps) are one page with `flow`.
 
-Delete what's left of the sample app (its screens, components, data, texts) once nothing reads it.
 
 ## 6. Check it and show it
 

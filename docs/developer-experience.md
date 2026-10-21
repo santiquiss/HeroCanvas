@@ -1,6 +1,6 @@
 # Developer experience: connecting any app to HeroCanvas
 
-A first proposal to think through, not a decision. HeroCanvas today shows one app (the sample app, `app/`) built in its
+A first proposal to think through, not a decision. HeroCanvas today shows one app (`app/`; with none, its own tour) built in its
 own React. The goal: a team with an app in React, React Native, Flutter, SwiftUI or Jetpack Compose installs it,
 connects their app in minutes, and from then on designs, reviews and hands off on a canvas that matches their code.
 
@@ -85,7 +85,7 @@ replace the first and never touch the second. How well that works depends on how
 | | How they got it | How they update | What goes wrong |
 |---|---|---|---|
 | **Template** (today's README) | "Use this template": a new repo, one commit, no shared history | A merge with `--allow-unrelated-histories` | Git can't tell who changed what: nearly every file conflicts. In practice, nobody updates |
-| **Clone or fork** | History shared with HeroCanvas | `git pull upstream main` | The tool's folders merge cleanly; `app/` conflicts whenever the sample app changes (it shares the folder with theirs); `package.json`, `CHANGELOG.md` and the README always conflict. A fork of a public repo is public |
+| **Clone or fork** | History shared with HeroCanvas | `git pull upstream main` | The tool's folders merge cleanly; `app/` conflicts whenever the starter app changes (it shares the folder with theirs); `package.json`, `CHANGELOG.md` and the README always conflict. A fork of a public repo is public |
 | **Update command** | Any of the above | `npx herocanvas update`: the tool's folders replaced by a release's; `app/`, `proposals/` and `herocanvas.config.ts` left alone | Nothing in the tool, as long as they didn't edit it. Their app may need changes when the contract does |
 | **Package** | `npm install herocanvas`; their repo holds only the config, the app and the proposals | `npm install herocanvas@latest` | Only what the contract breaks, which semver announces |
 
@@ -97,7 +97,7 @@ An **`update-herocanvas` skill** does the migrating: it reads the changelog betw
 team's app to each contract change (a renamed manifest field, a new required token), then runs the checks. Updating
 becomes "update HeroCanvas" to the agent.
 
-The sample app lives in the package (or `herocanvas init` writes it), never in the team's folder, so changing it never
+The starter (the tour) lives in the tool, never in the team's folder, so changing it never
 conflicts with their app.
 
 **Path**: the update command and the skill first (done in 0.5.0: `npm run update` and `update-herocanvas`, from git
@@ -113,7 +113,7 @@ you never edit it.
 | Laravel | HeroCanvas |
 |---|---|
 | `laravel/framework`, in `vendor/` | The tool: `src/` today, the npm package later |
-| `laravel new` writes the skeleton | `npx herocanvas init` writes `herocanvas.config.ts`, the sample app and `proposals/` |
+| `laravel new` writes the skeleton | `npx herocanvas init` writes `herocanvas.config.ts`, an empty `app/` and `proposals/` |
 | `app/`, `routes/`, `config/` are yours | `app/`, `proposals/`, `herocanvas.config.ts` and `brand/` are yours |
 | `vendor:publish` copies a view to change it | Ejecting a piece |
 | The upgrade guide, Laravel Shift | The changelog, the `update-herocanvas` skill |

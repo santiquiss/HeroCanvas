@@ -1,65 +1,87 @@
-// The tour's screens: Welcome (how to connect an app: its code or a Figma file; the tour itself is the sample to look
-// around in), the list of the tour's steps, and a page per step.
-import type { ComponentType, ReactNode } from 'react';
-import { Icon } from '../components/Icon';
+// The tour's screens, three tabs after iOS: Welcome (what HeroCanvas is, its goal, how it works), Tour (a page per
+// part of HeroCanvas, to try around the device) and Get Started (how to connect an app: its code, or a Figma file).
+import type { ComponentType } from 'react';
 import { useNav } from '../nav/context';
 import type { PageProps } from '../nav/types';
 import { STEPS, type TourStep } from './steps';
-import { NextButton, TourPage, TourRow, TryIt, WayCard } from './TourKit';
+import { CapsuleButton, Hero, IconTile, ListRow, PromptField, Screen, Section, TextCell } from './TourKit';
 import styles from './screens.module.css';
 
-const WAYS = [
-  {
-    icon: 'code',
-    title: 'Connect your app’s code',
-    tag: 'Recommended',
-    body: 'Your agent reads your app’s repository (React, React Native, Flutter, SwiftUI or Compose) and builds its mirror here: every screen as a page, with your components, tokens and texts. Your code is only read, never changed.',
-    prompt: 'Connect my app to HeroCanvas. Its code is in <the path to your app’s repository>.',
-  },
-  {
-    icon: 'draw',
-    title: 'Start from a Figma file',
-    body: 'No code yet, or the design leads: your agent reads the file’s frames, components and variables (with Figma connected to it). Connect the code later.',
-    prompt: 'Build my app in HeroCanvas from this Figma file: <the file’s link>',
-  },
-];
+const HOW = [
+  { icon: 'link', tint: 'blue', title: 'Connect your app', subtitle: 'Your agent reads its code and mirrors it here' },
+  { icon: 'devices', tint: 'indigo', title: 'See it everywhere', subtitle: 'Every screen on every device, in light and dark' },
+  { icon: 'call_split', tint: 'pink', title: 'Propose changes', subtitle: 'Kept apart, in versions to compare' },
+  { icon: 'send', tint: 'green', title: 'Hand them off', subtitle: 'A spec in your code’s own terms' },
+] as const;
 
 export function WelcomeScreen() {
   const nav = useNav();
   return (
-    <TourPage title="Welcome" bare>
-      <header className={styles.hero}>
-        <img src="/pwa/icon-192.png" alt="" width={64} height={64} className={styles.logo} />
-        <h1 className={styles.heroTitle}>Welcome to HeroCanvas</h1>
-        <p className={styles.heroLead}>Your app’s screens will be here, on every device at once. To begin, open your agent in this folder and ask it one of these.</p>
-      </header>
-      <div className={styles.stack}>
-        {WAYS.map((w, i) => (
-          <WayCard key={w.title} {...w} recommended={i === 0} />
+    <Screen title="Welcome">
+      <Hero icon={<img src="/pwa/icon-192.png" alt="" width={88} height={88} className={styles.appIcon} />} title="HeroCanvas" subtitle="Design your app’s screens in code, with an AI agent, on a canvas of real devices." />
+      <Section header="What it is">
+        <TextCell>A design tool built on your app’s code. Its screens aren’t drawings: they’re a mirror of your app, rebuilt from the code with the same components, props and tokens your developers use.</TextCell>
+      </Section>
+      <Section header="The goal">
+        <TextCell>Design where your app will live: on every phone and tablet at once, in light and dark, in every language, with its real navigation. Then hand off changes in the terms your code already speaks.</TextCell>
+      </Section>
+      <Section header="How it works">
+        {HOW.map((h) => (
+          <ListRow key={h.title} icon={h.icon} tint={h.tint} title={h.title} subtitle={h.subtitle} />
         ))}
+      </Section>
+      <div className={styles.actions}>
+        <CapsuleButton title="Take the Tour" onPressed={() => nav.goTab('tour')} />
+        <CapsuleButton title="Get Started" filled={false} onPressed={() => nav.goTab('getStarted')} />
       </div>
-      <TourRowCard>
-        <TourRow icon="explore" title="Take the tour" line="What each part of HeroCanvas does, to try right here" onTap={() => nav.goTab('tour')} />
-      </TourRowCard>
-    </TourPage>
+    </Screen>
   );
-}
-
-function TourRowCard({ children }: { children: ReactNode }) {
-  return <div className={styles.card}>{children}</div>;
 }
 
 export function TourScreen() {
   const nav = useNav();
   return (
-    <TourPage title="Tour">
-      <p className={styles.intro}>This is an app too: HeroCanvas’s own, while yours isn’t connected. Each step is a page; open one and try it on the interface around the device.</p>
-      <div className={styles.card}>
+    <Screen title="Tour">
+      <Section header="Try each part" footer="This is an app too: HeroCanvas’s own, here until yours is connected. Each step is a page; try it on the interface around the device.">
         {STEPS.map((s) => (
-          <TourRow key={s.id} icon={s.icon} title={s.title} line={s.line} onTap={() => nav.push(s.id, {})} />
+          <ListRow key={s.id} icon={s.icon} tint={s.tint} title={s.title} subtitle={s.line} onTap={() => nav.push(s.id, {})} />
         ))}
-      </div>
-    </TourPage>
+      </Section>
+    </Screen>
+  );
+}
+
+const WAYS = [
+  {
+    header: 'Recommended',
+    icon: 'code',
+    tint: 'blue',
+    title: 'Connect your app’s code',
+    text: 'Your agent reads your app’s repository (React, React Native, Flutter, SwiftUI or Compose) and builds its mirror here: every screen as a page, with your components, tokens and texts. Your code is only read, never changed.',
+    prompt: 'Connect my app to HeroCanvas. Its code is in <the path to your app’s repository>.',
+  },
+  {
+    header: 'No code yet',
+    icon: 'draw',
+    tint: 'purple',
+    title: 'Start from a Figma file',
+    text: 'When the design leads: your agent reads the file’s frames, components and variables, with Figma connected to it. Connect the code later.',
+    prompt: 'Build my app in HeroCanvas from this Figma file: <the file’s link>',
+  },
+] as const;
+
+export function GetStartedScreen() {
+  return (
+    <Screen title="Get Started">
+      <p className={styles.lead}>Open your agent (Claude Code, or any that reads AGENTS.md) in this folder, and ask it one of these.</p>
+      {WAYS.map((w) => (
+        <Section key={w.title} header={w.header}>
+          <ListRow icon={w.icon} tint={w.tint} title={w.title} />
+          <TextCell>{w.text}</TextCell>
+          <PromptField prompt={w.prompt} />
+        </Section>
+      ))}
+    </Screen>
   );
 }
 
@@ -69,19 +91,24 @@ export function stepScreen(step: TourStep): ComponentType<PageProps> {
   function Step() {
     const nav = useNav();
     return (
-      <TourPage title={step.title}>
-        <div className={styles.stepIcon}>
-          <Icon name={step.icon} size={36} />
+      <Screen title={step.title}>
+        <div className={styles.stepHead}>
+          <IconTile icon={step.icon} tint={step.tint} size={64} />
+          <h1 className={styles.stepTitle}>{step.title}</h1>
+          <p className={styles.stepLine}>{step.line}</p>
         </div>
-        <h1 className={styles.stepTitle}>{step.title}</h1>
-        {step.body.map((p) => (
-          <p key={p} className={styles.stepBody}>
-            {p}
-          </p>
-        ))}
-        <TryIt text={step.tryIt} />
-        {next ? <NextButton label={`Next: ${next.title}`} onPressed={() => nav.push(next.id, {})} /> : <NextButton label="Connect your app" onPressed={() => nav.goTab('start')} />}
-      </TourPage>
+        <Section>
+          {step.body.map((p) => (
+            <TextCell key={p}>{p}</TextCell>
+          ))}
+        </Section>
+        <Section header="Try it">
+          <TextCell>{step.tryIt}</TextCell>
+        </Section>
+        <div className={styles.actions}>
+          {next ? <CapsuleButton title={`Next: ${next.title}`} onPressed={() => nav.push(next.id, {})} /> : <CapsuleButton title="Get Started" onPressed={() => nav.goTab('getStarted')} />}
+        </div>
+      </Screen>
     );
   }
   return Step;

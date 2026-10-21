@@ -1,10 +1,14 @@
 // The tour's steps: one page each, about a part of HeroCanvas, with something to try on this very screen. In order:
 // each step's page links to the next (Flow draws the path).
 
+import type { Tint } from './TourKit';
+
 export interface TourStep {
   id: string;
   /** A Material Symbol. */
   icon: string;
+  /** Its icon tile's system color. */
+  tint: Tint;
   title: string;
   /** One line for the tour's list. */
   line: string;
@@ -17,6 +21,7 @@ export interface TourStep {
 export const STEPS: TourStep[] = [
   {
     id: 'devices',
+    tint: 'blue',
     icon: 'devices',
     title: 'Devices',
     line: 'Every phone, foldable and tablet, side by side',
@@ -28,6 +33,7 @@ export const STEPS: TourStep[] = [
   },
   {
     id: 'themes',
+    tint: 'indigo',
     icon: 'dark_mode',
     title: 'Light and dark',
     line: 'The screens in both themes, and HeroCanvas’s own',
@@ -36,6 +42,7 @@ export const STEPS: TourStep[] = [
   },
   {
     id: 'inspect',
+    tint: 'orange',
     icon: 'ads_click',
     title: 'Inspect and Layers',
     line: 'What every element is, as the code names it',
@@ -47,6 +54,7 @@ export const STEPS: TourStep[] = [
   },
   {
     id: 'pages',
+    tint: 'green',
     icon: 'account_tree',
     title: 'Pages and Flow',
     line: 'Every screen of the app, and how they connect',
@@ -58,6 +66,7 @@ export const STEPS: TourStep[] = [
   },
   {
     id: 'scenarios',
+    tint: 'purple',
     icon: 'science',
     title: 'Scenarios',
     line: 'The app as different people, languages and text sizes',
@@ -66,6 +75,7 @@ export const STEPS: TourStep[] = [
   },
   {
     id: 'proposals',
+    tint: 'pink',
     icon: 'call_split',
     title: 'Proposals and comments',
     line: 'Changes kept apart, to compare and hand off',
@@ -77,6 +87,7 @@ export const STEPS: TourStep[] = [
   },
   {
     id: 'capture',
+    tint: 'teal',
     icon: 'photo_camera',
     title: 'Capture',
     line: 'Images and videos of any screen',

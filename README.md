@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.11.1-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.12.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -17,8 +17,8 @@ It's made to be used **with an AI coding agent** (Claude Code, or any agent that
 up by hand: you point the agent at your app and ask. The agent reads your app's code, builds the mirror, and keeps it
 honest; you look at the canvas, try the scenarios, and say what to change.
 
-> Early days. It ships with a sample app (a small task manager) so you can see everything working. Connecting your own
-> app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
+> Early days. Until you connect your app, HeroCanvas shows its own **tour**, a small app that walks through every part
+> of it. Connecting your own app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
 > per stack are next — see [Developer experience](docs/developer-experience.md).
 
 ## How it works
@@ -52,23 +52,17 @@ npm install
 
 Your copy will hold your app's mirror and your proposals: it's where your team designs.
 
-Two starting points, as branches: `main` comes with the sample app (a task manager) to look around; **`empty`** has no
-app at all: HeroCanvas shows its own **tour** instead, a small app of its own: a Welcome tab with the ways to connect
-yours, and a page per part of HeroCanvas to try right there (devices, themes, Inspect and Layers, Pages and Flow,
-Scenarios, proposals, Capture). `git switch empty`, or copy the template with all its branches.
-
-### 2. See the sample app
+### 2. Take the tour
 
 ```
 npm run dev
 ```
 
-Open the address it prints. Try it: switch devices in the toolbar, turn one, add more (All devices), tap through the
-Tasks app, pick another persona or language in **Scenarios**, open **Flow** to see every page and the welcome steps,
-press **Inspect** and point at a component.
-
-Tasks is a sample: a small task manager whose people, projects and tasks are made up (all in
-`app/data/sample.ts`). It's there to show what HeroCanvas does, and connecting your app replaces it.
+Open the address it prints. With no app connected yet, the devices show HeroCanvas's own **tour**, an iOS-style app
+in three tabs: **Welcome** (what HeroCanvas is, its goal, how it works), **Tour** (a page per part of HeroCanvas, each
+with something to try on the interface around the device: devices, themes, Inspect and Layers, Pages and Flow,
+Scenarios, proposals, Capture) and **Get Started** (how to connect your app). Every part of HeroCanvas works on it;
+connecting your app replaces it.
 
 ### 3. Make it yours
 
@@ -86,7 +80,7 @@ claude
 ```
 
 The agent follows the `connect-app` skill: it detects your stack, reads your routes, theme, navigation and texts, and
-replaces the sample app with your app's mirror — every screen as a placeholder page first. Then it mirrors the
+replaces the tour with your app's mirror — every screen as a placeholder page first. Then it mirrors the
 screens one at a time, starting with the one you pick, and shows you each before the next. Your app's code is only
 read, never changed.
 

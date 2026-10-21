@@ -1,5 +1,5 @@
 // The connected app's pages (app/pages.tsx) and navigation, as the tools read them. With none (no app connected yet:
-// the `empty` branch), HeroCanvas's own tour stands in (src/tour): a small app of its own, so every part of the
+// a fresh copy), HeroCanvas's own tour stands in (src/tour): a small app of its own, so every part of the
 // designer has something real to show while explaining itself.
 import { BASE_PAGES as APP_PAGES, navigation as APP_NAVIGATION } from '@app';
 import type { AppNavigation } from '../contract';

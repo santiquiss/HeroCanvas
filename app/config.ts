@@ -1,13 +1,8 @@
-// The sample app's settings (AppConfig): plain data, so the simulator can read them without loading the app's screens.
+// Your app's settings (AppConfig): none yet. HeroCanvas shows Get started until the app declares its pages; your
+// agent writes this file when it connects your app (the connect-app skill).
 import type { AppConfig } from 'herocanvas';
-import { PERSONAS } from './data/sample';
 
 export const appConfig: AppConfig = {
-  name: 'Tasks',
-  languages: [
-    { id: 'en', name: 'English' },
-    { id: 'es', name: 'Español' },
-  ],
-  personas: PERSONAS,
-  home: 'today',
+  name: 'Your app',
+  home: '',
 };

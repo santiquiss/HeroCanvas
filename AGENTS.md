@@ -7,8 +7,8 @@ file). The README says what HeroCanvas is; this file is how to change it.
 
 Two sides, as in Laravel's skeleton and framework:
 
-- **The team's code**, at the root: `app/` (the connected app, today a sample app, a task manager, with made-up data
-  all in `app/data/sample.ts`), `proposals/`, `herocanvas.config.ts`, `brand/`. It imports the tool only as
+- **The team's code**, at the root: `app/` (the connected app; none yet, so HeroCanvas shows its own tour),
+  `proposals/`, `herocanvas.config.ts`, `brand/`. It imports the tool only as
   `from 'herocanvas'` (`src/index.ts`, the public API); a test fails on any import reaching into `src/`.
 - **The tool**, in `src/`: never knows the app. It reads it as `@app`: its settings (`config.ts`), pages
   (`pages.tsx`), navigation (`index.ts`), stories, connectors (`connectors/*.json`), screen config and the `--app-*`
@@ -26,8 +26,8 @@ update (`update-herocanvas`). At 1.0 it holds still. A new folder or file of the
 Step by step, in `.claude/skills/<name>/SKILL.md` (Claude Code loads them on its own; any other agent reads the file
 when the task is one of these):
 
-- **`connect-app`**: the person's app connected for the first time: its code read (any stack), the sample app in
-  `app/` replaced by its mirror (settings, tokens, navigation, one page per screen).
+- **`connect-app`**: the person's app connected for the first time: its code read (any stack), or a Figma file;
+  `app/` filled with its mirror (settings, tokens, navigation, one page per screen).
 - **`mirror-screen`**: one screen or component of the app, built or fixed to match its code.
 - **`new-proposal`**: a change to the app as a proposal (`proposals/<slug>`), with versions and a handoff.
 - **`new-persona`**: one or several personas, from what about a user changes the app's screens and the person's
@@ -70,6 +70,3 @@ Versioning: two versions, two changelogs.
   the tool bumps it (0.Y.0 features, 0.Y.Z fixes), adds an entry (a **Contract** item for what a team must adapt),
   updates the README's badge, and is tagged `vX.Y.Z`: the tags are what `npm run update` installs. Shown on its
   page (`#/about`), from the ⓘ at the bottom of the left rail.
-
-Branches: `main` has the sample app, `empty` has none; they differ only in the team's files. Tags are cut on `main`,
-then `main` is merged into `empty`.

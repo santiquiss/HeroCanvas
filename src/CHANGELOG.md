@@ -6,6 +6,16 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.12.0 — 2026-10-21
+
+- **The tour is the starting point, on `main`**: the Tasks sample app is gone (it's kept in the `sample-tasks` tag), and so
+  is the `empty` branch. A fresh copy opens on HeroCanvas's own tour until an app is connected.
+- **The tour after iOS**: three tabs, Welcome (what HeroCanvas is, its goal, how it works), Tour (a page per part) and
+  Get Started (connecting an app's code or a Figma file). Large titles, inset grouped lists, Settings-style icon tiles,
+  iOS's system colors in light and dark, SF Pro, capsule buttons, and Liquid Glass on the tab bar, the back button and
+  Copy. Its type follows the device's text size.
+- **Contract**: none for a team's app. The tool's tests that used Tasks's pages are skipped.
+
 ## 0.11.1 — 2026-10-21
 
 - **The tour's Welcome** offers two ways to begin, the app's code or a Figma file: no more "Look at a sample app", since
