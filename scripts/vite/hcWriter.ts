@@ -1,6 +1,6 @@
 // Dev-server endpoint that lets the designer save its data to files in the project (dev only).
 //
-//   GET  /__hc/status            → { writable: true }
+//   GET  /__hc/status            → { writable: true, root }: the project it serves (npm run shot finds its own by it)
 //   POST /__hc/write { path, data } → writes `data` as pretty JSON to `path` (relative to the project root)
 //   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in app/pages.tsx
 //                                    (`null` removes the field; omitted fields are left alone)
@@ -81,7 +81,7 @@ export function hcWriter(): Plugin {
         const host = req.headers.host ?? '';
         const origin = req.headers.origin;
         if (req.headers['x-hc'] !== '1' || (origin && new URL(origin).host !== host)) return send(res, 403, { error: 'forbidden' });
-        if (req.method === 'GET' && req.url === '/status') return send(res, 200, { writable: true });
+        if (req.method === 'GET' && req.url === '/status') return send(res, 200, { writable: true, root });
         if (req.method === 'POST' && req.url === '/manifest') {
           try {
             const { page, ...fields } = JSON.parse(await readBody(req));

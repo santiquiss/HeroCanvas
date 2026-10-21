@@ -55,8 +55,7 @@ Other items (new features, fixes) need nothing, but tell the person about the on
 
 - `npm install` (the dependencies may have changed), then `npm run typecheck`, `npm run lint`, `npm test`,
   `npx vite build`.
-- Look at it: `npm run shot -- "/<a page>"` (pass `--base` with the dev server's address if another app uses port
-  5173), phone and tablet, light and dark. The app should look as it did, plus what the changelog says is new.
+- Look at it: `npm run shot -- "/<a page>"`, phone and tablet, light and dark. The app should look as it did, plus what the changelog says is new.
 - Tell the person, short: the versions (from → to), what's new for them, what you adapted in their code and why, any
   clash and how you resolved it. Then commit, when they say so: `Update HeroCanvas to <version>`. If you adapted
   their code, add a line to their `CHANGELOG.md` too (and bump `package.json`'s version, a fix).

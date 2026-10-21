@@ -73,8 +73,7 @@ initials or a generated one instead.
 ## 5. Check and show
 
 - `npm run typecheck`, `npm run lint`, `npm test`.
-- Look at the screens the persona changes, as them: `npm run shot -- "/<page>?persona=<id>"` (with `--base` if
-  another app uses port 5173), phone and tablet, light and dark. Empty states for a new user, long names that wrap or
+- Look at the screens the persona changes, as them: `npm run shot -- "/<page>?persona=<id>"`, phone and tablet, light and dark. Empty states for a new user, long names that wrap or
   cut, a paid feature shown or locked, a role's missing actions.
 - Show the person, short: each persona, who they are, what they change on screen, the link to try them.
 - Add an entry to the root `CHANGELOG.md` (and bump `package.json`'s version): it's a change to the team's mirror.

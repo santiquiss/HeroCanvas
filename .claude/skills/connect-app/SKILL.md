@@ -55,10 +55,13 @@ none (leave them out). A language written right to left (Arabic, Hebrew, Persian
 own: write the screens with logical sides (`margin-inline-start`, `text-align: start`, flex order), never left and
 right, and flip only what points (a chevron, a back arrow) with `:dir(rtl)`.
 
-**Images and icons** the screens use (the app's logo, illustrations, its asset catalog: an `.xcassets`, Android's
-`res/drawable*`, Flutter's `assets/`) go in `public/<app>/`, keeping their folders, at 2× when there are several
-scales; screens reach them through `import.meta.env.BASE_URL` (`${import.meta.env.BASE_URL}<app>/…`), never from `/`.
-An asset catalog's colors are tokens (step 3), not images.
+**Images** the screens use: `npm run assets -- --from <its .xcassets | res/ | assets folder>` copies them into
+`public/<app>/` (an asset catalog's 2×, Android's densest, folders kept) and lists an asset catalog's colors, light and
+dark, to make tokens of (step 3); screens reach the images through `import.meta.env.BASE_URL`
+(`${import.meta.env.BASE_URL}<app>/…`), never from `/`.
+
+**Texts**: `npm run texts -- --from <its translations>` (`.strings`, `.xcstrings`, `strings.xml`, ARB, i18next JSON)
+writes one `app/i18n.<lang>.json` per language, key → text; `app/i18n.ts` reads them in the screen's language.
 
 **Icons**: an iOS or macOS app's SF Symbols, as the app has them: `npm run symbols -- <name>…` (every
 `systemName:` / `systemImage:` the screens use; on a Mac) and its own symbols, `npm run symbols -- --from

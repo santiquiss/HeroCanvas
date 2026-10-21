@@ -1,7 +1,7 @@
 // `npm run shot`'s arguments (scripts/shot.mjs): which screens to shoot, how, and the steps before each picture. Pure:
 // argv in, a plan out; the URL each shot opens. Tested in args.test.mjs.
 
-export const DEFAULTS = { scale: 2, theme: 'both', base: 'http://localhost:5173', outDir: 'shots' };
+export const DEFAULTS = { scale: 2, theme: 'both', base: null, outDir: 'shots' };
 
 /**
  * One shot: `route` (the app's, as the designer's address writes it after `#`: `/today?proposal=PJ-3`), its options
@@ -27,7 +27,7 @@ Options
   --scale <n>          pixels per point (default 2)
   --padding <pt>       room around (default 40)
   --gap <pt>           room between the two (default 40)
-  --base <url>         the designer (default http://localhost:5173; if it doesn't answer, one is started)
+  --base <url>         the designer (default: this project's dev server, wherever it runs; else one is started)
   --out-dir <folder>   with --batch: where the PNGs go (default shots/)
 
 Steps, in order, before the picture (on every screen)

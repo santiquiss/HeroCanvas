@@ -32,8 +32,8 @@ For each component the screen uses, reuse the mirror's if it exists (`app/compon
 
 Mock data in one module under `app/data/`, derived from the persona (`?persona=`), never numbers written in the
 screen that another screen also shows. Texts by their key in the app's translations (`app/i18n.ts`), in every
-language the app has: convert its files as they are (`.strings`, `.xcstrings`, ARB, `strings.xml`) into one JSON per
-language (`app/i18n.<lang>.json`), never retyped.
+language the app has: `npm run texts -- --from <its translations>` converts them into one JSON per language
+(`app/i18n.<lang>.json`), never retyped; images the screen needs, `npm run assets -- --from <its catalog>`.
 
 **What only the platform draws** (a MapKit map, a Swift Charts chart, a video, a web view) is drawn here as close as
 the web allows: a chart's marks with SVG, a map as its colors and a pin. Say in the component's comment what it

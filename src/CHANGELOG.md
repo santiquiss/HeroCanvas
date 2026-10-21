@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.34.0 — 2026-10-21
+
+What connecting Food Truck took by hand, now in the tool:
+
+- **`npm run assets -- --from <path>`**: an app's images into `public/<app>/`: an asset catalog's (`.xcassets`, the 2×
+  of each, folders kept), Android's `res/` (the densest of each; vector drawables listed) or any folder's; and an asset
+  catalog's colors, light and dark, listed to make tokens of.
+- **`npm run texts -- --from <path>`**: an app's translations into `app/i18n.<lang>.json`, from `.strings` (UTF-8 or
+  UTF-16), String Catalogs (`.xcstrings`), Android's `strings.xml`, ARB or i18next JSON, merged by key.
+- **`npm run shot` finds this project's dev server** on its own, on whatever port it took (Vite moves on when 5173 is
+  taken, often by another project): no more `--base`. The dev server says which project it serves (`/__hc/status`).
+- `connect-app` and `mirror-screen` use the new commands.
+
 ## 0.33.0 — 2026-10-21
 
 - **SF Symbols on the screens**: `<Icon name="sf:box.truck" />`, beside Material Symbols. `npm run symbols -- <name>…`

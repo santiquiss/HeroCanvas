@@ -4,7 +4,7 @@
 
 ### Superpowers for Designers
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.33.0-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.34.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -196,8 +196,10 @@ Other agents can read the same files: they're plain Markdown.
 - **Icons as your app draws them**: Material Symbols, or your app's SF Symbols and its own `.symbolset`s, made on a
   Mac with `npm run symbols` (`<Icon name="sf:box.truck" />`). HeroCanvas ships no SF Symbols: Apple's license lets
   you use them to design apps for its platforms, from your Mac's own copy.
+- **Your app's assets in one command**: `npm run assets` (images and an asset catalog's colors) and `npm run texts`
+  (translations from `.strings`, `.xcstrings`, `strings.xml`, ARB or i18next JSON), read from your app's repository.
 - **Screenshots from the terminal**: `npm run shot -- "/today"` (light and dark, in device frames; `--device`,
-  `--land`, `--compare` with a proposal) — what the agent uses to look at its own work.
+  `--land`, `--compare` with a proposal; it finds this project's dev server on its own) — what the agent uses to look at its own work.
 
 <p align="center"><img src="docs/images/inspect.jpg" width="100%" alt="Inspect on a list row: highlighted on the device with its measurements, its place in Layers, and its props, layout and tokens in the right panel"><br>
 <sub><b>Inspect</b>: the component under the cursor, measured on the device, with its props, layout and tokens; Layers shows where it sits.</sub></p>
