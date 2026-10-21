@@ -63,11 +63,7 @@ in their own stack, not yours; native previews show one view of one platform at 
 
 ## How it works
 
-```
- your app's code ──read──▶  agent  ──writes──▶  app (the mirror)  ──▶  the canvas
- (any stack, untouched)     (Claude)            pages, components,          devices, flows, scenarios,
-                                                tokens, texts, data         proposals, Inspect, comments
-```
+<p align="center"><img src="docs/images/how-it-works.jpg" width="100%" alt="How it works: your app's code (any stack, untouched) is read by the agent, which writes the app's mirror (pages, components, tokens, texts, data), shown on the canvas (devices, flows, proposals, Inspect and more)"></p>
 
 1. **The mirror** (`app/`) is your app as it is today: one page per screen at its route, your components with
    your names and props, your tokens as `--app-*` variables, your texts in every language, mock data per persona.
