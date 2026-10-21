@@ -1,6 +1,8 @@
-/* The tour's beacons: a ring around the part a step names, and a dot at its corner pulsing out. Transforms and
+/* The tour's beacons, in the emblem's yellow: a ring around the part a step names, and a dot at its corner pulsing out. Transforms and
    opacity only; still with reduced motion. */
 .layer {
+  /* The yellow of HeroCanvas's emblem. */
+  --beacon: #ffc21a;
   position: fixed;
   inset: 0;
   z-index: 900;
@@ -12,7 +14,7 @@
 .ring {
   position: absolute;
   inset: -3px;
-  box-shadow: 0 0 0 2px var(--hc-brand);
+  box-shadow: 0 0 0 2px var(--beacon);
   animation: glow 1.6s ease-in-out infinite;
 }
 .dot {
@@ -22,7 +24,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--hc-brand);
+  background: var(--beacon);
   box-shadow: 0 0 0 2px var(--ui-bg, #fff);
 }
 .dot::after {
@@ -30,16 +32,16 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--hc-brand);
+  background: var(--beacon);
   animation: ripple 1.6s ease-out infinite;
 }
 @keyframes glow {
   0%,
   100% {
-    opacity: 0.25;
+    opacity: 0.45;
   }
   50% {
-    opacity: 0.9;
+    opacity: 1;
   }
 }
 @keyframes ripple {
