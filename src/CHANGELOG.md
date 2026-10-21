@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.32.3 — 2026-10-21
+
+- `mirror-screen`, from mirroring all of Food Truck: translations converted from the app's files into one JSON per
+  language, never retyped; what only the platform draws (maps, charts, video) drawn as close as the web allows and
+  said so; an app's custom symbols as the closest Material Symbol.
+
 ## 0.32.2 — 2026-10-21
 
 - `mirror-screen`: a bar fixed at the top spans the screen's whole width (its side margins taken back), or the page
