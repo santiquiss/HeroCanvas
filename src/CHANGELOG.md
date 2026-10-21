@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.6.1 — 2026-10-21
+
+- **HeroCanvas's page**: an ⓘ at the bottom of the left rail, over the light / dark switch, with HeroCanvas's version
+  under it, opens About (`#/about`): who made it, its license and this changelog, as a page of its own (no side
+  panels). It replaces the ⓘ beside the version in the toolbar.
+- **The copy's version** in the toolbar is a button like its neighbors (the left panel's toggle, the Live menu), with
+  the same border.
+
 ## 0.6.0 — 2026-10-21
 
 - **Two versions, two changelogs**: a copy's own (`package.json`'s `version`, the root `CHANGELOG.md`: the team's

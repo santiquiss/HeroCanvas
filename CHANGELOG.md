@@ -2,7 +2,7 @@
 
 This copy's changelog: your app's mirror (`app/`) and your proposals (`proposals/`). Its version is
 `package.json`'s, shown at the top left of HeroCanvas, where this file opens. HeroCanvas's own changes are in
-`src/CHANGELOG.md` (the ⓘ beside the version); updates bring them, and never touch this file.
+`src/CHANGELOG.md` (the ⓘ at the bottom of the left rail opens them); updates bring them, never touching this file.
 
 Today it's the sample app's: replace it with your own when you connect your app.
 

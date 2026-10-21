@@ -1,0 +1,86 @@
+/* About: a page to read, centered on the canvas, in the interface's colors. */
+.scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--ui-bg);
+}
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+  color: var(--ui-text-2);
+  font-size: 14px;
+  line-height: 21px;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.logo {
+  border-radius: 13px;
+}
+.title {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 800;
+}
+.version {
+  color: var(--ui-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.credits {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--ui-bg-subtle);
+  color: var(--ui-text);
+}
+.credits p {
+  margin: 0;
+}
+.credits p + p {
+  margin-top: 8px;
+  color: var(--ui-text-2);
+}
+.section {
+  margin: 36px 0 0;
+  color: var(--ui-text);
+  font-size: 18px;
+  font-weight: 700;
+}
+.changelog h3 {
+  margin: 24px 0 8px;
+  color: var(--ui-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+.changelog p {
+  margin: 8px 0;
+}
+.changelog ul {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+.changelog li + li {
+  margin-top: 6px;
+}
+.changelog code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--ui-hover);
+  font-size: 12.5px;
+}
+.page a {
+  color: var(--ui-blue-text);
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 32px 16px 64px;
+  }
+}

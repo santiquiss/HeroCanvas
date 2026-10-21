@@ -13,7 +13,7 @@ never touches. `npm run update` does the replacing; this skill does what's left:
 
 - `git status` must be clean: commit or stash the person's work first (ask before committing it for them). The update
   is then one change they can review with `git diff` or undo with `git checkout .`.
-- Say which HeroCanvas version they have (`src/version.json`; the ⓘ in the toolbar) and which they'd get:
+- Say which HeroCanvas version they have (`src/version.json`; under the ⓘ in the left rail) and which they'd get:
   `npm run update -- --dry-run` lists every file it would write, merge, delete or keep, and the changelog between
   the two. A version other than the latest: `npm run update -- 0.6.0`. Their own fork as the source:
   `--from <git url>` (or a `herocanvas` remote).

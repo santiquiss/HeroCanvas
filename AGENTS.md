@@ -56,5 +56,5 @@ Versioning: two versions, two changelogs.
   to `app/` or `proposals/` bumps it and adds an entry. Shown at the top left of the toolbar.
 - **HeroCanvas's** (`src/version.json`, `src/CHANGELOG.md`): only when developing HeroCanvas itself. Every commit to
   the tool bumps it (0.Y.0 features, 0.Y.Z fixes), adds an entry (a **Contract** item for what a team must adapt),
-  updates the README's badge, and is tagged `vX.Y.Z`: the tags are what `npm run update` installs. Shown in the
-  toolbar's ⓘ.
+  updates the README's badge, and is tagged `vX.Y.Z`: the tags are what `npm run update` installs. Shown at the
+  bottom of the left rail (ⓘ), which opens its page (`#/about`).

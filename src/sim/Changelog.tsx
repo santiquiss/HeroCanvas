@@ -1,9 +1,8 @@
-// The versions in the toolbar. This copy's (package.json): a button that opens its CHANGELOG.md, the team's record of
-// their mirror and proposals. Beside it, ⓘ: HeroCanvas itself, its version, who made it, its license and its own
-// changelog (src/CHANGELOG.md). Each opens in a panel under it; a click outside or Esc closes it.
+// This copy's version in the toolbar (package.json): a button that opens its CHANGELOG.md, the team's record of their
+// mirror and proposals, in a panel under it (a click outside or Esc closes it). HeroCanvas's own version and
+// changelog have their page (About, the rail's ⓘ); the markdown reading here serves both.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
-import hcChangelog from '../CHANGELOG.md?raw';
 import styles from './Changelog.module.css';
 
 /** Inline markdown: **bold**, `code` and [links](url). */
@@ -70,19 +69,16 @@ function render(md: string): ReactNode[] {
   return out;
 }
 
-const REPO = 'https://github.com/santiquiss/HeroCanvas';
-
 // The team's changelog, at the project's root: optional (a copy may not keep one).
 const appChangelog = Object.values(import.meta.glob<string>('/CHANGELOG.md', { eager: true, query: '?raw', import: 'default' }))[0];
 
-/** A changelog from its first version: the file's intro (how versions are numbered) is for the repo, not the panel. */
-const body = (md: string) => render(md.slice(md.indexOf('\n## ') + 1));
+/** A changelog from its first version: the file's intro (how versions are numbered) is for the repo, not the page. */
+export const changelogBody = (md: string) => render(md.slice(md.indexOf('\n## ') + 1));
 
-const APP_BODY = appChangelog ? body(appChangelog) : null;
-const HC_BODY = body(hcChangelog);
+const APP_BODY = appChangelog ? changelogBody(appChangelog) : null;
 
 /** A toolbar button with its panel under it. */
-function Popup({ label, title, className, panelTitle, children }: { label: ReactNode; title: string; className?: string; panelTitle: string; children: ReactNode }) {
+function Popup({ label, title, panelTitle, children }: { label: ReactNode; title: string; panelTitle: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -100,7 +96,7 @@ function Popup({ label, title, className, panelTitle, children }: { label: React
   }, [open]);
   return (
     <span ref={box} className={styles.wrap}>
-      <button className={`${className ?? styles.version} ${open ? styles.versionOn : ''}`} title={title} aria-label={title} aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button className={`${styles.version} ${open ? styles.versionOn : ''}`} title={title} aria-label={title} aria-expanded={open} onClick={() => setOpen(!open)}>
         {label}
       </button>
       {open && (
@@ -123,27 +119,6 @@ export function VersionButton() {
   return (
     <Popup label={`v${__APP_VERSION__}`} title="This copy's changes (CHANGELOG.md)" panelTitle="Changelog">
       {APP_BODY ?? <p>No CHANGELOG.md at the project's root: start one to keep track of your mirror and proposals.</p>}
-    </Popup>
-  );
-}
-
-/** HeroCanvas itself: version, attribution, license, and what changed in it. */
-export function AboutButton() {
-  return (
-    <Popup label={<Icon name="info" size={16} />} title="About HeroCanvas" className={styles.about} panelTitle={`HeroCanvas ${__HC_VERSION__}`}>
-      <div className={styles.credits}>
-        <p>
-          Made with <a href={REPO} target="_blank" rel="noreferrer">HeroCanvas</a>, by Santiago Quiss.
-        </p>
-        <p>
-          Free to use, change and share under the{' '}
-          <a href="https://polyformproject.org/licenses/shield/1.0.0" target="_blank" rel="noreferrer">
-            PolyForm Shield 1.0.0
-          </a>{' '}
-          license, except to offer a product that competes with it. Keep its copyright notice with any copy.
-        </p>
-      </div>
-      {HC_BODY}
     </Popup>
   );
 }

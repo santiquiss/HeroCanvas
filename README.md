@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.6.0-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.6.1-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -182,8 +182,8 @@ as `AGENTS.md` says. Ideas and fixes are welcome as issues and pull requests.
 ## Versions
 
 Two, each with its changelog. **Your copy's** (`package.json`, `CHANGELOG.md`): the changes to your mirror and
-proposals, shown at the top left of HeroCanvas. **HeroCanvas's** (`src/version.json`,
-[`src/CHANGELOG.md`](src/CHANGELOG.md)): the tool's, in the ⓘ beside it, along with its license; updates bring it.
+proposals, at the top left of HeroCanvas. **HeroCanvas's** (`src/version.json`, [`src/CHANGELOG.md`](src/CHANGELOG.md)):
+the tool's, under the ⓘ at the bottom of the left rail, which opens its page with the license; updates bring it.
 
 ## License
 

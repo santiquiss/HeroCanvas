@@ -2,23 +2,27 @@
   position: relative;
   display: flex;
 }
-/* The version: a quiet link next to the name. */
+/* This copy's version: a button like its neighbors (the left panel's toggle, the Live menu), so the bar reads as one. */
 .version {
-  padding: 2px 6px;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--ui-text-muted);
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
   font: inherit;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
 .version:hover,
 .versionOn {
-  background: var(--ui-hover);
-  color: var(--ui-text);
+  background: var(--ui-bg-subtle);
+}
+.version:focus-visible {
+  outline: 2px solid #0d99ff;
+  outline-offset: 1px;
 }
 .panel {
   position: absolute;
@@ -94,36 +98,4 @@
 }
 .body a {
   color: var(--ui-blue-text);
-}
-/* ⓘ beside the version: quieter still, an icon only. */
-.about {
-  width: 24px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--ui-text-muted);
-  cursor: pointer;
-}
-.about:hover {
-  background: var(--ui-hover);
-  color: var(--ui-text);
-}
-.credits {
-  margin: 10px 0 4px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--ui-hover);
-  color: var(--ui-text);
-}
-.credits p {
-  margin: 0;
-}
-.credits p + p {
-  margin-top: 6px;
-  color: var(--ui-text-2);
 }

@@ -1,6 +1,7 @@
 // The designer's mode rail (Preline's mini sidebar, our way): a column at the left edge, light like the toolbar, with the logo at the top
 // and the modes as icons below it. A mode's name shows in a tooltip beside it on hover or keyboard focus (its
-// aria-label too); the current one is lit. At the bottom, the interface's light / dark switch (uiTheme). Capture is the prototype's (`?capture=1`), listed as one more mode.
+// aria-label too); the current one is lit. At the bottom, HeroCanvas itself (ⓘ and its version: the About page) over
+// the interface's light / dark switch (uiTheme). Capture is the prototype's (`?capture=1`), listed as one more mode.
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
@@ -65,8 +66,16 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
           </li>
         ))}
       </ul>
-      {/* At the bottom: the interface's theme (not the screens': the view bar's Light / Dark). */}
-      <button className={`${styles.item} ${styles.end}`} aria-label={ui === 'dark' ? 'Light interface' : 'Dark interface'} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
+      {/* At the bottom: HeroCanvas's own version, opening its page (About: credits, license, changelog). */}
+      <button className={`${styles.item} ${styles.about} ${styles.end} ${current === 'about' ? styles.on : ''}`} aria-label={`About HeroCanvas ${__HC_VERSION__}`} aria-current={current === 'about' ? 'page' : undefined} onClick={() => go('about')}>
+        <Icon name="info" size={20} fill={current === 'about'} />
+        <span className={styles.aboutVersion}>{__HC_VERSION__}</span>
+        <span className={styles.tip} role="tooltip">
+          About HeroCanvas
+        </span>
+      </button>
+      {/* The interface's theme (not the screens': the view bar's Light / Dark). */}
+      <button className={styles.item} aria-label={ui === 'dark' ? 'Light interface' : 'Dark interface'} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
         <Icon name={ui === 'dark' ? 'light_mode' : 'dark_mode'} size={20} />
         <span className={styles.tip} role="tooltip">
           {ui === 'dark' ? 'Light interface' : 'Dark interface'}

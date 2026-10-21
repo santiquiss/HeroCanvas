@@ -7,6 +7,7 @@ import { SelectionInUrl } from '../design/SelectionInUrl';
 import { Gallery } from '../gallery/Gallery';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlowView } from '../flow/FlowView';
+import { About } from './About';
 import { useMode, useRememberMode, useSetMode, type Mode } from './modes';
 import { useNavRoot } from '../nav/context';
 import { detailOpenFor } from '../nav/stack';
@@ -330,7 +331,8 @@ function DesignerShell() {
           {/* Off screen, on demand: where each component shows up (the changes popover's links). */}
           <PageScanner design={search.get('proposal') ?? 'live'} />
           <div className={styles.workspace}>
-            {prefs.left && (
+            {/* About is a page to read: no panels beside it. */}
+            {prefs.left && mode !== 'about' && (
               <ErrorBoundary label="Left panel" resetKey={location.pathname}>
                 {/* Capture keeps Pages: the screen to shoot, picked without leaving it. */}
                 <div className={styles.lockable} data-locked={recordingNow || undefined} inert={recordingNow}>
@@ -341,7 +343,9 @@ function DesignerShell() {
             <div className={styles.canvas} data-canvas>
             {rail && <WhereRail name={rail} makeLayout={makeLayout} />}
             {/* Components and Tokens: the gallery's pages (a component's examples, or the tokens). */}
-            {mode === 'components' || mode === 'tokens' ? (
+            {mode === 'about' ? (
+              <About />
+            ) : mode === 'components' || mode === 'tokens' ? (
               <ErrorBoundary label="Gallery" fill resetKey={location.pathname + location.search}>
                 <Gallery />
               </ErrorBoundary>
@@ -504,7 +508,7 @@ function DesignerShell() {
                 pixels={capPlan?.pixels ?? [0, 0]}
               />
               )
-            ) : prefs.right && (
+            ) : prefs.right && mode !== 'about' && (
               <ErrorBoundary label="Right panel" resetKey={location.pathname}>
                 <PanelHost side="right" mode={mode} prefs={prefs} update={updatePrefs} />
               </ErrorBoundary>
