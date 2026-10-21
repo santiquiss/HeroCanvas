@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.15.0-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.15.1-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -123,7 +123,7 @@ Other agents can read the same files: they're plain Markdown.
   wide screens, and one rule for sheets: an action sheet on a phone is a menu hanging from its button on an iPad, a
   task is a dialog.
 - **Launch**: the app's launch screen and its way into the first screen (screen, enter, hold, exit: the same four
-  phases as iOS and Android), played on a cold start; Scenarios plays it again.
+  phases as iOS and Android), played on a cold start; Pages' Launch screen (or Scenarios' Replay) plays it again.
 - **Pages, Flow, Scenarios**: every page and its variants; flows laid out step by step; personas, the language, the
   system's text size and Bold Text, and each page's own controls — all in the URL, so a scenario is a link.
 - **Proposals**: changes kept apart, with versions to compare side by side and a handoff for whoever builds them.

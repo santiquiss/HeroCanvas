@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.15.1 — 2026-10-21
+
+- **The launch in Pages**: a Launch section on top, with Launch screen: it opens the app's first screen and plays the
+  launch on every device, again each time it's picked, to watch it while building it. Replays (here and Scenarios'
+  Replay) play even with the launch Off, and no longer go in the URL.
+
 ## 0.15.0 — 2026-10-21
 
 - **Launch, for any app**: an app declares its launch screen in `appConfig.launch`, in the four phases iOS and Android

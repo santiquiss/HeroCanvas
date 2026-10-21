@@ -13,6 +13,8 @@ import type { FlowStep, PageDef, PageRef, PageStatus } from '../nav/types';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
+import { HOME, LAUNCH } from '../nav/pages';
+import { replayLaunch } from '../sim/launch';
 
 export const STATUS_COLOR: Record<PageStatus, string> = { done: '#16a34a', pending: '#f59e0b', placeholder: '#c4c8ce' };
 
@@ -33,10 +35,10 @@ export function PagesPanel() {
   // Collapsed, the button expands all; otherwise it collapses all (and again, closing what was opened since).
   const collapsed = TREE.mode() === 'collapsed';
   const app = [...tabs, ...loose(pages)];
-  // Boot pages (a welcome flow) start before the app: their own group, above the tabs.
-  const groups = boots.length
+  // Boot pages (a welcome flow) start before the app: their own group, above the tabs (and under the launch).
+  const groups = boots.length || LAUNCH
     ? [
-        { label: 'Before the app', roots: boots },
+        ...(boots.length ? [{ label: 'Before the app', roots: boots }] : []),
         { label: 'App', roots: app },
       ]
     : [{ label: null, roots: app }];
@@ -45,6 +47,7 @@ export function PagesPanel() {
       {/* A search shows every match's branch open, whatever is collapsed: nothing to collapse then. */}
       <SearchField placeholder="Search pages" value={q} onChange={setQ} action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? 'Expand all' : 'Collapse all'} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />} />
       <div style={{ paddingBottom: 12 }}>
+        {LAUNCH && 'launch screen'.includes(query) && <LaunchRow />}
         {groups.map((g) => (
           <Fragment key={g.label ?? 'app'}>
             {/* A group's title only while something in it matches the search. */}
@@ -185,6 +188,33 @@ function Row({ depth, def, label, refOf, caret, onCaret, onClick, variant, count
       {!variant && def.level !== 'tab' && <span className={styles.badge}>{def.level}</span>}
       {!variant && <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} title={def.status} />}
     </div>
+  );
+}
+
+/**
+ * The app's launch (AppConfig.launch), first: it opens the app's first screen and plays the launch on every device,
+ * again each time it's picked, to watch it while building it.
+ */
+function LaunchRow() {
+  const nav = useNavRoot();
+  const play = () => {
+    nav.open(HOME);
+    replayLaunch();
+  };
+  return (
+    <>
+      <div className={styles.treeGroup}>Launch</div>
+      <div className={styles.row} style={{ paddingLeft: 8 }} onClick={play} title="Play the launch on every device (again each time)">
+        <span className={styles.caret} />
+        <span className={styles.roleIcon}>
+          <Icon name="rocket_launch" size={16} />
+        </span>
+        <span className={styles.name}>Launch screen</span>
+        <span className={styles.launchPlay}>
+          <Icon name="replay" size={15} />
+        </span>
+      </div>
+    </>
   );
 }
 

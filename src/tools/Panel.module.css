@@ -1030,3 +1030,13 @@
 .listTools > .segment > .btn {
   flex: none;
 }
+
+/* The Launch row's replay mark: quiet, brighter on hover. */
+.launchPlay {
+  margin-left: auto;
+  display: flex;
+  color: var(--ui-text-subtle);
+}
+.row:hover .launchPlay {
+  color: var(--ui-text);
+}

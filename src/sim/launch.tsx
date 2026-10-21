@@ -1,9 +1,10 @@
 // The app's launch (AppConfig.launch), played on a device's screen: the four phases every platform has — the
 // screen the system draws while the app loads (background, icon, brand mark), the icon's enter, the hold while it
 // loads, the exit into the first screen. Played on a cold start: once since HeroCanvas loaded (Scenarios › Launch),
-// every time a screen mounts, or never; Replay plays it again. Screens read useLaunchPhase() to start their own
-// entrance when it's over. Transforms and opacity only; still copies and reduced motion skip it.
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+// every time a screen mounts, or never; replayLaunch() (Pages' Launch row, Scenarios' Replay) plays it again on every
+// screen. Screens read useLaunchPhase() to start their own entrance when it's over. Transforms and opacity only; still
+// copies and reduced motion skip it.
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import type { LaunchConfig } from '../contract';
 import { componentInstance } from '../design/component';
 import { spring, useStill } from '../kit/motion';
@@ -12,7 +13,20 @@ import { useUrlParams } from './SimContext';
 import styles from './launch.module.css';
 
 export const LAUNCH_PARAM = 'launch';
-export const LAUNCH_RUN_PARAM = 'launchRun';
+
+/** Replays, counted: each one plays the launch again on every screen (kept in memory, not the URL: not a scenario). */
+let runs = 0;
+const listeners = new Set<() => void>();
+export function replayLaunch() {
+  runs++;
+  listeners.forEach((l) => l());
+}
+const useRuns = () =>
+  useSyncExternalStore(
+    (l) => (listeners.add(l), () => listeners.delete(l)),
+    () => runs,
+    () => 0,
+  );
 export type LaunchPlayback = 'once' | 'always' | 'off';
 export const LAUNCH_PLAYBACK: { value: LaunchPlayback; label: string }[] = [
   { value: 'once', label: 'Once' },
@@ -33,20 +47,20 @@ export function useLaunch(LAUNCH: LaunchConfig | undefined, root: HTMLElement | 
   const still = useStill();
   const get = useUrlParams();
   const playback = (get(LAUNCH_PARAM) as LaunchPlayback | null) ?? 'once';
-  const run = get(LAUNCH_RUN_PARAM);
+  const run = useRuns();
   const should = () => !!LAUNCH && !still && playback !== 'off' && (playback === 'always' || !played);
   const [phase, setPhase] = useState<LaunchPhase>(() => (should() ? 'screen' : 'done'));
-  // Replay (a new run) plays it again, whatever the playback but Off.
+  // A replay plays it again, whatever the playback: it's asked for.
   const firstRun = useRef(true);
   useEffect(() => {
     if (firstRun.current) return void (firstRun.current = false);
-    if (LAUNCH && !still && playback !== 'off') setPhase('screen');
-  }, [run, playback, still]);
+    if (LAUNCH && !still) setPhase('screen');
+  }, [run, LAUNCH, still]);
   const done = useCallback(() => {
     played = true;
     setPhase('done');
   }, []);
-  const overlay = LAUNCH && phase !== 'done' && root ? <LaunchOverlay key={run ?? ''} config={LAUNCH} theme={theme} root={root} onExit={() => setPhase('exit')} onDone={done} /> : null;
+  const overlay = LAUNCH && phase !== 'done' && root ? <LaunchOverlay key={run} config={LAUNCH} theme={theme} root={root} onExit={() => setPhase('exit')} onDone={done} /> : null;
   return { phase, overlay };
 }
 

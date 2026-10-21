@@ -13,7 +13,7 @@ import type { PageControl } from '../nav/types';
 import { useUrlPatch } from '../sim/SimContext';
 import { BASE_LANGUAGE, LANG_PARAM, LANGUAGES, languageIn } from '../sim/language';
 import { LAUNCH } from '../nav/pages';
-import { LAUNCH_PARAM, LAUNCH_PLAYBACK, LAUNCH_RUN_PARAM } from '../sim/launch';
+import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
 import { PersonaPicker, usePersonaParam } from './PersonaPicker';
 
@@ -110,12 +110,12 @@ function LaunchSection() {
   const value = search.get(LAUNCH_PARAM) ?? 'once';
   return (
     <div className={styles.section}>
-      <Title label="Launch" hint="app" params={[LAUNCH_PARAM, LAUNCH_RUN_PARAM]} />
+      <Title label="Launch" hint="app" params={[LAUNCH_PARAM]} />
       <Row label="Plays" note="The launch screen while the app starts, then its exit into the first screen: on a cold start.">
         <Select label="Launch plays" value={value} onChange={(v) => patch({ [LAUNCH_PARAM]: v === 'once' ? null : v })} options={LAUNCH_PLAYBACK} />
       </Row>
       <div className={styles.setting}>
-        <button className={styles.btn} disabled={value === 'off'} onClick={() => patch({ [LAUNCH_RUN_PARAM]: String(Date.now() % 1e6) })}>
+        <button className={styles.btn} onClick={replayLaunch}>
           <Icon name="replay" size={14} />
           Replay
         </button>
