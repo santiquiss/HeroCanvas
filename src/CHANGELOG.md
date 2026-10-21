@@ -6,6 +6,10 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.23.2 — 2026-10-21
+
+- **The tour's beacons in the emblem's red**: its yellow didn't show on the light interface.
+
 ## 0.23.1 — 2026-10-21
 
 - **The tour's beacons in the emblem's yellow** instead of the interface's blue, their ring a little stronger at

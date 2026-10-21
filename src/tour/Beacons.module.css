@@ -1,8 +1,8 @@
-/* The tour's beacons, in the emblem's yellow: a ring around the part a step names, and a dot at its corner pulsing out. Transforms and
+/* The tour's beacons, in the emblem's red: a ring around the part a step names, and a dot at its corner pulsing out. Transforms and
    opacity only; still with reduced motion. */
 .layer {
-  /* The yellow of HeroCanvas's emblem. */
-  --beacon: #ffc21a;
+  /* The red of HeroCanvas's emblem. */
+  --beacon: #e8352b;
   position: fixed;
   inset: 0;
   z-index: 900;
