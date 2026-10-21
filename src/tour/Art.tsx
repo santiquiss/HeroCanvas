@@ -174,11 +174,11 @@ const ART: Record<Exclude<ArtName, 'tour'>, ReactNode> = {
       </div>
       <div className={`${styles.pop} ${styles.d1} ${styles.stage}`} style={at(104, 44)}>
         <span className={styles.floor} />
-        <Phone className={styles.turned} style={{ position: 'absolute', inset: 0 }} block="var(--app-teal)" button />
+        <Phone className={styles.turned} style={{ position: 'absolute', inset: 0 }} block="var(--app-purple)" button />
       </div>
       <div className={`${styles.pop} ${styles.d2} ${styles.segments}`} style={at(0, 0, { right: 0, width: 'fit-content', margin: '0 auto' })}>
         <span>Image</span>
-        <span className={`${styles.segmentOn} ${styles.segmentTeal}`}>Video</span>
+        <span className={`${styles.segmentOn} ${styles.segmentPurple}`}>Video</span>
       </div>
       <div className={`${styles.pop} ${styles.d3} ${styles.rec}`} style={at(60, 52)}>
         <i />

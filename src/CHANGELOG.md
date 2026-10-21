@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.21.1 — 2026-10-21
+
+- **Welcome's Capture card in purple**, titled "Screens ready to share." with a clearer line, instead of teal and
+  "Show it off.". The deck's cards take a purple tint instead of teal.
+
 ## 0.21.0 — 2026-10-21
 
 - **A Capture card on Welcome**: "Show it off.", before the tour's card, with its illustration (a phone turned in 3D

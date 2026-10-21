@@ -478,8 +478,8 @@
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(0, 30, 40, 0.35), transparent);
 }
-.segments > .segmentTeal {
-  color: var(--app-teal);
+.segments > .segmentPurple {
+  color: var(--app-purple);
 }
 .rec {
   display: flex;
@@ -516,7 +516,7 @@
 }
 .swatches .swatchOn {
   box-shadow:
-    0 0 0 2px var(--app-teal),
+    0 0 0 2px var(--app-purple),
     0 0 0 4px #ffffff;
 }
 @media (prefers-reduced-motion: reduce) {
