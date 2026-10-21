@@ -1,4 +1,5 @@
-// The tour's screens: Welcome (how to connect an app), the list of the tour's steps, and a page per step.
+// The tour's screens: Welcome (how to connect an app: its code or a Figma file; the tour itself is the sample to look
+// around in), the list of the tour's steps, and a page per step.
 import type { ComponentType, ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { useNav } from '../nav/context';
@@ -20,12 +21,6 @@ const WAYS = [
     title: 'Start from a Figma file',
     body: 'No code yet, or the design leads: your agent reads the file’s frames, components and variables (with Figma connected to it). Connect the code later.',
     prompt: 'Build my app in HeroCanvas from this Figma file: <the file’s link>',
-  },
-  {
-    icon: 'smartphone',
-    title: 'Look at a sample app',
-    body: 'A task manager with made-up data, mirrored as your app will be. It’s on the main branch.',
-    prompt: 'git switch main',
   },
 ];
 

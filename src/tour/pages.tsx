@@ -13,7 +13,7 @@ export const TOUR_PAGES: Record<string, PageDef> = {
     component: WelcomeScreen,
     tab: { label: 'Welcome', short: 'Welcome', icon: 'waving_hand' },
     status: 'done',
-    note: 'How to connect your app: its code, a Figma file, or the sample app first',
+    note: 'How to connect your app: its code, or a Figma file',
     links: [{ to: 'tour', label: 'Take the tour' }],
   },
   tour: {
