@@ -17,6 +17,9 @@ It's made to be used **with an AI coding agent** (Claude Code, or any agent that
 up by hand: you point the agent at your app and ask. The agent reads your app's code, builds the mirror, and keeps it
 honest; you look at the canvas, try the scenarios, and say what to change.
 
+<p align="center"><img src="docs/images/canvas.jpg" width="100%" alt="HeroCanvas with the same screen on an iPhone, a Pixel Fold and an iPad side by side, its pages on the left and Scenarios on the right"><br>
+<sub>One screen on an iPhone, a foldable and an iPad at once, with the app's pages and the scenarios to try it in.</sub></p>
+
 > Early days. Until you connect your app, HeroCanvas shows its own **tour**, a small app that walks through every part
 > of it. Connecting your own app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
 > per stack are next — see [Developer experience](docs/developer-experience.md).
@@ -133,6 +136,12 @@ Other agents can read the same files: they're plain Markdown.
   **Capture**: images and videos of the screens in 3D, with light and motion.
 - **Screenshots from the terminal**: `npm run shot -- "/today"` (light and dark, in device frames; `--device`,
   `--land`, `--compare` with a proposal) — what the agent uses to look at its own work.
+
+<p align="center"><img src="docs/images/inspect.jpg" width="100%" alt="Inspect on a list row: highlighted on the device with its measurements, its place in Layers, and its props, layout and tokens in the right panel"><br>
+<sub><b>Inspect</b>: the component under the cursor, measured on the device, with its props, layout and tokens; Layers shows where it sits.</sub></p>
+
+<p align="center"><img src="docs/images/capture.webp" width="340" alt="An iPhone turned in 3D with a soft shadow, exported from Capture"><br>
+<sub><b>Capture</b>: any screen as an image or a video, the device turned in 3D, ready for a deck or a store page.</sub></p>
 
 ## Project layout
 
