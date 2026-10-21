@@ -6,6 +6,10 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.23.5 — 2026-10-21
+
+- **The ring of the + beside the devices a touch softer** (20% of the icon's color, from 30%).
+
 ## 0.23.4 — 2026-10-21
 
 - **The + beside the devices a little less faint**: a ring of the icon's color, mostly see-through, and the button

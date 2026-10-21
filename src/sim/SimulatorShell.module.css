@@ -399,7 +399,7 @@
   /* At rest its + in a light ring (the icon's color, mostly see-through); pointed at, a solid button. */
   background: transparent;
   color: var(--hc-canvas-icon);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--hc-canvas-icon) 30%, transparent);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--hc-canvas-icon) 20%, transparent);
   opacity: 0.85;
   transition:
     opacity 150ms ease,
