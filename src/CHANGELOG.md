@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.20.0 — 2026-10-21
+
+- **The tour's tab pages**: their titles centered and a size smaller (Title, 28); on tablets the content as wide as
+  about 70% of the screen (a phone keeps its whole width).
+- **The tour's rail shows its labels** on tablets: each tab its icon and its name beside it, as an iPad's sidebar
+  (the rail 200 wide).
+
+**Contract**
+
+- `appConfig.layout` (optional, `ScreenLayout`, exported from `herocanvas`): the room the app's screens give its
+  navigation, its rail's width and the like, which until now only a proposal could set. A proposal's layout now
+  applies over the app's. Nothing to adapt: without it, the defaults stay.
+
 ## 0.19.1 — 2026-10-21
 
 - **The launch's color leaves with it**: the screen takes the launch's background only while its screen shows, and

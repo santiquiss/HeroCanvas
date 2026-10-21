@@ -15,7 +15,8 @@
   color: var(--app-text);
 }
 .content {
-  max-width: 640px;
+  /* A phone's whole width; on a tablet about 70% of the screen, as iPad's readable width. */
+  max-width: max(640px, 70cqw);
   margin: 0 auto;
 }
 /* A plain screen: its content a column in the screen's height, centered in it. Nothing scrolls, nothing clips: its
@@ -37,7 +38,8 @@
 .largeTitle {
   margin: 0;
   padding-bottom: var(--app-space-s);
-  font: var(--app-font-large-title);
+  font: var(--app-font-title);
+  text-align: center;
 }
 
 /* A pushed screen's bar: it stays while the page scrolls, the page fading under it. */

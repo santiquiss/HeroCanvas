@@ -1,7 +1,7 @@
 // The tour's manifest: HeroCanvas's own app, shown while no app is connected (nav/pages.tsx), declared as any app's
 // pages are: three tabs (Welcome, what it is; Tour, its steps; Get Started, how to connect yours) and a pushed page per
 // step, each linking on to the next, so Pages, Flow, Inspect, Layers and Capture all have something real to show.
-import type { LaunchConfig } from '../contract';
+import type { LaunchConfig, ScreenLayout } from '../contract';
 import type { PageDef } from '../nav/types';
 import { GetStartedScreen, stepScreen, TourScreen, WelcomeScreen } from './screens';
 import { STEPS } from './steps';
@@ -10,6 +10,9 @@ import { STEPS } from './steps';
  * The tour's launch, declared as any app's: the emblem alone on the brand's blue springs in with a sheen, holds a
  * moment, and flies onto the emblem of Welcome's AppIcon as the blue fades, crossfading into the icon.
  */
+/** The tour's rail shows its tabs' labels, as an iPad sidebar does: wider than an icons-only one. */
+export const TOUR_LAYOUT: ScreenLayout = { railWidth: 200 };
+
 export const TOUR_LAUNCH: LaunchConfig = {
   background: 'radial-gradient(120% 80% at 50% 35%, #2f86ff 0%, #0a5cff 45%, #0035b8 100%)',
   icon: '/tour/emblem.png',

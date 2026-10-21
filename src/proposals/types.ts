@@ -11,6 +11,7 @@
 //
 // A proposal never copies the base: it only declares what it adds or changes.
 import type { ReactNode } from 'react';
+import type { ScreenLayout } from '../contract';
 import type { PageDef } from '../nav/types';
 import type { ScreenConfig } from '../nav/screenConfig';
 
@@ -47,21 +48,8 @@ export interface ProposalMeta {
 /** A ticket's page: the ticket itself when it's an address; none for a bare id (the tracker isn't known here). */
 export const ticketUrl = (ticket: string): string | undefined => (/^https?:\/\//.test(ticket) ? ticket : undefined);
 
-/**
- * What a proposal changes in the screens' layout (sim/layout computeLayout), for what a component can't change from
- * inside: the room the screens give it.
- */
-export interface ProposalLayout {
-  /** The tablet rail's width (pt; Live's 72): the content moves over by it (a rail with labels is wider). */
-  railWidth?: number;
-  /** A rail that folds (a sidebar): its width folded (`?rail=folded`, design/overridableRegistry RAIL_PARAM). */
-  railFoldedWidth?: number;
-  /** The rail shows the user (a sidebar's account): the screens drop their own way to them (a header's avatar). */
-  userInRail?: boolean;
-  /** The room between the rail and the left column when a page shows two (list and detail; Live's padX, 16), and
-   * between the right one and the screen's edge. */
-  splitGap?: number;
-}
+/** What a proposal's version changes in the screens' layout (sim/layout computeLayout), over the app's own. */
+export type ProposalLayout = ScreenLayout;
 
 /** What a proposal's pages.tsx exports. */
 export interface ProposalCode {

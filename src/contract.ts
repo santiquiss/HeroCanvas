@@ -34,6 +34,24 @@ export interface AppConfig {
   home: string;
   /** What the app shows while it starts (LaunchConfig). None: it opens straight on its first screen. */
   launch?: LaunchConfig;
+  /** The room its screens give its navigation (ScreenLayout): a wider rail, one that folds. None: the defaults. */
+  layout?: ScreenLayout;
+}
+
+/**
+ * The room the screens give what a component can't change from inside: the tablet rail's width (a rail with labels is
+ * wider), and the like. The app declares its own (`appConfig.layout`); a proposal's version can change it.
+ */
+export interface ScreenLayout {
+  /** The tablet rail's width (pt; 72 by default): the content moves over by it. */
+  railWidth?: number;
+  /** A rail that folds (a sidebar): its width folded (`?rail=folded`). */
+  railFoldedWidth?: number;
+  /** The rail shows the user (a sidebar's account): the screens drop their own way to them (a header's avatar). */
+  userInRail?: boolean;
+  /** The room between the rail and the left column when a page shows two (list and detail; 16 by default), and
+   * between the right one and the screen's edge. */
+  splitGap?: number;
 }
 
 /**

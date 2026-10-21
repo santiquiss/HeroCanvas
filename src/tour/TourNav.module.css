@@ -99,6 +99,36 @@
   cursor: pointer;
 }
 
+/* Tablets: the rail's tabs, a glass column as wide as the rail, each tab its icon and its label. */
+.railTabs {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  padding: var(--app-space-xs);
+  border-radius: 28px;
+  pointer-events: auto;
+}
+.railTab {
+  position: relative;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.railLabel {
+  position: relative;
+  min-width: 0;
+  font: 600 15px/20px -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* The iPhone Duo: the column in its strip at the right. */
 .sideCol {
   position: absolute;

@@ -16,6 +16,9 @@ export const PROPOSAL_LOOKUP: {
   layout: (p: Proposal, variant: string | null) => ProposalLayout;
 } = { find: () => null, components: () => ({}), layout: () => ({}) };
 
+/** The app's own layout (`appConfig.layout`, or the tour's): set by nav/pages as it loads, under any proposal's. */
+export const LIVE_LAYOUT: { current: ProposalLayout } = { current: {} };
+
 /** The URL param of a rail that folds (`?rail=folded`): the app's state, as the user left it. */
 export const RAIL_PARAM = 'rail';
 export const railFoldedIn = (search: URLSearchParams) => search.get(RAIL_PARAM) === 'folded';
@@ -26,6 +29,6 @@ export const railFoldedIn = (search: URLSearchParams) => search.get(RAIL_PARAM) 
  */
 export function designLayout(proposal: string | null | undefined, variant: string | null | undefined, folded = false): ProposalLayout {
   const p = PROPOSAL_LOOKUP.find(proposal);
-  const layout = p ? PROPOSAL_LOOKUP.layout(p, variant ?? null) : {};
+  const layout = { ...LIVE_LAYOUT.current, ...(p ? PROPOSAL_LOOKUP.layout(p, variant ?? null) : {}) };
   return folded && layout.railFoldedWidth != null ? { ...layout, railWidth: layout.railFoldedWidth } : layout;
 }

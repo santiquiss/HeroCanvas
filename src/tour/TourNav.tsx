@@ -1,5 +1,5 @@
 // The tour's navigation (an AppNavigation, as an app gives one): its two tabs from the manifest, as a glass bar at the
-// bottom on phones, a rail on tablets, a column on the iPhone Duo. The simulator places them; this draws them.
+// bottom on phones, a rail with labels on tablets, a column on the iPhone Duo. The simulator places them; this draws them.
 import type { CSSProperties } from 'react';
 import { Icon } from '../components/Icon';
 import type { AppNavigation } from '../contract';
@@ -23,10 +23,11 @@ function TabIcon({ icon, sel }: { icon: string; sel: boolean }) {
   return <Icon name={icon} size={24} fill={sel} color={sel ? 'var(--app-primary)' : 'var(--app-text)'} style={{ position: 'relative' }} />;
 }
 
-function TabIndicator({ index, count, size }: { index: number; count?: number; size?: number }) {
+/** The selected tab's pill: across a bar (`count`), down a column (`size`, a tab's height; `wide`: the column's width). */
+function TabIndicator({ index, count, size, wide = false }: { index: number; count?: number; size?: number; wide?: boolean }) {
   const pos: CSSProperties =
     size != null
-      ? { left: 4, width: 40, height: size, top: 4 + Math.max(0, index) * size }
+      ? { left: 4, right: wide ? 4 : undefined, width: wide ? undefined : 40, height: size, top: 4 + Math.max(0, index) * size }
       : { top: 4, bottom: 4, width: `calc((100% - 8px) / ${count})`, left: `calc(4px + ${Math.max(0, index)} * (100% - 8px) / ${count})` };
   return <span className={styles.tabSel} style={{ ...pos, opacity: index < 0 ? 0 : 1 }} />;
 }
@@ -65,13 +66,24 @@ function Column({ tabs }: { tabs: Tab[] }) {
   );
 }
 
+/** Tablets: the tabs down the left, each its icon and its label beside it, as an iPad's sidebar. */
 function SideRail() {
   const { layout } = useSim();
   const tabs = useTabs();
   const hc = useComponent('NavigationRail', { items: tabs.map((t) => t.label), currentIndex: tabs.findIndex((t) => t.sel) });
   return (
     <div {...hc} className={styles.rail} style={{ left: layout.safeL, width: layout.railW - layout.safeL, paddingTop: layout.sbH + 30 }}>
-      <Column tabs={tabs} />
+      <div className={`${styles.glass} ${styles.railTabs}`}>
+        <TabIndicator index={tabs.findIndex((t) => t.sel)} size={48} wide />
+        {tabs.map((t) => (
+          <button key={t.id} className={styles.railTab} onClick={t.on}>
+            <TabIcon icon={t.icon} sel={t.sel} />
+            <span className={styles.railLabel} style={{ color: t.sel ? 'var(--app-primary)' : 'var(--app-text)' }}>
+              {t.label}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
