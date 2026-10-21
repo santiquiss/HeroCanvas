@@ -1,9 +1,23 @@
 // The tour's manifest: HeroCanvas's own app, shown while no app is connected (nav/pages.tsx), declared as any app's
 // pages are: three tabs (Welcome, what it is; Tour, its steps; Get Started, how to connect yours) and a pushed page per
 // step, each linking on to the next, so Pages, Flow, Inspect, Layers and Capture all have something real to show.
+import type { LaunchConfig } from '../contract';
 import type { PageDef } from '../nav/types';
 import { GetStartedScreen, stepScreen, TourScreen, WelcomeScreen } from './screens';
 import { STEPS } from './steps';
+
+/**
+ * The tour's launch, declared as any app's: its icon on the brand's blue springs in with a sheen, holds a moment, and
+ * flies to Welcome's AppIcon as the blue fades.
+ */
+export const TOUR_LAUNCH: LaunchConfig = {
+  background: 'radial-gradient(120% 80% at 50% 35%, #2f86ff 0%, #0a5cff 45%, #0035b8 100%)',
+  icon: '/pwa/icon-192.png',
+  iconSize: 128,
+  enter: 'shine',
+  hold: 500,
+  exit: { to: 'AppIcon' },
+};
 
 export const TOUR_PAGES: Record<string, PageDef> = {
   start: {
@@ -13,18 +27,7 @@ export const TOUR_PAGES: Record<string, PageDef> = {
     component: WelcomeScreen,
     tab: { label: 'Welcome', short: 'Welcome', icon: 'home' },
     status: 'done',
-    note: 'What HeroCanvas is, its goal and how it works; it opens with a launch animation',
-    controls: [
-      {
-        param: 'launch',
-        label: 'Launch',
-        note: 'The splash and its transition into the screen',
-        options: [
-          { value: 'once', label: 'Once' },
-          { value: 'always', label: 'Every time' },
-        ],
-      },
-    ],
+    note: 'What HeroCanvas is, its goal and how it works',
     links: [
       { to: 'tour', label: 'Take the Tour' },
       { to: 'getStarted', label: 'Get Started' },

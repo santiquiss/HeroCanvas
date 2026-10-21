@@ -17,7 +17,7 @@ An app gives HeroCanvas four things (`app/`):
 
 | | What | Where |
 |---|---|---|
-| Settings | Name, languages, personas, the home tab | `config.ts` (`AppConfig`) |
+| Settings | Name, languages, personas, the home tab, the launch (screen, enter, hold, exit) | `config.ts` (`AppConfig`) |
 | Pages | One per screen, at its route: level (tab, push, cover, boot), links, state, flows, controls, list–detail | `pages.tsx` |
 | Navigation | Its tab bar, rail and Duo column | `nav/` (`AppNavigation`) |
 | Look | Its tokens (`--app-*`): colors per theme, space, radii, type, elevation | `theme.css` over `src/kit/tokens.css` |

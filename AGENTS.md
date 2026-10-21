@@ -55,6 +55,9 @@ The person's app's own repository is read, never edited: everything goes in Hero
   (`src/tour`): its pages, navigation, components with their stories, and its theme as `--app-*` tokens
   (`src/tour/theme.css`), so every mode has something real. A new part of the designer gets a step in
   `src/tour/steps.ts`.
+- **Launch in four phases**: an app's launch screen is `appConfig.launch` (screen, enter, hold, exit: the names
+  iOS and Android share), played by the simulator; a screen waits for it with `useLaunchPhase()`. Never a splash of
+  a screen's own.
 - **A component against the code, in three words**: **Matches code**, **Differs from code**, or **Local** (only in
   HeroCanvas, not in the app's code). Where it came from (a Figma file, another design tool, a proposal) is a note,
   never a state of its own; tiers (Atoms…) show only when Figma or the code gives them. Tokens the same: no code

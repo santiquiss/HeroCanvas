@@ -4,7 +4,9 @@ import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, t
 import { DesignOverride } from '../design/overridable';
 import { composePages } from '../nav/manifest';
 import { findProposal } from '../proposals';
-import { NAVIGATION } from '../nav/pages';
+import { LAUNCH, NAVIGATION } from '../nav/pages';
+import { useLaunch } from './launch';
+import { LaunchPhaseCtx } from './launchPhase';
 const { SideNav, SideRail, TabBar } = NAVIGATION;
 import { Icon } from '../components/Icon';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -206,6 +208,8 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
   const { stack } = nav;
   const { setRoot, captureProps, inspect } = useDesignRoot();
   const [screen, setScreen] = useState<HTMLDivElement | null>(null);
+  // The app's launch on a cold start (sim/launch): its phase for the screens, its overlay over them.
+  const launch = useLaunch(LAUNCH, screen, theme);
   const a11y = useAccessibility();
   const textVars = useMemo(() => systemTextVars(textSystemOf(L.os), a11y.textSize, a11y.boldText), [L.os, a11y.textSize, a11y.boldText]);
   // Where the sheets a page keeps itself go (screenLayer.tsx).
@@ -345,6 +349,7 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
           WebkitUserSelect: 'none',
         }}
       >
+        <LaunchPhaseCtx.Provider value={launch.phase}>
         {/* The device in hand shows its own status, camera, home indicator and keyboard. */}
         {!L.real && <StatusBar layout={L} />}
 
@@ -538,8 +543,10 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
           </div>
         )}
         {kbField && !L.real && <SystemKeyboard os={L.os} land={L.land} open={kbOpen} field={kbField} bottomInset={L.botIn} width={L.vw} height={L.vh} onHeight={setKbH} />}
+        {launch.overlay}
         {!L.real && <LandscapeCamera layout={L} />}
         {!L.real && <HomeIndicator layout={L} />}
+        </LaunchPhaseCtx.Provider>
       </div>
     </KeyboardInsetCtx.Provider>
   );

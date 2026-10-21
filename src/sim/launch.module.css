@@ -1,0 +1,96 @@
+/* The launch over a device's screen: over the app and its navigation, under the status bar and system chrome. */
+.launch {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.background {
+  position: absolute;
+  inset: 0;
+}
+.iconMove {
+  position: relative;
+  display: block;
+  will-change: transform;
+}
+.icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.waiting {
+  opacity: 0;
+}
+
+/* Enter. */
+.enterFade {
+  animation: fadeIn var(--enter-ms) var(--enter-ease) both;
+}
+.enterSpring {
+  animation: springIn var(--enter-ms) var(--enter-ease) both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes springIn {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+}
+/* A band of light across the icon as it lands. */
+.sheen {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.55) 50%, transparent 62%);
+  transform: translateX(-120%);
+  animation: sweep 900ms cubic-bezier(0.3, 0.6, 0.2, 1) 380ms forwards;
+}
+@keyframes sweep {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+/* A brand mark near the bottom (Android). */
+.branding {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  max-width: 200px;
+  max-height: 80px;
+  transform: translateX(-50%);
+}
+
+/* Exit: every kind fades the background; the icon fades, zooms through, rides up with it, or flies (styled inline). */
+.exit_fade,
+.exit_zoom {
+  opacity: 0;
+  transition: opacity var(--exit-ms) ease-out;
+}
+.exit_zoom .iconMove {
+  transform: scale(2.4);
+  transition: transform var(--exit-ms) var(--exit-ease);
+}
+.exit_slide {
+  transform: translateY(-100%);
+  transition: transform var(--exit-ms) var(--exit-ease);
+}
+.exitFly .background,
+.exitFly .branding {
+  opacity: 0;
+  transition: opacity calc(var(--exit-ms) * 0.7) ease-out calc(var(--exit-ms) * 0.15);
+}

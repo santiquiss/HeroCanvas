@@ -32,4 +32,35 @@ export interface AppConfig {
   personas?: Persona[];
   /** The tab an empty or unknown URL opens. */
   home: string;
+  /** What the app shows while it starts (LaunchConfig). None: it opens straight on its first screen. */
+  launch?: LaunchConfig;
+}
+
+/**
+ * The app's launch, the same four phases on every platform: the **screen** the system draws while the app loads
+ * (iOS's launch screen, Android's splash screen: a background, the icon, a brand mark), how its icon **enter**s, how
+ * long it **hold**s while the app loads, and how it **exit**s into the first screen. HeroCanvas plays it on a cold
+ * start (Scenarios › Launch); screens learn when it's over with useLaunchPhase().
+ */
+export interface LaunchConfig {
+  /** The screen's background, a CSS color or gradient, per theme or one for both. */
+  background: string | { light: string; dark: string };
+  /** The icon, under public/ (iOS: the launch screen's image; Android: windowSplashScreenAnimatedIcon). */
+  icon?: string;
+  /** Its side, in points. Default 120. */
+  iconSize?: number;
+  /** Android's icon background: a circle behind the icon, in this color. None: the icon alone, rounded as an app icon. */
+  iconBackground?: string;
+  /** A brand mark near the bottom, under public/ (Android's windowSplashScreenBrandingImage). */
+  branding?: string;
+  /** How the icon appears: at once, fading, springing in, or springing in with a sheen across it. Default none. */
+  enter?: 'none' | 'fade' | 'spring' | 'shine';
+  /** How long it stays once in, in ms, standing for the app's loading (Android's setKeepOnScreenCondition). Default 600. */
+  hold?: number;
+  /**
+   * How it gives way to the first screen (Android's setOnExitAnimationListener; on iOS, a view of the app's own that
+   * continues the launch screen): fading, the icon zooming through, sliding up, or the icon flying to a component of
+   * the first screen (`{ to: 'AppIcon' }`, by its name) while the background fades. Default fade.
+   */
+  exit?: 'fade' | 'zoom' | 'slide' | { to: string };
 }

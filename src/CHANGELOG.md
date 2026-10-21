@@ -6,6 +6,20 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.15.0 — 2026-10-21
+
+- **Launch, for any app**: an app declares its launch screen in `appConfig.launch`, in the four phases iOS and Android
+  share: the **screen** (background per theme, icon, Android's icon background and brand mark), how the icon
+  **enter**s (none, fade, spring, shine), how long it **hold**s while the app loads, how it **exit**s (fade, zoom,
+  slide, or the icon flying to a component of the first screen). The simulator plays it on every device on a cold
+  start, over the app and its navigation, under the status bar.
+- **Scenarios › Launch**: once since HeroCanvas loaded (the default), every time a screen opens, or off; Replay.
+- **The tour declares its launch** like any app (it had its own): the splash, then its icon flying to Welcome's.
+- **`connect-app`** reads a launch screen from the code: iOS's Info.plist or storyboard, Android's SplashScreen theme
+  and API, `flutter_native_splash`, Expo's `splash`.
+- **Contract** (additions, nothing to adapt): `AppConfig.launch` (`LaunchConfig`), and `useLaunchPhase()` from
+  `herocanvas` for a screen to start its entrance when the launch is over.
+
 ## 0.14.0 — 2026-10-21
 
 - **Welcome opens with a launch**, to show the motion a screen can have: a splash in the brand's blue where the app

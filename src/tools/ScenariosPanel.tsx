@@ -12,6 +12,8 @@ import { useNavRoot } from '../nav/context';
 import type { PageControl } from '../nav/types';
 import { useUrlPatch } from '../sim/SimContext';
 import { BASE_LANGUAGE, LANG_PARAM, LANGUAGES, languageIn } from '../sim/language';
+import { LAUNCH } from '../nav/pages';
+import { LAUNCH_PARAM, LAUNCH_PLAYBACK, LAUNCH_RUN_PARAM } from '../sim/launch';
 import styles from './Panel.module.css';
 import { PersonaPicker, usePersonaParam } from './PersonaPicker';
 
@@ -43,6 +45,8 @@ export function ScenariosPanel() {
       <LanguageSection />
 
       <AccessibilitySection />
+
+      {LAUNCH && <LaunchSection />}
 
       {pages.map((r) => {
         const def = nav.def(r.id);
@@ -92,6 +96,30 @@ function AccessibilitySection() {
       <Row label="Bold text">
         <Switch label="Bold text" checked={boldText} onChange={(on) => patch({ [ACCESSIBILITY_PARAMS.bold]: on ? 'on' : null })} />
       </Row>
+    </div>
+  );
+}
+
+/**
+ * The app's launch (AppConfig.launch): when it plays (once since HeroCanvas loaded, every time a screen opens, or
+ * never), and Replay.
+ */
+function LaunchSection() {
+  const [search] = useSearchParams();
+  const patch = useUrlPatch();
+  const value = search.get(LAUNCH_PARAM) ?? 'once';
+  return (
+    <div className={styles.section}>
+      <Title label="Launch" hint="app" params={[LAUNCH_PARAM, LAUNCH_RUN_PARAM]} />
+      <Row label="Plays" note="The launch screen while the app starts, then its exit into the first screen: on a cold start.">
+        <Select label="Launch plays" value={value} onChange={(v) => patch({ [LAUNCH_PARAM]: v === 'once' ? null : v })} options={LAUNCH_PLAYBACK} />
+      </Row>
+      <div className={styles.setting}>
+        <button className={styles.btn} disabled={value === 'off'} onClick={() => patch({ [LAUNCH_RUN_PARAM]: String(Date.now() % 1e6) })}>
+          <Icon name="replay" size={14} />
+          Replay
+        </button>
+      </div>
     </div>
   );
 }

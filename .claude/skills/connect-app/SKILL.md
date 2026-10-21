@@ -51,6 +51,22 @@ differs from the file is then the file's to update, not the mirror's.
 the person who they are if the code doesn't say (a subscription tier, an empty state). Put the app's logo or icon in
 `public/assets/` if they want it on the screens.
 
+### The launch (`appConfig.launch`)
+
+If the app has a launch screen, declare it (`LaunchConfig`, the same four phases on every platform: the **screen**,
+how its icon **enter**s, how long it **hold**s, how it **exit**s). Read it from where the code keeps it:
+
+| Stack | Screen | Hold | Exit |
+|---|---|---|---|
+| iOS | `UILaunchScreen` in Info.plist (`UIColorName`, `UIImageName`) or `LaunchScreen.storyboard` | A view of the app's own over it while it loads | That view's animation |
+| Android | A `Theme.SplashScreen` theme: `windowSplashScreenBackground`, `windowSplashScreenAnimatedIcon`, `windowSplashScreenIconBackgroundColor`, `windowSplashScreenBrandingImage` | `setKeepOnScreenCondition` | `setOnExitAnimationListener` |
+| Flutter | `flutter_native_splash.yaml` (`color`, `image`, `color_dark`, `branding`, `android_12`) | `FlutterNativeSplash.preserve` / `remove` | In the app |
+| Expo / React Native | `app.json` `splash` (`image`, `backgroundColor`, `dark`), `react-native-bootsplash` | `SplashScreen.preventAutoHideAsync` | `hideAsync` (a fade), or in the app |
+
+Colors per theme as the code gives them; the icon and brand mark copied into `public/`; `hold` from what the app
+waits for (a short one when it loads nothing); `exit: { to: '<Component>' }` when the icon lands on a component of the
+first screen. No launch screen in the code: leave `launch` out.
+
 ## 3. Look (`app/theme.css`)
 
 Write the app's tokens as the `--app-*` variables the kit and the screens read (`src/kit/tokens.css` lists them and
