@@ -52,7 +52,14 @@
     transform: scale(0.55);
   }
 }
-/* A band of light across the icon as it lands. */
+/* A band of light across the icon as it lands, clipped to it (its square, or its own shape). */
+.sheenClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
 .sheen {
   position: absolute;
   inset: -20%;
@@ -89,6 +96,11 @@
 .exit_slide {
   transform: translateY(-100%);
   transition: transform var(--exit-ms) var(--exit-ease);
+}
+/* Landing: it fades out as the component it flew to fades in. */
+.landing {
+  opacity: 0;
+  transition: opacity var(--crossfade-ms) ease;
 }
 .exitFly .background,
 .exitFly .branding {

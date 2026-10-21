@@ -47,8 +47,10 @@ export interface LaunchConfig {
   background: string | { light: string; dark: string };
   /** The icon, under public/ (iOS: the launch screen's image; Android: windowSplashScreenAnimatedIcon). */
   icon?: string;
-  /** Its side, in points. Default 120. */
+  /** Its side (its width, for a shape of its own), in points. Default 120. */
   iconSize?: number;
+  /** `rounded` (default): cut as an app icon. `none`: the image's own shape (a logo, an emblem on transparency). */
+  iconShape?: 'rounded' | 'none';
   /** Android's icon background: a circle behind the icon, in this color. None: the icon alone, rounded as an app icon. */
   iconBackground?: string;
   /** A brand mark near the bottom, under public/ (Android's windowSplashScreenBrandingImage). */
@@ -60,7 +62,9 @@ export interface LaunchConfig {
   /**
    * How it gives way to the first screen (Android's setOnExitAnimationListener; on iOS, a view of the app's own that
    * continues the launch screen): fading, the icon zooming through, sliding up, or the icon flying to a component of
-   * the first screen (`{ to: 'AppIcon' }`, by its name) while the background fades. Default fade.
+   * the first screen (`{ to: 'AppIcon' }`, by its name) while the background fades, crossfading into it as it lands.
+   * It lands on the component's `data-launch-anchor` element when it has one (where the icon sits inside it: an
+   * emblem inside an app icon), else on the component. Default fade.
    */
   exit?: 'fade' | 'zoom' | 'slide' | { to: string };
 }

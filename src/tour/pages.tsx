@@ -7,13 +7,14 @@ import { GetStartedScreen, stepScreen, TourScreen, WelcomeScreen } from './scree
 import { STEPS } from './steps';
 
 /**
- * The tour's launch, declared as any app's: its icon on the brand's blue springs in with a sheen, holds a moment, and
- * flies to Welcome's AppIcon as the blue fades.
+ * The tour's launch, declared as any app's: the emblem alone on the brand's blue springs in with a sheen, holds a
+ * moment, and flies onto the emblem of Welcome's AppIcon as the blue fades, crossfading into the icon.
  */
 export const TOUR_LAUNCH: LaunchConfig = {
   background: 'radial-gradient(120% 80% at 50% 35%, #2f86ff 0%, #0a5cff 45%, #0035b8 100%)',
-  icon: '/pwa/icon-192.png',
-  iconSize: 128,
+  icon: '/tour/emblem.png',
+  iconSize: 200,
+  iconShape: 'none',
   enter: 'shine',
   hold: 500,
   exit: { to: 'AppIcon' },

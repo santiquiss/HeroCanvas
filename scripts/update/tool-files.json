@@ -4,6 +4,7 @@
     "src",
     "scripts",
     "public/assets/devices",
+    "public/tour",
     "docs",
     ".claude/skills/connect-app",
     ".claude/skills/mirror-screen",

@@ -6,6 +6,16 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.16.0 — 2026-10-21
+
+- **The tour's launch with its emblem**: the emblem alone on the blue (`brand/hc-emblem.png`), flying onto the emblem
+  inside Welcome's app icon (`brand/hc-icon.png`, its rounded tile and depth) and crossfading into it as it lands,
+  aligned to the pixel: no jump. The icon starts floating only once the launch is over.
+- **The launch's exit lands exactly**: on the component's `data-launch-anchor` when it has one, without overshoot,
+  crossfading into it.
+- **Contract** (additions, nothing to adapt): `LaunchConfig.iconShape` (`none`: an image with its own shape, the
+  sheen following it), and `data-launch-anchor` for where an exit lands inside a component.
+
 ## 0.15.2 — 2026-10-21
 
 - **The launch edge to edge**: no light hairline around it any more. Under the launch screen the app isn't shown yet

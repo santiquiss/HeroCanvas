@@ -34,8 +34,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  box-shadow: var(--app-elevation);
+  /* The image has its own rounded tile and depth: a shadow in its shape, not a box's. */
+  filter: drop-shadow(0 6px 14px rgba(0, 30, 90, 0.25));
 }
 .face img {
   display: block;
@@ -50,6 +50,13 @@
   opacity: var(--glare);
   transition: opacity 300ms ease;
   mix-blend-mode: soft-light;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+/* Where the emblem sits in the icon: the launch lands its emblem on it (data-launch-anchor). */
+.anchor {
+  position: absolute;
+  pointer-events: none;
 }
 
 /* A section rising in after the launch, each a step after the last. */

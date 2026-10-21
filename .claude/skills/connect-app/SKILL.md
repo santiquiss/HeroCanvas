@@ -65,7 +65,9 @@ how its icon **enter**s, how long it **hold**s, how it **exit**s). Read it from 
 
 Colors per theme as the code gives them; the icon and brand mark copied into `public/`; `hold` from what the app
 waits for (a short one when it loads nothing); `exit: { to: '<Component>' }` when the icon lands on a component of the
-first screen. No launch screen in the code: leave `launch` out.
+first screen. A logo or emblem with its own shape (on transparency) is `iconShape: 'none'`; when it lands inside a
+bigger component (an emblem inside the app icon), mark that spot in the component with `data-launch-anchor`. No launch
+screen in the code: leave `launch` out.
 
 ## 3. Look (`app/theme.css`)
 
