@@ -13,6 +13,7 @@ import styles from './screens.module.css';
 /** Welcome's cards, in order: what HeroCanvas is, then the tour. */
 export const WELCOME: Omit<DeckCardProps, 'count' | 'top' | 'style' | 'action'>[] = [
   { tint: 'blue', kicker: 'What it is', title: 'Your app, not a drawing.', text: 'Its screens rebuilt from your code, with the components, props and tokens your developers use.', art: <Illustration name="code" /> },
+  { tint: 'green', kicker: 'How you work', title: 'You ask, your agent builds.', text: 'Nothing to drag or draw: every change goes through your AI agent. Describe it, add a screenshot or a Figma link, and it writes it in code.', art: <Illustration name="agent" /> },
   { tint: 'indigo', kicker: 'Everywhere', title: 'Every device, every theme.', text: 'Phones, foldables and tablets side by side, in light and dark, in every language.', art: <Illustration name="devices" /> },
   { tint: 'pink', kicker: 'Proposals', title: 'Change it in versions.', text: 'Ideas stay apart from the app as it is, to compare before anything ships.', art: <Illustration name="versions" /> },
   { tint: 'yellow', kicker: 'Handoff', title: 'Hand it off in code’s terms.', text: 'A spec with your own component names and tokens, ready for whoever builds it.', art: <Illustration name="handoff" /> },

@@ -186,7 +186,7 @@ export function PromptField({ prompt }: { prompt: string }) {
 }
 
 /** A deck card's color: a system tint, or ink (the text's color, so it turns over with the theme). */
-export type DeckTint = 'blue' | 'indigo' | 'pink' | 'yellow' | 'purple' | 'ink';
+export type DeckTint = 'blue' | 'green' | 'indigo' | 'pink' | 'yellow' | 'purple' | 'ink';
 
 export interface DeckCardProps {
   tint: DeckTint;

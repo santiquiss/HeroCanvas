@@ -524,3 +524,98 @@
     animation: none;
   }
 }
+
+/* The agent: a request with its references (a screenshot, a Figma link), becoming a change on a phone. */
+.strokeDark {
+  fill: none;
+  stroke: #111318;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ask {
+  width: 178px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 12px 12px;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #111318;
+  box-shadow: 0 16px 34px rgba(0, 60, 20, 0.25);
+  rotate: -2deg;
+}
+.askHead {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #1a7f37;
+  font-size: 11px;
+  font-weight: 700;
+}
+.askText {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 17px;
+}
+.attachments {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 28px;
+}
+.shot {
+  width: 34px;
+  height: 44px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px 4px;
+  border-radius: 6px;
+  background: #e8ebf0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.shot i {
+  height: 10px;
+  border-radius: 3px;
+  background: #0a63ff;
+}
+.shot i + i {
+  height: 6px;
+  width: 70%;
+  background: #c7cad3;
+}
+.link {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f1f3f6;
+  color: #4a4d57;
+  font: 600 10px ui-monospace, Menlo, monospace;
+}
+.askSend {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #111318;
+  color: #ffffff;
+}
+.grown {
+  flex: none;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--app-primary);
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 5px #111318;
+}

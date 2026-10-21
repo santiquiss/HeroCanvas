@@ -1,5 +1,5 @@
 // Welcome's illustrations, one per card of its deck: code becoming a screen, the devices and themes, versions to
-// compare, a handoff spec, a screen captured in 3D, the tour's stops around a phone. Drawn on a 300×220 box, scaled to the room the card leaves them; their pieces pop in when
+// compare, a request to the agent becoming a change, a handoff spec, a screen captured in 3D, the tour's stops around a phone. Drawn on a 300×220 box, scaled to the room the card leaves them; their pieces pop in when
 // their card comes to the top (TourKit's DeckCard sets `data-top`).
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
@@ -9,7 +9,7 @@ import { STEPS } from './steps';
 import { IconTile } from './TourKit';
 import styles from './Art.module.css';
 
-export type ArtName = 'code' | 'devices' | 'versions' | 'handoff' | 'capture' | 'tour';
+export type ArtName = 'code' | 'agent' | 'devices' | 'versions' | 'handoff' | 'capture' | 'tour';
 
 const W = 300;
 const H = 220;
@@ -45,6 +45,7 @@ const LABELS: Record<ArtName, string> = {
   devices: 'A tablet and two phones, in light and dark, in several languages',
   versions: 'The live screen beside a proposal, with versions to switch',
   handoff: 'A handoff spec of a component, with its props, tokens and spacing',
+  agent: 'A request to the agent, with a screenshot and a Figma link, becoming a change on a phone',
   capture: 'A phone turned in 3D in a camera’s frame, recording a video',
   tour: 'A phone with the tour’s stops around it',
 };
@@ -161,6 +162,47 @@ const ART: Record<Exclude<ArtName, 'tour'>, ReactNode> = {
         <span className={styles.line} style={{ width: '80%' }} />
         <span className={styles.line} style={{ width: '70%' }} />
         <span className={styles.button} />
+      </div>
+    </>
+  ),
+  agent: (
+    <>
+      <div className={`${styles.pop} ${styles.ask}`} style={at(0, 28)}>
+        <span className={styles.askHead}>
+          <Icon name="auto_awesome" size={14} fill />
+          <span>Your agent</span>
+        </span>
+        <span className={styles.askText}>Make the cards bigger on tablets, like this one</span>
+        <span className={styles.attachments}>
+          <span className={styles.shot}>
+            <i />
+            <i />
+          </span>
+          <span className={styles.link}>
+            <Icon name="link" size={12} />
+            <span>figma.com/…</span>
+          </span>
+        </span>
+        <span className={styles.askSend}>
+          <Icon name="arrow_upward" size={14} weight={700} />
+        </span>
+      </div>
+      <svg className={`${styles.pop} ${styles.d1} ${styles.strokeDark}`} style={at(176, 96)} width="40" height="30" viewBox="0 0 54 30" aria-hidden>
+        <path d="M3 18c12-12 28-12 44-2" />
+        <path d="M40 8l8 8-10 5" />
+      </svg>
+      <div className={`${styles.pop} ${styles.d2} ${styles.phone} ${styles.shadow}`} style={at(214, 20, { width: 86, height: 180 })}>
+        <span className={styles.bar} style={{ width: '55%' }} />
+        <span className={styles.grown} />
+        <span className={styles.line} style={{ width: '80%' }} />
+        <span className={styles.line} style={{ width: '62%' }} />
+        <span className={styles.button} />
+      </div>
+      <div className={`${styles.pop} ${styles.d3} ${styles.ready}`} style={at(196, 192)}>
+        <span className={styles.readyCheck}>
+          <Icon name="check" size={15} weight={700} />
+        </span>
+        <span>Done</span>
       </div>
     </>
   ),

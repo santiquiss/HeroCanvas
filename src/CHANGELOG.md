@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.29.0 — 2026-10-21
+
+- **The tour says how you work with HeroCanvas**: AI first, every change asked of the agent, not drawn by hand as in
+  Figma, with words, screenshots, references or Figma links. Welcome has a card for it, second ("You ask, your agent
+  builds.", with its illustration: a request with a screenshot and a Figma link becoming a change), and the Tour
+  opens with a step of its own, "Working with your agent", with what to try.
+- `Illustration` takes `agent`; the deck's cards take a green tint (dark text).
+
 ## 0.28.0 — 2026-10-21
 
 - **Apache License 2.0**, instead of PolyForm Shield: open source, free to use, change and share, commercial uses

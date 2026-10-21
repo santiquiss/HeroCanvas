@@ -22,6 +22,20 @@ export interface TourStep {
 
 export const STEPS: TourStep[] = [
   {
+    id: 'agent',
+    tint: 'green',
+    icon: 'auto_awesome',
+    title: 'Working with your agent',
+    line: 'Every change is asked for, not drawn',
+    body: [
+      'HeroCanvas is AI first: there’s nothing to drag or draw here, as in Figma. Your screens are code, and your AI agent writes it. You ask, it builds, and the canvas shows the result.',
+      'Ask the way you’d brief a designer or a developer: in words, with a screenshot or a sketch, a reference from another app, or a link to a Figma frame. The agent reads them and turns them into components, tokens and pages.',
+      'HeroCanvas is where you look, compare and decide: the devices, the themes, the scenarios, the versions of a proposal. Inspect and comments help you say precisely what to change next.',
+    ],
+    tryIt: 'Open your agent (Claude Code, or any that reads AGENTS.md) in this folder and ask it about this screen, like “Which components is the Tour tab made of?”. Then ask it to connect your app: Get Started has the words.',
+    spots: [],
+  },
+  {
     id: 'devices',
     tint: 'blue',
     icon: 'devices',

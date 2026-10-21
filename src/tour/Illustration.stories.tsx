@@ -2,7 +2,7 @@
 import { stories } from '../design/storyFormat';
 import { Illustration, type ArtName } from './Art';
 
-const ON: Record<ArtName, string> = { code: 'var(--app-primary)', devices: 'var(--app-indigo)', versions: 'var(--app-pink)', handoff: 'var(--app-yellow)', capture: 'var(--app-purple)', tour: 'var(--app-text)' };
+const ON: Record<ArtName, string> = { code: 'var(--app-primary)', agent: 'var(--app-success)', devices: 'var(--app-indigo)', versions: 'var(--app-pink)', handoff: 'var(--app-yellow)', capture: 'var(--app-purple)', tour: 'var(--app-text)' };
 
 export default stories({
   component: 'Illustration',

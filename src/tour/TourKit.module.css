@@ -330,7 +330,8 @@
     transform 560ms cubic-bezier(0.2, 0.9, 0.25, 1.04),
     opacity 400ms ease;
 }
-.deckCard.yellow {
+.deckCard.yellow,
+.deckCard.green {
   color: #111318;
 }
 .deckCard.ink {
