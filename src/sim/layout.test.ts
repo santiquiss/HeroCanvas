@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { findDevice, findDisplay } from '../devices/devices';
+import { findAnyDevice, findDisplay } from '../devices/devices';
 import { anchoredFloats, computeLayout, tallSheetTop } from './layout';
 
 const layoutOf = (device: string, display: string | null = null, land = false) =>
-  computeLayout({ display: findDisplay(findDevice(device), display), land, supported: true, detailOpen: false });
+  computeLayout({ display: findDisplay(findAnyDevice(device), display), land, supported: true, detailOpen: false });
 
 describe('a sheet as tall as it gets', () => {
   it('stops 10 under the status bar, as the app’s', () => {

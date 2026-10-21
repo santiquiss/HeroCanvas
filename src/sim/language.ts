@@ -11,6 +11,9 @@ export const LANG_PARAM = 'lang';
 export const LANGUAGES: { id: Language; name: string }[] = app.languages?.length ? app.languages : [{ id: 'en', name: 'English' }];
 export const BASE_LANGUAGE: Language = LANGUAGES[0].id;
 
+/** Languages written right to left (Arabic, Hebrew, Persian, Urdu…): their screens are mirrored, as the systems do. */
+export const isRtl = (lang: Language) => /^(ar|he|iw|fa|ur|ps|yi|dv|ku|sd|ug)(-|$)/i.test(lang);
+
 /** A `?lang=` value as one of the app's languages (its base when unset or unknown). */
 export const languageIn = (v: string | null | undefined): Language => (v && LANGUAGES.some((l) => l.id === v) ? v : BASE_LANGUAGE);
 

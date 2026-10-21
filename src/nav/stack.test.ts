@@ -12,7 +12,8 @@ const refs = Object.entries(pages).flatMap(([id, def]) => {
 describe('page URLs', () => {
   it.each(refs.map((r) => [`${r.id} ${JSON.stringify(r.params)}`, r]))('%s round-trips', (_, ref) => {
     const path = buildPath(pages, ref);
-    expect(path).not.toMatch(/\/\/|\/$/);
+    // No empty segment, no trailing slash (the root itself is `/`).
+    if (path !== '/') expect(path).not.toMatch(/\/\/|\/$/);
     expect(parsePath(pages, path)).toEqual(ref);
   });
   it('a page whose path needs a param opens on its default without one (a project: work)', () => {

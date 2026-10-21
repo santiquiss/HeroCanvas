@@ -23,7 +23,8 @@ export const SIM_PARAMS = ['device', 'devices', 'display', 'arrange', 'sort', 'c
  * One rule for the live screens and the Flow thumbnails.
  */
 export function detailOpenFor(pages: Manifest, stack: PageRef[]): boolean {
-  return stack.length > 1 && pages[stack[1].id].level === 'push';
+  // A root that's a list–detail of its own (a sidebar app) keeps what's pushed in its detail pane, not in the panel.
+  return stack.length > 1 && pages[stack[1].id].level === 'push' && !pages[stack[0].id]?.split;
 }
 
 function match(pattern: string, path: string): Params | null {

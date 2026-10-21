@@ -27,7 +27,7 @@ import { isTextField, KeyboardInsetCtx, useKeyboardInset } from './keyboard';
 import { CornerStatusImage, HomeIndicator, LandscapeCamera, StatusBar } from './SystemChrome';
 import { SystemKeyboard } from './SystemKeyboard';
 import { useAccessibility } from './scenario';
-import { useLanguage } from './language';
+import { isRtl, useLanguage } from './language';
 import { textSystemOf } from './systemText';
 import { systemTextVars } from '../theme/systemTextVars';
 import { useRealKeyboard } from './useRealViewport';
@@ -280,13 +280,11 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
   /** Off the app area's right edge (and its shadow), from a layer's left. */
   const offRight = (left: number) => `translateX(${appW - left + 8}px)`;
   const baseEntry = useMemo(() => ({ ref: stack[0], index: 0 }), [stack]);
-  const pushes = foldSplit(
-    stack.slice(1, end).map((ref, j) => ({ ref, index: j + 1 })),
-    R.pushes.width,
-    cfg,
-    nav.def,
-    L,
-  );
+  const pushed = stack.slice(1, end).map((ref, j) => ({ ref, index: j + 1 }));
+  // A root that's a list–detail itself (a sidebar app, SwiftUI's NavigationSplitView), wide enough: what's pushed over
+  // it shows in its own detail pane, beside it, and nothing slides over it.
+  const baseSplit = boot ? null : foldSplit([baseEntry, ...pushed], R.base.width, cfg, nav.def, L)[0];
+  const pushes = baseSplit?.split ? [] : foldSplit(pushed, R.pushes.width, cfg, nav.def, L);
   // Covers span the screen, except the iPhone Duo right column (status + nav), which stays reserved.
   // Covers split (list–detail) by the width they actually get.
   const covers = foldSplit(
@@ -328,6 +326,8 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
         data-theme={theme}
         // The device's language (Scenarios › Language): the browser hyphenates and picks quotes by it.
         lang={language}
+        // Right to left (Arabic, Hebrew…), the screen mirrors: rows, bars and the status bar flip, as iOS and Android do.
+        dir={isRtl(language) ? 'rtl' : 'ltr'}
         data-device-screen
         {...(preview ? {} : captureProps)}
         style={{
@@ -382,7 +382,7 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
                     animation: `hcTabIn ${TAB_IN_MS}ms ${EASE}`,
                   }}
                 >
-                  {boot ? null : <PageView entry={baseEntry} />}
+                  {boot ? null : baseSplit?.split ? <EntryView entry={baseSplit} /> : <PageView entry={baseEntry} />}
                 </div>
               </RightEdgeCtx.Provider>
             </div>

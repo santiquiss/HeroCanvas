@@ -27,7 +27,9 @@ Detect the stack from the root:
 | `*.xcodeproj`, `Package.swift` with SwiftUI | SwiftUI | `NavigationStack` destinations, a route enum, `TabView` | the asset catalog's colors, a theme struct | `.xcstrings`, `Localizable.strings` |
 | `build.gradle(.kts)` with Compose | Jetpack Compose | Navigation Compose `NavHost` | `MaterialTheme`, `ColorScheme` | `res/values*/strings.xml` |
 
-Tell the person what you found in two or three lines (stack, how many screens, tabs, languages) before writing.
+Tell the person what you found in two or three lines (stack, how many screens, tabs, languages) before writing. A
+platform HeroCanvas has no device for (the Mac, the Apple Watch, a TV, a desktop web layout) is left out: say so.
+Widgets, Live Activities and App Intents aren't screens: leave them out too.
 
 ### From a Figma file instead
 
@@ -46,10 +48,19 @@ differs from the file is then the file's to update, not the mirror's.
 
 ## 2. Settings (`app/config.ts`)
 
-`appConfig`: the app's name, its languages (the base first, as its code lists them), its home tab, and 2–3
+`appConfig`: the app's name, its languages (the base first, as its code lists them), its home page, and 2–3
 **personas**: who uses the app in ways that change the screens (new with no data, an active one, a paying one…). Ask
-the person who they are if the code doesn't say (a subscription tier, an empty state). Put the app's logo or icon in
-`public/assets/` if they want it on the screens.
+the person who they are if the code doesn't say (a subscription tier, an empty state); an app with no accounts has
+none (leave them out). A language written right to left (Arabic, Hebrew, Persian, Urdu) mirrors its screens on its
+own: write the screens with logical sides (`margin-inline-start`, `text-align: start`, flex order), never left and
+right, and flip only what points (a chevron, a back arrow) with `:dir(rtl)`.
+
+**Images and icons** the screens use (the app's logo, illustrations, its asset catalog: an `.xcassets`, Android's
+`res/drawable*`, Flutter's `assets/`) go in `public/<app>/`, keeping their folders, at 2× when there are several
+scales; screens reach them through `import.meta.env.BASE_URL` (`${import.meta.env.BASE_URL}<app>/…`), never from `/`.
+An asset catalog's colors are tokens (step 3), not images.
+
+Name the copy after the app: `package.json`'s `name` (`<app>-herocanvas`, e.g. `food-truck-herocanvas`).
 
 ### The devices (`appConfig.devices`)
 
@@ -82,13 +93,25 @@ screen in the code: leave `launch` out.
 Write the app's tokens as the `--app-*` variables the kit and the screens read (`src/kit/tokens.css` lists them and
 their defaults): colors per theme (`[data-theme='light']`, `[data-theme='dark']`), space, radii, the type styles as
 `font` shorthands, elevation. Take the values from the app's theme, not from screenshots. A token the app has and the
-contract doesn't: add it as `--app-<name>` too; screens may read it.
+contract doesn't: add it as `--app-<name>` too; screens may read it. HeroCanvas applies the file to the screens itself:
+don't import it.
+
+An app on the platform's own look (SwiftUI's or UIKit's defaults, Material's) takes the platform's values:
+`src/tour/theme.css` has iOS's system colors, text styles and grouped backgrounds to start from; change its accent
+(the asset catalog's AccentColor) and what the app sets of its own.
 
 ## 4. Navigation (`app/nav/`)
 
 The app's tab bar (phones), and rail and side column (large screens) if it has them, as `AppNavigation` components,
 like the tour's (`src/tour/TourNav.tsx`, an example to start from). Same tabs, icons (Material Symbols names closest to the app's), labels and
 look. If the app has no tabs, the components render nothing and every page is a push or a cover.
+
+**A sidebar app** (SwiftUI's `NavigationSplitView`, UIKit's `UISplitViewController`, Material's list-detail or a
+navigation drawer that stays open on tablets) has no tabs: its sidebar is one root page (`level: 'tab'`, the app's
+home) with a `split` (list–detail: `minWidth`, `ratio: 'detail'`, the sidebar's width as `masterWidth`, the section it
+opens on as `defaultChild`), and each section a `push` over it. On a phone the sidebar is the screen and a section
+slides over it; on a wide screen the sidebar stays and the section shows beside it, as the app does. The sidebar
+reads `useSplit()` to highlight the section that's open.
 
 ## 5. Pages (`app/pages.tsx`)
 

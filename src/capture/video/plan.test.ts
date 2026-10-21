@@ -1,13 +1,13 @@
 // A clip's crop and size (plan.ts): every turn fits, sizes are even (H.264), a fixed size is kept.
 import { describe, expect, it } from 'vitest';
-import { findDevice, findDisplay } from '../../devices/devices';
+import { findAnyDevice, findDisplay } from '../../devices/devices';
 import { computeLayout } from '../../sim/layout';
 import { exportCrop } from '../exportImage';
 import { bodyOf } from '../models';
 import { videoPlan } from './plan';
 import { sequenceOf } from './motion';
 
-const layout = computeLayout({ display: findDisplay(findDevice('ip17'), null), land: false, supported: true, detailOpen: false });
+const layout = computeLayout({ display: findDisplay(findAnyDevice('ip17'), null), land: false, supported: true, detailOpen: false });
 const spec = bodyOf('ip17', 'main');
 const base = { sequence: sequenceOf({ in: 'swing', mid: 'orbit', out: 'swing' }), duration: 2, fps: 30, scale: 2, padding: 40, shadow: true };
 

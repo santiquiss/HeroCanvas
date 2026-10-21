@@ -6,6 +6,27 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.30.0 — 2026-10-21
+
+From connecting a real app for the first time (Apple's Food Truck, SwiftUI):
+
+- **The app's theme applies itself**: `app/theme.css` was only read as text (Tokens, Inspect) and the screens showed
+  the kit's defaults unless the app imported it. Now HeroCanvas applies it, as it does the tour's.
+- **A root page can be a list–detail**: a sidebar app (SwiftUI's `NavigationSplitView`, a split view, Material's
+  list-detail) is a root page with a `split`, its sections pushed over it. On a wide screen the sidebar stays and the
+  section shows beside it; the tablet's side panel doesn't open over it. Until now only pushed pages could split.
+- **Right-to-left languages mirror the screens** (Arabic, Hebrew, Persian, Urdu…): the screen takes `dir="rtl"`, so
+  rows, bars and the status bar flip, as iOS and Android do.
+- **The tool's tests don't depend on the app**: they look devices up among all of them (`findAnyDevice`), whatever
+  the app targets, and accept `/` as a page's path.
+- `connect-app` knows more: sidebar apps, an iOS app's theme from the platform's values, images from an asset
+  catalog, right-to-left texts, platforms HeroCanvas has no device for, naming the copy after the app.
+
+**Contract**
+
+- `app/theme.css` needs no import: if the app imports it, the import can go (keeping it does no harm).
+- A root page may have `split`: nothing to adapt.
+
 ## 0.29.3 — 2026-10-21
 
 - **About credits the MacrosFirst team**: made by Santiago Quiss and Agus Salas, in collaboration with the

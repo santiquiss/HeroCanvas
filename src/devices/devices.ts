@@ -282,6 +282,9 @@ export const sizeClass = (d: Display): SizeClass => (Math.min(d.w, d.h) >= 600 ?
 /** A display's id across the app: `device:display`, e.g. `ipduo:outer`. */
 export const displayId = (device: Device, display: Display) => `${device.id}:${display.key}`;
 
+/** Any device by its id, the app's targets or not: tests, and matching a real phone. */
+export const findAnyDevice = (id: string): Device => ALL_DEVICES.find((d) => d.id === id)!;
+
 export function findDevice(id: string | null): Device {
   return DEVICES.find((d) => d.id === id) ?? DEVICES.find((d) => d.id === DEFAULT_DEVICE)!;
 }

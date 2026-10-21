@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findDevice, findDisplay } from '../devices/devices';
+import { findAnyDevice, findDisplay } from '../devices/devices';
 import { computeLayout } from './layout';
 import { matchDisplay, platformOf, realByDefault, realDisplay, turnedSafe } from './realDevice';
 
@@ -45,7 +45,7 @@ describe('the device in hand', () => {
     const L = computeLayout({ display, land: false, supported: false, detailOpen: false });
     expect([L.sbH, L.botIn]).toEqual([62, 34]);
     // A registry display keeps its OS's heights.
-    const ip17 = findDevice('ip17');
+    const ip17 = findAnyDevice('ip17');
     expect(computeLayout({ display: findDisplay(ip17, null), land: false, supported: false, detailOpen: false }).sbH).toBe(54);
   });
 
