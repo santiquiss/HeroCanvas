@@ -315,7 +315,8 @@ the tool's, on its page (the ⓘ at the bottom of the left rail) with the licens
 
 ## License
 
-Made by [Santiago Quiss](https://github.com/santiquiss) and [Agus Salas](https://github.com/salasagustina-ds).
+Made by [Santiago Quiss](https://github.com/santiquiss) and [Agus Salas](https://github.com/salasagustina-ds), in
+collaboration with the [MacrosFirst](https://macrosfirst.com) team.
 
 Open source under the [Apache License 2.0](LICENSE): use it, change it and share it freely, for yourself or your
 company, commercial uses included. Any copy or project built from it keeps the license and the [`NOTICE`](NOTICE) file,
