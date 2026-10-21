@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.32.0 — 2026-10-21
+
+- **Page describes the layout, it doesn't edit it**: how a page's list and detail show on this display (side by side,
+  or one at a time and from what width), the iPhone Duo's right column, the tablet's side panel and the size class
+  are read-only lines of Layout, in words for any layout. The controls that overrode them by hand (and saved them to
+  `screen-config.json`) are gone: they're set in code. "Stack" is "Open pages".
+- **An app with no rail keeps no room for one**: `appConfig.layout.railWidth: 0` (a sidebar app), said in the
+  contract and in `connect-app`. Page's Navigation says when the app draws its own.
+
+**Contract**
+
+- `ScreenLayout.railWidth: 0` means no rail: set it if your app has none on tablets.
+
 ## 0.31.0 — 2026-10-21
 
 - **The layout has iOS's size class**: `layout.horizontalSizeClass` (`compact` or `regular`), for a screen that lays

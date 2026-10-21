@@ -9,7 +9,6 @@ import { HOLD_PARAM, stateKeys } from '../nav/stack';
 import { isFullScreen } from '../nav/types';
 import { DEVICES, displayId, findDevice, findDisplay, type Device, type Display } from '../devices/devices';
 import { landscapeFor, sideColumnFor, splitFor, supportsLandscape, useScreenConfigLayers } from '../nav/screenConfig';
-import { useCanWrite } from '../persist/devApi';
 import { listDetailActive, LIST_DETAIL_BOTTOM_NAV_MIN } from '../sim/layout';
 import { parseDevices } from '../sim/deviceSet';
 import { useSim, useUrlPatch } from '../sim/SimContext';
@@ -20,6 +19,7 @@ export function PageInspector() {
   const nav = useNavRoot();
   const { layout: L } = useSim();
   const [search] = useSearchParams();
+  const { effective: cfg } = useScreenConfigLayers();
   const [copied, setCopied] = useState(false);
   const top = nav.stack[nav.stack.length - 1];
   const def = nav.def(top.id);
@@ -65,12 +65,6 @@ export function PageInspector() {
 
       {def.flow && <FlowSection id={top.id} />}
 
-      {nav.stack
-        .filter((r) => nav.def(r.id).split)
-        .map((r) => (
-          <ScreenConfigSection key={r.id} id={r.id} />
-        ))}
-      {L.sideNav && <SideColumnSection id={top.id} />}
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Params</div>
@@ -90,9 +84,9 @@ export function PageInspector() {
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>
-          Stack
+          Open pages
           <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-            {nav.stack.length} {nav.stack.length === 1 ? 'level' : 'levels'}
+            {nav.stack.length === 1 ? 'this one' : `${nav.stack.length}, bottom to top`}
           </span>
         </div>
         <div className={styles.crumbs}>
@@ -103,7 +97,7 @@ export function PageInspector() {
                 key={i}
                 className={styles.crumb}
                 style={{ paddingLeft: 6 + i * 12, fontWeight: isTop ? 600 : 400 }}
-                title={isTop ? 'Current page' : 'Go back to this level'}
+                title={isTop ? 'This page' : 'Go back to this page'}
                 onClick={() => !isTop && nav.setStack(nav.stack.slice(0, i + 1))}
               >
                 <Icon name={i === 0 ? 'home' : 'subdirectory_arrow_right'} size={14} />
@@ -132,9 +126,11 @@ export function PageInspector() {
         <div className={styles.sectionTitle}>Layout</div>
         <div className={styles.kv}>
           <Pair k="Viewport" v={`${L.vw} × ${L.vh}`} />
-          <Pair k="Class" v={`${L.isTablet ? 'Tablet' : 'Phone'} · ${L.os}${L.land ? ' · landscape' : ''}${L.rotLocked ? ' · rotation locked' : ''}`} />
-          <Pair k="Navigation" v={{ column: 'Right column', rail: 'Rail (left)', bottom: 'Bottom bar' }[L.nav]} />
-          <Pair k="Split" v={L.split ? `Yes · panel ${L.detailW}px` : 'No'} />
+          <Pair k="Class" v={`${L.isTablet ? 'Tablet' : 'Phone'} · ${L.os} · ${L.horizontalSizeClass}${L.land ? ' · landscape' : ''}${L.rotLocked ? ' · rotation locked' : ''}`} />
+          <Pair k="Navigation" v={navigationOf(L)} />
+          <ListDetailRows />
+          {L.sideNav && <Pair k="Right column" v={sideColumnFor(top.id, def, cfg) === 'nav' ? 'The navigation, under the status' : 'Empty: kept for the status'} />}
+          {L.split && !nav.def(nav.stack[0].id).split && <Pair k="Side panel" v={L.dashOpen ? `Open beside the page · ${L.detailW} wide` : `Opens beside the page when one is pushed · ${L.detailW} wide`} />}
           <Pair k="Content" v={`${L.contentW}px · ${L.cols} cols`} />
           <Pair k="Safe area" v={`top ${L.sbH} · bottom ${L.botIn}${L.safeL ? ` · left ${L.safeL}` : ''}`} />
           {L.reserved && <Pair k="Reserved" v={`top-right ${L.reserved.width}×${L.reserved.height} · header inset ${L.headerInsetR}`} />}
@@ -235,75 +231,6 @@ function Pair({ k, v }: { k: string; v: string | null }) {
   );
 }
 
-const MIN_WIDTHS = [600, 720, 834, 1024];
-const MASTER_WIDTHS = [320, 360, 400, 440];
-const select: React.CSSProperties = { height: 24, border: '1px solid #dfe2e6', borderRadius: 6, font: 'inherit', fontSize: 11, padding: '0 4px', maxWidth: '100%' };
-
-/** Live override of a page's master–detail config (kept in the URL as `cfg`). */
-function ScreenConfigSection({ id }: { id: string }) {
-  const nav = useNavRoot();
-  const { layout: L } = useSim();
-  const { effective: cfg, setUrl: setCfg } = useScreenConfigLayers();
-  const def = nav.def(id);
-  const base = def.split!;
-  const eff = splitFor(id, def, cfg);
-  const o = cfg[id] ?? {};
-  const on = o.split !== false;
-  // Covers and boot pages span the screen; a root (a sidebar app's) the base, beside the rail; pushed pages the main
-  // area (or the tablet panel).
-  const width = isFullScreen(def.level) ? L.vw : def.level === 'tab' ? L.baseW : L.split ? L.detailW : L.mainW;
-  const active = !!eff && listDetailActive(L, width, eff.minWidth);
-  const need = eff ? (L.bottomNav ? Math.max(eff.minWidth, LIST_DETAIL_BOTTOM_NAV_MIN) : eff.minWidth) : 0;
-  const child = nav.def(base.defaultChild.id);
-  const variants = child.variants?.() ?? [];
-  const current = JSON.stringify(eff?.defaultChild.params ?? base.defaultChild.params);
-
-  return (
-    <div className={styles.section}>
-      <div className={styles.sectionTitle}>
-        Screen config · {nav.title({ id, params: {} })}
-      </div>
-      <div className={styles.kv} style={{ alignItems: 'center' }}>
-        <span className={styles.k}>List–detail</span>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-          <input type="checkbox" checked={on} onChange={(e) => setCfg(id, { split: e.target.checked })} />
-          <span className={styles.muted}>{!on ? 'off: always stacks' : active ? `active (${width}px ≥ ${need})` : `stacks here (${width}px < ${need}${L.bottomNav && need > eff!.minWidth ? ', bottom nav' : ''})`}</span>
-        </label>
-        <span className={styles.k}>From width</span>
-        <select style={select} disabled={!on} value={eff?.minWidth ?? base.minWidth} onChange={(e) => setCfg(id, { minWidth: Number(e.target.value) })}>
-          {MIN_WIDTHS.map((w) => (
-            <option key={w} value={w}>
-              {w}px{w === base.minWidth ? ' (code)' : ''}
-            </option>
-          ))}
-        </select>
-        <span className={styles.k}>Proportion</span>
-        <select style={select} disabled={!on} value={eff?.ratio ?? base.ratio} onChange={(e) => setCfg(id, { ratio: e.target.value as 'equal' | 'detail' })}>
-          <option value="equal">50 / 50{base.ratio === 'equal' ? ' (code)' : ''}</option>
-          <option value="detail">Detail-dominant{base.ratio === 'detail' ? ' (code)' : ''}</option>
-        </select>
-        <span className={styles.k}>List width</span>
-        <select style={select} disabled={!on || (eff?.ratio ?? base.ratio) === 'equal'} value={eff?.masterWidth ?? base.masterWidth} onChange={(e) => setCfg(id, { masterWidth: Number(e.target.value) })}>
-          {MASTER_WIDTHS.map((w) => (
-            <option key={w} value={w}>
-              {w}px{w === base.masterWidth ? ' (code)' : ''}
-            </option>
-          ))}
-        </select>
-        <span className={styles.k}>Default</span>
-        <select style={select} disabled={!on} value={current} onChange={(e) => setCfg(id, { defaultParams: JSON.parse(e.target.value) })}>
-          {variants.map((v) => (
-            <option key={v.label} value={JSON.stringify(v.params)}>
-              {v.label}
-              {JSON.stringify(v.params) === JSON.stringify(base.defaultChild.params) ? ' (code)' : ''}
-            </option>
-          ))}
-        </select>
-      </div>
-      <SaveBar id={id} />
-    </div>
-  );
-}
 
 /** The displays on the canvas: the single device, or each display of a set (none in All devices). */
 function canvasDisplays(search: URLSearchParams): { device: Device; display: Display }[] {
@@ -346,118 +273,40 @@ function LandscapeSupport({ id }: { id: string }) {
   );
 }
 
-
-/** iPhone Duo: what the right column shows on the current page. */
-function SideColumnSection({ id }: { id: string }) {
-  const nav = useNavRoot();
-  const { effective: cfg, setUrl: setCfg } = useScreenConfigLayers();
-  const def = nav.def(id);
-  const value = sideColumnFor(id, def, cfg);
-  const base = def.sideColumn ?? (isFullScreen(def.level) ? 'empty' : 'nav');
-  return (
-    <div className={styles.section}>
-      <div className={styles.sectionTitle}>iPhone Duo column · {nav.title(nav.stack[nav.stack.length - 1])}</div>
-      <div className={styles.kv} style={{ alignItems: 'center' }}>
-        <span className={styles.k}>Right column</span>
-        <select style={select} value={value} onChange={(e) => setCfg(id, { sideColumn: e.target.value as 'nav' | 'empty' })}>
-          <option value="nav">Navigation{base === 'nav' ? ' (code)' : ''}</option>
-          <option value="empty">Empty (reserved){base === 'empty' ? ' (code)' : ''}</option>
-        </select>
-      </div>
-      <p className={styles.muted} style={{ margin: '8px 0 0' }}>
-        The status and Dynamic Island always live in this column; content never goes under it.
-      </p>
-      <SaveBar id={id} />
-    </div>
-  );
+/** Where the app's navigation is on this display, in words. */
+function navigationOf(L: ReturnType<typeof useSim>['layout']): string {
+  if (L.nav === 'rail' && L.railW <= L.safeL) return 'None of the tool’s: the app’s own (a sidebar, a header)';
+  return { column: 'A column at the right', rail: 'A rail at the left', bottom: 'A bar at the bottom' }[L.nav];
 }
 
 /**
- * Where the page's config comes from, and the actions to move it between layers:
- *   unsaved (URL) → Save as default (screen-config.json) → Make code default (app/pages.tsx)
- *   Revert to code default drops what was saved. The two destructive actions ask for confirmation inline.
+ * The pages that show a list and its detail (a sidebar app, a settings screen): whether they do side by side on this
+ * display or one at a time, and from what width. Read only: set in code (`split`, app/pages.tsx).
  */
-function SaveBar({ id }: { id: string }) {
+function ListDetailRows() {
   const nav = useNavRoot();
-  const { url, saved, effective, proposal, save, discard, resetSaved, makeCodeDefault } = useScreenConfigLayers();
-  const writable = useCanWrite();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [confirm, setConfirm] = useState<'revert' | 'code' | null>(null);
-  const def = nav.def(id);
-  const unsaved = !!url[id] && Object.keys(url[id]).length > 0;
-  const isSaved = !!saved[id] && Object.keys(saved[id]).length > 0;
-  const splitOff = !!def.split && effective[id]?.split === false;
-  const run = async (fn: () => Promise<void>) => {
-    setBusy(true);
-    setError(null);
-    try {
-      await fn();
-      setConfirm(null);
-    } catch (e) {
-      setError(String(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const noWrite = 'Saving needs the dev server (npm run dev)';
-  const tip = (t: string) => (writable ? t : noWrite);
+  const { layout: L } = useSim();
+  const { effective: cfg } = useScreenConfigLayers();
   return (
-    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-        <span className={styles.badge} style={unsaved ? { background: 'var(--ui-amber-soft)', color: 'var(--ui-amber-text)' } : isSaved ? { background: 'var(--ui-green-soft)', color: 'var(--ui-green-text)' } : undefined}>
-          {unsaved ? 'Unsaved (URL only)' : isSaved ? (proposal ? 'Saved in proposal' : 'Saved project default') : proposal ? 'Same as base' : 'Code default'}
-        </span>
-        {!confirm && unsaved && (
-          <>
-            <button className={styles.btn} disabled={!writable || busy} title={tip(proposal ? `Save in the proposal (proposals/${proposal.folder}/config.json)` : 'Save for everyone in app/screen-config.json; the code stays as is')} onClick={() => run(() => save(id))}>
-              <Icon name="save" size={14} />
-              {proposal ? 'Save to proposal' : 'Save as default'}
-            </button>
-            <button className={styles.btn} disabled={busy} title="Drop the unsaved changes" onClick={() => discard(id)}>
-              Discard
-            </button>
-          </>
-        )}
-        {!confirm && !proposal && (unsaved || isSaved) && (
-          <button className={styles.btn} disabled={!writable || busy} title={tip('Write these values into the page in app/pages.tsx')} onClick={() => setConfirm('code')}>
-            <Icon name="code" size={14} />
-            Make code default
-          </button>
-        )}
-        {!confirm && !unsaved && isSaved && (
-          <button className={styles.btn} disabled={!writable || busy} title={tip(proposal ? 'Remove this page from the proposal config; it goes back to the base' : 'Delete the saved values; the page goes back to what the code says')} onClick={() => setConfirm('revert')}>
-            <Icon name="restart_alt" size={14} />
-            {proposal ? 'Revert to base' : 'Revert to code default'}
-          </button>
-        )}
-      </div>
-      {confirm && (
-        <div style={{ padding: 8, borderRadius: 6, background: 'var(--ui-bg-subtle)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span>
-            {confirm === 'revert'
-              ? proposal
-                ? 'Remove this page from the proposal config? It goes back to the base.'
-                : 'Delete the saved values of this page? It goes back to what the code says.'
-              : `Write these values into app/pages.tsx as the code default?${splitOff ? ' List–detail is off: it will be removed from the code.' : ''}`}
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              className={styles.btn}
-              disabled={busy}
-              style={{ background: 'var(--ui-strong)', color: 'var(--ui-on-strong)', borderColor: 'var(--ui-strong)' }}
-              onClick={() => run(() => (confirm === 'revert' ? resetSaved(id) : makeCodeDefault(id, def)))}
-            >
-              {confirm === 'revert' ? 'Revert' : 'Write to code'}
-            </button>
-            <button className={styles.btn} disabled={busy} onClick={() => setConfirm(null)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-      {!writable && unsaved && <span className={styles.muted}>{noWrite}. The link keeps the change.</span>}
-      {error && <span style={{ color: 'var(--ui-red-text)' }}>{error}</span>}
-    </div>
+    <>
+      {nav.stack
+        .filter((r) => nav.def(r.id).split)
+        .map((r) => {
+          const def = nav.def(r.id);
+          const eff = splitFor(r.id, def, cfg);
+          if (!eff) return null;
+          const width = isFullScreen(def.level) ? L.vw : def.level === 'tab' ? L.baseW : L.split ? L.detailW : L.mainW;
+          const need = L.bottomNav ? Math.max(eff.minWidth, LIST_DETAIL_BOTTOM_NAV_MIN) : eff.minWidth;
+          const side = listDetailActive(L, width, eff.minWidth);
+          const list = eff.ratio === 'equal' ? 'half each' : `the list ${eff.masterWidth} wide`;
+          return (
+            <Pair
+              key={r.id}
+              k={`List & detail${nav.stack.filter((x) => nav.def(x.id).split).length > 1 ? ` · ${nav.title(r)}` : ''}`}
+              v={side ? `Side by side here (${list}): ${width} ≥ ${need}` : `One at a time here: side by side from ${need} wide (${width} here)`}
+            />
+          );
+        })}
+    </>
   );
 }

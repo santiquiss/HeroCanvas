@@ -60,7 +60,10 @@ export interface DeviceTargets {
  * wider), and the like. The app declares its own (`appConfig.layout`); a proposal's version can change it.
  */
 export interface ScreenLayout {
-  /** The tablet rail's width (pt; 72 by default): the content moves over by it. */
+  /**
+   * The tablet rail's width (pt; 72 by default): the content moves over by it. `0`: the app has no rail (a sidebar
+   * app, one with tabs only on phones): nothing is kept for one at the left.
+   */
   railWidth?: number;
   /** A rail that folds (a sidebar): its width folded (`?rail=folded`). */
   railFoldedWidth?: number;

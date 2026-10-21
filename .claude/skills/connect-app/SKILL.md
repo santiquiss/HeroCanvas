@@ -111,7 +111,8 @@ navigation drawer that stays open on tablets) has no tabs: its sidebar is one ro
 home) with a `split` (list–detail: `minWidth`, `ratio: 'detail'`, the sidebar's width as `masterWidth`, the section it
 opens on as `defaultChild`), and each section a `push` over it. On a phone the sidebar is the screen and a section
 slides over it; on a wide screen the sidebar stays and the section shows beside it, as the app does. The sidebar
-reads `useSplit()` to highlight the section that's open.
+reads `useSplit()` to highlight the section that's open. Such an app has no rail: `appConfig.layout = { railWidth: 0 }`,
+so nothing is kept for one at the left of a tablet.
 
 ## 5. Pages (`app/pages.tsx`)
 
