@@ -1,7 +1,10 @@
 // About (#/about, the rail's ⓘ): HeroCanvas itself, apart from the app it shows. Its version (src/version.json),
 // who made it, its license, and its changelog (src/CHANGELOG.md), as a page of its own.
+import { useNavigate } from 'react-router';
 import hcChangelog from '../CHANGELOG.md?raw';
+import { Icon } from '../components/Icon';
 import { changelogBody } from './Changelog';
+import { useSetMode } from './modes';
 import styles from './About.module.css';
 
 const REPO = 'https://github.com/santiquiss/HeroCanvas';
@@ -14,15 +17,21 @@ const AUTHORS = [
 const BODY = changelogBody(hcChangelog);
 
 export function About() {
+  const navigate = useNavigate();
+  const setMode = useSetMode();
+  // Back where it was opened from; opened from a link (nothing before it here), to the prototype.
+  const back = () => ((window.history.state?.idx ?? 0) > 0 ? navigate(-1) : setMode('prototype'));
   return (
     <div className={styles.scroll}>
+      <button className={styles.back} onClick={back} aria-label="Back" title="Back">
+        <Icon name="arrow_back" size={20} />
+      </button>
       <article className={styles.page}>
+        {/* The app icon at 192px (made from the logo by scripts/vite/brand.ts): sharp at this size on any screen. */}
         <header className={styles.head}>
-          <img src="/assets/logo-64.png" alt="" width={56} height={56} className={styles.logo} />
-          <div>
-            <h1 className={styles.title}>HeroCanvas</h1>
-            <span className={styles.version}>Version {__HC_VERSION__}</span>
-          </div>
+          <img src="/pwa/icon-192.png" alt="" width={96} height={96} className={styles.logo} />
+          <h1 className={styles.title}>HeroCanvas</h1>
+          <span className={styles.version}>Version {__HC_VERSION__}</span>
         </header>
         <section className={styles.credits}>
           <p>

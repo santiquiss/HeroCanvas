@@ -44,12 +44,9 @@ export function Toolbar(props: ToolbarProps) {
   return (
     <div className={styles.toolbar}>
       {/* Each panel's toggle at its own edge, as in Figma. */}
-      {/* About has no side panels: nothing to toggle there. */}
-      {props.mode !== 'about' && (
-        <button className={styles.panelBtn} title="Toggle left panel" onClick={props.onToggleLeft}>
-          <Icon name={props.leftOpen ? 'left_panel_close' : 'left_panel_open'} size={18} />
-        </button>
-      )}
+      <button className={styles.panelBtn} title="Toggle left panel" onClick={props.onToggleLeft}>
+        <Icon name={props.leftOpen ? 'left_panel_close' : 'left_panel_open'} size={18} />
+      </button>
       {/* The logo, the modes and HeroCanvas's own version are the rail's (ModeRail); this copy's version stays here,
           opening its changelog. */}
       <VersionButton />
@@ -62,7 +59,7 @@ export function Toolbar(props: ToolbarProps) {
       <div className={styles.spacer} />
       {/* The actions on the right, closer together than the bar's own spacing. */}
       <div className={styles.actions}>
-      {props.mode !== 'flow' && props.mode !== 'tokens' && props.mode !== 'about' && !capture && (
+      {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && (
         <Chip active={inspect} onClick={() => setInspect(!inspect)} title="Inspect components (I)">
           <Icon name="ads_click" size={18} />
           Inspect
@@ -77,11 +74,9 @@ export function Toolbar(props: ToolbarProps) {
       {/* Capture is in the mode rail (ModeRail). */}
       {/* Capture's picture is exported, not linked: a link here wouldn't bring it. */}
       {!capture && <ShareButton />}
-      {props.mode !== 'about' && (
-        <button className={styles.panelBtn} title="Toggle right panel" onClick={props.onToggleRight}>
-          <Icon name={props.rightOpen ? 'right_panel_close' : 'right_panel_open'} size={18} />
-        </button>
-      )}
+      <button className={styles.panelBtn} title="Toggle right panel" onClick={props.onToggleRight}>
+        <Icon name={props.rightOpen ? 'right_panel_close' : 'right_panel_open'} size={18} />
+      </button>
       </div>
     </div>
   );

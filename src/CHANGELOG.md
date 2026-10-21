@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.6.3 — 2026-10-21
+
+- **About, a page of its own**: no toolbar over it (the versions, proposals and Share are the app's), a back arrow at
+  the top left to where it was opened from (the prototype, from a link), and its header centered: the app icon at
+  192px, sharp at 96, over a larger name and the version.
+
 ## 0.6.2 — 2026-10-21
 
 - **Authors**: HeroCanvas is made by Santiago Quiss and Agus Salas, both credited with their GitHub profiles on the

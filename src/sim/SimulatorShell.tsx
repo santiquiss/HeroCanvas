@@ -317,15 +317,18 @@ function DesignerShell() {
         <ModeRail mode={mode} onMode={setMode} />
       </div>
       <div className={styles.app}>
-        <div className={styles.lockable} data-locked={recordingNow || undefined} inert={recordingNow}>
-          <Toolbar
-            leftOpen={prefs.left}
-            rightOpen={prefs.right}
-            onToggleLeft={() => updatePrefs({ left: !prefs.left })}
-            onToggleRight={() => updatePrefs({ right: !prefs.right })}
-            mode={mode}
-          />
-        </div>
+        {/* About is a page to read: no toolbar over it (its versions, proposals and sharing are the app's). */}
+        {mode !== 'about' && (
+          <div className={styles.lockable} data-locked={recordingNow || undefined} inert={recordingNow}>
+            <Toolbar
+              leftOpen={prefs.left}
+              rightOpen={prefs.right}
+              onToggleLeft={() => updatePrefs({ left: !prefs.left })}
+              onToggleRight={() => updatePrefs({ right: !prefs.right })}
+              mode={mode}
+            />
+          </div>
+        )}
         <SharedSimProvider>
         <SimProvider layout={shownLayout} theme={theme}>
           {/* Off screen, on demand: where each component shows up (the changes popover's links). */}
