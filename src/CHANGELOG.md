@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.16.1 — 2026-10-21
+
+- **The launch settles instead of snapping**: flying to a component, the icon lands a little bigger and both shrink
+  into place together while one crossfades into the other (the icon fading out faster than the component fades in).
+  Two images that don't match to the pixel read as one thing changing, not a jump.
+
 ## 0.16.0 — 2026-10-21
 
 - **The tour's launch with its emblem**: the emblem alone on the blue (`brand/hc-emblem.png`), flying onto the emblem

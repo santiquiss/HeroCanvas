@@ -36,10 +36,18 @@ export const LAUNCH_PLAYBACK: { value: LaunchPlayback; label: string }[] = [
 
 const ENTER = { spring: spring(0.55, 0.32), fade: { easing: 'ease-out', ms: 320 } };
 const EXIT = spring(0.6, 0.12);
-/** Flying to a component: no overshoot, so it lands exactly where it crossfades. */
-const FLY = spring(0.65, 0);
-/** Its crossfade into the component: over the flight's last part. */
-const CROSSFADE_MS = 260;
+/** Flying to a component: no overshoot. */
+const FLY = spring(0.6, 0);
+/**
+ * Then it settles: it lands a little bigger than the component (SETTLE_SCALE) and both shrink into place together as
+ * one crossfades into the other. Moving as one, two images that don't match to the pixel (an emblem alone, the same
+ * emblem in an app icon) read as one thing changing, not a jump.
+ */
+const SETTLE = spring(0.5, 0);
+const SETTLE_SCALE = 1.08;
+const CROSSFADE_MS = 380;
+/** The icon fades out faster than the component fades in: less of the two at once, a ghost of one on the other. */
+const FADE_OUT_MS = 220;
 /** Whether a launch played since HeroCanvas loaded (Once plays it only then). */
 let played = false;
 
@@ -86,7 +94,7 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
   const enter = config.enter ?? 'none';
   const enterMs = enter === 'none' ? 0 : enter === 'fade' ? ENTER.fade.ms : ENTER.spring.ms;
   const out = config.exit ?? 'fade';
-  const exitMs = typeof out === 'object' ? FLY.ms : EXIT.ms;
+  const exitMs = typeof out === 'object' ? Math.round(FLY.ms * 0.8 + SETTLE.ms) : EXIT.ms;
   const shape = config.iconShape ?? 'rounded';
 
   // The screen's own background matches the launch's while it plays: its rounded corners are antialiased apart from
@@ -124,19 +132,32 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
         const anchor = target?.querySelector<HTMLElement>('[data-launch-anchor]') ?? target;
         const from = icon.current?.getBoundingClientRect();
         const to = anchor?.getBoundingClientRect();
-        if (target && from && to) {
+        const box = target?.getBoundingClientRect();
+        if (target && from && to && box) {
           const t = target;
-          t.style.opacity = '0';
           const k = root.getBoundingClientRect().width / root.offsetWidth || 1;
-          const dx = (to.left + to.width / 2 - (from.left + from.width / 2)) / k;
-          const dy = (to.top + to.height / 2 - (from.top + from.height / 2)) / k;
-          setExit({ transform: `translate(${dx}px, ${dy}px) scale(${to.width / from.width})`, transition: `transform ${FLY.ms}ms ${FLY.easing}, opacity ${CROSSFADE_MS}ms ease` });
-          // As it lands, the component fades in under it and it fades out: one becomes the other.
+          // Where the anchor is with the component grown by SETTLE_SCALE about its center, and where it ends.
+          const cx = box.left + box.width / 2;
+          const cy = box.top + box.height / 2;
+          const at = (scale: number) => {
+            const ax = cx + (to.left + to.width / 2 - cx) * scale;
+            const ay = cy + (to.top + to.height / 2 - cy) * scale;
+            const dx = (ax - (from.left + from.width / 2)) / k;
+            const dy = (ay - (from.top + from.height / 2)) / k;
+            return `translate(${dx}px, ${dy}px) scale(${(to.width / from.width) * scale})`;
+          };
+          t.style.transition = 'none';
+          t.style.opacity = '0';
+          t.style.transform = `scale(${SETTLE_SCALE})`;
+          setExit({ transform: at(SETTLE_SCALE), transition: `transform ${FLY.ms}ms ${FLY.easing}` });
+          // Landed: both settle to their size together, the component fading in as the icon fades out.
           window.setTimeout(() => {
-            t.style.transition = `opacity ${CROSSFADE_MS}ms ease`;
+            t.style.transition = `opacity ${CROSSFADE_MS}ms ease, transform ${SETTLE.ms}ms ${SETTLE.easing}`;
             t.style.opacity = '1';
+            t.style.transform = '';
+            setExit({ transform: at(1), transition: `transform ${SETTLE.ms}ms ${SETTLE.easing}, opacity ${FADE_OUT_MS}ms ease-out` });
             setLanding(true);
-          }, Math.max(0, FLY.ms * 0.62 - CROSSFADE_MS / 2));
+          }, FLY.ms * 0.8);
           return;
         }
       }
@@ -146,6 +167,7 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
       if (!target) return;
       target.style.opacity = '';
       target.style.transition = '';
+      target.style.transform = '';
     };
     const t2 = window.setTimeout(
       () => {
@@ -166,7 +188,7 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
   const exiting = exit !== null;
   const exitClass = !exiting ? '' : typeof out === 'object' ? styles.exitFly : styles[`exit_${out}`];
   return (
-    <div className={`${styles.launch} ${exitClass}`} data-launch style={{ '--exit-ms': `${exitMs}ms`, '--exit-ease': EXIT.easing, '--crossfade-ms': `${CROSSFADE_MS}ms` } as CSSProperties}>
+    <div className={`${styles.launch} ${exitClass}`} data-launch style={{ '--exit-ms': `${exitMs}ms`, '--exit-ease': EXIT.easing, '--crossfade-ms': `${FADE_OUT_MS}ms` } as CSSProperties}>
       <div className={styles.background} style={{ background: bg }} />
       {config.icon && (
         <span className={`${styles.iconMove} ${landing ? styles.landing : ''}`} style={exit && typeof out === 'object' ? exit : undefined}>
