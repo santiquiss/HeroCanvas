@@ -44,6 +44,23 @@ app itself.
 **Figma still has its place.** Use it to sketch something new, or as a source: HeroCanvas can start from a Figma file
 before there's code, and your agent can read a frame you link to turn it into components on the canvas.
 
+### How it compares
+
+| | Figma | Storybook | AI app builders<br><sub>(v0, Lovable, Bolt…)</sub> | Xcode / Android Studio previews | **HeroCanvas** |
+|---|:-:|:-:|:-:|:-:|:-:|
+| Designs on your app's real components | — | ✓ | — | ✓ | ✓ |
+| Your existing app, any stack | — | ◐ | — | — | ✓ |
+| Whole screens with their navigation and flows | ◐ | — | ✓ | — | ✓ |
+| Every phone, foldable and tablet at once, at real size | ◐ | — | — | ◐ | ✓ |
+| Personas, languages, text sizes, themes switched live | ◐ | ◐ | — | ◐ | ✓ |
+| Changes in versions to compare, kept apart from the app | ◐ | — | ◐ | — | ✓ |
+| Handoff in your code's own terms | ◐ | ◐ | — | — | ✓ |
+| Changed by asking an AI agent | ◐ | — | ✓ | ◐ | ✓ |
+| Comments for the whole team on the screens | ✓ | — | ◐ | — | ✓ |
+
+<sub>✓ yes · ◐ partly, or with extra setup · — no. Storybook shows components one by one; AI app builders make a new app
+in their own stack, not yours; native previews show one view of one platform at a time.</sub>
+
 ## How it works
 
 ```
