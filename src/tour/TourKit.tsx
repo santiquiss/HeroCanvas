@@ -233,7 +233,7 @@ const PEEK = 14;
  * Cards in a stack, as Wallet holds them: the top one is swiped (or dragged) away to show the next, back brings it
  * back; buttons under it do the same, with a hint between them.
  */
-export function CardDeck({ cards }: { cards: Omit<DeckCardProps, 'count' | 'top' | 'style'>[] }) {
+export function CardDeck({ cards, onFinish }: { cards: Omit<DeckCardProps, 'count' | 'top' | 'style'>[]; /** Swiping on past the last card (or Next on it): where the deck leads. */ onFinish?: () => void }) {
   const hc = useComponent('CardDeck', { cards: cards.length });
   const [index, setIndex] = useState(0);
   const [dx, setDx] = useState(0);
@@ -283,7 +283,11 @@ export function CardDeck({ cards }: { cards: Omit<DeckCardProps, 'count' | 'top'
       // Past 15% of the card, or flicked: the next (or the last) card; else back.
       const width = r.width * ratio;
       const dir = x < -width * 0.15 || speed < -0.25 ? 1 : x > width * 0.15 || speed > 0.25 ? -1 : 0;
-      go(from + dir);
+      // On past the last card: where the deck leads (it stays on its last card, behind).
+      if (from + dir > last && onFinish) {
+        go(last);
+        onFinish();
+      } else go(from + dir);
     };
     const cancel = () => {
       stop();
@@ -332,7 +336,7 @@ export function CardDeck({ cards }: { cards: Omit<DeckCardProps, 'count' | 'top'
           <Icon name="arrow_back_ios_new" size={20} />
         </button>
         <span className={styles.deckHint}>{index === last ? 'Ready when you are' : 'Swipe the card'}</span>
-        <button className={`${styles.round} ${styles.roundNext}`} aria-label="Next card" disabled={index === last} onClick={() => go(index + 1)}>
+        <button className={`${styles.round} ${styles.roundNext}`} aria-label="Next card" disabled={index === last && !onFinish} onClick={() => (index === last ? onFinish?.() : go(index + 1))}>
           <Icon name="arrow_forward_ios" size={20} />
         </button>
       </div>

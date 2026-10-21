@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.25.3 — 2026-10-21
+
+- **Swiping on past Welcome's last card opens the Tour**, as Take the Tour does; so does Next there, instead of
+  being off. `CardDeck` takes `onFinish`.
+
 ## 0.25.2 — 2026-10-21
 
 - **Text size says whose sizes they are**: the slider is the device's system's, and now shows it: under it, iOS's

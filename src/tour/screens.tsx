@@ -36,7 +36,7 @@ export function WelcomeScreen() {
         </div>
       </header>
       <Reveal on={ready} index={0} className={styles.welcomeDeck}>
-        <CardDeck cards={cards} />
+        <CardDeck cards={cards} onFinish={() => nav.goTab('tour')} />
       </Reveal>
     </Screen>
   );
