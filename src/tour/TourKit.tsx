@@ -14,7 +14,7 @@ export type Tint = 'blue' | 'indigo' | 'purple' | 'pink' | 'orange' | 'yellow' |
 
 /**
  * A screen, as iOS lays one out. A tab's root opens with an empty bar over a large title at the left; scrolled, its
- * content goes under the bar, which blurs it (iOS 26's soft scroll edge: glass fading out downward, no hairline), and
+ * content goes under the bar, which blurs it (glass, evenly, ending straight with a very faint line), and
  * once the large title is under the bar too, its title shows in it, small and centered. A pushed screen's bar has a
  * glass back button and its title inline from the start. The bar stays at the top. The page's grouped background, its
  * side margins from the simulator's layout. `plain`: no title and no scroll, its content laid out in the screen's

@@ -42,8 +42,8 @@
   font: var(--app-font-large-title);
 }
 
-/* The bar, fixed at the top while the page scrolls under it. Its glass, iOS 26's soft scroll edge: what's under it
-   blurred, fading out downward (no hairline), shown once the content goes under. */
+/* The bar, fixed at the top while the page scrolls under it. Its glass, shown once the content goes under: what's
+   under it evenly blurred, a little, ending straight with a very faint line, as iOS's bar does. */
 .bar {
   position: sticky;
   top: 0;
@@ -52,12 +52,11 @@
 }
 .barGlass {
   position: absolute;
-  inset: 0 0 -18px;
-  background: color-mix(in srgb, var(--app-page) 72%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.8);
-  backdrop-filter: blur(14px) saturate(1.8);
-  -webkit-mask-image: linear-gradient(#000 calc(100% - 30px), transparent);
-  mask-image: linear-gradient(#000 calc(100% - 30px), transparent);
+  inset: 0;
+  background: color-mix(in srgb, var(--app-page) 80%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.8);
+  backdrop-filter: blur(10px) saturate(1.8);
+  box-shadow: inset 0 -0.5px 0 color-mix(in srgb, var(--app-text) 10%, transparent);
   opacity: 0;
   transition: opacity 200ms ease;
   pointer-events: none;

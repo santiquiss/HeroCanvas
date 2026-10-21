@@ -6,11 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.22.1 — 2026-10-21
+
+- **The bar's glass, as iOS draws it**: an even, lighter blur that ends straight, with a very faint line under it,
+  instead of fading out downward.
+
 ## 0.22.0 — 2026-10-21
 
 - **The tour's titles behave as iOS's**: a tab opens with an empty bar over its large title (34, at the content's
-  left); scrolled, the content goes under the bar, which blurs it (iOS 26's soft scroll edge: glass fading out
-  downward, no hairline), and once the large title is under it, its title shows in the bar, small and centered. The
+  left); scrolled, the content goes under the bar, which blurs it, and once the large title is under it, its title shows in the bar, small and centered. The
   bar stays at the top; pushed pages get the same glass. Replaces 0.20.0's centered, smaller titles.
 - `NavigationBar` takes no back button (a tab's bar) and `titleShown`; `LargeTitle` no longer takes `top`.
 
