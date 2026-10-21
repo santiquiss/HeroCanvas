@@ -15,7 +15,7 @@ import { BASE_LANGUAGE, LANG_PARAM, LANGUAGES, languageIn } from '../sim/languag
 import { LAUNCH } from '../nav/pages';
 import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
-import { NoPersonas, PersonaPicker, usePersonaParam } from './PersonaPicker';
+import { PersonaPicker, usePersonaParam } from './PersonaPicker';
 
 interface Option {
   value: string;
@@ -30,7 +30,7 @@ export function ScenariosPanel() {
 
   return (
     <>
-      {/* Always there: with no personas, the default user and how to make some. */}
+      {/* Always there: with no personas, the anonymous user, its menu saying how to make some. */}
       <div className={styles.section}>
         <div className={styles.sectionTitle}>
           Persona
@@ -38,7 +38,7 @@ export function ScenariosPanel() {
             every page
           </span>
         </div>
-        {persona ? <PersonaPicker persona={persona} onPick={pick} /> : <NoPersonas />}
+        <PersonaPicker persona={persona} onPick={pick} />
       </div>
 
       <LanguageSection />

@@ -6,14 +6,21 @@ import type { Persona } from '../contract';
 import { Icon } from '../components/Icon';
 import { DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/persona';
 import { useUrlPatch } from '../sim/SimContext';
+import surface from '../theme/surface.module.css';
 import styles from './Panel.module.css';
 
-/** The persona in the URL (none when the app has no personas), and picking one (the default is no param). */
-export function usePersonaParam(): [Persona | undefined, (id: Persona['id']) => void] {
+/** Who the screens show when the app has no personas: anyone, with the app's own sample data. */
+export const ANONYMOUS: Persona = { id: 'anonymous', name: 'Anonymous user', description: 'Anyone, with the app’s sample data' };
+
+/**
+ * The persona in the URL, and picking one (the default is no param). With no personas, the anonymous user: the
+ * picker still shows, to say what personas are.
+ */
+export function usePersonaParam(): [Persona, (id: Persona['id']) => void] {
   const [search] = useSearchParams();
   const patch = useUrlPatch();
   const pick = (id: string) => patch({ [PERSONA_PARAM]: id === DEFAULT_PERSONA ? null : id });
-  return [findPersona(search.get(PERSONA_PARAM)), pick];
+  return [findPersona(search.get(PERSONA_PARAM)) ?? ANONYMOUS, pick];
 }
 
 export function PersonaPicker({ persona, onPick }: { persona: Persona; onPick: (id: Persona['id']) => void }) {
@@ -50,7 +57,7 @@ export function PersonaPicker({ persona, onPick }: { persona: Persona; onPick: (
       </button>
       {open && (
         <div ref={list} className={styles.personaMenu} role="listbox" aria-label="Persona">
-          {PERSONAS.map((p) => (
+          {(PERSONAS.length ? PERSONAS : [ANONYMOUS]).map((p) => (
             <button
               key={p.id}
               role="option"
@@ -65,6 +72,20 @@ export function PersonaPicker({ persona, onPick }: { persona: Persona; onPick: (
               <Icon name="check" size={18} color="var(--ui-text)" style={{ visibility: p.id === persona.id ? 'visible' : 'hidden' }} />
             </button>
           ))}
+          {/* No personas yet: the empty state, under the one user there is. */}
+          {!PERSONAS.length && (
+            <div className={`${surface.empty} ${styles.personaEmpty}`}>
+              <span className={surface.emptyIcon}>
+                <Icon name="group" size={22} />
+              </span>
+              <span className={surface.emptyTitle}>No personas yet</span>
+              <span className={surface.emptyBody}>
+                Personas are who the app is tried as: a new user with nothing yet, someone on a paid plan, an admin with a
+                busy team. Each brings their own data, and every screen shows theirs. Ask your agent: “Create personas for
+                my app.”
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -86,24 +107,3 @@ export function PersonaRow({ persona: p }: { persona: Persona }) {
   );
 }
 
-/** Who the screens show when the app has no personas: anyone, with the app's own sample data. */
-export const DEFAULT_USER: Persona = { id: 'user', name: 'User', description: 'Anyone using the app, with its sample data' };
-
-/**
- * The persona section with no personas yet: the one user every app has, and what personas are and how they're made
- * (the new-persona skill), so the section is there to find before there's anything to pick.
- */
-export function NoPersonas() {
-  return (
-    <>
-      <div className={`${styles.persona} ${styles.personaStatic}`}>
-        <PersonaRow persona={DEFAULT_USER} />
-      </div>
-      <p className={styles.sectionHint}>
-        Personas are who the app is tried as: a new user with nothing yet, someone on a paid plan, an admin with a busy
-        team. Each brings their own data, and every screen shows theirs. Ask your agent to create them: “Create personas
-        for my app.”
-      </p>
-    </>
-  );
-}

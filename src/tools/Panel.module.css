@@ -1041,13 +1041,12 @@
   color: var(--ui-text);
 }
 
-/* No personas yet: the default user, not a menu. A section with nothing to pick yet says how to get some (sectionHint). */
-.personaStatic {
-  cursor: default;
+/* No personas yet: the menu's empty state, under the anonymous user. */
+.personaEmpty {
+  margin-top: 4px;
+  border-top: 1px solid var(--ui-line-subtle);
 }
-.personaStatic:hover {
-  background: none;
-}
+/* A section with nothing to pick yet says how to get some. */
 .sectionHint {
   margin: 8px 2px 0;
   color: var(--ui-text-muted);

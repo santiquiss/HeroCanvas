@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.25.1 — 2026-10-21
+
+- **No personas: the picker all the same**: Scenarios › Persona shows "Anonymous user" in its usual dropdown, and
+  opening it lists them over the empty state (what personas are, what to ask the agent). Capture lists personas only
+  when the app has some.
+
 ## 0.25.0 — 2026-10-21
 
 - **Scenarios › Persona is always there**: with no personas, it shows the one user every app has ("User", anyone with

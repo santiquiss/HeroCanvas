@@ -10,6 +10,7 @@ import styles from './CapturePanel.module.css';
 import { exportImage, FORMATS, type ImageFormat } from './exportImage';
 import { BACKGROUNDS, effectivePrefs, exportBackground, playedLength, PLAYBACK_SPEEDS, presetOf, SHADOW_PRESETS, SIZE_PRESETS, videoOn, type CapturePrefs, type PlaybackSpeed } from './prefs';
 import { PersonaPicker, usePersonaParam } from '../tools/PersonaPicker';
+import { PERSONAS } from '../sim/persona';
 import { ResizeEdge } from '../tools/PanelHost';
 import type { BodySpec, Finish } from './models';
 import { DEFAULT_LIGHT, lightSide, presetAt, PRESET_SIDE, type LightFrom, type Lighting } from './scene';
@@ -334,7 +335,7 @@ export function CapturePanel(p: CapturePanelProps) {
         </div>
       )}
       <div className={panel.body}>
-        {persona && (
+        {PERSONAS.length > 0 && (
           <section className={panel.section}>
             <div className={panel.sectionTitle}>
               <span>Persona</span>
