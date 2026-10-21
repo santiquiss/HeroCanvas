@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.19.0 — 2026-10-21
+
+- **A device's header fits its device**: when its controls don't fit above a device (a set zoomed out), the ones
+  that don't go into a ⋯ menu, the least used first (language, version, video layout, rotate, displays); the name
+  keeps what room it can, and remove stays out, last of all.
+- **Devices closer together**: a set's devices sit 20 apart instead of 48, and the + at its ends (and beside a
+  single device) closer to them, so Fit shows them larger.
+
 ## 0.18.2 — 2026-10-21
 
 - **Welcome's last card draws the tour**: its seven stops, in their own icons and colors, orbiting slowly around a

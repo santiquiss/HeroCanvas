@@ -252,10 +252,10 @@
   z-index: 3;
 }
 .multiEndL {
-  right: calc(100% + 24px);
+  right: calc(100% + 14px);
 }
 .multiEndR {
-  left: calc(100% + 24px);
+  left: calc(100% + 14px);
 }
 /* Each device's header: device menu, display, rotate, remove. */
 .devHead {
@@ -445,6 +445,73 @@
   transform: scale(1.06);
 }
 
+
+/* What doesn't fit in a header: a ⋯ menu under it, one row per control. */
+/* Too narrow for all but the name: it keeps its text, not its chevron. */
+.devHeadTight > .devName {
+  padding: 0 6px;
+}
+.devHeadOpen {
+  z-index: 20;
+  opacity: 1;
+}
+.devMenu {
+  composes: surface from '../theme/surface.module.css';
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  max-width: 280px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.devMenuRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px 0 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ui-text);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.devMenuRow:hover {
+  background: var(--ui-hover);
+}
+.devMenuLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.devMenuCheck {
+  color: var(--ui-text);
+}
+.devMenuNoCheck {
+  visibility: hidden;
+}
+/* The header's parts at their full width, out of sight: what it measures to know what fits. */
+.devMeasure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 4px;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.devMeasurePart {
+  display: flex;
+  gap: 4px;
+}
 
 /* A device's own version (an override): its header stays visible; the version chip is on (.devChipOn). */
 .devHeadOwn {

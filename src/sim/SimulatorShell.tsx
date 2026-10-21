@@ -423,7 +423,7 @@ function DesignerShell() {
                     <span
                       key={dir}
                       className={styles.addSide}
-                      style={{ left: `calc(50% + ${dir * ((box.w * scale) / 2 + 40)}px)`, top: '50%' }}
+                      style={{ left: `calc(50% + ${dir * ((box.w * scale) / 2 + 32)}px)`, top: '50%' }}
                     >
                       <AddDeviceButton side={dir < 0 ? 'left' : 'right'} onPick={(id) => addBeside(dir < 0 ? 'left' : 'right', id)} />
                     </span>

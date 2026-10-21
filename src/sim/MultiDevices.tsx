@@ -1,12 +1,13 @@
 // A custom set of devices side by side (`?devices=`), each with its own display and orientation, repeats allowed, at
-// one scale. Each has a small header (DeviceHeader: drag handle, device, display, rotate, version, remove); + at both ends adds one, and a
+// one scale, close together so they show as large as they can. Each has a small header (DeviceHeader: drag handle,
+// device, display, rotate, version, language, remove; what doesn't fit in a ⋯ menu); + at both ends adds one, and a
 // small + shows on hover between two to add one there. The screens share the app's navigation and overlays (sheets,
 // menus, dialogs, toasts): an action on one shows on all. The active one (the last you touched, or in Inspect with
 // nothing selected the one under the pointer) is the inspectable one.
 // Each can show its own version instead of the toolbar's (Live, another proposal, a proposal's version): side by side,
 // that compares them; the components those versions replace change, navigation stays shared.
 import { designLayout } from '../design/overridableRegistry';
-import { Fragment, useRef, useState, type PointerEvent } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { Icon } from '../components/Icon';
 import { DEVICES, findDevice, findDisplay, type DeviceType } from '../devices/devices';
 import { supportsLandscape } from '../nav/screenConfig';
@@ -30,8 +31,8 @@ import styles from './SimulatorShell.module.css';
  * view bar and each device's header (36 px, 12 above the frame), which sit outside the layout.
  */
 const MARGIN = VIEW_BAR_H + 36 + 12 + 8;
-const SIDE = 96;
-const GAP = 48;
+const SIDE = 64;
+const GAP = 20;
 
 const TYPES: [DeviceType, string][] = [
   ['phone', 'Phones'],
@@ -103,11 +104,15 @@ function useGlobalDesign(): string {
  * The device's version: by default the global selection (the toolbar's, named in the list); another one (Live, a
  * proposal, a proposal's version) is an override, and turns the icon on.
  */
-function DesignPicker({ value, onPick }: { value?: string; onPick: (design: string | undefined) => void }) {
+function DesignPicker({ value, onPick, row = false }: { value?: string; onPick: (design: string | undefined) => void; row?: boolean }) {
   const global = useGlobalDesign();
   return (
-    <label className={`${styles.devChip} ${styles.devDesign} ${value ? styles.devChipOn : ''}`} title={value ? `Version on this device: ${designLabel(value)}` : `Version on this device: the global selection (${designLabel(global)})`}>
+    <label
+      className={row ? `${styles.devMenuRow} ${styles.devDesign}` : `${styles.devChip} ${styles.devDesign} ${value ? styles.devChipOn : ''}`}
+      title={value ? `Version on this device: ${designLabel(value)}` : `Version on this device: the global selection (${designLabel(global)})`}
+    >
       <Icon name="call_split" size={16} />
+      {row && <span className={styles.devMenuLabel}>Version: {value ? designLabel(value) : `${designLabel(global)} (global)`}</span>}
       <select value={value ?? ''} onChange={(e) => onPick(e.target.value || undefined)} aria-label="Version on this device">
         <option value="">{designLabel(global)} (Global selection)</option>
         <option value="live">Live</option>
@@ -135,14 +140,17 @@ function DesignPicker({ value, onPick }: { value?: string; onPick: (design: stri
  * The device's language: by default the global one (`?lang=`, Scenarios › Language, named in the list); another is an
  * override, the icon on with its code (a row of devices reads as the languages they show).
  */
-function LanguagePicker({ value, onPick }: { value?: Language; onPick: (lang: Language | undefined) => void }) {
+function LanguagePicker({ value, onPick, row = false }: { value?: Language; onPick: (lang: Language | undefined) => void; row?: boolean }) {
   const get = useUrlParams();
   const global = LANGUAGES.find((l) => l.id === languageIn(get(LANG_PARAM)))!;
   const own = value && LANGUAGES.find((l) => l.id === value);
   return (
-    <label className={`${styles.devChip} ${styles.devDesign} ${own ? styles.devChipOn : ''}`} title={own ? `Language on this device: ${own.name}` : `Language on this device: the global one (${global.name})`}>
+    <label
+      className={row ? `${styles.devMenuRow} ${styles.devDesign}` : `${styles.devChip} ${styles.devDesign} ${own ? styles.devChipOn : ''}`}
+      title={own ? `Language on this device: ${own.name}` : `Language on this device: the global one (${global.name})`}
+    >
       <Icon name="translate" size={16} />
-      {own && <span>{own.id}</span>}
+      {row ? <span className={styles.devMenuLabel}>Language: {own ? own.name : `${global.name} (global)`}</span> : own && <span>{own.id}</span>}
       <select value={value ?? ''} onChange={(e) => onPick((e.target.value || undefined) as Language | undefined)} aria-label="Language on this device">
         <option value="">{global.name} (Global selection)</option>
         {LANGUAGES.map((l) => (
@@ -170,9 +178,17 @@ export function AddDeviceButton({ onPick, side }: { onPick: (id: string) => void
 }
 
 
+/** What a header can show after its device's name, in order; the first of `DROP` go into its ⋯ menu first. */
+type HeadPart = 'displays' | 'video' | 'rotate' | 'design' | 'language';
+const DROP: HeadPart[] = ['language', 'design', 'video', 'rotate', 'displays'];
+/** The name keeps at least this much (or all of it, if shorter) before a control moves into the menu. */
+const NAME_MIN = 84;
+
 /**
- * A device's header on the canvas: its device, its displays, the video layout, rotate; in a set also
- * the drag handle, its version and remove. The single device has one too (the view bar has Compare).
+ * A device's header on the canvas: its device, its displays, the video layout, rotate; in a set also the drag handle,
+ * its version, its language and remove. The single device has one too (the view bar has Compare). Narrower than all of
+ * them (`style.maxWidth`, a device zoomed out), what doesn't fit goes into a ⋯ menu, the least used first; remove
+ * stays out, last of all.
  */
 export function DeviceHeader({
   device: id,
@@ -206,8 +222,120 @@ export function DeviceHeader({
   style?: React.CSSProperties;
 }) {
   const dev = findDevice(id);
+  const hasVideo = !!(findDisplay(dev, displayKey).videoSplit && !land && onVideo);
+  const parts: HeadPart[] = [
+    ...(dev.displays.length > 1 ? (['displays'] as const) : []),
+    ...(hasVideo ? (['video'] as const) : []),
+    'rotate' as const,
+    ...(design ? (['design'] as const) : []),
+    ...(language ? (['language'] as const) : []),
+  ];
+
+  // Which parts fit: each one's width read from a hidden copy of them all, against the room the header has.
+  const measure = useRef<HTMLDivElement>(null);
+  const [hidden, setHidden] = useState<HeadPart[]>([]);
+  // Too narrow even then: the name drops its chevron (the name still opens the menu) to keep more of itself.
+  const [tight, setTight] = useState(false);
+  const room = typeof style?.maxWidth === 'number' ? style.maxWidth : Infinity;
+  const key = parts.join() + displayKey + land + (design?.value ?? '') + (language?.value ?? '');
+  useLayoutEffect(() => {
+    const el = measure.current;
+    if (!el) return;
+    const width = (k: string) => el.querySelector<HTMLElement>(`[data-part="${k}"]`)?.offsetWidth ?? 0;
+    const GAP_PX = 4;
+    const PAD = 8;
+    const fixed = PAD + (grip ? width('grip') + GAP_PX : 0) + Math.min(width('name'), NAME_MIN) + (onRemove ? width('remove') + GAP_PX : 0);
+    const sizes = new Map(parts.map((p) => [p, width(p) + GAP_PX]));
+    const more = width('more') + GAP_PX;
+    const drop: HeadPart[] = [];
+    const total = () => fixed + parts.filter((p) => !drop.includes(p)).reduce((w, p) => w + sizes.get(p)!, 0) + (drop.length ? more : 0);
+    for (const p of DROP) {
+      if (total() <= room) break;
+      if (parts.includes(p)) drop.push(p);
+    }
+    setHidden((h) => (h.join() === drop.join() ? h : drop));
+    setTight(total() > room);
+    // `parts` is described by `key`.
+  }, [key, room, !!grip, !!onRemove]);
+
+  const [menu, setMenu] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const away = (e: globalThis.PointerEvent) => !root.current?.contains(e.target as Node) && setMenu(false);
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false);
+    document.addEventListener('pointerdown', away);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('pointerdown', away);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [menu]);
+  const shown = hidden.length ? parts.filter((p) => !hidden.includes(p)) : parts;
+  const closing = (f: () => void) => () => {
+    f();
+    setMenu(false);
+  };
+
+  const chip = (p: HeadPart) => {
+    switch (p) {
+      case 'displays':
+        return dev.displays.map((x) => (
+          <button key={x.key} className={`${styles.devChip} ${x.key === displayKey ? styles.devChipOn : ''}`} onClick={() => onDisplay(x.key)}>
+            {x.label.split(' ')[0]}
+          </button>
+        ));
+      case 'video':
+        return (
+          <button key={p} className={`${styles.devChip} ${video ? styles.devChipOn : ''}`} title="Video layout: 16:9 on top, the app below" onClick={onVideo}>
+            <Icon name="smart_display" size={16} />
+          </button>
+        );
+      case 'rotate':
+        return (
+          <button key={p} className={`${styles.devChip} ${land ? styles.devChipOn : ''}`} title={land ? 'Portrait' : 'Landscape'} onClick={onRotate}>
+            <Icon name="screen_rotation" size={16} />
+          </button>
+        );
+      case 'design':
+        return <DesignPicker key={p} value={design!.value} onPick={design!.onPick} />;
+      case 'language':
+        return <LanguagePicker key={p} value={language!.value} onPick={language!.onPick} />;
+    }
+  };
+  const row = (p: HeadPart) => {
+    const check = (on: boolean) => <Icon name="check" size={16} className={on ? styles.devMenuCheck : styles.devMenuNoCheck} />;
+    switch (p) {
+      case 'displays':
+        return dev.displays.map((x) => (
+          <button key={x.key} className={styles.devMenuRow} onClick={closing(() => onDisplay(x.key))}>
+            {check(x.key === displayKey)}
+            <span className={styles.devMenuLabel}>{x.label}</span>
+          </button>
+        ));
+      case 'video':
+        return (
+          <button key={p} className={styles.devMenuRow} onClick={closing(() => onVideo?.())}>
+            {check(!!video)}
+            <span className={styles.devMenuLabel}>Video layout</span>
+          </button>
+        );
+      case 'rotate':
+        return (
+          <button key={p} className={styles.devMenuRow} onClick={closing(onRotate)}>
+            {check(land)}
+            <span className={styles.devMenuLabel}>Landscape</span>
+          </button>
+        );
+      case 'design':
+        return <DesignPicker key={p} row value={design!.value} onPick={(v) => (design!.onPick(v), setMenu(false))} />;
+      case 'language':
+        return <LanguagePicker key={p} row value={language!.value} onPick={(v) => (language!.onPick(v), setMenu(false))} />;
+    }
+  };
+
   return (
-    <div className={`${styles.devHead} ${className ?? ''}`} style={style} data-canvas-ui>
+    <div ref={root} className={`${styles.devHead} ${menu ? styles.devHeadOpen : ''} ${tight ? styles.devHeadTight : ''} ${className ?? ''}`} style={style} data-canvas-ui>
       {grip && (
         <span className={styles.devGrip} title="Drag to reorder" {...grip}>
           <Icon name="drag_indicator" size={16} />
@@ -215,29 +343,48 @@ export function DeviceHeader({
       )}
       <DevicePicker className={styles.devName} value={id} title={`${dev.name} · change device`} onPick={onDevice}>
         <span className={styles.devNameText}>{dev.name}</span>
-        <Icon name="expand_more" size={16} />
+        {!tight && <Icon name="expand_more" size={16} />}
       </DevicePicker>
-      {dev.displays.length > 1 &&
-        dev.displays.map((x) => (
-          <button key={x.key} className={`${styles.devChip} ${x.key === displayKey ? styles.devChipOn : ''}`} onClick={() => onDisplay(x.key)}>
-            {x.label.split(' ')[0]}
-          </button>
-        ))}
-      {findDisplay(dev, displayKey).videoSplit && !land && onVideo && (
-        <button className={`${styles.devChip} ${video ? styles.devChipOn : ''}`} title="Video layout: 16:9 on top, the app below" onClick={onVideo}>
-          <Icon name="smart_display" size={16} />
+      {shown.map(chip)}
+      {hidden.length > 0 && (
+        <button className={`${styles.devChip} ${menu ? styles.devChipOn : ''}`} title="More" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
+          <Icon name="more_horiz" size={16} />
         </button>
       )}
-      <button className={`${styles.devChip} ${land ? styles.devChipOn : ''}`} title={land ? 'Portrait' : 'Landscape'} onClick={onRotate}>
-        <Icon name="screen_rotation" size={16} />
-      </button>
-      {design && <DesignPicker value={design.value} onPick={design.onPick} />}
-      {language && <LanguagePicker value={language.value} onPick={language.onPick} />}
+      {/* Remove, always shown and last of all. */}
       {onRemove && (
         <button className={styles.devChip} title="Remove" onClick={onRemove}>
           <Icon name="close" size={16} />
         </button>
       )}
+      {menu && hidden.length > 0 && (
+        <div className={styles.devMenu} role="menu">
+          {parts.filter((p) => hidden.includes(p)).map(row)}
+        </div>
+      )}
+      {/* Every part at its full width, unseen: what the header measures to know what fits. */}
+      <div ref={measure} className={styles.devMeasure} aria-hidden inert>
+        {grip && (
+          <span className={styles.devGrip} data-part="grip">
+            <Icon name="drag_indicator" size={16} />
+          </span>
+        )}
+        <span className={styles.devName} data-part="name">
+          <span>{dev.name}</span>
+          <Icon name="expand_more" size={16} />
+        </span>
+        {parts.map((p) => (
+          <span key={p} className={styles.devMeasurePart} data-part={p}>
+            {chip(p)}
+          </span>
+        ))}
+        <span className={styles.devChip} data-part="more">
+          <Icon name="more_horiz" size={16} />
+        </span>
+        <span className={styles.devChip} data-part="remove">
+          <Icon name="close" size={16} />
+        </span>
+      </div>
     </div>
   );
 }
