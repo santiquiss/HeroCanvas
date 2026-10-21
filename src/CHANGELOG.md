@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.32.1 — 2026-10-21
+
+- **A sidebar app upright on a tablet**: when its list and detail show one at a time (an iPad upright), a section
+  slides over the sidebar across the whole screen, as SwiftUI does, instead of opening in the tablet's side panel.
+- `connect-app`: an iPhone app runs on the iPhone Duo too: an iOS app's targets keep it.
+
 ## 0.32.0 — 2026-10-21
 
 - **Page describes the layout, it doesn't edit it**: how a page's list and detail show on this display (side by side,

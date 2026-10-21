@@ -260,7 +260,10 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
   const end = coverAt < 0 ? stack.length : coverAt;
   const [cfg] = useScreenConfig();
   // Every layer's box comes from the regions (src/sim/regions.ts).
-  const R = screenRegions(L);
+  // A root that's a list–detail of its own (a sidebar app) never sends its pages to the tablet's side panel: side by
+  // side they go in its detail pane (baseSplit, below); one at a time they slide over it, as on a phone.
+  const regions = screenRegions(L);
+  const R = nav.def(stack[0].id).split && regions.pushes.inPanel ? { ...regions, pushes: { left: L.railW, width: L.mainW, inPanel: false } } : regions;
   // When the pushes' region moves (the split's right part opening or closing), the pages in it glide
   // from where they were instead of jumping: `glide` is the offset they come from, for one animation. Not on a new
   // screen size (rotation, another device), where everything relays out at once.

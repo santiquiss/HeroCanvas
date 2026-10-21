@@ -66,7 +66,7 @@ Name the copy after the app: `package.json`'s `name` (`<app>-herocanvas`, e.g. `
 
 Which devices the app is made for, so the designer offers only those (`DeviceTargets`: `platforms` iOS and/or Android,
 `types` phone, foldable, tablet; left out, every device). Read it from the code: an Xcode project alone is iOS, its
-`TARGETED_DEVICE_FAMILY` (1 iPhone, 2 iPad) the kinds; an Android project alone is Android (a `largeScreens` or
+`TARGETED_DEVICE_FAMILY` (1 iPhone, with the iPhone Duo, a foldable that runs iPhone apps; 2 iPad) the kinds; an Android project alone is Android (a `largeScreens` or
 tablet-only `<supports-screens>` narrows it); React Native and Flutter by the platform folders they ship (`ios/`,
 `android/`); a web app, every device. Say what you set, and leave it out when the code doesn't narrow it.
 
