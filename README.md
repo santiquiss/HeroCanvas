@@ -73,6 +73,25 @@ in their own stack, not yours; native previews show one view of one platform at 
 3. **Proposals** (`proposals/`) are changes to the mirror, kept apart: new pages, replaced components, versions A
    and B to compare, and a `handoff.md` for whoever builds it.
 
+## The story
+
+HeroCanvas was born inside **[MacrosFirst](https://macrosfirst.com)**, a macro tracker and meal planner used every day
+on iPhone and Android ([App Store](https://apps.apple.com/us/app/macrosfirst/id1253012487) ·
+[Google Play](https://play.google.com/store/apps/details?id=com.ha.prepsmart)).
+
+We set out to design MacrosFirst for **foldables**: phones that open into a tablet, with two screens, hinges and
+layouts that change as you fold them. No design tool could show that honestly. A Figma frame can't fold, can't keep
+the app's real navigation, and can't tell you what the code will actually do on a Galaxy Z Fold or a Pixel Fold. So
+we built our own canvas: MacrosFirst's screens, rebuilt from its code, on every device at once, with an AI agent doing
+the building.
+
+It kept growing. Every phone, tablet and foldable; light and dark; every language; personas and text sizes;
+proposals to compare; Inspect, comments and handoffs in the code's own terms. It became the way we design MacrosFirst,
+and something we couldn't imagine working without. So we took everything specific to MacrosFirst out of it, made it
+work for any app and any stack, and decided to share it with the world.
+
+If HeroCanvas helps you, give [MacrosFirst](https://macrosfirst.com) a try: it's where all of this started.
+
 ## Get started
 
 You need [Node.js](https://nodejs.org) 20 or newer, git, and an AI coding agent —
