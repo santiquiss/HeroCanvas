@@ -363,6 +363,9 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
             width: appW,
             overflow: 'clip',
             transition: `width ${PAGE_MS}ms ${EASE}`,
+            // Under the launch screen there's no app yet (laid out, so its exit can find where the icon lands): its
+            // page color would show at the screen's rounded edge, a hairline around the launch.
+            opacity: launch.phase === 'screen' ? 0 : undefined,
           }}
         >
           <RightEdgeCtx.Provider value>

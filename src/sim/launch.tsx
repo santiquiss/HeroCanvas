@@ -50,10 +50,12 @@ export function useLaunch(LAUNCH: LaunchConfig | undefined, root: HTMLElement | 
   const run = useRuns();
   const should = () => !!LAUNCH && !still && playback !== 'off' && (playback === 'always' || !played);
   const [phase, setPhase] = useState<LaunchPhase>(() => (should() ? 'screen' : 'done'));
-  // A replay plays it again, whatever the playback: it's asked for.
-  const firstRun = useRef(true);
+  // A replay plays it again, whatever the playback: it's asked for. Against the last replay seen, not a first-run
+  // flag: effects run twice on mount in development (StrictMode), which would read as a replay.
+  const seen = useRef(run);
   useEffect(() => {
-    if (firstRun.current) return void (firstRun.current = false);
+    if (run === seen.current) return;
+    seen.current = run;
     if (LAUNCH && !still) setPhase('screen');
   }, [run, LAUNCH, still]);
   const done = useCallback(() => {
@@ -79,6 +81,17 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
   const enter = config.enter ?? 'none';
   const enterMs = enter === 'none' ? 0 : enter === 'fade' ? ENTER.fade.ms : ENTER.spring.ms;
   const out = config.exit ?? 'fade';
+
+  // The screen's own background matches the launch's while it plays: its rounded corners are antialiased apart from
+  // the launch's, and the page color under them would show as a light hairline along the edge.
+  const bg = typeof config.background === 'string' ? config.background : config.background[theme];
+  useEffect(() => {
+    const before = root.style.background;
+    root.style.background = bg;
+    return () => {
+      root.style.background = before;
+    };
+  }, [root, bg]);
 
   // The images decoded first: a first load would show an empty square entering.
   useEffect(() => {
@@ -130,7 +143,6 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
-  const bg = typeof config.background === 'string' ? config.background : config.background[theme];
   const exiting = exit !== null;
   const exitClass = !exiting ? '' : typeof out === 'object' ? styles.exitFly : styles[`exit_${out}`];
   return (

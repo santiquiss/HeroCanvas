@@ -1,7 +1,8 @@
-/* The launch over a device's screen: over the app and its navigation, under the status bar and system chrome. */
+/* The launch over a device's screen: over the app and its navigation, under the status bar and system chrome. A
+   little past the screen's edges (its rounded clip cuts it): edge to edge, no hairline of what's under it. */
 .launch {
   position: absolute;
-  inset: 0;
+  inset: -2px;
   z-index: 80;
   display: flex;
   align-items: center;

@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.15.2 — 2026-10-21
+
+- **The launch edge to edge**: no light hairline around it any more. Under the launch screen the app isn't shown yet
+  (still laid out, for its exit to find where the icon lands), the screen takes the launch's background while it plays,
+  and the launch reaches past the screen's rounded clip.
+- **Fix**: Scenarios › Launch Off played it anyway on the dev server (React runs effects twice there, read as a
+  replay); a replay is now told by its count.
+
 ## 0.15.1 — 2026-10-21
 
 - **The launch in Pages**: a Launch section on top, with Launch screen: it opens the app's first screen and plays the
