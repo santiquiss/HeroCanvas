@@ -1,6 +1,5 @@
 // A shot's "Before" (liveNav.ts): the address under Live, and telling two renders of a screen apart.
 import { describe, expect, it } from 'vitest';
-import { ON_SAMPLE_APP } from '../../test/sampleApp';
 import { composePages } from '../../nav/manifest';
 import type { Nav } from '../../nav/context';
 import type { Proposal } from '../../proposals/types';
@@ -12,17 +11,20 @@ const navWith = (code: string | null) => {
   return { proposal, pages: composePages(null), stack: [] } as unknown as Nav;
 };
 
+// Any page of Live's at a path with no params: the tour's, or the connected app's.
+const [someId, someDef] = Object.entries(composePages(null)).find(([, d]) => !d.path.includes(':'))!;
+
 describe('liveNavFor', () => {
-  it.runIf(ON_SAMPLE_APP)('reads the address with Live’s pages', () => {
-    const live = liveNavFor(navWith('PT-1'), '/profile', new URLSearchParams('proposal=PT-1'))!;
+  it('reads the address with Live’s pages', () => {
+    const live = liveNavFor(navWith('PT-1'), someDef.path, new URLSearchParams('proposal=PT-1'))!;
     expect(live.proposal).toBeNull();
-    expect(live.stack.at(-1)?.id).toBe('profile');
+    expect(live.stack.at(-1)?.id).toBe(someId);
     expect(live.pages).toBe(composePages(null));
-    expect(live.change('profile')).toBeNull();
+    expect(live.change(someId)).toBeNull();
   });
   it('has no Before for a page the proposal adds, or without a proposal', () => {
     expect(liveNavFor(navWith('PT-1'), '/not-in-live', new URLSearchParams('proposal=PT-1'))).toBeNull();
-    expect(liveNavFor(navWith(null), '/profile', new URLSearchParams())).toBeNull();
+    expect(liveNavFor(navWith(null), someDef.path, new URLSearchParams())).toBeNull();
   });
 });
 

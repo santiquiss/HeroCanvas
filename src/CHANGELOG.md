@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.26.3 — 2026-10-21
+
+- **Every test runs**: the four that needed the old sample app (Tasks) now run on whichever pages are loaded (the
+  tour's, or the connected app's); 211 pass, none skipped.
+- **Dependencies up to date** within their ranges (React 19.3.1, React Router 8.5, Vite 8.3.5, Vitest 5.0.5, oxlint),
+  and happy-dom 21 (tests only), which closes a critical advisory.
+- The docs no longer mention the project HeroCanvas came from.
+
 ## 0.26.2 — 2026-10-21
 
 - **Inspect names Figma and the code only when they're connected**: a token without a code name no longer says

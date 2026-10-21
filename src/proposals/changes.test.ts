@@ -2,7 +2,6 @@
 // replaces, the ones it adds parameters to, and the ones it adds to the code's library. Against a proposal built here:
 // the repository may have none.
 import { describe, expect, it } from 'vitest';
-import { ON_SAMPLE_APP } from '../test/sampleApp';
 import { changeCounts } from '../design/ChangeCounts';
 import { componentKind } from '../gallery/route';
 import { BASE_PAGES } from '../nav/pages';
@@ -58,11 +57,13 @@ describe('proposalChanges', () => {
       ['ListTile', 'version'],
     ]);
   });
-  it.runIf(ON_SAMPLE_APP)('tells new, changed and removed pages apart', () => {
-    const p = fixture({ pages: { today: { ...BASE_PAGES.today, title: 'Now' }, profile: null, inbox: { ...BASE_PAGES.today, path: '/inbox' } } });
+  it('tells new, changed and removed pages apart', () => {
+    // Two of Live's pages, whichever are loaded (the tour's, or the app's).
+    const [a, b] = Object.keys(BASE_PAGES);
+    const p = fixture({ pages: { [a]: { ...BASE_PAGES[a], title: 'Now' }, [b]: null, inbox: { ...BASE_PAGES[a], path: '/inbox' } } });
     const pages = Object.fromEntries(proposalChanges(p, null, BASE_PAGES).pages.map((x) => [x.id, x]));
-    expect(pages.today).toMatchObject({ kind: 'changed', details: ['Settings changed: title'] });
-    expect(pages.profile.kind).toBe('removed');
+    expect(pages[a]).toMatchObject({ kind: 'changed', details: ['Settings changed: title'] });
+    expect(pages[b].kind).toBe('removed');
     expect(pages.inbox.kind).toBe('new');
   });
 });

@@ -38,8 +38,8 @@ review. Inspect, the gallery and the handoff use them when they're there.
 | Cost | Keeping two versions (agents make it cheap) | A web build and an SDK in the app | A build per sync; slow |
 
 They're not exclusive. The likely shape: **mirror for designing, live or snapshots for checking it against the
-code.** A page could show its mirror beside its real render, and Inspect could diff them (the QA tickets MF Designer
-writes by hand today).
+code.** A page could show its mirror beside its real render, and Inspect could diff them (QA that's done by hand
+today).
 
 ## Connectors per stack
 
@@ -163,8 +163,8 @@ where it stops being something one team maintains.
    while the repo is private: the update command and skill (see Updates).
 2. **React (web) and React Native / Expo**: the most popular stacks, mirror and live from the same language, routes
    and props readable with TypeScript's own tools.
-3. **Flutter**: what MF Designer already does by hand (the analyzer for the API, ARB for texts, Widgetbook as the
-   catalog), turned into connectors.
+3. **Flutter**: its own tools turned into connectors (the analyzer for the API, ARB for texts, Widgetbook as the
+   catalog).
 4. **SwiftUI and Compose**: mirror first, snapshots next; their routes are the hardest to read statically.
 
 ## Open questions
