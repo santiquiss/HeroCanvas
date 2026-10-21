@@ -54,7 +54,8 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **The tour stands in for an app**: with none connected (`NO_APP`, `src/nav/noApp.ts`), HeroCanvas shows its own
   (`src/tour`): its pages, navigation, components with their stories, and its theme as `--app-*` tokens
   (`src/tour/theme.css`), so every mode has something real. A new part of the designer gets a step in
-  `src/tour/steps.ts`.
+  `src/tour/steps.ts`, its `spots` naming the controls it points at (`data-tour` on them): a beacon pulses on
+  each while the step is open.
 - **Launch in four phases**: an app's launch screen is `appConfig.launch` (screen, enter, hold, exit: the names
   iOS and Android share), played by the simulator; a screen waits for it with `useLaunchPhase()`. Never a splash of
   a screen's own.

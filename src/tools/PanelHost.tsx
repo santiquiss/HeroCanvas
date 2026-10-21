@@ -93,7 +93,7 @@ export function PanelHost({
       <ResizeEdge side={side} width={prefs.width?.[side] ?? DEFAULT_W[side]} onWidth={(w) => update({ width: { [side]: w } })} />
       <div className={styles.tabs}>
         {tools.map((t) => (
-          <button key={t.id} className={`${styles.tab} ${t === active ? styles.tabOn : ''}`} title={t.title} onClick={() => pick(t)}>
+          <button key={t.id} data-tour={`panel-${t.id}`} className={`${styles.tab} ${t === active ? styles.tabOn : ''}`} title={t.title} onClick={() => pick(t)}>
             <Icon name={t.icon} size={16} />
             {t.title}
             {t.badge && <t.badge />}

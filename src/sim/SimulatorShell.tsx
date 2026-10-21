@@ -48,6 +48,8 @@ import { FpsMeter } from './FpsMeter';
 import { usePan } from './usePan';
 import { DEVICE_SORTS, parseZoom, VIEW_BAR_H, ViewBar, ZoomBar, type Arrange, type DeviceSort } from './ViewBar';
 import { TouchPointer } from './TouchPointer';
+import { NO_APP } from '../nav/noApp';
+import { TourBeacons } from '../tour/Beacons';
 import styles from './SimulatorShell.module.css';
 
 /**
@@ -309,6 +311,8 @@ function DesignerShell() {
       <RevealInspector mode={mode} update={updatePrefs} />
       <RevealComment update={updatePrefs} />
       <SelectionInUrl />
+      {/* With no app connected, the tour's step points at the parts it names. */}
+      {NO_APP && (mode === 'prototype' || mode === 'flow') && <TourBeacons />}
       {/* The mode rail at the left edge, the full height; the toolbar and the workspace beside it. */}
       <div className={styles.window}>
       {/* While an interaction records, the rest of the interface dims and stops answering, in place (no layout

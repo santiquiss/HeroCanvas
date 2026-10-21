@@ -8,7 +8,7 @@ import styles from './ThemeSwitch.module.css';
 export function ThemeSwitch({ floating, className }: { floating?: boolean; className?: string }) {
   const [theme, setTheme] = useUrlState<'light' | 'dark'>('theme', 'light');
   return (
-    <span className={`${styles.seg} ${floating ? styles.floating : ''} ${className ?? ''}`} role="group" aria-label="Theme" data-canvas-ui>
+    <span className={`${styles.seg} ${floating ? styles.floating : ''} ${className ?? ''}`} role="group" aria-label="Theme" data-canvas-ui data-tour="screen-theme">
       {(['light', 'dark'] as const).map((t) => (
         <button key={t} className={t === theme ? styles.on : ''} onClick={() => setTheme(t)}>
           <Icon name={t === 'light' ? 'light_mode' : 'dark_mode'} size={14} />

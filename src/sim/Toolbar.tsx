@@ -20,9 +20,9 @@ interface ToolbarProps {
   mode: Mode;
 }
 
-function Chip({ active, onClick, title, children }: { active?: boolean; onClick: () => void; title?: string; children: React.ReactNode }) {
+function Chip({ active, onClick, title, tour, children }: { active?: boolean; onClick: () => void; title?: string; /** What the tour points at it by (data-tour). */ tour?: string; children: React.ReactNode }) {
   return (
-    <button className={`${styles.chip} ${active ? styles.active : ''}`} onClick={onClick} title={title}>
+    <button className={`${styles.chip} ${active ? styles.active : ''}`} onClick={onClick} title={title} data-tour={tour}>
       {children}
     </button>
   );
@@ -60,13 +60,13 @@ export function Toolbar(props: ToolbarProps) {
       {/* The actions on the right, closer together than the bar's own spacing. */}
       <div className={styles.actions}>
       {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && (
-        <Chip active={inspect} onClick={() => setInspect(!inspect)} title="Inspect components (I)">
+        <Chip active={inspect} onClick={() => setInspect(!inspect)} title="Inspect components (I)" tour="inspect">
           <Icon name="ads_click" size={18} />
           Inspect
         </Chip>
       )}
       {props.mode === 'prototype' && !capture && (
-        <Chip active={commenting} onClick={() => setCommenting(!commenting)} title="Comment: click on the screen to leave one (C)">
+        <Chip active={commenting} onClick={() => setCommenting(!commenting)} title="Comment: click on the screen to leave one (C)" tour="comment">
           <Icon name="add_comment" size={18} />
           Comment
         </Chip>

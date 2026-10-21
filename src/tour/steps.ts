@@ -16,6 +16,8 @@ export interface TourStep {
   body: string[];
   /** What to do now, on the interface around the device. */
   tryIt: string;
+  /** What `tryIt` names on the interface (their `data-tour`): a beacon pulses on each while the step is open. */
+  spots: string[];
 }
 
 export const STEPS: TourStep[] = [
@@ -30,6 +32,7 @@ export const STEPS: TourStep[] = [
       'Compare the same page on several devices at once to see how it adapts.',
     ],
     tryIt: 'Pick another device in the menu above the canvas, turn it with the arrow beside it, or press + beside the device to add a second one.',
+    spots: ['device-menu', 'rotate', 'add-device'],
   },
   {
     id: 'themes',
@@ -39,6 +42,7 @@ export const STEPS: TourStep[] = [
     line: 'The screens in both themes, and HeroCanvas’s own',
     body: ['The screens follow the app’s tokens: switch their theme and every color changes as the code says it does.', 'HeroCanvas has its own theme too, apart from the screens’.'],
     tryIt: 'Use Light / Dark at the top right of the canvas for the screens; the moon at the bottom of the left rail for HeroCanvas.',
+    spots: ['screen-theme', 'ui-theme'],
   },
   {
     id: 'inspect',
@@ -51,6 +55,7 @@ export const STEPS: TourStep[] = [
       'Layers shows the screen as a tree of components, nested as the code nests them.',
     ],
     tryIt: 'Press Inspect at the top right (or the I key) and point at this card. Then open Layers, on the left, beside Pages.',
+    spots: ['inspect', 'panel-layers'],
   },
   {
     id: 'pages',
@@ -63,6 +68,7 @@ export const STEPS: TourStep[] = [
       'Flow lays them all out on one canvas, linked as they navigate.',
     ],
     tryIt: 'Open another page from Pages, on the left. Then pick Flow in the left rail: this tour, step by step.',
+    spots: ['panel-pages', 'mode-flow'],
   },
   {
     id: 'scenarios',
@@ -72,6 +78,7 @@ export const STEPS: TourStep[] = [
     line: 'The app as different people, languages and text sizes',
     body: ['Personas show the app with different people’s data: someone new, someone with a lot. Languages and the system text size apply to every screen.', 'Each page can add its own states too: empty, loading, an error.'],
     tryIt: 'Open Scenarios, on the right, and drag the text size: this screen grows with it.',
+    spots: ['panel-scenarios'],
   },
   {
     id: 'proposals',
@@ -84,6 +91,7 @@ export const STEPS: TourStep[] = [
       'Comments pin notes for your team on a spot of a screen.',
     ],
     tryIt: 'Open the Live menu at the top to see where proposals list, and Comment to leave a note on this screen.',
+    spots: ['proposals', 'comment'],
   },
   {
     id: 'capture',
@@ -93,5 +101,6 @@ export const STEPS: TourStep[] = [
     line: 'Images and videos of any screen',
     body: ['Any screen as a picture or a video: the device turned in 3D, its color, light and shadow, or the screen alone. For a deck, a store page, a post.'],
     tryIt: 'Pick the camera in the left rail, then Image or Video on the right, and export.',
+    spots: ['mode-capture'],
   },
 ];

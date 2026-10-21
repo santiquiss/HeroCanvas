@@ -57,7 +57,7 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
       <ul className={styles.items}>
         {MODES.map(({ mode: m, label, icon }) => (
           <li key={m}>
-            <button className={`${styles.item} ${current === m ? styles.on : ''}`} aria-label={label} aria-current={current === m ? 'page' : undefined} onClick={() => go(m)}>
+            <button data-tour={`mode-${m}`} className={`${styles.item} ${current === m ? styles.on : ''}`} aria-label={label} aria-current={current === m ? 'page' : undefined} onClick={() => go(m)}>
               <Icon name={icon} size={20} fill={current === m} />
               <span className={styles.tip} role="tooltip">
                 {m === 'capture' && capture ? 'Capture · Esc to leave' : label}
@@ -74,7 +74,7 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
         </span>
       </button>
       {/* The interface's theme (not the screens': the view bar's Light / Dark). */}
-      <button className={styles.item} aria-label={ui === 'dark' ? 'Light interface' : 'Dark interface'} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
+      <button data-tour="ui-theme" className={styles.item} aria-label={ui === 'dark' ? 'Light interface' : 'Dark interface'} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
         <Icon name={ui === 'dark' ? 'light_mode' : 'dark_mode'} size={20} />
         <span className={styles.tip} role="tooltip">
           {ui === 'dark' ? 'Light interface' : 'Dark interface'}

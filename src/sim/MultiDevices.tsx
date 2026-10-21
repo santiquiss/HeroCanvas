@@ -47,15 +47,18 @@ function DevicePicker({
   title,
   children,
   className,
+  tour,
 }: {
   value?: string;
   onPick: (id: string) => void;
   title: string;
   children: React.ReactNode;
   className: string;
+  /** What the tour points at it by (data-tour). */
+  tour?: string;
 }) {
   return (
-    <label className={className} title={title}>
+    <label className={className} title={title} data-tour={tour}>
       {children}
       <select
         value={value ?? ''}
@@ -171,6 +174,7 @@ export function AddDeviceButton({ onPick, side }: { onPick: (id: string) => void
       className={`${styles.addDevice} ${between ? styles.addDeviceSmall : ''}`}
       title={between ? 'Add a device here' : `Add a device on the ${side}`}
       onPick={onPick}
+      tour={between ? undefined : 'add-device'}
     >
       <Icon name="add" size={between ? 16 : 20} />
     </DevicePicker>
@@ -293,7 +297,7 @@ export function DeviceHeader({
         );
       case 'rotate':
         return (
-          <button key={p} className={`${styles.devChip} ${land ? styles.devChipOn : ''}`} title={land ? 'Portrait' : 'Landscape'} onClick={onRotate}>
+          <button key={p} data-tour="rotate" className={`${styles.devChip} ${land ? styles.devChipOn : ''}`} title={land ? 'Portrait' : 'Landscape'} onClick={onRotate}>
             <Icon name="screen_rotation" size={16} />
           </button>
         );
@@ -341,7 +345,7 @@ export function DeviceHeader({
           <Icon name="drag_indicator" size={16} />
         </span>
       )}
-      <DevicePicker className={styles.devName} value={id} title={`${dev.name} · change device`} onPick={onDevice}>
+      <DevicePicker className={styles.devName} value={id} title={`${dev.name} · change device`} onPick={onDevice} tour="device-menu">
         <span className={styles.devNameText}>{dev.name}</span>
         {!tight && <Icon name="expand_more" size={16} />}
       </DevicePicker>

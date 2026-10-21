@@ -73,6 +73,7 @@ export function ProposalMenu() {
         </button>
       )}
       <button
+        data-tour="proposals"
         className={`${styles.trigger} ${active ? styles.triggerProposal : ''} ${open ? styles.triggerOpen : ''}`}
         title="Design: what's live, or a proposal"
         aria-haspopup="listbox"

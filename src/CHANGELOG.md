@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.23.0 — 2026-10-21
+
+- **The tour points at what it talks about**: while a step is open on the device, each part of the interface it
+  names pulses (a dot at its corner rippling out, a ring around it in its shape): Inspect and Layers, the device
+  menu, rotate and +, Light / Dark and the interface's moon, Pages and Flow, Scenarios, the Live menu and Comment,
+  Capture. A part stops once clicked; opening the step again brings it back.
+- Steps declare their `spots`; the designer's controls carry `data-tour` (AGENTS.md: a new part's step names its own).
+
 ## 0.22.1 — 2026-10-21
 
 - **The bar's glass, as iOS draws it**: an even, lighter blur that ends straight, with a very faint line under it,
