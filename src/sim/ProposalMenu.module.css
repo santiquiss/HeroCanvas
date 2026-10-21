@@ -274,3 +274,12 @@
 .footer:hover {
   background: var(--ui-hover);
 }
+
+/* With no app connected: on view, saying what it's for (its tooltip), but off. */
+.trigger:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.trigger:disabled:hover {
+  background: var(--ui-bg);
+}

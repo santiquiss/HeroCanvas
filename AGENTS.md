@@ -51,6 +51,9 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **Pages by their role**: wherever the designer lists pages, a page's icon is its level's (`ROLE_ICONS`,
   `src/nav/stack.ts`: tab, push, cover, boot), the same for every app; never the app's own icons, which may be
   missing or not drawable.
+- **Empty mode explains**: with no app connected (`NO_APP`, `src/nav/pages.tsx`) the designer still shows, each part
+  saying what it's for. A new panel declares its `empty` line in `src/tools/registry.ts`; a new mode, its hint in
+  `src/sim/NoAppMode.tsx`; a control that needs an app is disabled with a title saying what it does.
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done
@@ -66,3 +69,6 @@ Versioning: two versions, two changelogs.
   the tool bumps it (0.Y.0 features, 0.Y.Z fixes), adds an entry (a **Contract** item for what a team must adapt),
   updates the README's badge, and is tagged `vX.Y.Z`: the tags are what `npm run update` installs. Shown on its
   page (`#/about`), from the ⓘ at the bottom of the left rail.
+
+Branches: `main` has the sample app, `empty` has none; they differ only in the team's files. Tags are cut on `main`,
+then `main` is merged into `empty`.

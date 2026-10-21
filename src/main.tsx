@@ -1,10 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Route, Routes } from 'react-router';
-import { BASE_PAGES } from '@app';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { NavProvider } from './nav/NavProvider';
-import { GetStarted } from './sim/GetStarted';
 import { SimulatorShell } from './sim/SimulatorShell';
 import './kit/tokens.css';
 import './theme/theme.css';
@@ -23,7 +21,7 @@ window.addEventListener('vite:preloadError', (e) => {
 window.setTimeout(() => sessionStorage.removeItem('hc.reloaded'), 10_000);
 
 // HashRouter: deep links work on any static host without rewrite rules.
-const designer = (
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HashRouter>
       <Routes>
@@ -47,18 +45,5 @@ const designer = (
         />
       </Routes>
     </HashRouter>
-  </StrictMode>
-);
-
-// No app connected yet (it declares no pages): how to begin, instead of a simulator with nothing to show.
-const noApp = Object.keys(BASE_PAGES).length === 0;
-
-createRoot(document.getElementById('root')!).render(
-  noApp ? (
-    <StrictMode>
-      <GetStarted />
-    </StrictMode>
-  ) : (
-    designer
-  ),
+  </StrictMode>,
 );

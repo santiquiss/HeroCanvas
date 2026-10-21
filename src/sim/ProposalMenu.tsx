@@ -7,6 +7,7 @@ import { Icon } from '../components/Icon';
 import { PROPOSALS } from '../proposals';
 import { STATUSES, type Proposal } from '../proposals/types';
 import { StatusDot, useProposalParam } from '../tools/ProposalPanel';
+import { NO_APP } from '../nav/pages';
 import surface from '../theme/surface.module.css';
 import styles from './ProposalMenu.module.css';
 
@@ -63,6 +64,17 @@ export function ProposalMenu() {
     }
   };
 
+  // No app connected: the picker on view, off, saying what it's for.
+  if (NO_APP)
+    return (
+      <div className={styles.root}>
+        <button className={styles.trigger} disabled title="Live or a proposal: the app as it is, or a change to it kept apart, to compare and hand off. Once your app is connected.">
+          <Icon name={LIVE_ICON} size={16} />
+          <span className={styles.triggerTitle}>Live</span>
+          <Icon name="expand_more" size={18} />
+        </button>
+      </div>
+    );
   return (
     <div ref={root} className={styles.root} onKeyDown={open ? onKey : undefined}>
       {/* Back to Live in one click, beside the proposal on screen. */}

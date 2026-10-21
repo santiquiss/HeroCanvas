@@ -1,0 +1,41 @@
+.screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  background: var(--app-page);
+  color: var(--app-text);
+  text-align: center;
+}
+.icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  border-radius: 20px;
+  background: var(--app-surface);
+  color: var(--app-text-muted);
+}
+.title {
+  margin: 0;
+  font: var(--app-font-title);
+}
+.body {
+  max-width: 280px;
+  margin: 0;
+  font: var(--app-font-body);
+  color: var(--app-text-muted);
+}
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font: var(--app-font-label);
+  color: var(--app-primary);
+}

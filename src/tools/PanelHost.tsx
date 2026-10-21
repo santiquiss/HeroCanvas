@@ -1,12 +1,15 @@
 import { useEffect, useState, type PointerEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Icon } from '../components/Icon';
+import { EmptyHint } from '../components/EmptyHint';
 import { useDesignRoot } from '../design/DesignContext';
+import { NO_APP } from '../nav/pages';
 import { useSimQuery, type Mode } from '../sim/modes';
 import { TOOLS } from './registry';
 import styles from './Panel.module.css';
 
-const KEY = 'hc.panels';
+// Apart with no app connected: Get started opens first there, whatever tab the viewer last had with an app.
+const KEY = NO_APP ? 'hc.panels.noApp' : 'hc.panels';
 
 /** The last route each tool with routes had (the token group, the component), to go back to on its tab. */
 const lastRoute = new Map<string, string>();
@@ -65,7 +68,7 @@ export function PanelHost({
   only?: string[];
 }) {
   const { inspect } = useDesignRoot();
-  const onSide = TOOLS.filter((t) => t.side === side && (t.modes ?? ['prototype', 'components']).includes(mode) && (!only || only.includes(t.id)));
+  const onSide = TOOLS.filter((t) => t.side === side && (t.modes ?? ['prototype', 'components']).includes(mode) && (!only || only.includes(t.id)) && (!t.noAppOnly || NO_APP));
   const inspector = inspect ? onSide.filter((t) => t.whileInspecting) : [];
   // The tab that was active comes back when Inspect ends: the inspector never becomes the remembered tool.
   const tools = inspector.length ? inspector : onSide.filter((t) => !t.whileInspecting);
@@ -101,7 +104,14 @@ export function PanelHost({
         ))}
       </div>
       <div className={styles.body}>
-        <C />
+        {/* No app connected: in each tool's place, what it shows once there is one. */}
+        {NO_APP && active.empty ? (
+          <EmptyHint icon={active.icon} title={active.title}>
+            {active.empty}
+          </EmptyHint>
+        ) : (
+          <C />
+        )}
       </div>
     </aside>
   );

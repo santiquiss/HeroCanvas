@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.9.0 — 2026-10-21
+
+- **Empty mode**: with no app connected, HeroCanvas shows its whole interface instead of a page of its own. The
+  device shows where the app's screens will be; each panel (Pages, Layers, Page, Scenarios, Comments, Proposal,
+  Components, Tokens) says what it shows once there's an app; Flow, Components, Tokens and Capture say the same on
+  the canvas; Live, Inspect, Comment and Share are on view but off, their tooltips saying what they do. The devices,
+  their themes and sizes work.
+- **Get started** is the right panel's first tab in empty mode: the three ways to begin, ready to copy.
+
 ## 0.8.0 — 2026-10-21
 
 - **Get started**: with no app connected (it declares no pages), HeroCanvas opens on a page that guides the start

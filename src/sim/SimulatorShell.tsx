@@ -8,6 +8,8 @@ import { Gallery } from '../gallery/Gallery';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlowView } from '../flow/FlowView';
 import { About } from './About';
+import { NO_APP } from '../nav/pages';
+import { NoAppMode } from './NoAppMode';
 import { useMode, useRememberMode, useSetMode, type Mode } from './modes';
 import { useNavRoot } from '../nav/context';
 import { detailOpenFor } from '../nav/stack';
@@ -156,7 +158,8 @@ function DesignerShell() {
   // The device centers on the canvas itself; the margin for the view bar and zoom is the same above and below.
   const fit = fitScale(layout, stage.w, stage.h - 2 * VIEW_BAR_H + 48);
   const box = frameBox(layout);
-  const capture = captureParam && mode === 'prototype';
+  // No app connected: Capture's place shows what it's for (NoAppMode), not its settings.
+  const capture = captureParam && mode === 'prototype' && !NO_APP;
   const model = modelOf(device.id);
   const bodyColor = colors[device.id] ?? model.finishes[0].color;
   const bodySpec = bodyOf(device.id, display.key);
@@ -348,6 +351,9 @@ function DesignerShell() {
             {/* Components and Tokens: the gallery's pages (a component's examples, or the tokens). */}
             {mode === 'about' ? (
               <About />
+            ) : NO_APP && (mode !== 'prototype' || captureParam) ? (
+              // No app connected: the mode's place, saying what it shows (the prototype has its stand-in page).
+              <NoAppMode mode={mode === 'prototype' ? 'capture' : mode} />
             ) : mode === 'components' || mode === 'tokens' ? (
               <ErrorBoundary label="Gallery" fill resetKey={location.pathname + location.search}>
                 <Gallery />

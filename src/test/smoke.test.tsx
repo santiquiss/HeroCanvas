@@ -4,7 +4,8 @@
 // checked in the simulator.
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { GetStarted } from '../sim/GetStarted';
+import { NO_APP } from '../nav/pages';
+import { GetStartedPanel, WAYS } from '../tools/GetStartedPanel';
 import { STORIES } from '../design/stories';
 import { HOME } from '../nav/home';
 import { composePages } from '../nav/manifest';
@@ -45,12 +46,12 @@ function placesOf(pages: Manifest): { name: string; ref: PageRef }[] {
 
 const live = composePages(null);
 
-// No app connected (it declares no pages): Get started shows instead of the simulator, with the ways to begin.
-if (!placesOf(live).length)
+// No app connected (it declares no pages): the designer in its empty mode, Get started listing the ways to begin.
+if (NO_APP)
   describe('No app connected', () => {
-    it('shows how to start', () => {
-      const html = renderToStaticMarkup(<GetStarted />);
-      for (const way of ['Connect your app’s code', 'Start from a Figma file', 'Look around first']) expect(html).toContain(way);
+    it('Get started shows how to start', () => {
+      const html = renderToStaticMarkup(<GetStartedPanel />);
+      for (const way of WAYS) expect(html).toContain(way.title);
     });
   });
 
