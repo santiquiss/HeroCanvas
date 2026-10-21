@@ -358,7 +358,7 @@ export function CapturePanel(p: CapturePanelProps) {
           <label className={`${styles.select} ${deviceLocked ? styles.locked : ''}`}>
             <span>{p.device.name}</span>
             <select value={p.device.id} disabled={deviceLocked} onChange={(e) => p.onDevice(e.target.value)}>
-              {TYPES.map(([type, label]) => (
+              {TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
                 <optgroup key={type} label={label}>
                   {DEVICES.filter((d) => d.type === type).map((d) => (
                     <option key={d.id} value={d.id}>

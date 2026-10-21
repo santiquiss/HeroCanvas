@@ -51,6 +51,14 @@ differs from the file is then the file's to update, not the mirror's.
 the person who they are if the code doesn't say (a subscription tier, an empty state). Put the app's logo or icon in
 `public/assets/` if they want it on the screens.
 
+### The devices (`appConfig.devices`)
+
+Which devices the app is made for, so the designer offers only those (`DeviceTargets`: `platforms` iOS and/or Android,
+`types` phone, foldable, tablet; left out, every device). Read it from the code: an Xcode project alone is iOS, its
+`TARGETED_DEVICE_FAMILY` (1 iPhone, 2 iPad) the kinds; an Android project alone is Android (a `largeScreens` or
+tablet-only `<supports-screens>` narrows it); React Native and Flutter by the platform folders they ship (`ios/`,
+`android/`); a web app, every device. Say what you set, and leave it out when the code doesn't narrow it.
+
 ### The launch (`appConfig.launch`)
 
 If the app has a launch screen, declare it (`LaunchConfig`, the same four phases on every platform: the **screen**,

@@ -88,7 +88,7 @@ export function ViewBar(p: ViewBarProps) {
           <Icon name={p.device.displays[0].w >= 600 ? 'tablet' : 'smartphone'} size={18} />
           <span>{p.device.name}</span>
           <select value={p.device.id} onChange={(e) => p.onDevice(e.target.value)} title="Device">
-            {DEVICE_TYPES.map(([type, label]) => (
+            {DEVICE_TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
               <optgroup key={type} label={label}>
                 {DEVICES.filter((d) => d.type === type).map((d) => (
                   <option key={d.id} value={d.id}>

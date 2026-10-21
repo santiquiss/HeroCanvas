@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEVICES } from '../devices/devices';
+import { ALL_DEVICES as DEVICES } from '../devices/devices';
 import { computeLayout } from '../sim/layout';
 import { deviceMesh, radiiOf } from './body';
 import { DEVICE_MODELS } from './models';

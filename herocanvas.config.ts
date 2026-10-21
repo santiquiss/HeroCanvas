@@ -1,4 +1,4 @@
-// HeroCanvas's own settings: how the tool itself looks (not the app it shows: that's src/app/config.ts). Read when the
+// HeroCanvas's own settings: how the tool itself looks (not the app it shows: that's app/config.ts, which also says which devices the app is for). Read when the
 // dev server starts or the site is built (scripts/vite/brand.ts); restart `npm run dev` after a change.
 import type { HeroCanvasConfig } from './scripts/vite/brand.ts';
 

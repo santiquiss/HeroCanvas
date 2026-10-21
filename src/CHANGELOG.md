@@ -6,6 +6,20 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.26.0 — 2026-10-21
+
+- **An app says which devices it's for**: `appConfig.devices` (`DeviceTargets`: `platforms` iOS and/or Android,
+  `types` phone, foldable, tablet), and the designer offers only those, in the device menus, a set's +, Compare's
+  presets (none left empty or repeating All devices) and Capture. Left out: every device, as before. The canvas opens
+  on the iPhone 17 Pro, or the first target when it isn't one. A real phone is still matched against every device.
+- `connect-app` reads the targets from the app's code (an Xcode or Android project alone, its device family, the
+  platform folders it ships); `app/config.ts` shows examples.
+
+**Contract**
+
+- `appConfig.devices` (optional) and the `DeviceTargets` type, exported from `herocanvas`. Nothing to adapt: without
+  it, every device stays. To narrow them, add it to `app/config.ts`, e.g. `devices: { platforms: ['ios'] }`.
+
 ## 0.25.4 — 2026-10-21
 
 - **A phone for every page** in the lists of pages (Pages, Flow, the changes menu), instead of an icon per role (a

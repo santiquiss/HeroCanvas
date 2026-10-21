@@ -36,6 +36,23 @@ export interface AppConfig {
   launch?: LaunchConfig;
   /** The room its screens give its navigation (ScreenLayout): a wider rail, one that folds. None: the defaults. */
   layout?: ScreenLayout;
+  /**
+   * The devices the app is made for (DeviceTargets): the designer offers only those, in every menu, Compare and Capture.
+   * None: every device.
+   */
+  devices?: DeviceTargets;
+}
+
+/**
+ * Which devices an app is for, by platform and by kind; what's left out of either isn't offered. `{ platforms: ['ios']
+ * }`: iPhones and iPads; `{ types: ['tablet'] }`: tablets of both; `{ platforms: ['android'], types: ['phone',
+ * 'foldable'] }`: Android phones and foldables.
+ */
+export interface DeviceTargets {
+  /** iOS (iPhone and iPad) and/or Android. None: both. */
+  platforms?: ('ios' | 'android')[];
+  /** Phones, foldables, tablets. None: all three. */
+  types?: ('phone' | 'foldable' | 'tablet')[];
 }
 
 /**

@@ -3,7 +3,7 @@
 // here holds still between releases (a change is in CHANGELOG.md); anything not here is the tool's own business.
 
 // What the app gives the tool (app/index.ts).
-export type { AppConfig, AppNavigation, LaunchConfig, Persona, ScreenLayout } from './contract';
+export type { AppConfig, AppNavigation, DeviceTargets, LaunchConfig, Persona, ScreenLayout } from './contract';
 export type { FlowDef, PageDef, PageProps } from './nav/types';
 
 // Instrumenting components and their stories.

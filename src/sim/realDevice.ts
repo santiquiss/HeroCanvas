@@ -2,7 +2,7 @@
 // size, instead of a drawing of a device (SimulatorShell's real mode). A known device (its width, and a height that
 // fits it) keeps its traits: the iPhone Duo's column and corner status, a foldable's navigation. Any other screen is
 // a plain phone or tablet of its size.
-import { DEVICES, type Device, type DeviceOS, type Display, type SafeArea } from '../devices/devices';
+import { ALL_DEVICES as DEVICES, type Device, type DeviceOS, type Display, type SafeArea } from '../devices/devices';
 
 /** URL param: `1` real mode on, `0` off (the designer, on a phone too); unset, it's on where `realByDefault` says. */
 export const REAL_PARAM = 'real';

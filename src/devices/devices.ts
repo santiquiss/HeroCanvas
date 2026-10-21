@@ -1,4 +1,7 @@
-// Device registry. Add a device = add one entry here. All sizes are CSS px.
+// Device registry. Add a device = add one entry here. All sizes are CSS px. The app's targets (appConfig.devices) narrow
+// it: DEVICES is what the designer offers, ALL_DEVICES every one (a real phone is matched against them all).
+import { appConfig } from '@app/config';
+import type { DeviceTargets } from '../contract';
 
 export type DeviceOS = 'ios' | 'android' | 'ipad';
 
@@ -118,7 +121,7 @@ const foldInner: Partial<Display> = { camRight: true, rot: true, nav: { portrait
 
 // Sizes in points. iPhones and iPads from the Xcode 27 simulator's profiles (capabilities.plist: corner radius, Home
 // button, Dynamic Island); their safe areas are iOS's. Androids from their panels at their default density (dp).
-export const DEVICES: Device[] = [
+export const ALL_DEVICES: Device[] = [
   // The smallest iPhone still in use: a Home button, a 20pt status bar, square corners. The body is 67.3×138.4 mm
   // around a 375×667 screen (~6.4 pt a mm): ~20 at the sides, ~110 above and below it (the earpiece; the Home button).
   {
@@ -237,7 +240,7 @@ export interface DeviceGroup {
   label: string;
   has: (device: Device, display: Display) => boolean;
 }
-export const DEVICE_GROUPS: DeviceGroup[] = [
+const GROUPS: DeviceGroup[] = [
   { id: 'all', label: 'All devices', has: () => true },
   // iPads too (iPadOS): Apple's devices against Android's.
   { id: 'ios', label: 'iOS', has: (_, x) => x.os !== 'android' },
@@ -246,9 +249,28 @@ export const DEVICE_GROUPS: DeviceGroup[] = [
   { id: 'foldables', label: 'Foldables', has: (d) => d.type === 'foldable' },
   { id: 'tablets', label: 'Tablets', has: (d) => d.type === 'tablet' },
 ];
-export const deviceGroup = (id: string | null | undefined): DeviceGroup => DEVICE_GROUPS.find((g) => g.id === id) ?? DEVICE_GROUPS[0];
 
-export const DEFAULT_DEVICE = 'ip17';
+/** A device's platform: iOS for iPhones and iPads (iPadOS), else Android. */
+export const platformOf = (d: Device): 'ios' | 'android' => (d.displays[0].os === 'android' ? 'android' : 'ios');
+
+/** The devices an app's targets keep; every device when they keep none (a mistyped target never empties the menus). */
+export function targetDevices(t: DeviceTargets | undefined, all = ALL_DEVICES): Device[] {
+  const kept = all.filter((d) => (!t?.platforms?.length || t.platforms.includes(platformOf(d))) && (!t?.types?.length || t.types.includes(d.type)));
+  return kept.length ? kept : all;
+}
+
+/** The devices the designer offers: the app's targets (appConfig.devices), all of them by default. */
+export const DEVICES: Device[] = targetDevices(appConfig.devices);
+
+/** The device the canvas opens on: the iPhone 17 Pro, or the app's first target when it isn't one. */
+export const DEFAULT_DEVICE = DEVICES.some((d) => d.id === 'ip17') ? 'ip17' : DEVICES[0].id;
+
+/** Compare's presets the app's devices fill: none empty, none that would show them all again besides All devices. */
+export const DEVICE_GROUPS: DeviceGroup[] = GROUPS.filter((g) => {
+  const n = DEVICES.filter((d) => d.displays.some((x) => g.has(d, x))).length;
+  return g.id === 'all' || (n > 0 && n < DEVICES.length);
+});
+export const deviceGroup = (id: string | null | undefined): DeviceGroup => DEVICE_GROUPS.find((g) => g.id === id) ?? DEVICE_GROUPS[0];
 
 /**
  * Size class of a display, by its short side (which rotating doesn't change), as apps usually decide it
