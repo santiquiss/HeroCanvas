@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.17.0 — 2026-10-21
+
+- **Welcome in pages**: "Welcome to HeroCanvas" under the icon, then pages to swipe (what it is, the goal, how it
+  works) with a page control, the last one "Start with the Tour". No long scroll; on a short phone the hero drops its
+  line so the tallest page fits.
+- **Pager and PageControl** in the tour's kit, with stories: pages swiped one at a time (a mouse drags them too), a
+  dot per page. `Screen` takes `plain` for a screen laid out in its own height, without a large title.
+
 ## 0.16.2 — 2026-10-21
 
 - **Welcome's icon shines when tapped** instead of spinning: a band of light across it, in its shape. It still floats

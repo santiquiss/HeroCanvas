@@ -1,5 +1,5 @@
 // Welcome's motion, after the launch (the tour's LaunchConfig, played by the simulator: its icon flies to AppIcon):
-// the sections rising in one after another, and the icon alive, floating, tilting in 3D after the pointer and
+// the pages rising in, and the icon alive, floating, tilting in 3D after the pointer and
 // shining when tapped (a band of light across it). Compositor-only (transform, opacity); still copies and reduced motion get the end state.
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useComponent } from '../design/component';
@@ -75,10 +75,10 @@ export function AppIcon({ size = 88 }: { size?: number }) {
 }
 
 /** A block that rises in, `index` steps after the launch (`on`). */
-export function Reveal({ on, index, children }: { on: boolean; index: number; children: ReactNode }) {
+export function Reveal({ on, index, className = '', children }: { on: boolean; index: number; className?: string; children: ReactNode }) {
   const entered = useEntered(on);
   return (
-    <div className={`${styles.reveal} ${entered ? styles.revealed : ''}`} style={{ transitionDelay: `${index * 70}ms` }}>
+    <div className={`${styles.reveal} ${entered ? styles.revealed : ''} ${className}`} style={{ transitionDelay: `${index * 70}ms` }}>
       {children}
     </div>
   );

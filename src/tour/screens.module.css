@@ -23,3 +23,25 @@
   font: var(--app-font-body);
   color: var(--app-text-secondary);
 }
+/* Welcome's pages, under the hero: they shrink before the hero does. */
+.pages {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--app-space-xxl);
+}
+.start {
+  padding: 0 var(--app-space-l) var(--app-space-l);
+}
+.start > :first-child {
+  margin-top: 0;
+}
+/* A short phone (an iPhone SE): the hero without its line, so the tallest page still fits. */
+@container (max-height: 700px) {
+  .welcomeHead p {
+    display: none;
+  }
+  .pages {
+    margin-top: var(--app-space-l);
+  }
+}

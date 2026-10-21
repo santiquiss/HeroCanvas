@@ -5,7 +5,7 @@ import { STEPS } from './steps';
 
 export default stories({
   component: 'Hero',
-  args: { title: 'HeroCanvas', subtitle: 'Design your app’s screens in code, with an AI agent, on a canvas of real devices.', icon: 'app' },
+  args: { title: 'Welcome to HeroCanvas', subtitle: 'Design your app’s screens in code, with an AI agent, on a canvas of real devices.', icon: 'app' },
   controls: { icon: { type: 'select', options: ['app', 'tile'] } },
   width: 'content',
   render: ({ title, subtitle, icon }) => (

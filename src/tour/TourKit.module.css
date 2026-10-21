@@ -3,6 +3,8 @@
 .screen {
   position: relative;
   height: 100%;
+  /* So a screen can lay out by the room it has (Welcome, on a short phone). */
+  container-type: size;
   -webkit-font-smoothing: antialiased;
 }
 .scroll {
@@ -15,6 +17,20 @@
 .content {
   max-width: 640px;
   margin: 0 auto;
+}
+/* A plain screen: its content a column in the screen's height, centered in it. */
+.plain {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.plain > .content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .largeTitle {
@@ -252,4 +268,70 @@
   font: var(--app-font-label);
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Paged: the pages in a row that snaps one at a time; a page scrolls on its own if it doesn't fit. */
+.pager {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.track {
+  min-height: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+.dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+.page {
+  flex: 0 0 100%;
+  min-width: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.page > :first-child {
+  margin-top: 0;
+}
+
+/* iOS's page control: small dots, the current one solid. */
+.pageControl {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  padding: var(--app-space-m) 0 var(--app-space-xs);
+}
+.dot {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.dot::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: auto;
+  border-radius: 50%;
+  background: var(--app-text);
+  opacity: 0.22;
+  transition: opacity 200ms ease;
+}
+.currentDot::before {
+  opacity: 0.85;
 }
