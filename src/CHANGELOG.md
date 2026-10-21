@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.18.2 — 2026-10-21
+
+- **Welcome's last card draws the tour**: its seven stops, in their own icons and colors, orbiting slowly around a
+  phone with HeroCanvas's icon, instead of the emblem. `Illustration` takes `tour`.
+
 ## 0.18.1 — 2026-10-21
 
 - **Welcome's deck swipes as it should**: a short flick moves on (it's the speed that counts, or a drag past 15% of

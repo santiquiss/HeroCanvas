@@ -16,7 +16,7 @@ export const WELCOME: Omit<DeckCardProps, 'count' | 'top' | 'style' | 'action'>[
   { tint: 'indigo', kicker: 'Everywhere', title: 'Every device, every theme.', text: 'Phones, foldables and tablets side by side, in light and dark, in every language.', art: <Illustration name="devices" /> },
   { tint: 'pink', kicker: 'Proposals', title: 'Change it in versions.', text: 'Ideas stay apart from the app as it is, to compare before anything ships.', art: <Illustration name="versions" /> },
   { tint: 'yellow', kicker: 'Handoff', title: 'Hand it off in code’s terms.', text: 'A spec with your own component names and tokens, ready for whoever builds it.', art: <Illustration name="handoff" /> },
-  { tint: 'ink', kicker: 'Next', title: 'Start with the Tour.', text: `${STEPS.length} short stops to try every part on the interface around this device.`, art: <img className={styles.emblem} src="/tour/emblem.png" alt="" /> },
+  { tint: 'ink', kicker: 'Next', title: 'Start with the Tour.', text: `${STEPS.length} short stops to try every part on the interface around this device.`, art: <Illustration name="tour" /> },
 ];
 
 /** Welcome: the icon beside "Welcome to HeroCanvas", over a deck of cards to swipe; the last one opens the tour. */

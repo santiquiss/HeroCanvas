@@ -1,12 +1,15 @@
 // Welcome's illustrations, one per card of its deck: code becoming a screen, the devices and themes, versions to
-// compare, a handoff spec. Drawn on a 300×220 box, scaled to the room the card leaves them; their pieces pop in when
+// compare, a handoff spec, the tour's stops around a phone. Drawn on a 300×220 box, scaled to the room the card leaves them; their pieces pop in when
 // their card comes to the top (TourKit's DeckCard sets `data-top`).
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { useComponent } from '../design/component';
+import { useStill } from '../kit/motion';
+import { STEPS } from './steps';
+import { IconTile } from './TourKit';
 import styles from './Art.module.css';
 
-export type ArtName = 'code' | 'devices' | 'versions' | 'handoff';
+export type ArtName = 'code' | 'devices' | 'versions' | 'handoff' | 'tour';
 
 const W = 300;
 const H = 220;
@@ -31,7 +34,7 @@ export function Illustration({ name }: { name: ArtName }) {
   return (
     <div {...hc} ref={fit} className={styles.fit}>
       <div ref={box} className={styles.box} role="img" aria-label={LABELS[name]}>
-        {ART[name]}
+        {name === 'tour' ? <Orbit /> : ART[name]}
       </div>
     </div>
   );
@@ -42,6 +45,7 @@ const LABELS: Record<ArtName, string> = {
   devices: 'A tablet and two phones, in light and dark, in several languages',
   versions: 'The live screen beside a proposal, with versions to switch',
   handoff: 'A handoff spec of a component, with its props, tokens and spacing',
+  tour: 'A phone with the tour’s stops around it',
 };
 
 /** A phone's screen: a title bar, a block, lines, and a button when asked. */
@@ -57,7 +61,31 @@ function Phone({ style, className = '', block, dark = false, button = false }: {
   );
 }
 
-const ART: Record<ArtName, ReactNode> = {
+/** The tour's stops in a slow orbit around a phone (still in a still copy or with reduced motion). */
+function Orbit() {
+  const still = useStill();
+  const tile = 42;
+  return (
+    <>
+      <div className={`${styles.pop} ${styles.ring}`} />
+      <div className={`${styles.pop} ${styles.d1} ${styles.center}`}>
+        <img src="/tour/icon.png" alt="" />
+      </div>
+      <div className={`${styles.pop} ${styles.d2} ${styles.orbit} ${still ? '' : styles.spin}`}>
+        {STEPS.map((step, k) => {
+          const a = -Math.PI / 2 + (k * 2 * Math.PI) / STEPS.length;
+          return (
+            <span key={step.id} className={styles.stop} style={{ left: 150 + 100 * Math.cos(a) - tile / 2, top: 110 + 100 * Math.sin(a) - tile / 2 }}>
+              <IconTile icon={step.icon} tint={step.tint} size={tile} />
+            </span>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+const ART: Record<Exclude<ArtName, 'tour'>, ReactNode> = {
   code: (
     <>
       <div className={`${styles.pop} ${styles.code}`} style={at(0, 46)}>

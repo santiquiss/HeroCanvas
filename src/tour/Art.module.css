@@ -366,3 +366,58 @@
   border-radius: 11px;
   background: var(--app-success);
 }
+
+/* The tour: its stops orbiting a phone, in the card's own color (ink turns over with the theme). */
+.ring {
+  left: 50px;
+  top: 10px;
+  width: 200px;
+  height: 200px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px dashed currentColor;
+  opacity: 0.3;
+}
+[data-top='false'] .ring {
+  opacity: 0;
+}
+.center {
+  left: 119px;
+  top: 54px;
+  width: 62px;
+  height: 112px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 2.5px solid currentColor;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--app-primary) 50%, transparent);
+}
+.center img {
+  width: 34px;
+  height: 34px;
+}
+.orbit {
+  inset: 0;
+}
+.stop {
+  position: absolute;
+}
+.spin {
+  animation: spin 60s linear infinite;
+}
+.spin .stop {
+  animation: spin 60s linear infinite reverse;
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin,
+  .spin .stop {
+    animation: none;
+  }
+}
