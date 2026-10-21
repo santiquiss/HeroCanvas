@@ -56,8 +56,15 @@
   font-weight: 800;
   letter-spacing: -0.01em;
 }
+.tagline {
+  margin: 4px 0 0;
+  color: var(--ui-text);
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+}
 .version {
-  margin-top: 4px;
+  margin-top: 6px;
   color: var(--ui-text-muted);
   font-size: 14px;
   font-weight: 600;

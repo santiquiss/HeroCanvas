@@ -31,6 +31,7 @@ export function About() {
         <header className={styles.head}>
           <img src="/pwa/icon-192.png" alt="" width={96} height={96} className={styles.logo} />
           <h1 className={styles.title}>HeroCanvas</h1>
+          <p className={styles.tagline}>Superpowers for Designers</p>
           <span className={styles.version}>Version {__HC_VERSION__}</span>
         </header>
         <section className={styles.credits}>

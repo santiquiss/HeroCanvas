@@ -6,6 +6,10 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.29.1 — 2026-10-21
+
+- **"Superpowers for Designers"**, HeroCanvas's tagline, under its name on the About page and at the top of the README.
+
 ## 0.29.0 — 2026-10-21
 
 - **The tour says how you work with HeroCanvas**: AI first, every change asked of the agent, not drawn by hand as in
