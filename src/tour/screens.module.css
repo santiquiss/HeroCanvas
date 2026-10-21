@@ -28,9 +28,9 @@
   flex: none;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   width: 100%;
-  max-width: 440px;
   margin: var(--app-space-s) auto 0;
 }
 .welcomeTitle {

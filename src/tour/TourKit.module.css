@@ -388,6 +388,19 @@
   font: var(--app-font-label);
   color: var(--app-text-secondary);
 }
+/* A tablet (its page 500 wide or more, beside the rail: wider than any phone): the deck takes more of it. */
+@container (min-width: 500px) {
+  .stack {
+    max-height: 820px;
+  }
+  .stackInner {
+    max-width: 580px;
+    max-height: 792px;
+  }
+  .deckControls {
+    max-width: 580px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .deckCard {
     transition: opacity 200ms ease;

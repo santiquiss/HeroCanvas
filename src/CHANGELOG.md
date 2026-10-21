@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.20.1 — 2026-10-21
+
+- **Welcome on tablets**: its deck takes more of the screen (up to 580 wide and 790 tall, from an iPad mini up), and
+  "Welcome to HeroCanvas" is centered on every device.
+
 ## 0.20.0 — 2026-10-21
 
 - **The tour's tab pages**: their titles centered and a size smaller (Title, 28); on tablets the content as wide as
