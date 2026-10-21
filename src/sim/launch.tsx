@@ -75,8 +75,14 @@ export function useLaunch(LAUNCH: LaunchConfig | undefined, root: HTMLElement | 
     setPhase('done');
   }, []);
   const overlay = LAUNCH && phase !== 'done' && root ? <LaunchOverlay key={run} config={LAUNCH} theme={theme} root={root} onExit={() => setPhase('exit')} onDone={done} /> : null;
-  return { phase, overlay };
+  // The screen's own background is the launch's while its screen shows: the screen's rounded corners are antialiased
+  // apart from the launch's, and the page color under them would show as a light hairline along the edge. Back to the
+  // page's as the exit starts (the screen's areas outside the page, beside a rail or a column, show it).
+  const background = LAUNCH && phase === 'screen' ? launchBackground(LAUNCH, theme) : undefined;
+  return { phase, overlay, background };
 }
+
+const launchBackground = (config: LaunchConfig, theme: 'light' | 'dark') => (typeof config.background === 'string' ? config.background : config.background[theme]);
 
 /** The element of the screen's first visible instance of a component (by its name), the icon's landing place. */
 function findComponent(root: HTMLElement, name: string): HTMLElement | null {
@@ -97,16 +103,7 @@ function LaunchOverlay({ config, theme, root, onExit, onDone }: { config: Launch
   const exitMs = typeof out === 'object' ? Math.round(FLY.ms * 0.8 + SETTLE.ms) : EXIT.ms;
   const shape = config.iconShape ?? 'rounded';
 
-  // The screen's own background matches the launch's while it plays: its rounded corners are antialiased apart from
-  // the launch's, and the page color under them would show as a light hairline along the edge.
-  const bg = typeof config.background === 'string' ? config.background : config.background[theme];
-  useEffect(() => {
-    const before = root.style.background;
-    root.style.background = bg;
-    return () => {
-      root.style.background = before;
-    };
-  }, [root, bg]);
+  const bg = launchBackground(config, theme);
 
   // The images decoded first: a first load would show an empty square entering.
   useEffect(() => {

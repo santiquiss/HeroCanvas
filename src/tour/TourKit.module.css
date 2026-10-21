@@ -18,11 +18,12 @@
   max-width: 640px;
   margin: 0 auto;
 }
-/* A plain screen: its content a column in the screen's height, centered in it. */
+/* A plain screen: its content a column in the screen's height, centered in it. Nothing scrolls, nothing clips: its
+   shadows reach under the rail or the iPhone Duo's column beside it (they have no background of their own). */
 .plain {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 .plain > .content {
   flex: 1;

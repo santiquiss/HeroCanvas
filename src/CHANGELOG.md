@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.19.1 — 2026-10-21
+
+- **The launch's color leaves with it**: the screen takes the launch's background only while its screen shows, and
+  the page's again as the exit starts, declared rather than set and restored by hand. The areas beside a tablet's
+  rail or the iPhone Duo's column no longer stay the launch's blue.
+- **Welcome's shadows reach under the column**: a plain screen (the tour's Welcome) doesn't clip, so its cards'
+  shadows go on under the iPhone Duo's column and a tablet's rail, which have no background of their own.
+
 ## 0.19.0 — 2026-10-21
 
 - **A device's header fits its device**: when its controls don't fit above a device (a set zoomed out), the ones

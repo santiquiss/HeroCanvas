@@ -340,7 +340,7 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
           position: 'relative',
           width: L.vw,
           height: L.vh,
-          background: 'var(--pg)',
+          background: launch.background ?? 'var(--pg)',
           borderRadius: L.screenRadius,
           overflow: 'clip',
           transition: 'background 200ms',
