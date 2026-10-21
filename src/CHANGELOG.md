@@ -6,6 +6,16 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.7.0 — 2026-10-21
+
+- **The `new-persona` skill**: one or several personas for the connected app. It reads the app for what about a user
+  changes its screens (account state, plan, role, how much data, language), proposes a set or asks what defines each
+  one (the app's own values as options), and saves each with its mock data, derived like the rest, and a photo if
+  wanted; then checks the screens as them.
+- **`npm run persona:avatar -- <image> <id>`**: a persona's photo from an image the person gives: its centered square
+  at 256 px, in `public/personas/<id>.png` (JPEG, HEIC and others converted with macOS's `sips`). No photo: their
+  initials, as before.
+
 ## 0.6.6 — 2026-10-21
 
 - **Page icons by role**: Pages, Flow, the changes menu and a component's places show each page by its role in the

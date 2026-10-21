@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.6.6-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.7.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -95,6 +95,7 @@ Talk to the agent about what you see on the canvas:
 > Propose a new onboarding with two versions: one with a video, one with three steps.
 > On the iPad the list should open beside the detail. Make it a proposal.
 > Write the handoff for PJ-2 and take screenshots of it on a phone and an iPad.
+> Create two personas: an admin on the paid plan and someone who just signed up.
 ```
 
 Share any view by its link (**Share**: the device, page, scenario and proposal are in the URL), leave **comments** on
@@ -110,6 +111,8 @@ step by step live in `.claude/skills/`:
 | `connect-app` | The first time: your app's code becomes the mirror (settings, tokens, navigation, pages). |
 | `mirror-screen` | A screen or component of your app, built or fixed to match its code. |
 | `new-proposal` | A change to explore or hand off: pages, components, versions, the handoff spec. |
+| `new-persona` | Someone to try the app as: it reads what changes the screens per user, asks you who they are, saves their data and photo. |
+| `update-herocanvas` | A newer HeroCanvas into your copy, your code adapted to what changed. |
 
 Other agents can read the same files: they're plain Markdown.
 

@@ -8,7 +8,7 @@ export interface Persona {
   name: string;
   /** One line on who they are, for the Scenarios panel. */
   description?: string;
-  /** An image under public/ (a 256 px JPEG is plenty). */
+  /** Its photo, under public/ (`npm run persona:avatar` makes `personas/<id>.png`); none: their initials. */
   avatar?: string;
 }
 

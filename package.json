@@ -12,6 +12,7 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit",
     "preview": "vite preview",
     "proposal:code": "node --experimental-strip-types --no-warnings scripts/proposal-code.mjs",
+    "persona:avatar": "node --experimental-strip-types --no-warnings scripts/persona-avatar.mjs",
     "shot": "node scripts/shot.mjs",
     "update": "node scripts/update.mjs"
   },

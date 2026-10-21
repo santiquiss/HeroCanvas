@@ -8,6 +8,7 @@
     ".claude/skills/connect-app",
     ".claude/skills/mirror-screen",
     ".claude/skills/new-proposal",
+    ".claude/skills/new-persona",
     ".claude/skills/update-herocanvas"
   ],
   "files": ["index.html", "vite.config.ts", "tsconfig.json", "tsconfig.app.json", "tsconfig.node.json", "AGENTS.md", "LICENSE", ".gitignore"],

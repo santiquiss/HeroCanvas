@@ -143,6 +143,16 @@ function boxFilter(src: Float32Array, from: number, lines: number, to: number, s
   return out;
 }
 
+/** The largest centered square of the image (a photo cropped for an avatar). */
+export function square(img: Image): Image {
+  const side = Math.min(img.width, img.height);
+  const x0 = Math.floor((img.width - side) / 2);
+  const y0 = Math.floor((img.height - side) / 2);
+  const data = new Uint8Array(side * side * 4);
+  for (let y = 0; y < side; y++) data.set(img.data.subarray(((y0 + y) * img.width + x0) * 4, ((y0 + y) * img.width + x0 + side) * 4), y * side * 4);
+  return { width: side, height: side, data };
+}
+
 /** The image over a solid color (an iOS home-screen icon can't be transparent: iOS fills it with black). */
 export function flatten(img: Image, [r, g, b]: [number, number, number]): Image {
   const data = new Uint8Array(img.data);

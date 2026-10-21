@@ -1,6 +1,6 @@
 // The PNG reader, scaler and writer behind the icons (scripts/vite/png.ts).
 import { describe, expect, it } from 'vitest';
-import { flatten, readPng, resize, writePng } from './png.ts';
+import { flatten, readPng, resize, square, writePng } from './png.ts';
 
 const solid = (w, h, rgba) => ({ width: w, height: h, data: new Uint8Array(w * h * 4).map((_, i) => rgba[i % 4]) });
 
@@ -25,5 +25,12 @@ describe('png', () => {
   });
   it('lays a transparent image over a color', () => {
     expect([...flatten(solid(1, 1, [0, 0, 0, 0]), [255, 255, 255]).data]).toEqual([255, 255, 255, 255]);
+  });
+  it('crops the centered square of a wide image', () => {
+    // 4×2: columns 0 and 3 red, 1 and 2 blue: the square is the two blue columns.
+    const wide = { width: 4, height: 2, data: new Uint8Array(32).map((_, i) => { const x = (i >> 2) % 4; return i % 4 === 3 ? 255 : i % 4 === (x === 1 || x === 2 ? 2 : 0) ? 255 : 0; }) };
+    const sq = square(wide);
+    expect([sq.width, sq.height]).toEqual([2, 2]);
+    expect([...sq.data.subarray(0, 4)]).toEqual([0, 0, 255, 255]);
   });
 });
