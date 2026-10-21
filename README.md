@@ -24,6 +24,26 @@ honest; you look at the canvas, try the scenarios, and say what to change.
 > of it. Connecting your own app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
 > per stack are next — see [Developer experience](docs/developer-experience.md).
 
+## Why not just Figma?
+
+Figma is a great place to explore. But once an app exists, a Figma file is a **drawing of it**: it drifts from the
+code, it can't show what the code does, and every design has to be rebuilt by hand to ship. HeroCanvas designs on the
+app itself.
+
+| | A Figma file | HeroCanvas |
+|---|---|---|
+| **What you design on** | A drawing that drifts from the app | A mirror of the app, rebuilt from its code |
+| **Components** | Copies of the real ones, out of sync over time | The code's components, with their names and props |
+| **Devices** | One frame per size, drawn by hand | Every phone, foldable and tablet at once, at real size, with safe areas, keyboard and navigation |
+| **States and data** | Static mockups of a few cases | Personas, languages, text sizes, light and dark, a page's states: switched live, each one a link |
+| **Behavior** | Prototypes that fake it | Real navigation, sheets, menus and dialogs that behave as the app's do |
+| **Handoff** | Specs a developer translates into code | Proposals in the code's own terms: component names, props, tokens |
+| **How you change it** | By hand, frame by frame | By asking your AI agent, in words, with screenshots, references or Figma links |
+| **Accessibility** | Checked by eye | Large text sizes and Bold Text applied to every screen: where a layout breaks shows |
+
+**Figma still has its place.** Use it to sketch something new, or as a source: HeroCanvas can start from a Figma file
+before there's code, and your agent can read a frame you link to turn it into components on the canvas.
+
 ## How it works
 
 ```
