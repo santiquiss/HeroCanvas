@@ -19,6 +19,9 @@ interface IconProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'color'> {
 /** The SF Symbols and app symbols the team made (`npm run symbols`, app/symbols.json): name → file and size in points. */
 const SYMBOLS = Object.values(import.meta.glob('@app/symbols.json', { eager: true, import: 'default' }))[0] as Record<string, { file: string; w: number; h: number }> | undefined;
 
+/** Whether the team made an SF Symbol (or an app symbol) of this name (`npm run symbols`). */
+export const hasSymbol = (name: string) => !!SYMBOLS?.[name];
+
 const SF_WEIGHTS: [number, string][] = [[150, 'ultralight'], [250, 'thin'], [350, 'light'], [450, 'regular'], [550, 'medium'], [650, 'semibold'], [750, 'bold'], [850, 'heavy'], [1000, 'black']];
 
 /**

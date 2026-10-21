@@ -17,7 +17,9 @@ parameters, the tokens they use, the texts (their keys), the data they show and 
 
 ## 2. Components first
 
-For each component the screen uses, reuse the mirror's if it exists (`app/components`). If not, write it there:
+For each component the screen uses, reuse the mirror's if it exists (`app/components`). The platform's own views
+(SwiftUI's List and Section, NavigationLink, Picker, Toggle…) come from `herocanvas/ios`, not rewritten. If not, write
+it there:
 
 - **Its name and props are the code's** (`onPressed`, not `onClick`, if the code says so). A prop the code doesn't
   have (something only the simulator needs) is declared with `declareProps` (`src/design/simulatorProps.ts`):

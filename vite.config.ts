@@ -21,6 +21,8 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: /^herocanvas$/, replacement: fileURLToPath(new URL('./src/index.ts', import.meta.url)) },
+      // The iOS kit (SwiftUI's views on the app's tokens), its own entry: only an app that uses it loads it.
+      { find: /^herocanvas\/ios$/, replacement: fileURLToPath(new URL('./src/ios/index.tsx', import.meta.url)) },
       { find: /^@app(?=\/|$)/, replacement: fileURLToPath(new URL('./app', import.meta.url)) },
     ],
   },

@@ -6,6 +6,21 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.35.0 — 2026-10-21
+
+- **An iOS kit**, `herocanvas/ios`: SwiftUI's own views as iOS draws them, for mirroring a SwiftUI or UIKit app
+  without rebuilding the platform: `NavigationStack` (a screen: its large title collapsing into a glass bar, back,
+  toolbar, `searchable`), `Section` (inset grouped), `NavigationLink`, `LabeledContent`, `Label`, `Picker` (segmented
+  and menu), `SearchField`, `TextField`, `Toggle`, `Gauge`. Named as SwiftUI names them (Inspect and Layers say so),
+  on the app's tokens, right to left as the screen is, their glyphs SF Symbols when the team made them.
+- `hasSymbol(name)`, from `herocanvas`: whether an SF Symbol was made.
+- `connect-app`, `mirror-screen` and AGENTS.md: a SwiftUI app's mirror uses the kit; only its own components are
+  written.
+
+**Contract**
+
+- `herocanvas/ios` (new entry) and `hasSymbol`: nothing to adapt.
+
 ## 0.34.1 — 2026-10-21
 
 - The new commands pass the linter.

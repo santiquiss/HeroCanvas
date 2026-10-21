@@ -13,7 +13,7 @@ export { stories, type Args, type Control, type FrameWidth, type Story, type Sto
 
 // The kit: the overlays and buttons the simulator presents with, on the app's tokens. And the icons.
 export * from './kit';
-export { Icon } from './components/Icon';
+export { hasSymbol, Icon } from './components/Icon';
 
 // The simulator, as a screen sees it: its layout and state, the language, the navigation.
 export { useHeaderInset, usePadL, usePadR, useSharedState, useSim, useUrlState } from './sim/SimContext';

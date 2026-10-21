@@ -113,6 +113,10 @@ The app's tab bar (phones), and rail and side column (large screens) if it has t
 like the tour's (`src/tour/TourNav.tsx`, an example to start from). Same tabs, icons (Material Symbols names closest to the app's), labels and
 look. If the app has no tabs, the components render nothing and every page is a push or a cover.
 
+**A SwiftUI (or UIKit) app** builds its screens from the platform's views: take them from `herocanvas/ios`
+(`NavigationStack`, `Section`, `NavigationLink`, `LabeledContent`, `Label`, `Picker`, `SearchField`, `TextField`,
+`Toggle`, `Gauge`), named as SwiftUI names them; write only the app's own components.
+
 **A sidebar app** (SwiftUI's `NavigationSplitView`, UIKit's `UISplitViewController`, Material's list-detail or a
 navigation drawer that stays open on tablets) has no tabs: its sidebar is one root page (`level: 'tab'`, the app's
 home) with a `split` (list–detail: `minWidth`, `ratio: 'detail'`, the sidebar's width as `masterWidth`, the section it

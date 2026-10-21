@@ -13,6 +13,9 @@ Two sides, as in Laravel's skeleton and framework:
 - **The tool**, in `src/`: never knows the app. It reads it as `@app`: its settings (`config.ts`), pages
   (`pages.tsx`), navigation (`index.ts`), stories, connectors (`connectors/*.json`), screen config and the `--app-*`
   tokens. A tool that needs to know a page by name is in the wrong place: declare it in the manifest instead.
+- **The iOS kit** (`src/ios`, `herocanvas/ios`): SwiftUI's own views (a NavigationStack's screen, List's Sections and
+  rows, Picker, Toggle…), named as SwiftUI names them, on the `--app-*` tokens: a SwiftUI app's mirror uses them
+  instead of rebuilding the platform.
 - **The kit** (`src/kit`, part of the tool): the overlays the simulator presents with, and their buttons. Styled only
   with `--app-*` tokens, so any app's look reaches them.
 
