@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.29.3 — 2026-10-21
+
+- **About credits the MacrosFirst team**: made by Santiago Quiss and Agus Salas, in collaboration with the
+  [MacrosFirst](https://macrosfirst.com) team, as the README says.
+
 ## 0.29.2 — 2026-10-21
 
 - **The built site works under a path** (GitHub Pages' `user.github.io/repo`), not only at a domain's root: the build

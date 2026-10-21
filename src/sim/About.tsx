@@ -8,6 +8,8 @@ import { useSetMode } from './modes';
 import styles from './About.module.css';
 
 const REPO = 'https://github.com/santiquiss/HeroCanvas';
+/** The app HeroCanvas was first made for (README, The story). */
+const MACROSFIRST = 'https://macrosfirst.com';
 const LICENSE = 'https://www.apache.org/licenses/LICENSE-2.0';
 /** Who made it, with their GitHub profiles. */
 const AUTHORS = [
@@ -44,8 +46,12 @@ export function About() {
                   {a.name}
                 </a>
               </span>
-            ))}{' '}
-            ·{' '}
+            ))}
+            , in collaboration with the{' '}
+            <a href={MACROSFIRST} target="_blank" rel="noreferrer">
+              MacrosFirst
+            </a>{' '}
+            team ·{' '}
             <a href={REPO} target="_blank" rel="noreferrer">
               github.com/santiquiss/HeroCanvas
             </a>
