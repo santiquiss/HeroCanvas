@@ -2,8 +2,8 @@
 
 # HeroCanvas
 
-<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.5.0-3b6fd8"></a>
-<a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.6.0-3b6fd8"></a>
+<a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
 
@@ -179,6 +179,15 @@ Comments stay in each browser until you connect a Supabase project (`src/comment
 `npm run typecheck`, `npm run lint`, `npm test`, `npx vite build` before a change is done; versions and the changelog
 as `AGENTS.md` says. Ideas and fixes are welcome as issues and pull requests.
 
+## Versions
+
+Two, each with its changelog. **Your copy's** (`package.json`, `CHANGELOG.md`): the changes to your mirror and
+proposals, shown at the top left of HeroCanvas. **HeroCanvas's** (`src/version.json`,
+[`src/CHANGELOG.md`](src/CHANGELOG.md)): the tool's, in the ⓘ beside it, along with its license; updates bring it.
+
 ## License
 
-[MIT](LICENSE).
+Source-available under the [PolyForm Shield License 1.0.0](LICENSE): use it, change it and share it freely, for
+yourself or your company, to design any app, commercial ones included. What it doesn't allow is offering a product that
+competes with HeroCanvas (selling it, hosting it as a service, a rival tool built from it). Keep the `Required Notice`
+line of `LICENSE` with any copy. Your own code (`app/`, `proposals/`) is yours.

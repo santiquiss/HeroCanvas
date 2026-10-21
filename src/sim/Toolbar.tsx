@@ -8,7 +8,7 @@ import { ChangesMenu, HighlightButton } from './ChangesMenu';
 import { useUrlState } from './SimContext';
 import { useProposalParam } from '../tools/ProposalPanel';
 import { ProposalMenu } from './ProposalMenu';
-import { VersionButton } from './Changelog';
+import { AboutButton, VersionButton } from './Changelog';
 import { useCommentsUi } from '../comments';
 import styles from './Toolbar.module.css';
 
@@ -49,6 +49,7 @@ export function Toolbar(props: ToolbarProps) {
       </button>
       {/* The logo and the modes are the rail's (ModeRail); the version stays here, opening the changelog. */}
       <VersionButton />
+      <AboutButton />
       <ProposalMenu />
       <VariantPicker />
       <ChangesMenu proposalId={proposalId} />

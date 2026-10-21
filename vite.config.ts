@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import pkg from './package.json' with { type: 'json' }
+import hcVersion from './src/version.json' with { type: 'json' }
 import hc from './herocanvas.config.ts'
 import { brand } from './scripts/vite/brand.ts'
 import { hcWriter } from './scripts/vite/hcWriter.ts'
@@ -20,10 +21,11 @@ export default defineConfig({
       { find: /^@app(?=\/|$)/, replacement: fileURLToPath(new URL('./app', import.meta.url)) },
     ],
   },
-  // The app's version (package.json), shown in the toolbar. See CHANGELOG.md. The build's id (when it was built, or
+  // The versions in the toolbar: this copy's (package.json, its CHANGELOG.md) and HeroCanvas's (src/version.json,
+  // src/CHANGELOG.md). The build's id (when it was built, or
   // when the dev server started): what's derived from the code and cached in the browser (the page index) is keyed
   // on it, so a new build doesn't read a stale cache.
-  define: { __APP_VERSION__: JSON.stringify(pkg.version), __BUILD_ID__: JSON.stringify(String(Date.now())) },
+  define: { __APP_VERSION__: JSON.stringify(pkg.version), __HC_VERSION__: JSON.stringify(hcVersion.version), __BUILD_ID__: JSON.stringify(String(Date.now())) },
   // `npm test`: the logic's unit tests (and the scripts': npm run shot's arguments) and the smoke test (every page, every story renders), in a DOM of happy-dom.
   test: {
     environment: 'happy-dom',

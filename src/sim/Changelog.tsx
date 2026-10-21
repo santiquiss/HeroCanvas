@@ -1,8 +1,9 @@
-// The version in the toolbar: a button that opens CHANGELOG.md (the file itself, imported raw) in a panel under it.
-// Closes on a click outside or Esc.
+// The versions in the toolbar. This copy's (package.json): a button that opens its CHANGELOG.md, the team's record of
+// their mirror and proposals. Beside it, ⓘ: HeroCanvas itself, its version, who made it, its license and its own
+// changelog (src/CHANGELOG.md). Each opens in a panel under it; a click outside or Esc closes it.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import changelog from '../../CHANGELOG.md?raw';
 import { Icon } from '../components/Icon';
+import hcChangelog from '../CHANGELOG.md?raw';
 import styles from './Changelog.module.css';
 
 /** Inline markdown: **bold**, `code` and [links](url). */
@@ -21,18 +22,27 @@ function inline(text: string): ReactNode[] {
   });
 }
 
-/** The changelog's blocks: each version (`## ` heading) with its paragraphs and bullet lists. */
+/** The changelog's blocks: each version (`## ` heading) with its paragraphs and bullet lists (one level nested). */
 function render(md: string): ReactNode[] {
   const out: ReactNode[] = [];
   let para: string[] = [];
-  let list: string[] = [];
+  let list: { text: string; sub: string[] }[] = [];
   const flush = () => {
     if (para.length) out.push(<p key={out.length}>{inline(para.join(' '))}</p>);
     if (list.length)
       out.push(
         <ul key={out.length}>
           {list.map((li, i) => (
-            <li key={i}>{inline(li)}</li>
+            <li key={i}>
+              {inline(li.text)}
+              {li.sub.length > 0 && (
+                <ul>
+                  {li.sub.map((s, j) => (
+                    <li key={j}>{inline(s)}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
           ))}
         </ul>,
       );
@@ -40,25 +50,39 @@ function render(md: string): ReactNode[] {
     list = [];
   };
   for (const line of md.split('\n')) {
+    const last = list[list.length - 1];
     if (line.startsWith('# ')) continue;
     if (line.startsWith('## ')) {
       flush();
       out.push(<h3 key={out.length}>{inline(line.slice(3))}</h3>);
     } else if (line.startsWith('- ')) {
       if (para.length) flush();
-      list.push(line.slice(2));
-    } else if (/^\s+\S/.test(line) && list.length) list[list.length - 1] += ' ' + line.trim();
-    else if (!line.trim()) flush();
+      list.push({ text: line.slice(2), sub: [] });
+    } else if (/^\s+- /.test(line) && last) last.sub.push(line.trim().slice(2));
+    else if (/^\s+\S/.test(line) && last) {
+      // A wrapped line: it continues the last item, or its last nested one.
+      if (last.sub.length) last.sub[last.sub.length - 1] += ' ' + line.trim();
+      else last.text += ' ' + line.trim();
+    } else if (!line.trim()) flush();
     else para.push(line.trim());
   }
   flush();
   return out;
 }
 
-// From the first version: the file's intro (how versions are numbered) is for the repo, not the panel.
-const BODY = render(changelog.slice(changelog.indexOf('\n## ') + 1));
+const REPO = 'https://github.com/santiquiss/HeroCanvas';
 
-export function VersionButton() {
+// The team's changelog, at the project's root: optional (a copy may not keep one).
+const appChangelog = Object.values(import.meta.glob<string>('/CHANGELOG.md', { eager: true, query: '?raw', import: 'default' }))[0];
+
+/** A changelog from its first version: the file's intro (how versions are numbered) is for the repo, not the panel. */
+const body = (md: string) => render(md.slice(md.indexOf('\n## ') + 1));
+
+const APP_BODY = appChangelog ? body(appChangelog) : null;
+const HC_BODY = body(hcChangelog);
+
+/** A toolbar button with its panel under it. */
+function Popup({ label, title, className, panelTitle, children }: { label: ReactNode; title: string; className?: string; panelTitle: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -76,20 +100,50 @@ export function VersionButton() {
   }, [open]);
   return (
     <span ref={box} className={styles.wrap}>
-      <button className={`${styles.version} ${open ? styles.versionOn : ''}`} title="What's new (CHANGELOG.md)" aria-expanded={open} onClick={() => setOpen(!open)}>
-        v{__APP_VERSION__}
+      <button className={`${className ?? styles.version} ${open ? styles.versionOn : ''}`} title={title} aria-label={title} aria-expanded={open} onClick={() => setOpen(!open)}>
+        {label}
       </button>
       {open && (
-        <div className={styles.panel} role="dialog" aria-label="Changelog">
+        <div className={styles.panel} role="dialog" aria-label={panelTitle}>
           <div className={styles.head}>
-            <span>Changelog</span>
+            <span>{panelTitle}</span>
             <button className={styles.close} aria-label="Close" onClick={() => setOpen(false)}>
               <Icon name="close" size={18} />
             </button>
           </div>
-          <div className={styles.body}>{BODY}</div>
+          <div className={styles.body}>{children}</div>
         </div>
       )}
     </span>
+  );
+}
+
+/** This copy's version: the team's changelog. */
+export function VersionButton() {
+  return (
+    <Popup label={`v${__APP_VERSION__}`} title="This copy's changes (CHANGELOG.md)" panelTitle="Changelog">
+      {APP_BODY ?? <p>No CHANGELOG.md at the project's root: start one to keep track of your mirror and proposals.</p>}
+    </Popup>
+  );
+}
+
+/** HeroCanvas itself: version, attribution, license, and what changed in it. */
+export function AboutButton() {
+  return (
+    <Popup label={<Icon name="info" size={16} />} title="About HeroCanvas" className={styles.about} panelTitle={`HeroCanvas ${__HC_VERSION__}`}>
+      <div className={styles.credits}>
+        <p>
+          Made with <a href={REPO} target="_blank" rel="noreferrer">HeroCanvas</a>, by Santiago Quiss.
+        </p>
+        <p>
+          Free to use, change and share under the{' '}
+          <a href="https://polyformproject.org/licenses/shield/1.0.0" target="_blank" rel="noreferrer">
+            PolyForm Shield 1.0.0
+          </a>{' '}
+          license, except to offer a product that competes with it. Keep its copyright notice with any copy.
+        </p>
+      </div>
+      {HC_BODY}
+    </Popup>
   );
 }

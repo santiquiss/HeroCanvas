@@ -26,13 +26,13 @@ describe('the update plan', () => {
 });
 
 describe('package.json', () => {
-  it('takes the new version, scripts and dependencies, keeping the team’s own', () => {
+  it('takes the new scripts and dependencies, keeping the team’s own, and their version', () => {
     const base = { name: 'x', version: '0.1.0', scripts: { dev: 'vite', old: 'a' }, dependencies: { react: '19.0.0', gone: '1' } };
     const target = { name: 'herocanvas', version: '0.2.0', scripts: { dev: 'vite --open', update: 'node u' }, dependencies: { react: '19.1.0' } };
     const local = { name: 'acme-design', version: '0.1.0', scripts: { dev: 'vite', old: 'a', mine: 'b' }, dependencies: { react: '19.0.0', gone: '1', zod: '3' } };
     expect(mergePackage(local, base, target)).toEqual({
       name: 'acme-design',
-      version: '0.2.0',
+      version: '0.1.0',
       scripts: { dev: 'vite --open', mine: 'b', update: 'node u' },
       dependencies: { react: '19.1.0', zod: '3' },
     });

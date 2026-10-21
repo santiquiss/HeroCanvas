@@ -153,7 +153,7 @@ and the new version and applies that diff to the team's copy, keeping their chan
 what a developer would do by hand, without anyone having to remember to.
 
 **Signals to act on**: when several teams eject the same piece, it's missing an extension point, or the change
-belongs in HeroCanvas. And since it's open source, a change that's general should come back as a pull request,
+belongs in HeroCanvas. And since its source is open, a change that's general should come back as a pull request,
 where it stops being something one team maintains.
 
 ## Order

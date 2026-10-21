@@ -13,9 +13,10 @@ never touches. `npm run update` does the replacing; this skill does what's left:
 
 - `git status` must be clean: commit or stash the person's work first (ask before committing it for them). The update
   is then one change they can review with `git diff` or undo with `git checkout .`.
-- Say which version they have (`package.json`'s `version`) and which they'd get: `npm run update -- --dry-run` lists
-  every file it would write, merge, delete or keep, and the changelog between the two. A version other than the
-  latest: `npm run update -- 0.6.0`. Their own fork as the source: `--from <git url>` (or a `herocanvas` remote).
+- Say which HeroCanvas version they have (`src/version.json`; the ⓘ in the toolbar) and which they'd get:
+  `npm run update -- --dry-run` lists every file it would write, merge, delete or keep, and the changelog between
+  the two. A version other than the latest: `npm run update -- 0.6.0`. Their own fork as the source:
+  `--from <git url>` (or a `herocanvas` remote).
 
 ## 2. Run it
 
@@ -42,7 +43,8 @@ upstream as a pull request (docs/developer-experience.md, Changing the tool itse
 
 ## 4. The team's code: contract changes
 
-Read every section the update printed. Each **Contract** item is a change in what crosses between the tool and the
+Read every section the update printed (HeroCanvas's `src/CHANGELOG.md`; the root `CHANGELOG.md` is the team's own
+and the update leaves it alone). Each **Contract** item is a change in what crosses between the tool and the
 team's code (`herocanvas`'s exports, what the tool reads from `app/`): a renamed export, a new required field in the
 manifest, a moved file, a new token. For each one, adapt `app/` and `proposals/` as it says. `npm run typecheck`
 finds most of them; the changelog explains the rest. Don't edit the tool to make old app code fit.
@@ -56,4 +58,5 @@ Other items (new features, fixes) need nothing, but tell the person about the on
 - Look at it: `npm run shot -- "/<a page>"` (pass `--base` with the dev server's address if another app uses port
   5173), phone and tablet, light and dark. The app should look as it did, plus what the changelog says is new.
 - Tell the person, short: the versions (from → to), what's new for them, what you adapted in their code and why, any
-  clash and how you resolved it. Then commit, when they say so: `Update HeroCanvas to <version>`.
+  clash and how you resolved it. Then commit, when they say so: `Update HeroCanvas to <version>`. If you adapted
+  their code, add a line to their `CHANGELOG.md` too (and bump `package.json`'s version, a fix).

@@ -33,11 +33,12 @@ export function plan(base, target, local) {
 }
 
 /**
- * package.json: the new version's `version`, `scripts` and dependencies, keeping what the team added (a script, a
- * dependency) and what they changed that this update doesn't change. Fields outside those are the team's.
+ * package.json: the new version's `scripts` and dependencies, keeping what the team added (a script, a dependency)
+ * and what they changed that this update doesn't change. Every other field is the team's, `version` included (their
+ * copy's; HeroCanvas's is src/version.json).
  */
 export function mergePackage(local, base, target) {
-  const out = { ...local, version: target.version };
+  const out = { ...local };
   for (const field of ['scripts', 'dependencies', 'devDependencies']) {
     const l = local[field] ?? {};
     const b = base[field] ?? {};

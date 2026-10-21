@@ -9,7 +9,7 @@
 //   npm run update -- --dry-run      what it would do, changing nothing
 //   npm run update -- --from <git url>   another source (a fork); default: the `herocanvas` remote, else GitHub's
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { changesBetween, mergePackage, newer, plan, versions } from './update/plan.mjs';
@@ -103,7 +103,8 @@ function main() {
 
   const remotes = git(['remote']).split('\n');
   const source = opts.from ?? (remotes.includes('herocanvas') ? git(['remote', 'get-url', 'herocanvas']).trim() : DEFAULT_SOURCE);
-  const current = JSON.parse(readFileSync('package.json', 'utf8')).version;
+  // HeroCanvas's version here (src/version.json; before 0.6.0, package.json's held it).
+  const current = JSON.parse(readFileSync(existsSync('src/version.json') ? 'src/version.json' : 'package.json', 'utf8')).version;
 
   let tags;
   try {
@@ -115,7 +116,7 @@ function main() {
   const target = opts.version ?? available[0];
   if (!target) fail(`No versions (vX.Y.Z tags) at ${source}.`);
   if (!available.includes(target)) fail(`No version ${target} at ${source}. The latest: ${available.slice(0, 5).join(', ')}.`);
-  if (!available.includes(current)) fail(`This copy's version (${current}, package.json) isn't one of ${source}'s: can't tell what changed here.`);
+  if (!available.includes(current)) fail(`This copy's HeroCanvas version (${current}, src/version.json) isn't one of ${source}'s: can't tell what changed here.`);
   if (!newer(target, current)) {
     console.log(`HeroCanvas is up to date (${current}).`);
     return;
@@ -141,7 +142,7 @@ function main() {
     else if (merge(s.path, current, target)) clashes.push(s.path);
   }
 
-  // package.json: merged by field (the version, scripts and dependencies are the tool's; the rest is the team's).
+  // package.json: merged by field (the scripts and dependencies are the tool's; the rest, the version included, the team's).
   const pkgChanged = !opts.dryRun && manifest.merged.includes('package.json');
   if (pkgChanged) {
     const local = JSON.parse(readFileSync('package.json', 'utf8'));
@@ -157,8 +158,14 @@ function main() {
   list('keep', 'Kept as they are here');
   if (clashes.length) console.log(`\n⚠ Clashes to resolve (conflict markers, or a .herocanvas-new beside a binary file):\n${clashes.map((p) => `  ${p}`).join('\n')}`);
 
-  const changelog = changesBetween(show(TARGET, 'CHANGELOG.md').toString(), current, target);
-  console.log(`\n──── What changed (CHANGELOG.md, ${current} → ${target}) ────\n\n${changelog}\n`);
+  // HeroCanvas's changelog: src/CHANGELOG.md (before 0.6.0, the root's).
+  let log;
+  try {
+    log = show(TARGET, 'src/CHANGELOG.md').toString();
+  } catch {
+    log = show(TARGET, 'CHANGELOG.md').toString();
+  }
+  console.log(`\n──── What changed in HeroCanvas (src/CHANGELOG.md, ${current} → ${target}) ────\n\n${changesBetween(log, current, target)}\n`);
   console.log(
     opts.dryRun
       ? 'Dry run: nothing changed.'
