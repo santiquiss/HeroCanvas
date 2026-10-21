@@ -6,6 +6,13 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.23.3 — 2026-10-21
+
+- **The room between devices follows how many there are**: 56 for two, 40 for three, 24 for four or more, so a few
+  breathe and many still show large.
+- **Subtler + buttons**: at rest only their + in a faint ring, solid with a shadow when pointed at; the one between
+  two devices is smaller, so it never sits over them.
+
 ## 0.23.2 — 2026-10-21
 
 - **The tour's beacons in the emblem's red**: its yellow didn't show on the light interface.

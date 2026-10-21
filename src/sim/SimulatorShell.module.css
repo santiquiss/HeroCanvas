@@ -396,18 +396,24 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--hc-canvas-chip-solid);
+  /* At rest just its +, in a faint ring; pointed at, a solid button. */
+  background: transparent;
   color: var(--hc-canvas-icon);
+  box-shadow: 0 0 0 1px var(--hc-canvas-chip-line);
+  opacity: 0.6;
+  transition:
+    opacity 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+.addDevice:hover,
+.addDevice:focus-within {
+  opacity: 1;
+  background: var(--hc-canvas-chip-solid);
   box-shadow:
     0 2px 8px rgba(15, 20, 30, 0.12),
     0 0 0 1px var(--hc-canvas-chip-line);
-  opacity: 0.7;
-  transition:
-    opacity 150ms ease,
-    transform 150ms ease;
-}
-.addDevice:hover {
-  opacity: 1;
   transform: scale(1.06);
 }
 /* Between two devices of a set: a zero-width slot whose gap-wide hit area reveals a small +. */
@@ -430,9 +436,10 @@
   align-items: center;
   justify-content: center;
 }
+/* Small enough for the tightest gap (24): it never sits over the devices beside it. */
 .addDeviceSmall {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   opacity: 0;
   transform: scale(0.8);
 }

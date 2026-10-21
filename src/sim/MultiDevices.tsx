@@ -1,5 +1,5 @@
 // A custom set of devices side by side (`?devices=`), each with its own display and orientation, repeats allowed, at
-// one scale, close together so they show as large as they can. Each has a small header (DeviceHeader: drag handle,
+// one scale, closer together the more there are, so they show as large as they can. Each has a small header (DeviceHeader: drag handle,
 // device, display, rotate, version, language, remove; what doesn't fit in a ⋯ menu); + at both ends adds one, and a
 // small + shows on hover between two to add one there. The screens share the app's navigation and overlays (sheets,
 // menus, dialogs, toasts): an action on one shows on all. The active one (the last you touched, or in Inspect with
@@ -32,7 +32,8 @@ import styles from './SimulatorShell.module.css';
  */
 const MARGIN = VIEW_BAR_H + 36 + 12 + 8;
 const SIDE = 64;
-const GAP = 20;
+/** The room between devices: generous for a few, tighter as more share the canvas, so they still show large. */
+export const deviceGap = (count: number) => (count <= 2 ? 56 : count === 3 ? 40 : 24);
 
 const TYPES: [DeviceType, string][] = [
   ['phone', 'Phones'],
@@ -176,7 +177,7 @@ export function AddDeviceButton({ onPick, side }: { onPick: (id: string) => void
       onPick={onPick}
       tour={between ? undefined : 'add-device'}
     >
-      <Icon name="add" size={between ? 16 : 20} />
+      <Icon name="add" size={between ? 14 : 20} />
     </DevicePicker>
   );
 }
@@ -415,7 +416,7 @@ export function multiFit(layouts: Layout[], stageW: number, stageH: number): num
   const tallest = Math.max(...boxes.map((b) => b.h));
   // The whole row: the frames scale, the gaps and the side margins (the end +s) don't.
   const row = boxes.reduce((w, b) => w + b.w, 0);
-  const fixed = 2 * SIDE + GAP * (layouts.length - 1);
+  const fixed = 2 * SIDE + deviceGap(layouts.length) * (layouts.length - 1);
   return Math.max(0.2, Math.min(1, (stageH - 2 * MARGIN) / tallest, (stageW - fixed) / row));
 }
 
@@ -438,6 +439,7 @@ export function MultiDevices({
   onChange: (items: DeviceItem[]) => void;
 }) {
   const [active, setActive] = useState(0);
+  const gap = deviceGap(items.length);
   const act = Math.min(active, items.length - 1);
   const pan = usePan();
   const content = useRef<HTMLDivElement>(null);
@@ -480,7 +482,7 @@ export function MultiDevices({
       x: e.clientX,
       to: i,
       centers: rects.map((r) => r.left + r.width / 2),
-      shift: rects[i].width + GAP,
+      shift: rects[i].width + gap,
     };
     setDragging(i);
   };
@@ -520,7 +522,7 @@ export function MultiDevices({
     <div ref={canvas} className={styles.multi} {...pan}>
       <div ref={content} className={styles.multiRow} style={{ padding: `${MARGIN}px ${SIDE}px` }}>
         {/* Only the frames are laid out: headers and the end + are positioned around them. */}
-        <div className={styles.multiFrames} style={{ gap: GAP }}>
+        <div className={styles.multiFrames} style={{ gap }}>
           <span className={`${styles.multiEnd} ${styles.multiEndL}`}>
             <AddDeviceButton side="left" onPick={(id) => insert(0, id)} />
           </span>
@@ -531,8 +533,8 @@ export function MultiDevices({
               <Fragment key={i}>
                 {i > 0 && (
                   // Zero-width slot in the gap (its negative margins cancel the extra flex gap); hovering the gap shows a small +.
-                  <div className={styles.gapSlot} style={{ margin: `0 ${-GAP / 2}px` }} hidden={dragging != null}>
-                    <div className={styles.gapHit} style={{ width: GAP }}>
+                  <div className={styles.gapSlot} style={{ margin: `0 ${-gap / 2}px` }} hidden={dragging != null}>
+                    <div className={styles.gapHit} style={{ width: gap }}>
                       <AddDeviceButton side="between" onPick={(id) => insert(i, id)} />
                     </div>
                   </div>
@@ -546,7 +548,7 @@ export function MultiDevices({
                   {/* No wider than its frame and the gap: zoomed out, neighbours' headers don't overlap (the name gives). */}
                   <DeviceHeader
                     className={it.design || it.lang ? styles.devHeadOwn : undefined}
-                    style={{ maxWidth: b.w * k + GAP }}
+                    style={{ maxWidth: b.w * k + gap }}
                     device={it.device}
                     display={it.display}
                     land={it.land}
