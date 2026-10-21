@@ -29,7 +29,7 @@ export function About() {
       <article className={styles.page}>
         {/* The app icon at 192px (made from the logo by scripts/vite/brand.ts): sharp at this size on any screen. */}
         <header className={styles.head}>
-          <img src="/pwa/icon-192.png" alt="" width={96} height={96} className={styles.logo} />
+          <img src={`${import.meta.env.BASE_URL}pwa/icon-192.png`} alt="" width={96} height={96} className={styles.logo} />
           <h1 className={styles.title}>HeroCanvas</h1>
           <p className={styles.tagline}>Superpowers for Designers</p>
           <span className={styles.version}>Version {__HC_VERSION__}</span>

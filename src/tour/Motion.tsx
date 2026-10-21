@@ -8,7 +8,7 @@ import { useLaunchPhase } from '../sim/launchPhase';
 import styles from './Motion.module.css';
 
 /** The app icon: the emblem on its blue tile, cropped to the tile (from brand/hc-icon.png). */
-const ICON = '/tour/icon.png';
+const ICON = `${import.meta.env.BASE_URL}tour/icon.png`;
 /** Where the emblem sits in it (fractions of its side): the launch's emblem lands exactly there. */
 const EMBLEM = { left: 0.052, top: 0.188, width: 0.896, height: 0.702 };
 const TILT = spring(0.45, 0.2);

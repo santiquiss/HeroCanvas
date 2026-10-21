@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.29.2 — 2026-10-21
+
+- **The built site works under a path** (GitHub Pages' `user.github.io/repo`), not only at a domain's root: the build
+  is relative (`base: './'`) and the tool's own images (the rail's logo, About's icon, the tour's icon and emblem, the
+  favicon) are reached through `import.meta.env.BASE_URL`. The README's Deploy has GitHub Pages' workflow.
+
 ## 0.29.1 — 2026-10-21
 
 - **"Superpowers for Designers"**, HeroCanvas's tagline, under its name on the About page and at the top of the README.

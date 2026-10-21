@@ -71,7 +71,7 @@ function Orbit() {
     <>
       <div className={`${styles.pop} ${styles.ring}`} />
       <div className={`${styles.pop} ${styles.d1} ${styles.center}`}>
-        <img src="/tour/icon.png" alt="" />
+        <img src={`${import.meta.env.BASE_URL}tour/icon.png`} alt="" />
       </div>
       <div className={`${styles.pop} ${styles.d2} ${styles.orbit} ${still ? '' : styles.spin}`}>
         {STEPS.map((step, k) => {

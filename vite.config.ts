@@ -13,6 +13,9 @@ export default defineConfig({
   // hcWriter: the designer saves screen config / proposals to project files (dev server only). brand: the tool's
   // colors, from herocanvas.config.ts (or its logo).
   plugins: [react(), hcWriter(), brand(hc)],
+  // Relative: the built site works wherever it's served, at a domain's root or under a path (GitHub Pages'
+  // user.github.io/repo). Public files are reached through import.meta.env.BASE_URL, never from `/`.
+  base: './',
   // The tool and the team's code meet through two names: the app imports the tool as `herocanvas` (src/index.ts, its
   // public API: the same import once the tool is a package), and the tool reads the app as `@app` (app/).
   resolve: {

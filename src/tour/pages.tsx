@@ -15,7 +15,7 @@ export const TOUR_LAYOUT: ScreenLayout = { railWidth: 200 };
 
 export const TOUR_LAUNCH: LaunchConfig = {
   background: 'radial-gradient(120% 80% at 50% 35%, #2f86ff 0%, #0a5cff 45%, #0035b8 100%)',
-  icon: '/tour/emblem.png',
+  icon: `${import.meta.env.BASE_URL}tour/emblem.png`,
   iconSize: 200,
   iconShape: 'none',
   enter: 'shine',

@@ -63,6 +63,8 @@ The person's app's own repository is read, never edited: everything goes in Hero
   HeroCanvas, not in the app's code). Where it came from (a Figma file, another design tool, a proposal) is a note,
   never a state of its own; tiers (Atoms…) show only when Figma or the code gives them. Tokens the same: no code
   connector, no "not in the code".
+- **Public files by `import.meta.env.BASE_URL`**, never from `/`: the built site is relative (`base: './'`), so it
+  works at a domain's root or under a path (GitHub Pages).
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done

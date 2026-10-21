@@ -4,7 +4,7 @@
 
 ### Superpowers for Designers
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.29.1-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.29.2-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -240,8 +240,39 @@ npm run build        # the site, in dist/
 
 **Netlify** and **Cloudflare Pages** work the same way (build `npm run build`, publish `dist`). **Your own stack**:
 build anywhere (your CI, a Dockerfile) and serve `dist/` from any static server or bucket (nginx, S3 and CloudFront,
-Firebase Hosting…). Links use the URL's hash, so no rewrite rules are needed. Serve it at the root of its domain or
-subdomain (`design.yourcompany.com`), not under a path.
+Firebase Hosting…). Links use the URL's hash, so no rewrite rules are needed, and it works at a domain's root
+(`design.yourcompany.com`) or under a path.
+
+**GitHub Pages**: in your repository, **Settings › Pages › Source: GitHub Actions**, then add
+`.github/workflows/pages.yml`:
+
+```yaml
+name: Pages
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci && npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+```
+
+Each push to `main` publishes it at `https://<you>.github.io/<your-repo>/`. Pages on a private repository needs a
+paid GitHub plan, and the site is public: for unreleased designs, prefer a host with access control.
 
 Good to know:
 
