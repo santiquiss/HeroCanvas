@@ -22,6 +22,9 @@ honest; you look at the canvas, try the scenarios, and say what to change.
 <p align="center"><img src="docs/images/canvas.jpg" width="100%" alt="HeroCanvas with the same screen on an iPhone, a Pixel Fold and an iPad side by side, its pages on the left and Scenarios on the right"><br>
 <sub>One screen on an iPhone, a foldable and an iPad at once, with the app's pages and the scenarios to try it in.</sub></p>
 
+> **See it with a real app**: the [`example/food-truck`](https://github.com/santiquiss/HeroCanvas/tree/example/food-truck)
+> branch is a copy with Apple's Food Truck (SwiftUI) connected, every screen mirrored.
+
 > Early days. Until you connect your app, HeroCanvas shows its own **tour**, a small app that walks through every part
 > of it. Connecting your own app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
 > per stack are next — see [Developer experience](docs/developer-experience.md).
