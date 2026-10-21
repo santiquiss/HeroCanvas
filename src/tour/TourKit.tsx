@@ -1,7 +1,7 @@
 // The tour's components (HeroCanvas's own app, shown while no app is connected), after iOS: large titles, inset
 // grouped lists, Settings-style icon tiles, capsule buttons, Liquid Glass on what floats. Instrumented (useComponent)
 // so Inspect and Layers name them. Drawn with the app tokens the tour's theme sets (theme.css: iOS's values).
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { useComponent } from '../design/component';
 import { useNav } from '../nav/context';
@@ -208,53 +208,73 @@ export function CardDeck({ cards }: { cards: Omit<DeckCardProps, 'count' | 'top'
   const [index, setIndex] = useState(0);
   const [dx, setDx] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const drag = useRef<{ x: number; id: number; moved: boolean; ratio: number } | null>(null);
+  // The drag under way: it follows the pointer on the window, so a release anywhere (or a lost one) ends it.
+  const end = useRef<(() => void) | null>(null);
+  useEffect(() => () => end.current?.(), []);
   const last = cards.length - 1;
   const go = (i: number) => {
     setIndex(Math.max(0, Math.min(last, i)));
     setDx(0);
     setDragging(false);
   };
+  const start = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || (e.target as HTMLElement).closest('button')) return;
+    // No text selection, no image drag: the pointer is the card's.
+    if (e.pointerType === 'mouse') e.preventDefault();
+    end.current?.();
+    const from = index;
+    const x0 = e.clientX;
+    const r = e.currentTarget.getBoundingClientRect();
+    // The device may be drawn scaled: the pointer's pixels into the deck's.
+    const ratio = e.currentTarget.clientWidth / r.width;
+    let moved = false;
+    let x = 0;
+    // The last moments of the drag, for a flick's speed.
+    let trail = [{ x: 0, t: e.timeStamp }];
+    const move = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return;
+      // The button let go where no release reached us: the drag is over.
+      if (ev.pointerType === 'mouse' && ev.buttons === 0) return up(ev);
+      x = (ev.clientX - x0) * ratio;
+      trail = [...trail.filter((p) => ev.timeStamp - p.t < 120), { x, t: ev.timeStamp }];
+      if (!moved) {
+        if (Math.abs(x) < 6) return;
+        moved = true;
+        setDragging(true);
+      }
+      setDx(x);
+    };
+    const up = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return;
+      stop();
+      if (!moved) return;
+      const first = trail[0];
+      const speed = (x - first.x) / Math.max(1, ev.timeStamp - first.t);
+      // Past 15% of the card, or flicked: the next (or the last) card; else back.
+      const width = r.width * ratio;
+      const dir = x < -width * 0.15 || speed < -0.25 ? 1 : x > width * 0.15 || speed > 0.25 ? -1 : 0;
+      go(from + dir);
+    };
+    const cancel = () => {
+      stop();
+      go(from);
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
+      window.removeEventListener('blur', cancel);
+      end.current = null;
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', cancel);
+    window.addEventListener('blur', cancel);
+    end.current = cancel;
+  };
   return (
     <div {...hc} className={styles.deck}>
-      <div
-        className={styles.stack}
-        style={{ paddingTop: PEEK * 2 }}
-        onPointerDown={(e) => {
-          if (e.button !== 0 || (e.target as HTMLElement).closest('button')) return;
-          const r = e.currentTarget.getBoundingClientRect();
-          // The device may be drawn scaled: the pointer's pixels into the deck's.
-          drag.current = { x: e.clientX, id: e.pointerId, moved: false, ratio: e.currentTarget.clientWidth / r.width };
-        }}
-        onPointerMove={(e) => {
-          const d = drag.current;
-          if (!d) return;
-          const x = (e.clientX - d.x) * d.ratio;
-          if (!d.moved) {
-            if (Math.abs(x) < 6) return;
-            d.moved = true;
-            setDragging(true);
-            try {
-              e.currentTarget.setPointerCapture(d.id);
-            } catch {
-              // A pointer already gone: the drag follows it while it's over the deck.
-            }
-          }
-          setDx(x);
-        }}
-        onPointerUp={() => {
-          const d = drag.current;
-          drag.current = null;
-          if (!d?.moved) return;
-          if (dx < -70) go(index + 1);
-          else if (dx > 70) go(index - 1);
-          else go(index);
-        }}
-        onPointerCancel={() => {
-          drag.current = null;
-          go(index);
-        }}
-      >
+      <div className={styles.stack} style={{ paddingTop: PEEK * 2 }} onPointerDown={start} onDragStart={(e) => e.preventDefault()}>
         <div className={styles.stackInner}>
           {cards.map((card, k) => {
             const d = k - index;

@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.18.1 — 2026-10-21
+
+- **Welcome's deck swipes as it should**: a short flick moves on (it's the speed that counts, or a drag past 15% of
+  the card, measured in the device's own size), and a drag always ends when the button is let go, even outside the
+  deck, instead of the card staying stuck to the pointer. No text selection or image drag while dragging.
+
 ## 0.18.0 — 2026-10-21
 
 - **Welcome as a deck of cards**: the icon beside "Welcome to HeroCanvas", over a stack of cards in color to swipe
