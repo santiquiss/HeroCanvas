@@ -1,17 +1,16 @@
 // The tour's components (HeroCanvas's own app, shown while no app is connected), after iOS: large titles, inset
 // grouped lists, Settings-style icon tiles, capsule buttons, Liquid Glass on what floats. Instrumented (useComponent)
 // so Inspect and Layers name them. Drawn with the app tokens the tour's theme sets (theme.css: iOS's values).
-import { Children, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { useComponent } from '../design/component';
-import { reducedMotion } from '../kit/motion';
 import { useNav } from '../nav/context';
 import { SEARCH_BAR_H } from '../sim/layout';
 import { usePadL, usePadR, useSim } from '../sim/SimContext';
 import styles from './TourKit.module.css';
 
 /** iOS's system tints, for icon tiles (their light and dark values are in TourKit.module.css). */
-export type Tint = 'blue' | 'indigo' | 'purple' | 'pink' | 'orange' | 'green' | 'teal' | 'gray';
+export type Tint = 'blue' | 'indigo' | 'purple' | 'pink' | 'orange' | 'yellow' | 'green' | 'teal' | 'gray';
 
 /**
  * A screen: a tab's root opens with a large title; a pushed screen has a navigation bar with a glass back button and
@@ -123,18 +122,6 @@ export function TextCell({ children }: { children: ReactNode }) {
   );
 }
 
-/** A screen's opening: the icon, a title and a line, centered. */
-export function Hero({ icon, title, subtitle }: { icon: ReactNode; title: string; subtitle: string }) {
-  const hc = useComponent('Hero', { title, subtitle });
-  return (
-    <header {...hc} className={styles.hero}>
-      {icon}
-      <h2 className={styles.heroTitle}>{title}</h2>
-      <p className={styles.heroSubtitle}>{subtitle}</p>
-    </header>
-  );
-}
-
 /** A capsule button: filled (the screen's one main action) or gray (a second one). */
 export function CapsuleButton({ title, filled = true, onPressed }: { title: string; filled?: boolean; onPressed: () => void }) {
   const hc = useComponent('CapsuleButton', { title, filled, onPressed });
@@ -168,111 +155,137 @@ export function PromptField({ prompt }: { prompt: string }) {
   );
 }
 
-/**
- * Pages side by side, one at a time: swiped (a mouse drags them as a finger would), with a page control under them,
- * as iOS's paged scroll view. As tall as its tallest page; a page taller than the room left scrolls on its own.
- */
-export function Pager({ children }: { children: ReactNode }) {
-  const pages = Children.toArray(children);
-  const hc = useComponent('Pager', { pages: pages.length });
-  const track = useRef<HTMLDivElement>(null);
-  const [page, setPage] = useState(0);
-  const go = (i: number) => {
-    const el = track.current;
-    if (el) el.scrollTo({ left: Math.max(0, Math.min(pages.length - 1, i)) * el.clientWidth, behavior: reducedMotion() ? 'auto' : 'smooth' });
-  };
-  useEffect(() => {
-    const el = track.current;
-    if (!el) return;
-    const scrolled = () => setPage(Math.round(el.scrollLeft / el.clientWidth));
-    // A mouse drag: snapping off while it follows the pointer, then on to the next page past 15% of a page, or back.
-    let drag: { x: number; left: number; id: number; moved: boolean } | null = null;
-    // The last drag's landing, until snapping is back on (a new drag ends it first).
-    let landing = () => {};
-    const down = (e: PointerEvent) => {
-      if (e.pointerType !== 'mouse' || e.button !== 0) return;
-      landing();
-      drag = { x: e.clientX, left: el.scrollLeft, id: e.pointerId, moved: false };
-    };
-    const move = (e: PointerEvent) => {
-      if (!drag) return;
-      // The device may be drawn scaled: the pointer's pixels into the page's.
-      const dx = (e.clientX - drag.x) * (el.clientWidth / el.getBoundingClientRect().width);
-      if (!drag.moved) {
-        if (Math.abs(dx) < 6) return;
-        drag.moved = true;
-        try {
-          el.setPointerCapture(drag.id);
-        } catch {
-          // A pointer already gone: the drag follows it while it stays over the pages.
-        }
-        el.classList.add(styles.dragging);
-      }
-      el.scrollLeft = drag.left - dx;
-    };
-    const up = () => {
-      const d = drag;
-      drag = null;
-      if (!d?.moved) return;
-      const from = Math.round(d.left / el.clientWidth);
-      const moved = (el.scrollLeft - d.left) / el.clientWidth;
-      const to = Math.max(0, Math.min(pages.length - 1, Math.abs(moved) > 0.15 ? from + Math.sign(moved) : from));
-      const left = to * el.clientWidth;
-      el.scrollTo({ left, behavior: reducedMotion() ? 'auto' : 'smooth' });
-      // Snapping back on once it's there (sooner, it would pull the page back where the drag left it).
-      const timer = window.setTimeout(() => landing(), 1000);
-      const arrived = () => {
-        if (Math.abs(el.scrollLeft - left) <= 1) landing();
-      };
-      landing = () => {
-        window.clearTimeout(timer);
-        el.removeEventListener('scroll', arrived);
-        el.classList.remove(styles.dragging);
-        landing = () => {};
-      };
-      el.addEventListener('scroll', arrived, { passive: true });
-      arrived();
-      // The drag isn't a tap on what's under it.
-      const swallow = (c: MouseEvent) => c.stopPropagation();
-      el.addEventListener('click', swallow, { capture: true, once: true });
-      window.setTimeout(() => el.removeEventListener('click', swallow, { capture: true }), 0);
-    };
-    el.addEventListener('scroll', scrolled, { passive: true });
-    el.addEventListener('pointerdown', down);
-    el.addEventListener('pointermove', move);
-    el.addEventListener('pointerup', up);
-    el.addEventListener('pointercancel', up);
-    return () => {
-      landing();
-      el.removeEventListener('scroll', scrolled);
-      el.removeEventListener('pointerdown', down);
-      el.removeEventListener('pointermove', move);
-      el.removeEventListener('pointerup', up);
-      el.removeEventListener('pointercancel', up);
-    };
-  }, [pages.length]);
+/** A deck card's color: a system tint, or ink (the text's color, so it turns over with the theme). */
+export type DeckTint = 'blue' | 'indigo' | 'pink' | 'yellow' | 'ink';
+
+export interface DeckCardProps {
+  tint: DeckTint;
+  /** A word or two over the card. */
+  kicker: string;
+  title: string;
+  text: string;
+  /** Its illustration. */
+  art?: ReactNode;
+  /** "2 of 5", when in a deck. */
+  count?: string;
+  /** The card's one button. */
+  action?: { title: string; onPressed: () => void };
+  /** Whether it's the deck's top card: its illustration pops in then. */
+  top?: boolean;
+  style?: CSSProperties;
+}
+
+/** A card of a deck, full of color: a kicker, an illustration, a title and its line, maybe a button. */
+export function DeckCard({ tint, kicker, title, text, art, count, action, top = true, style }: DeckCardProps) {
+  const hc = useComponent('DeckCard', { tint, kicker, title, text, count, action });
   return (
-    <div {...hc} className={styles.pager}>
-      <div ref={track} className={styles.track}>
-        {pages.map((p, i) => (
-          <div key={i} className={styles.page} aria-hidden={i !== page}>
-            {p}
-          </div>
-        ))}
-      </div>
-      <PageControl count={pages.length} current={page} onSelect={go} />
-    </div>
+    <article {...hc} className={`${styles.deckCard} ${styles[tint]}`} data-top={top} aria-hidden={!top} style={style}>
+      <header className={styles.deckHead}>
+        <span>{kicker}</span>
+        {count && <span className={styles.deckCount}>{count}</span>}
+      </header>
+      <div className={styles.deckArt}>{art}</div>
+      <h2 className={styles.deckTitle}>{title}</h2>
+      <p className={styles.deckText}>{text}</p>
+      {action && (
+        <button className={styles.deckAction} onClick={action.onPressed} tabIndex={top ? 0 : -1}>
+          {action.title}
+        </button>
+      )}
+    </article>
   );
 }
 
-/** A row of dots, one per page, the current one solid; a dot takes you to its page. */
-export function PageControl({ count, current, onSelect }: { count: number; current: number; onSelect: (page: number) => void }) {
-  const hc = useComponent('PageControl', { count, current, onSelect });
+/** How far each card behind the top one peeks out over it. */
+const PEEK = 14;
+
+/**
+ * Cards in a stack, as Wallet holds them: the top one is swiped (or dragged) away to show the next, back brings it
+ * back; buttons under it do the same, with a hint between them.
+ */
+export function CardDeck({ cards }: { cards: Omit<DeckCardProps, 'count' | 'top' | 'style'>[] }) {
+  const hc = useComponent('CardDeck', { cards: cards.length });
+  const [index, setIndex] = useState(0);
+  const [dx, setDx] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ x: number; id: number; moved: boolean; ratio: number } | null>(null);
+  const last = cards.length - 1;
+  const go = (i: number) => {
+    setIndex(Math.max(0, Math.min(last, i)));
+    setDx(0);
+    setDragging(false);
+  };
   return (
-    <div {...hc} className={styles.pageControl}>
-      {Array.from({ length: count }, (_, i) => (
-        <button key={i} className={`${styles.dot} ${i === current ? styles.currentDot : ''}`} aria-label={`Page ${i + 1} of ${count}`} aria-current={i === current} onClick={() => onSelect(i)} />
-      ))}
+    <div {...hc} className={styles.deck}>
+      <div
+        className={styles.stack}
+        style={{ paddingTop: PEEK * 2 }}
+        onPointerDown={(e) => {
+          if (e.button !== 0 || (e.target as HTMLElement).closest('button')) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          // The device may be drawn scaled: the pointer's pixels into the deck's.
+          drag.current = { x: e.clientX, id: e.pointerId, moved: false, ratio: e.currentTarget.clientWidth / r.width };
+        }}
+        onPointerMove={(e) => {
+          const d = drag.current;
+          if (!d) return;
+          const x = (e.clientX - d.x) * d.ratio;
+          if (!d.moved) {
+            if (Math.abs(x) < 6) return;
+            d.moved = true;
+            setDragging(true);
+            try {
+              e.currentTarget.setPointerCapture(d.id);
+            } catch {
+              // A pointer already gone: the drag follows it while it's over the deck.
+            }
+          }
+          setDx(x);
+        }}
+        onPointerUp={() => {
+          const d = drag.current;
+          drag.current = null;
+          if (!d?.moved) return;
+          if (dx < -70) go(index + 1);
+          else if (dx > 70) go(index - 1);
+          else go(index);
+        }}
+        onPointerCancel={() => {
+          drag.current = null;
+          go(index);
+        }}
+      >
+        <div className={styles.stackInner}>
+          {cards.map((card, k) => {
+            const d = k - index;
+            const transform =
+              d < 0 ? 'translateX(-130%) rotate(-16deg)' : d === 0 ? `translateX(${dx}px) rotate(${dx / 18}deg)` : `translateY(${-d * PEEK}px) scale(${1 - d * 0.06})`;
+            return (
+              <DeckCard
+                key={card.title}
+                {...card}
+                count={`${k + 1} of ${cards.length}`}
+                top={d === 0}
+                style={{
+                  transform,
+                  opacity: d < 0 || d > 2 ? 0 : 1,
+                  zIndex: cards.length - Math.abs(d),
+                  transition: d === 0 && dragging ? 'none' : undefined,
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <div className={styles.deckControls}>
+        <button className={`${styles.round} ${styles.roundBack}`} aria-label="Previous card" disabled={index === 0} onClick={() => go(index - 1)}>
+          <Icon name="arrow_back_ios_new" size={20} />
+        </button>
+        <span className={styles.deckHint}>{index === last ? 'Ready when you are' : 'Swipe the card'}</span>
+        <button className={`${styles.round} ${styles.roundNext}`} aria-label="Next card" disabled={index === last} onClick={() => go(index + 1)}>
+          <Icon name="arrow_forward_ios" size={20} />
+        </button>
+      </div>
     </div>
   );
 }

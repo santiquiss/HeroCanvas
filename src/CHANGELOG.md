@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.18.0 — 2026-10-21
+
+- **Welcome as a deck of cards**: the icon beside "Welcome to HeroCanvas", over a stack of cards in color to swipe
+  (or drag, or step with the buttons under it), as Wallet holds them. Each card has its own illustration (code
+  becoming a screen, the devices and themes, versions to compare, a handoff spec) whose pieces pop in when it comes
+  to the top; the last one is "Start with the Tour". Replaces 0.17.0's pages.
+- **In the tour's kit**: `CardDeck`, `DeckCard` and `Illustration`, with stories; a yellow tint (`--app-yellow` in
+  the tour's theme). Gone: `Pager`, `PageControl` and `Hero`, which nothing uses now.
+
 ## 0.17.0 — 2026-10-21
 
 - **Welcome in pages**: "Welcome to HeroCanvas" under the icon, then pages to swipe (what it is, the goal, how it

@@ -188,6 +188,13 @@
 .orange {
   background: var(--app-orange, var(--app-danger));
 }
+.yellow {
+  background: var(--app-yellow, var(--app-orange, var(--app-danger)));
+}
+/* Ink: the text's color, so a card of it turns over with the theme (black in light, white in dark). */
+.ink {
+  background: var(--app-text);
+}
 .green {
   background: var(--app-success);
 }
@@ -196,23 +203,6 @@
 }
 .gray {
   background: var(--app-gray, var(--app-text-muted));
-}
-
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--app-space-s) var(--app-space-s) 0;
-  text-align: center;
-}
-.heroTitle {
-  margin: var(--app-space-l) 0 0;
-  font: var(--app-font-title);
-}
-.heroSubtitle {
-  margin: var(--app-space-s) 0 0;
-  font: var(--app-font-body);
-  color: var(--app-text-secondary);
 }
 
 /* Capsule buttons: 50 pt tall, Headline. */
@@ -270,68 +260,133 @@
   cursor: pointer;
 }
 
-/* Paged: the pages in a row that snaps one at a time; a page scrolls on its own if it doesn't fit. */
-.pager {
+
+/* A deck: the stack fills the room left, the cards behind peeking over the top one; its controls under it. */
+.deck {
+  height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-.track {
-  min-height: 0;
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  touch-action: pan-x pan-y;
-}
-.track::-webkit-scrollbar {
-  display: none;
-}
-.dragging {
-  scroll-snap-type: none;
-  cursor: grabbing;
-  user-select: none;
-}
-.page {
-  flex: 0 0 100%;
-  min-width: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
-.page > :first-child {
-  margin-top: 0;
-}
-
-/* iOS's page control: small dots, the current one solid. */
-.pageControl {
-  flex: none;
-  display: flex;
   justify-content: center;
-  padding: var(--app-space-m) 0 var(--app-space-xs);
 }
-.dot {
-  width: 22px;
-  height: 22px;
-  padding: 0;
+/* As tall as the room allows up to a card's most (a tablet's), its controls right under it. */
+.stack {
+  flex: 1;
+  min-height: 0;
+  max-height: 628px;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.stackInner {
+  position: relative;
+  height: 100%;
+  max-width: 440px;
+  max-height: 600px;
+  margin: 0 auto;
+}
+.deckCard {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: var(--app-space-xxl) var(--app-space-xxl) var(--app-space-xl);
+  border-radius: 32px;
+  color: #ffffff;
+  box-shadow: 0 24px 50px rgba(17, 19, 40, 0.18);
+  user-select: none;
+  transform-origin: 50% 0;
+  transition:
+    transform 560ms cubic-bezier(0.2, 0.9, 0.25, 1.04),
+    opacity 400ms ease;
+}
+.deckCard.yellow {
+  color: #111318;
+}
+.deckCard.ink {
+  color: var(--app-page);
+}
+.deckHead {
+  display: flex;
+  justify-content: space-between;
+  font: var(--app-font-label);
+  font-weight: 700;
+  opacity: 0.75;
+}
+.deckCount {
+  font-weight: 600;
+  opacity: 0.8;
+}
+.deckArt {
+  flex: 1;
+  min-height: 0;
+  margin: var(--app-space-m) 0;
+}
+.deckTitle {
+  margin: 0;
+  font: var(--app-font-large-title);
+  line-height: 1.05;
+}
+.deckText {
+  margin: var(--app-space-s) 0 0;
+  font: var(--app-font-body);
+  opacity: 0.85;
+}
+.deckAction {
+  margin-top: var(--app-space-l);
+  min-height: 52px;
   border: none;
-  background: none;
+  border-radius: var(--app-radius-full);
+  background: var(--app-page);
+  color: var(--app-text);
+  font: var(--app-font-subheading);
   cursor: pointer;
 }
-.dot::before {
-  content: '';
-  display: block;
-  width: 8px;
-  height: 8px;
-  margin: auto;
-  border-radius: 50%;
-  background: var(--app-text);
-  opacity: 0.22;
+.deckAction:active {
+  transform: scale(0.97);
+}
+.deckControls {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 440px;
+  width: 100%;
+  margin: var(--app-space-l) auto 0;
+}
+.round {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--app-radius-full);
+  cursor: pointer;
   transition: opacity 200ms ease;
 }
-.currentDot::before {
-  opacity: 0.85;
+.round:active {
+  transform: scale(0.94);
+}
+.round:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.roundBack {
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+.roundNext {
+  background: var(--app-text);
+  color: var(--app-page);
+}
+.deckHint {
+  font: var(--app-font-label);
+  color: var(--app-text-secondary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .deckCard {
+    transition: opacity 200ms ease;
+  }
 }

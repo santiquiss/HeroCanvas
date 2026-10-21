@@ -1,0 +1,368 @@
+/* Welcome's illustrations: a 300×220 drawing scaled to fit (--art-scale), its pieces popping in on their card's turn. */
+.fit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.box {
+  position: relative;
+  flex: none;
+  width: 300px;
+  height: 220px;
+  scale: var(--art-scale, 1);
+}
+.box > * {
+  position: absolute;
+}
+
+/* In on their card's turn, one after another; still while it's behind. */
+.pop {
+  transition:
+    opacity 380ms ease,
+    translate 560ms cubic-bezier(0.2, 0.9, 0.25, 1.15),
+    scale 560ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
+}
+[data-top='false'] .pop {
+  opacity: 0;
+  translate: 0 16px;
+  scale: 0.92;
+}
+[data-top='true'] .d1 {
+  transition-delay: 80ms;
+}
+[data-top='true'] .d2 {
+  transition-delay: 160ms;
+}
+[data-top='true'] .d3 {
+  transition-delay: 240ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop {
+    transition: none;
+  }
+}
+
+.stroke {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.shadow {
+  box-shadow: 0 18px 36px rgba(0, 10, 60, 0.32);
+}
+
+/* A phone's screen. */
+.phone {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 18px 9px 9px;
+  border-radius: 22px;
+  background: #ffffff;
+}
+.dark {
+  background: #111318;
+  border: 3px solid #2c2c34;
+}
+.faded {
+  background: rgba(255, 255, 255, 0.55);
+}
+.bar {
+  flex: none;
+  height: 8px;
+  border-radius: 4px;
+  background: #111318;
+}
+.dark .bar {
+  background: #ffffff;
+}
+.faded .bar {
+  background: rgba(17, 19, 24, 0.5);
+}
+.block {
+  flex: none;
+  height: 46px;
+  border-radius: 10px;
+}
+.line {
+  flex: 1;
+  height: 6px;
+  max-height: 6px;
+  border-radius: 3px;
+  background: #e3e5eb;
+}
+.phone > .line {
+  flex: none;
+}
+.dark .line {
+  background: #3a3a44;
+}
+.faded .line {
+  background: rgba(17, 19, 24, 0.18);
+}
+.button {
+  margin-top: auto;
+  flex: none;
+  height: 20px;
+  border-radius: 10px;
+  background: #111318;
+}
+
+/* Code → screen. */
+.code {
+  width: 156px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border-radius: 18px;
+  background: #06308f;
+  box-shadow: 0 14px 30px rgba(0, 20, 80, 0.35);
+  color: #ffffff;
+  font: 600 12px/1.6 ui-monospace, Menlo, monospace;
+  rotate: -4deg;
+}
+.prop {
+  padding-left: 12px;
+}
+.today {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--app-primary);
+  color: #ffffff;
+  font-size: 13px;
+}
+.today small {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+.task {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.check,
+.open {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border-radius: 6px;
+}
+.check {
+  background: var(--app-success);
+}
+.open {
+  border: 2px solid #c7cad3;
+}
+
+/* Devices and themes. */
+.tablet {
+  width: 176px;
+  height: 130px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(20, 10, 80, 0.35);
+}
+.tablet > span {
+  border-radius: 8px;
+  background: #efeff4;
+}
+.chips,
+.toggle,
+.segments {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.chips > span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.chips > .chipOn,
+.toggle > .toggleOn,
+.segments > .segmentOn {
+  background: #ffffff;
+}
+.toggle {
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.toggle > span {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+}
+
+/* Versions. */
+.segments {
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 13px;
+}
+.segments > span {
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+.segments > .segmentOn {
+  color: var(--app-pink);
+}
+.changed {
+  position: relative;
+  flex: none;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--app-pink);
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 5px #ffcc00;
+}
+.new {
+  position: absolute;
+  right: -8px;
+  top: -10px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #ffcc00;
+  color: #111318;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* Handoff. */
+.spec {
+  width: 200px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 16px;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #111318;
+  box-shadow: 0 20px 40px rgba(90, 60, 0, 0.3);
+  rotate: -3deg;
+}
+.specHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.matches {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e9f9ee;
+  color: #1a7f37;
+  font-size: 11px;
+  font-weight: 700;
+}
+.specRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 600 12px ui-monospace, Menlo, monospace;
+}
+.specRow > span:first-child {
+  color: #6b6e78;
+}
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.swatch i {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--app-primary);
+}
+.measure {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  background: #111318;
+  rotate: 4deg;
+  box-shadow: 0 16px 30px rgba(90, 60, 0, 0.3);
+}
+.measure > * {
+  position: absolute;
+}
+.inner {
+  inset: 16px;
+  border-radius: 8px;
+  background: var(--app-primary);
+}
+.ticks {
+  left: 16px;
+  right: 16px;
+  top: 4px;
+  height: 8px;
+  box-sizing: border-box;
+  border-left: 2px solid #ff2d55;
+  border-right: 2px solid #ff2d55;
+}
+.rule {
+  left: 16px;
+  right: 16px;
+  top: 7px;
+  height: 2px;
+  background: #ff2d55;
+}
+.measure b {
+  left: 0;
+  right: 0;
+  top: 36px;
+  text-align: center;
+  color: #ffffff;
+  font: 800 15px ui-monospace, Menlo, monospace;
+}
+.ready {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 7px;
+  border-radius: 999px;
+  background: #111318;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.readyCheck {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: var(--app-success);
+}

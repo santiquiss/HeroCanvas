@@ -1,6 +1,5 @@
 // ListRow's stories: a row of an inset grouped list, in its group as it sits on screen.
 import { stories } from '../design/storyFormat';
-import { HOW } from './screens';
 import { STEPS } from './steps';
 import { ListRow, Section, type Tint } from './TourKit';
 
@@ -15,7 +14,7 @@ export default stories({
   ),
   stories: [
     { name: 'Opens a page', note: 'A step in the Tour: a chevron.' },
-    { name: 'Not tappable', args: { icon: HOW[0].icon, tint: HOW[0].tint, title: HOW[0].title, subtitle: HOW[0].subtitle, tappable: false }, note: 'How it works, on Welcome.' },
+    { name: 'Not tappable', args: { icon: STEPS[1].icon, tint: STEPS[1].tint as Tint, title: STEPS[1].title, subtitle: STEPS[1].line, tappable: false } },
     { name: 'Title only', args: { subtitle: '' } },
   ],
 });

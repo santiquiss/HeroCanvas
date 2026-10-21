@@ -23,25 +23,39 @@
   font: var(--app-font-body);
   color: var(--app-text-secondary);
 }
-/* Welcome's pages, under the hero: they shrink before the hero does. */
-.pages {
-  min-height: 0;
+/* Welcome: the icon beside its title, the deck under them taking the rest. */
+.welcomeHead {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 440px;
+  margin: var(--app-space-s) auto 0;
+}
+.welcomeTitle {
   display: flex;
   flex-direction: column;
-  margin-top: var(--app-space-xxl);
 }
-.start {
-  padding: 0 var(--app-space-l) var(--app-space-l);
+.welcomeTitle span {
+  font: var(--app-font-body);
+  color: var(--app-text-secondary);
 }
-.start > :first-child {
-  margin-top: 0;
+.welcomeTitle h1 {
+  margin: 0;
+  font: var(--app-font-large-title);
+  line-height: 1.05;
 }
-/* A short phone (an iPhone SE): the hero without its line, so the tallest page still fits. */
-@container (max-height: 700px) {
-  .welcomeHead p {
-    display: none;
-  }
-  .pages {
-    margin-top: var(--app-space-l);
-  }
+.welcomeDeck {
+  flex: 1;
+  min-height: 0;
+  margin-top: var(--app-space-m);
+}
+.emblem {
+  display: block;
+  height: 100%;
+  max-height: 170px;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.35));
 }

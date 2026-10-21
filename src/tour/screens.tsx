@@ -1,4 +1,4 @@
-// The tour's screens, three tabs after iOS: Welcome (what HeroCanvas is, its goal, how it works, in pages to swipe), Tour (a page per
+// The tour's screens, three tabs after iOS: Welcome (what HeroCanvas is, in a deck of cards to swipe), Tour (a page per
 // part of HeroCanvas, to try around the device) and Get Started (how to connect an app: its code, or a Figma file).
 import type { ComponentType } from 'react';
 import { useNav } from '../nav/context';
@@ -6,50 +6,36 @@ import { useLaunchPhase } from '../sim/launchPhase';
 import { AppIcon, Reveal } from './Motion';
 import type { PageProps } from '../nav/types';
 import { STEPS, type TourStep } from './steps';
-import { CapsuleButton, Hero, IconTile, ListRow, Pager, PromptField, Screen, Section, TextCell } from './TourKit';
+import { Illustration } from './Art';
+import { CapsuleButton, CardDeck, IconTile, ListRow, PromptField, Screen, Section, TextCell, type DeckCardProps } from './TourKit';
 import styles from './screens.module.css';
 
-export const HOW = [
-  { icon: 'link', tint: 'blue', title: 'Connect your app', subtitle: 'Your agent reads its code and mirrors it here' },
-  { icon: 'devices', tint: 'indigo', title: 'See it everywhere', subtitle: 'Every screen on every device, in light and dark' },
-  { icon: 'call_split', tint: 'pink', title: 'Propose changes', subtitle: 'Kept apart, in versions to compare' },
-  { icon: 'send', tint: 'green', title: 'Hand them off', subtitle: 'A spec in your code’s own terms' },
-] as const;
+/** Welcome's cards, in order: what HeroCanvas is, then the tour. */
+export const WELCOME: Omit<DeckCardProps, 'count' | 'top' | 'style' | 'action'>[] = [
+  { tint: 'blue', kicker: 'What it is', title: 'Your app, not a drawing.', text: 'Its screens rebuilt from your code, with the components, props and tokens your developers use.', art: <Illustration name="code" /> },
+  { tint: 'indigo', kicker: 'Everywhere', title: 'Every device, every theme.', text: 'Phones, foldables and tablets side by side, in light and dark, in every language.', art: <Illustration name="devices" /> },
+  { tint: 'pink', kicker: 'Proposals', title: 'Change it in versions.', text: 'Ideas stay apart from the app as it is, to compare before anything ships.', art: <Illustration name="versions" /> },
+  { tint: 'yellow', kicker: 'Handoff', title: 'Hand it off in code’s terms.', text: 'A spec with your own component names and tokens, ready for whoever builds it.', art: <Illustration name="handoff" /> },
+  { tint: 'ink', kicker: 'Next', title: 'Start with the Tour.', text: `${STEPS.length} short stops to try every part on the interface around this device.`, art: <img className={styles.emblem} src="/tour/emblem.png" alt="" /> },
+];
 
-/**
- * Welcome: the icon and "Welcome to HeroCanvas" over pages to swipe (what it is, the goal, how it works), the last
- * one the way in: the tour.
- */
+/** Welcome: the icon beside "Welcome to HeroCanvas", over a deck of cards to swipe; the last one opens the tour. */
 export function WelcomeScreen() {
   const nav = useNav();
-  // The pages rise in once the launch is over (the simulator plays it: the tour's LaunchConfig).
+  // The deck rises in once the launch is over (the simulator plays it: the tour's LaunchConfig).
   const ready = useLaunchPhase() === 'done';
+  const cards = WELCOME.map((c, i) => (i === WELCOME.length - 1 ? { ...c, action: { title: 'Take the Tour', onPressed: () => nav.goTab('tour') } } : c));
   return (
     <Screen title="Welcome" plain>
-      <div data-tilt-area className={styles.welcomeHead}>
-        <Hero icon={<AppIcon />} title="Welcome to HeroCanvas" subtitle="Design your app’s screens in code, with an AI agent, on a canvas of real devices." />
-      </div>
-      <Reveal on={ready} index={0} className={styles.pages}>
-        <Pager>
-          <Section header="What it is">
-            <TextCell>A design tool built on your app’s code. Its screens aren’t drawings: they’re a mirror of your app, rebuilt from the code with the same components, props and tokens your developers use.</TextCell>
-          </Section>
-          <Section header="The goal">
-            <TextCell>Design where your app will live: on every phone and tablet at once, in light and dark, in every language, with its real navigation. Then hand off changes in the terms your code already speaks.</TextCell>
-          </Section>
-          <Section header="How it works">
-            {HOW.map((h) => (
-              <ListRow key={h.title} icon={h.icon} tint={h.tint} title={h.title} subtitle={h.subtitle} />
-            ))}
-          </Section>
-          <Section header="Start with the Tour">
-            <TextCell>{`${STEPS.length} short pages, one for each part of HeroCanvas, to try on the interface around this device. Or connect your app right away.`}</TextCell>
-            <div className={styles.start}>
-              <CapsuleButton title="Take the Tour" onPressed={() => nav.goTab('tour')} />
-              <CapsuleButton title="Get Started" filled={false} onPressed={() => nav.goTab('getStarted')} />
-            </div>
-          </Section>
-        </Pager>
+      <header data-tilt-area className={styles.welcomeHead}>
+        <AppIcon size={58} />
+        <div className={styles.welcomeTitle}>
+          <span>Welcome to</span>
+          <h1>HeroCanvas</h1>
+        </div>
+      </header>
+      <Reveal on={ready} index={0} className={styles.welcomeDeck}>
+        <CardDeck cards={cards} />
       </Reveal>
     </Screen>
   );
