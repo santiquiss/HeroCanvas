@@ -8,7 +8,7 @@ import { useComments } from './store';
 import { openByPage } from './threads';
 import styles from './CommentsEager.module.css';
 
-export { CommentsProvider, useCommentsUi } from './CommentsContext';
+export { CommentsProvider, useCommenting, useCommentsUi } from './CommentsContext';
 
 const Layer = lazy(() => import('./CommentLayer'));
 const Panel = lazy(() => import('./CommentsPanel'));

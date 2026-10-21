@@ -3,6 +3,7 @@
 import type { Language } from './language';
 import { useState, type CSSProperties } from 'react';
 import { screenAttrs, type CanvasScreen } from '../comments/anchor';
+import { useCommenting } from '../comments/CommentsContext';
 import { useDesignRoot } from '../design/DesignContext';
 import { DeviceScreen } from './DeviceScreen';
 import { NOTCH_W, type Layout } from './layout';
@@ -70,6 +71,8 @@ export const frameBox = (l: Layout) => (l.rotLocked ? { w: l.frameH, h: l.frameW
 export function DeviceFrame({ layout, scale, theme, language, active = false, screen }: { layout: Layout; scale: number; theme: 'light' | 'dark'; /** Its own language (a set's device), over `?lang=`. */ language?: Language; active?: boolean; screen?: CanvasScreen }) {
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   const { inspect } = useDesignRoot();
+  // Inspect and comment mode keep their own cursor and click: no fingertip then.
+  const commenting = useCommenting();
   return (
     <>
       <div ref={setEl} className={styles.frame} style={frameStyle(layout, scale)} {...(screen && screenAttrs(screen))}>
@@ -78,7 +81,7 @@ export function DeviceFrame({ layout, scale, theme, language, active = false, sc
         </SimProvider>
         <FrameHardware layout={layout} />
       </div>
-      <TouchPointer frame={el} enabled={!inspect} scale={scale} rotated={layout.rotLocked} />
+      <TouchPointer frame={el} enabled={!inspect && !commenting} scale={scale} rotated={layout.rotLocked} />
     </>
   );
 }

@@ -31,6 +31,11 @@ export function useCommentsUi(): CommentsUi {
   return c;
 }
 
+/** Whether comment mode is on, anywhere (false outside the comments' provider: a frame in Flow or the gallery). */
+export function useCommenting(): boolean {
+  return useContext(Ctx)?.commenting ?? false;
+}
+
 /** What's being commented on: Live or the proposal, and the proposal's version on screen. */
 export function useCommentScope(): { design: string; variant: string | null } {
   const { proposal } = useNavRoot();
