@@ -439,13 +439,49 @@
 }
 
 /* Panel */
-.notice {
-  margin: 4px 8px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--ui-amber-soft);
-  color: var(--ui-amber-text);
-  line-height: 16px;
+/* Where comments are kept before a shared store: a quiet note, not a warning. */
+.note {
+  display: flex;
+  gap: 10px;
+  margin: 4px 8px 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--ui-hover);
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+.noteIcon {
+  flex: none;
+  display: flex;
+  color: var(--ui-text-subtle, var(--ui-text-muted));
+}
+.noteText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.noteText strong {
+  color: var(--ui-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.noteText ul {
+  margin: 2px 0 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.noteText b {
+  color: var(--ui-text);
+  font-weight: 600;
+}
+.noteText code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
 }
 .filters {
   display: flex;

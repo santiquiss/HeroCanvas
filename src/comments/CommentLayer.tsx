@@ -10,9 +10,9 @@ import { rememberAuthor } from '../persist/author';
 import { anchorAt, anchorElement, coveredAt, pageLayer, pagesAbove, pointIn, screenOf, screensIn, showsOn } from './anchor';
 import { screenScope, useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsContext';
 import { addComment, newCommentId, useCommentsOf } from './store';
-import { Avatar, KindTag, ReplyField, ResolveButton, sendOnEnter, SendButton, ThreadMessages, useAuthorName } from './parts';
+import { Avatar, ReplyField, ResolveButton, sendOnEnter, SendButton, ThreadMessages, useAuthorName } from './parts';
 import { commentLink, threadNumbers, threadsOf, timeAgo } from './threads';
-import { KINDS, MAX_AUTHOR, MAX_BODY, type CommentAnchor, type CommentKind } from './types';
+import { MAX_AUTHOR, MAX_BODY, type CommentAnchor, type CommentKind } from './types';
 import styles from './Comments.module.css';
 
 interface Draft {
@@ -160,7 +160,6 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
           <div className={styles.popHead}>
             <span className={styles.popTitle}>Comment</span>
             <span className={styles.number}>#{numbers.get(open.root.id)}</span>
-            <KindTag kind={open.root.kind} />
             <span style={{ flex: 1 }} />
             <ResolveButton thread={open} />
             <button className={styles.iconBtn} onClick={() => setSelected(null)} title="Close (Esc)" aria-label="Close">
@@ -228,9 +227,10 @@ function Popover({ at, box, width, bare = false, onEscape, children }: { at: Pla
   );
 }
 
-/** A new comment, as in Figma: the text, then what it's about and the round send button. Your name the first time. */
+/** A new comment, as in Figma: the text and the round send button. Your name the first time. */
 function Composer({ onPost }: { onPost: (kind: CommentKind, author: string, body: string) => Promise<void> }) {
-  const [kind, setKind] = useState<CommentKind>('design');
+  // What a comment is about isn't asked for now (no tags): every one is filed as design, which the store still keeps.
+  const kind: CommentKind = 'design';
   const { name, setName, ask } = useAuthorName();
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
@@ -263,13 +263,7 @@ function Composer({ onPost }: { onPost: (kind: CommentKind, author: string, body
       />
       {error && <span className={styles.error} style={{ padding: '0 12px 8px' }}>{error}</span>}
       <div className={styles.composerBar}>
-        <div className={styles.kinds} role="radiogroup" aria-label="What it's about">
-          {KINDS.map((k) => (
-            <button key={k.id} role="radio" aria-checked={k.id === kind} className={`${styles.kind} ${k.id === kind ? styles.kindOn : ''}`} style={{ '--k': k.color } as React.CSSProperties} onClick={() => setKind(k.id)}>
-              {k.label}
-            </button>
-          ))}
-        </div>
+        <span />
         <SendButton ready={ready} label="Post" onClick={() => void post()} />
       </div>
     </div>

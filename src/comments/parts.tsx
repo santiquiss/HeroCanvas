@@ -6,22 +6,13 @@ import { recalledAuthor, rememberAuthor } from '../persist/author';
 import { useMyOwner } from './owner';
 import { addComment, deleteComment, editComment, newCommentId, setResolved } from './store';
 import { initials, personColor, timeAgo, type Thread } from './threads';
-import { kindOf, MAX_AUTHOR, MAX_BODY, type Comment, type CommentKind } from './types';
+import { MAX_AUTHOR, MAX_BODY, type Comment } from './types';
 import styles from './Comments.module.css';
 
 export function Avatar({ name, size = 24 }: { name: string; size?: number }) {
   return (
     <span className={styles.avatar} style={{ width: size, height: size, fontSize: Math.round(size * 0.4), background: name ? personColor(name) : '#c4c8ce' }} aria-hidden>
       {name ? initials(name) : <Icon name="person" size={Math.round(size * 0.6)} />}
-    </span>
-  );
-}
-
-export function KindTag({ kind }: { kind: CommentKind }) {
-  const k = kindOf(kind);
-  return (
-    <span className={styles.tag} style={{ '--k': k.color } as React.CSSProperties}>
-      {k.label}
     </span>
   );
 }

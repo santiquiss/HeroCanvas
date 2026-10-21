@@ -10,10 +10,10 @@ import { pageName } from '../nav/stack';
 import { useMode } from '../sim/modes';
 import { SearchField } from '../tools/SearchField';
 import { useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsContext';
-import { Avatar, EditField, KindTag, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
+import { Avatar, EditField, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
 import { commentsShared, refresh, useComments, useCommentsOf } from './store';
 import { commentLink, filterThreads, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
-import { KINDS, type Comment, type CommentKind } from './types';
+import type { Comment } from './types';
 import { openSheetLink } from '../sim/sheetLinks';
 import panel from '../tools/Panel.module.css';
 import styles from './Comments.module.css';
@@ -29,7 +29,6 @@ export default function CommentsPanel() {
   const navigate = useNavigate();
   const location = useLocation();
   const [scope, setScope] = useState<'page' | 'all'>('page');
-  const [kinds, setKinds] = useState<CommentKind[]>([]);
   const [query, setQuery] = useState('');
   // In Flow there's no page on screen: every page's.
   const pageScope = mode === 'prototype' && scope === 'page';
@@ -37,8 +36,7 @@ export default function CommentsPanel() {
   const numbers = useMemo(() => threadNumbers(all), [all]);
   const onScreen = new Set(nav.stack.map((r) => r.id));
   const label = (t: Thread) => pageName(nav.pages, t.root.page);
-  const threads = filterThreads(all, { kinds, resolved, variant }).filter((t) => (!pageScope || onScreen.has(t.root.page) || t.root.id === selected) && threadMatches(t, query, label(t)));
-  const toggleKind = (k: CommentKind) => setKinds((ks) => (ks.includes(k) ? ks.filter((x) => x !== k) : [...ks, k]));
+  const threads = filterThreads(all, { resolved, variant }).filter((t) => (!pageScope || onScreen.has(t.root.page) || t.root.id === selected) && threadMatches(t, query, label(t)));
   const here = commentLink(location.pathname, location.search);
   const open = (t: Thread) => {
     if (t.root.id === selected) return setSelected(null);
@@ -53,7 +51,7 @@ export default function CommentsPanel() {
   return (
     <>
       <SearchField value={query} placeholder="Search comments" onChange={setQuery} />
-      {!commentsShared() && <div className={styles.notice}>Comments are saved in this browser only until the shared store is connected (src/comments/supabase.json).</div>}
+      {!commentsShared() && <SharingNote />}
       <div className={styles.filters}>
         <div className={styles.filterRow}>
           {mode === 'prototype' ? (
@@ -71,13 +69,6 @@ export default function CommentsPanel() {
             <input type="checkbox" checked={resolved} onChange={(e) => setResolvedShown(e.target.checked)} />
             Resolved
           </label>
-        </div>
-        <div className={styles.kinds}>
-          {KINDS.map((k) => (
-            <button key={k.id} className={`${styles.kind} ${kinds.includes(k.id) ? styles.kindOn : ''}`} style={{ '--k': k.color } as React.CSSProperties} onClick={() => toggleKind(k.id)} aria-pressed={kinds.includes(k.id)}>
-              {k.label}
-            </button>
-          ))}
         </div>
       </div>
       {state.status === 'error' && (
@@ -137,7 +128,6 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
         </div>
         <div className={styles.cardMeta}>
           <span className={styles.number}>#{number}</span>
-          <KindTag kind={root.kind} />
           <span className={styles.where}>
             {pageLabel}
             {root.variant ? ` · ${root.variant.toUpperCase()}` : ''}
@@ -195,4 +185,32 @@ function deviceLabel(id: string, display?: string | null): string {
   const d = findDevice(id);
   const x = d.displays.length > 1 ? d.displays.find((v) => v.key === display) : undefined;
   return x ? `${d.name} · ${x.label.split(' ')[0]}` : d.name;
+}
+
+/**
+ * Before a shared store is connected: where comments are kept for now, and the two ways to share them, as a note (not a
+ * warning: everything works, just in this browser).
+ */
+function SharingNote() {
+  return (
+    <div className={styles.note}>
+      <span className={styles.noteIcon}>
+        <Icon name="forum" size={18} />
+      </span>
+      <div className={styles.noteText}>
+        <strong>Comments stay in this browser for now</strong>
+        <span>To see the team’s and share yours, connect a shared database. Ask your agent for either:</span>
+        <ul>
+          <li>
+            <b>Supabase</b>, ready to go: a free project, the table from <code>src/comments/supabase.sql</code> and its
+            address and key in <code>src/comments/supabase.json</code>.
+          </li>
+          <li>
+            <b>Another database</b> your team already has: the agent writes its adapter in{' '}
+            <code>src/comments/backend.ts</code>.
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
 }

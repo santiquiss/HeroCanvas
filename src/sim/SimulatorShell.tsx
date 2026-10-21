@@ -542,11 +542,12 @@ function WithComments({ children }: { children: React.ReactNode }) {
 
 /** Opening a comment (a pin, a link) shows the Comments panel, where its thread is. */
 function RevealComment({ update }: { update: (p: Partial<PanelPrefs>) => void }) {
-  const { selected } = useCommentsUi();
+  const { selected, commenting } = useCommentsUi();
+  // Commenting (the toolbar's Comment, or C) and a comment picked both show the Comments tab.
   useEffect(() => {
-    if (selected) update({ right: true, tool: { right: 'comments' } });
+    if (selected || commenting) update({ right: true, tool: { right: 'comments' } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
+  }, [selected, commenting]);
   return null;
 }
 

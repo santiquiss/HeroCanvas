@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.24.0 — 2026-10-21
+
+- **Comments without a shared store say so kindly**: a quiet note instead of a yellow warning, with the two ways to
+  share them: Supabase, ready to go (`supabase.sql`, `supabase.json`), or a database the team already has (an
+  adapter in `src/comments/backend.ts`), either set up by the agent.
+- **No tags on comments for now**: Design, Handoff, Copy… are gone from the composer, the threads and the panel's
+  filters. Comments are still stored with one (design), so a connected table needs nothing.
+- **Comment opens the Comments tab**: the toolbar's Comment (or C) shows the right panel on Comments.
+
 ## 0.23.6 — 2026-10-21
 
 - **The launch plays only where the app starts**: opening (or reloading) on any other page, a tour step, another
