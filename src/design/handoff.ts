@@ -2,6 +2,7 @@
 // the code's component library or new in the active proposal (the work to do), its code API against the props drawn
 // here, its Figma mapping, the components it's built from, and the design tokens behind its measurements.
 import { PROPOSALS } from '../proposals';
+import { findTokenGroup } from './tokenCatalog';
 import { APP_WIDGETS } from './appWidgets';
 import { CHANGE } from './changes';
 import { mappingsFor, figmaComponent, type MapEntry } from './figma';
@@ -135,11 +136,10 @@ export function builtFrom(el: HTMLElement): { name: string; ids: string[] }[] {
 // ---------------------------------------------------------------- Tokens for measurements
 
 // The design file's spacing and radius scale, in px: 8-based ("2x" = 16), named as its variables are.
-const SPACING: [string, number][] = [
-  ['0_25x', 2], ['0_5x', 4], ['1x', 8], ['1_5x', 12], ['2x', 16], ['3x', 24], ['4x', 32], ['5x', 40], ['6x', 48], ['7x', 56], ['8x', 64],
-  ['9x', 72], ['10x', 80], ['11x', 88], ['12x', 96], ['13x', 104], ['14x', 112],
-];
-const RADIUS: [string, number][] = [['S', 4], ['M', 8], ['L', 12], ['XL', 16], ['XXL', 24], ['XXXL', 32]];
+/** The app's own scale, from its tokens (`--app-space-*`, `--app-radius-*`): each one's name and its size in px. */
+const scale = (group: string): [string, number][] => (findTokenGroup(group)?.tokens ?? []).map((t) => [t.name, parseFloat(t.value.light)] as [string, number]).filter(([, n]) => Number.isFinite(n));
+const SPACING = scale('spacing');
+const RADIUS = scale('radius');
 
 /** A measurement and its token; `token` null = not on the scale (a value to check: hardcoded, or a token missing). */
 export interface Measure {
@@ -149,18 +149,19 @@ export interface Measure {
 
 const px = (v: string) => Math.round(parseFloat(v) * 100) / 100;
 
-/** "16px" → Spacing/2x; 0 has no token to show. */
+/** "16px" → the app's space token of that size (`app-space-l`); 0 has no token to show. */
 export function spacing(v: string): Measure {
   const n = px(v);
-  const hit = SPACING.find(([, x]) => x === n);
-  return { px: n, token: hit ? `Spacing/${hit[0]}` : null };
+  const hit = n ? SPACING.find(([, x]) => x === n) : undefined;
+  return { px: n, token: hit ? hit[0] : null };
 }
 
-/** "12px" → Corner radius/L; a pill (radius ≥ half the height) is Corner radius/Full. */
+/** "12px" → the app's radius token of that size; a pill (radius ≥ half the height) is its full radius, when it has one. */
 export function radius(v: string, height: number): Measure {
   const n = px(v);
-  if (n >= height / 2) return { px: n, token: 'Corner radius/Full' };
+  const full = RADIUS.find(([name]) => /full|pill|round/.test(name));
+  if (n >= height / 2) return { px: n, token: full?.[0] ?? null };
   const hit = RADIUS.find(([, x]) => x === n);
-  return { px: n, token: hit ? `Corner radius/${hit[0]}` : null };
+  return { px: n, token: hit ? hit[0] : null };
 }
 

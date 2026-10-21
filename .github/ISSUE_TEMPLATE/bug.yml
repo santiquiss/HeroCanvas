@@ -1,0 +1,33 @@
+name: Bug
+description: Something in HeroCanvas doesn't work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: The screen's link
+      description: Page › Link, in the right panel (it carries the device, theme and scenario).
+  - type: input
+    id: version
+    attributes:
+      label: HeroCanvas version
+      description: The ⓘ at the bottom of the left rail.
+    validations:
+      required: true
+  - type: input
+    id: stack
+    attributes:
+      label: Your app's stack
+      description: React, React Native, Flutter, SwiftUI, Compose… or none (the tour).
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else
+      description: Screenshots, your browser, the agent you use.

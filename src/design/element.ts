@@ -1,5 +1,5 @@
-// An element picked on its own in Inspect (not a component instance): what kind of layer it is, named as a developer
-// would build it where there's a clear match (in the layout vocabulary of Row, Column, Expanded, Positioned…),
+// An element picked on its own in Inspect (not a component instance): what kind of layer it is, in a layout vocabulary
+// every stack shares (Row, Column, Text, Image; sizes as Fill, Hug or Fixed, as a design tool says them),
 // and the layers a component is made of (Layers' drill-down).
 import { CATALOG } from './catalog';
 import { componentTier } from './figma';
@@ -196,7 +196,7 @@ export function sizing(el: Element, axis: 'w' | 'h'): Sizing | null {
   return Math.abs(intrinsic - size) < 1 ? 'hug' : 'fixed';
 }
 
-/** A flex box's alignment in the code's names: MainAxisAlignment and CrossAxisAlignment. */
+/** A flex box's alignment, along its axis (`main`) and across it (`cross`): start, center, end, spaceBetween… */
 export function flexAlignment(cs: CSSStyleDeclaration): { main: string; cross: string } {
   const main: Record<string, string> = { center: 'center', 'flex-end': 'end', end: 'end', right: 'end', 'space-between': 'spaceBetween', 'space-around': 'spaceAround', 'space-evenly': 'spaceEvenly' };
   const cross: Record<string, string> = { 'flex-start': 'start', start: 'start', center: 'center', 'flex-end': 'end', end: 'end', baseline: 'baseline' };
@@ -213,9 +213,8 @@ function textUsesWidth(cs: CSSStyleDeclaration): boolean {
 }
 
 /**
- * A box's size on an axis as the app would build it: `Expanded` (it grows along its parent's main axis), the parent's
- * `CrossAxisAlignment.stretch`, a Row's or Column's own `MainAxisSize` along its axis, `double.infinity`, its content's
- * size (nothing set), or a set `width` / `height` (a SizedBox).
+ * A box's size on an axis, and how it gets it: Fill (the room left in its parent's row or column, stretched across
+ * it, pinned to two sides, or its parent's size), Hug (its content's: nothing set), or Fixed (a set width or height).
  */
 export function codeSizing(el: Element, axis: 'w' | 'h'): { sizing: Sizing; code: string } | null {
   const s = sizing(el, axis);
@@ -230,24 +229,24 @@ export function codeSizing(el: Element, axis: 'w' | 'h'): { sizing: Sizing; code
   const pinned = anchors(el);
   // A text that fills its parent only because CSS blocks do: aligned to the start, it reads the same at its own width
   // (and is cut at the parent's), as a Text with no width set is written.
-  if (s === 'fill' && w && !pinned && !parentFlex && elementKind(el) === 'text' && !textUsesWidth(cs)) return { sizing: 'hug', code: 'Its content (none set)' };
+  if (s === 'fill' && w && !pinned && !parentFlex && elementKind(el) === 'text' && !textUsesWidth(cs)) return { sizing: 'hug', code: 'Hug · its content' };
+  // In words every stack has (a design tool's Fill, Hug, Fixed), and how: not one framework's names.
   const code = (() => {
-    if (s === 'fill' && pinned) return `Positioned(${w ? 'left, right' : 'top, bottom'})`;
+    if (s === 'fill' && pinned) return `Fill · pinned to its parent's ${w ? 'left and right' : 'top and bottom'}`;
     if (s === 'fill') {
-      if (parentMain && px(cs.flexGrow) > 0) return 'Expanded';
-      if (ownMain) return 'MainAxisSize.max';
-      if (parentFlex && !parentMain) return 'CrossAxisAlignment.stretch (parent)';
-      return `Fills its parent (${dim}: double.infinity)`;
+      if (parentMain && px(cs.flexGrow) > 0) return 'Fill · the room left in its parent';
+      if (ownMain) return `Fill · its parent's ${dim}`;
+      if (parentFlex && !parentMain) return 'Fill · stretched by its parent';
+      return `Fill · its parent's ${dim}`;
     }
-    if (s === 'hug') return ownMain ? 'MainAxisSize.min' : 'Its content (none set)';
-    return `${dim}: ${w ? el.offsetWidth : el.offsetHeight}`;
+    if (s === 'hug') return 'Hug · its content';
+    return `Fixed · ${w ? el.offsetWidth : el.offsetHeight}`;
   })();
   return { sizing: s, code };
 }
 
 /**
- * How a text gives way when it doesn't fit, as a Text's `maxLines` and `overflow` (TextOverflow.ellipsis,
- * .clip): one line cut (`white-space: nowrap` with `text-overflow`), or several (`-webkit-line-clamp`). Read on the
+ * How a text gives way when it doesn't fit: how many lines it keeps, and whether it ends with “…” or is just cut: one line cut (`white-space: nowrap` with `text-overflow`), or several (`-webkit-line-clamp`). Read on the
  * text or the box that cuts it (a few levels up); `cut`: it's cut right now. Null when it just wraps.
  */
 export function textOverflowOf(el: Element): { maxLines: number; overflow: 'ellipsis' | 'clip'; cut: boolean } | null {

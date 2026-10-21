@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.27.0 — 2026-10-21
+
+- **Inspect speaks no one framework**: sizes are Fill, Hug or Fixed and how (the room left in its parent, stretched
+  by it, pinned to two sides, its content), alignment is Along / Across (Start, Center, Space between…), a pinned box
+  says its sides, a text's overflow its lines and "…", a color at an opacity is its token at that share. It used to
+  say them in Flutter's names (Expanded, CrossAxisAlignment.stretch, MainAxisSize, Positioned, TextStyle,
+  .withValues(alpha:)) for any app.
+- **Inspect's Code**: with a code connector, the call as the app's code writes it; without one, the component as the
+  mirror writes it, in JSX, and it says which.
+- **Spacing and radius by the app's own tokens** (`--app-space-*`, `--app-radius-*`) in Inspect and handoffs, instead
+  of a fixed scale (Spacing/2x, Corner radius/L) from another project: a value none of them has is flagged.
+- `CONTRIBUTING.md`, issue and pull request templates; the repository has a description and topics.
+
 ## 0.26.3 — 2026-10-21
 
 - **Every test runs**: the four that needed the old sample app (Tasks) now run on whichever pages are loaded (the

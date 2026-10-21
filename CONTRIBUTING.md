@@ -1,0 +1,36 @@
+# Contributing to HeroCanvas
+
+Thanks for helping. HeroCanvas is built with AI agents, and so is its development: [AGENTS.md](AGENTS.md) is the
+guide for any change (where code goes, the rules, what to check), whether you write it or your agent does.
+
+## Before you start
+
+- **A bug**: open an issue with the bug template: what you did, what you expected, what happened, and the link
+  HeroCanvas shows for the screen (it carries the device, theme and scenario).
+- **An idea or a bigger change**: open an issue with the feature template first, so we can agree on the shape
+  before you build it.
+- **Your app doesn't connect well** (a stack, a pattern the agent misreads): that's most valuable. Tell us the stack
+  and what went wrong; a small public repo that shows it is even better.
+
+## Working on it
+
+```
+npm install
+npm run dev
+```
+
+With no app connected, HeroCanvas shows its own tour: every part of it has a page there to try your change on.
+
+Before you open a pull request:
+
+- `npm run typecheck`, `npm run lint`, `npm test` and `npx vite build` pass.
+- You looked at it: `npm run shot -- "/<page>"`, or the dev server, on a phone and a tablet, light and dark.
+- The tool's version is bumped and `src/CHANGELOG.md` has an entry (AGENTS.md, Versioning). A change to what a
+  team's code relies on goes under **Contract**, saying what to adapt.
+- A new file or folder of the tool's is listed in `scripts/update/tool-files.json`, so updates bring it.
+
+Keep pull requests to one change each, with a line on why in the description.
+
+## License
+
+By contributing, you agree that your contribution is licensed under the project's license ([LICENSE](LICENSE)).

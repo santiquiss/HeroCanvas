@@ -1,0 +1,21 @@
+name: Idea
+description: Something HeroCanvas could do, or do better.
+labels: [idea]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you're trying to do
+      description: The situation, and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help
+      description: How you imagine it. A sketch is welcome.
+  - type: input
+    id: stack
+    attributes:
+      label: Your app's stack
+      description: If it's about connecting an app.

@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.26.3-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.27.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -181,7 +181,7 @@ Comments stay in each browser until you connect a Supabase project (`src/comment
 ## Develop HeroCanvas itself
 
 `npm run typecheck`, `npm run lint`, `npm test`, `npx vite build` before a change is done; versions and the changelog
-as `AGENTS.md` says. Ideas and fixes are welcome as issues and pull requests.
+as `AGENTS.md` says. Ideas and fixes are welcome as issues and pull requests: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Versions
 

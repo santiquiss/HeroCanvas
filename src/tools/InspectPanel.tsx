@@ -40,6 +40,9 @@ export function InspectPanel() {
 }
 
 /** What a click on the canvas picks: the component under the pointer, or the element itself. */
+/** Flex alignment in words (flexAlignment's values). */
+const ALIGN_WORDS: Record<string, string> = { start: 'Start', center: 'Center', end: 'End', stretch: 'Stretch', baseline: 'Baseline', spaceBetween: 'Space between', spaceAround: 'Space around', spaceEvenly: 'Space evenly' };
+
 function ScopeBar() {
   const { scope, setScope } = useDesign();
   const options = [
@@ -101,8 +104,9 @@ function Selection() {
   const mod = stories.get(inst.name);
   const work = WORK[workFor(inst.name, proposalId, lib, inst.props)];
   const widget = lib.widget(inst.name);
-  // The constructor call as the code writes it: the constructor and the widget's parameters (no simulator props), then the
-  // ones a proposal adds, each marked with its code.
+  // With a code connector, the call as the app's code writes it: the constructor and its parameters (no simulator
+  // props), then the ones a proposal adds, each marked with its code. Without one, the component as the mirror
+  // writes it (JSX): the only code known, in no other stack's syntax.
   const api = widget && apiContrast(widget, inst.props, inst.name);
   const snippet =
     widget && api
@@ -112,7 +116,8 @@ function Selection() {
           api.params.filter((p) => p.positional).map((p) => p.name),
           Object.fromEntries(api.proposed.map((p) => [p.name, p.proposal])),
         )
-      : codeCall(inst.name, inst.props);
+      : jsxCall(inst.name, inst.props);
+  const snippetFrom = widget && api ? 'The app’s code' : 'The mirror’s code (React)';
   const figma = figmaFor(inst.name);
   // Its tier (atom, molecule…) only when the code or Figma gives one: never a guess.
   const tier = widget?.tier ?? entry?.tier ?? (inst.name in APP_WIDGETS ? componentTier(inst.name) : undefined);
@@ -222,6 +227,9 @@ function Selection() {
         <SectionTitle id="code" title="Code">
           <CopyButton text={snippet} />
         </SectionTitle>
+        <div className={styles.muted} style={{ marginBottom: 6 }}>
+          {snippetFrom}
+        </div>
         <pre className={styles.mono} style={{ margin: 0, padding: 8, borderRadius: 6, background: 'var(--ui-bg-subtle)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
           {snippet}
         </pre>
@@ -328,8 +336,8 @@ function StyleSections({ el, textEl, theme }: { el: Element; textEl: HTMLElement
               <Key k="Position" icon="open_with" />
               <span className={`${styles.v} ${styles.mono}`}>
                 {pinned && (
-                  <span style={{ display: 'block' }} title={`position: ${cs.position}: placed by these sides in its ${cs.position === 'fixed' ? 'screen' : 'parent'}, as a Positioned in a Stack`}>
-                    Positioned({(['left', 'top', 'right', 'bottom'] as const).filter((sd) => pinned[sd] != null).map((sd) => `${sd}: ${pinned[sd]}`).join(', ') || 'none'})
+                  <span style={{ display: 'block' }} title={`Placed by these sides in its ${cs.position === 'fixed' ? 'screen' : 'parent'}, not by its parent's layout`}>
+                    Pinned: {(['left', 'top', 'right', 'bottom'] as const).filter((sd) => pinned[sd] != null).map((sd) => `${sd} ${pinned[sd]}`).join(', ') || 'none'}
                   </span>
                 )}
                 <Measured set={false} why={pinned ? 'where those sides put it, from the page' : "where its parent's layout puts it"}>
@@ -345,8 +353,8 @@ function StyleSections({ el, textEl, theme }: { el: Element; textEl: HTMLElement
               <span className={`${styles.v} ${styles.alignRow}`}>
                 <AlignDiagram cs={cs} />
                 <span className={styles.mono}>
-                  <span style={{ display: 'block' }} title="MainAxisAlignment">main: {align.main}</span>
-                  <span style={{ display: 'block' }} title="CrossAxisAlignment">cross: {align.cross}</span>
+                  <span style={{ display: 'block' }} title={`Along its ${column ? 'column' : 'row'}`}>Along: {ALIGN_WORDS[align.main] ?? align.main}</span>
+                  <span style={{ display: 'block' }} title={`Across its ${column ? 'column' : 'row'}`}>Across: {ALIGN_WORDS[align.cross] ?? align.cross}</span>
                 </span>
               </span>
             </>
@@ -396,7 +404,7 @@ function StyleSections({ el, textEl, theme }: { el: Element; textEl: HTMLElement
                 <Key k="Overflow" icon="more_horiz" />
                 <span className={`${styles.v} ${styles.mono}`}>
                   <span style={{ display: 'block' }}>
-                    maxLines: {overflow.maxLines}, overflow: TextOverflow.{overflow.overflow}
+                    {overflow.maxLines === 1 ? '1 line' : `${overflow.maxLines} lines`}, then {overflow.overflow === 'ellipsis' ? '“…”' : 'cut'}
                   </span>
                   <span className={styles.muted} style={{ display: 'block' }}>
                     {overflow.cut ? (overflow.overflow === 'ellipsis' ? 'Cut now, with “…”' : 'Cut now') : 'Fits now'}
@@ -681,9 +689,9 @@ function TokenLink({ name, suffix = '', label }: { name: string; suffix?: string
   );
 }
 
-/** One side's padding in the diagram: its spacing token by its step (`2x`), a 0 muted, a value off the scale flagged. */
+/** One side's padding in the diagram: its space token by its step (`l` of `app-space-l`), a 0 muted, a value off the scale flagged. */
 function SideValue({ m }: { m: Measure }) {
-  if (m.token) return <TokenLink name={m.token} label={m.token.replace(/^Spacing\//, '').replace('_', '.')} suffix="" />;
+  if (m.token) return <TokenLink name={m.token} label={m.token.replace(/^app-space-/, '')} suffix="" />;
   if (m.px === 0) return <span className={styles.muted}>0</span>;
   return (
     <span style={{ color: 'var(--ui-amber-text)' }} title="Off the scale: no token">
@@ -760,10 +768,10 @@ function ColorRow({ k, icon, el, prop, color, theme, role }: { k: string; icon?:
             {src.kind === 'code' || src.kind === 'figma' ? (
               <>
                 {/* The name the code writes first, Figma's as the reference under it. */}
-                {/* At an opacity: as the app writes it, the token .withValues(alpha:); Figma's variable at that %. */}
+                {/* At an opacity: the token at that share, in any stack. */}
                 <TokenLink
                   name={src.token.name}
-                  label={`${src.token.code?.replace(/^context\.commonColors\./, '') ?? src.token.figma}${src.alpha == null ? '' : src.token.code ? `.withValues(alpha: ${src.alpha})` : ` · ${Math.round(src.alpha * 100)}%`}`}
+                  label={`${src.token.code ?? src.token.figma}${src.alpha == null ? '' : ` · ${Math.round(src.alpha * 100)}%`}`}
                   suffix={` (${value})`}
                 />
                 {/* Only when a code connector says how the code names its tokens: without one, nothing is missing. */}
@@ -832,13 +840,13 @@ function TextStyleRow({ el, cs }: { el: Element; cs: CSSStyleDeclaration }) {
       <Key k="Style" icon="text_format" />
       <span className={styles.v}>
         {!src.style && <span className={styles.muted} title="No rule names its style: told by its values">≈ </span>}
-        {/* The widget the app writes it with (its text widget), its theme's TextStyle in the tooltip. */}
-        <span title={`${s.widget}(…): its TextStyle is ${s.code}`}>
+        {/* What the app writes it with (a code connector's name for it), its style's name in the code in the tooltip. */}
+        <span title={s.widget === s.name ? s.name : `Written with ${s.widget}; its style in the code is ${s.code}`}>
           <TokenLink name={s.name} label={s.widget} />
         </span>
         {src.weight != null && (
-          <span className={styles.mono} style={{ display: 'block' }} title="A weight set over the style, the text widget's style parameter">
-            style: TextStyle(fontWeight: FontWeight.w{src.weight})
+          <span className={styles.mono} style={{ display: 'block' }} title="A weight set over the style">
+            weight {src.weight}, over the style
           </span>
         )}
         {same.length > 0 && (
@@ -916,6 +924,26 @@ function fmt(v: unknown): string {
   if (Array.isArray(v)) return `[${v.length} items]`;
   if (v && typeof v === 'object') return JSON.stringify(v).slice(0, 80);
   return String(v);
+}
+
+/** A prop's value in braces: an element as `<…/>`, data as JSON (what can't be written, as …). */
+function jsxValue(v: unknown): string {
+  if (v && typeof v === 'object' && '$$typeof' in v) return '<…/>';
+  try {
+    return JSON.stringify(v) ?? '…';
+  } catch {
+    return '…';
+  }
+}
+
+/** A component as JSX writes it (the mirror's): strings as attributes, anything else in braces, functions elided. */
+function jsxCall(name: string, props: ComponentProps): string {
+  const attr = ([k, v]: [string, unknown]) =>
+    typeof v === 'string' ? `${k}="${v.replace(/"/g, '&quot;')}"` : v === true ? k : typeof v === 'function' ? `${k}={() => {}}` : `${k}={${jsxValue(v)}}`;
+  const attrs = Object.entries(props).filter(([, v]) => v != null && v !== false && typeof v !== 'symbol').map(attr);
+  if (!attrs.length) return `<${name} />`;
+  const line = `<${name} ${attrs.join(' ')} />`;
+  return line.length <= 60 ? line : `<${name}\n${attrs.map((a) => `  ${a}`).join('\n')}\n/>`;
 }
 
 /** rgb()/rgba() → Color(0xAARRGGBB). */
