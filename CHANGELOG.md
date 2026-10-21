@@ -5,6 +5,11 @@ HeroCanvas's versions. The number shows in the toolbar (package.json `version`);
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.3.1 — 2026-10-21
+
+- **Developer experience doc**: how a team's copy gets HeroCanvas's updates (template, clone, an update command, a
+  package) and how they can change the tool itself and still update (configure, extend, eject a piece, eject it all).
+
 ## 0.3.0 — 2026-10-20
 
 - **Stories for the sample app**: AppBar, Avatar, Checkbox, EmptyState, ListSection, ListTile, ProjectIcon and

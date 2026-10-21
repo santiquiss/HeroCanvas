@@ -77,10 +77,60 @@ npx herocanvas init
 From then on: `herocanvas sync` in CI keeps the connectors' files current, and a check fails when the code gets a
 parameter or a token the mirror doesn't know.
 
+## Updates
+
+A team's copy holds two kinds of code: the tool (ours) and their app's mirror and proposals (theirs). An update should
+replace the first and never touch the second. How well that works depends on how the copy was made:
+
+| | How they got it | How they update | What goes wrong |
+|---|---|---|---|
+| **Template** (today's README) | "Use this template": a new repo, one commit, no shared history | A merge with `--allow-unrelated-histories` | Git can't tell who changed what: nearly every file conflicts. In practice, nobody updates |
+| **Clone or fork** | History shared with HeroCanvas | `git pull upstream main` | The tool's folders merge cleanly; `src/app` conflicts whenever the sample app changes (it shares the folder with theirs); `package.json`, `CHANGELOG.md` and the README always conflict. A fork of a public repo is public |
+| **Update command** | Any of the above | `npx herocanvas update`: the tool's folders replaced by a release's; `src/app`, `src/proposals` and `herocanvas.config.ts` left alone | Nothing in the tool, as long as they didn't edit it. Their app may need changes when the contract does |
+| **Package** | `npm install herocanvas`; their repo holds only the config, the app and the proposals | `npm install herocanvas@latest` | Only what the contract breaks, which semver announces |
+
+The contract is what the tool reads from the app: `AppConfig`, the page manifest, `AppNavigation`, the `--app-*`
+tokens, `useComponent` and the stories' format, the connectors' JSON. With a package it's public API: it changes in
+major versions only, and each change comes with a migration.
+
+An **`update-herocanvas` skill** does the migrating: it reads the changelog between the two versions and adapts the
+team's app to each contract change (a renamed manifest field, a new required token), then runs the checks. Updating
+becomes "update HeroCanvas" to the agent.
+
+The sample app lives in the package (or `herocanvas init` writes it), never in the team's folder, so changing it never
+conflicts with their app.
+
+**Proposed path**: the update command and the skill now, while the repo is still private, so no one ends up with a
+copy that can't be updated; the package next (Order, step 1). The skill carries over unchanged.
+
+## Changing the tool itself
+
+A package doesn't stop a team from changing the tool. It makes visible which of their changes updates keep, and
+which they maintain. Four levels, cheapest to keep first:
+
+| | What | Example | On update |
+|---|---|---|---|
+| **Configure** | `herocanvas.config.ts` | Name, logo, brand color, devices, which panels show | Kept, always |
+| **Extend** | Their code, loaded through an extension point | A panel of their own, a toolbar tool, another handoff format, a connector, scenario controls | Kept while the extension API holds; a break is in the changelog |
+| **Eject a piece** | One of the tool's components copied into their repo (`npx herocanvas eject Toolbar`), used instead of the package's (as Docusaurus's *swizzle*) | A toolbar laid out differently | The rest updates; that piece is theirs |
+| **Eject everything** | The whole tool in their repo | Today's template | Full control; updating is a git merge |
+
+The app boundary already works this way: the app, its manifest, navigation, tokens and connectors are extension
+points ("declare, don't special-case"). More come when they're needed.
+
+**Ejected pieces need not go stale.** The update skill can merge them: it diffs the package's piece between the old
+and the new version and applies that diff to the team's copy, keeping their changes, and asks when the two clash —
+what a developer would do by hand, without anyone having to remember to.
+
+**Signals to act on**: when several teams eject the same piece, it's missing an extension point, or the change
+belongs in HeroCanvas. And since it's open source, a change that's general should come back as a pull request,
+where it stops being something one team maintains.
+
 ## Order
 
 1. **The boundary as a package**: HeroCanvas as an npm package (the tool) and the app as a folder it's pointed at
-   (`herocanvas.config.ts`), instead of a fork with `src/app` replaced. Everything else depends on this.
+   (`herocanvas.config.ts`), instead of a fork with `src/app` replaced. Everything else depends on this. Before it,
+   while the repo is private: the update command and skill (see Updates).
 2. **React (web) and React Native / Expo**: the most popular stacks, mirror and live from the same language, routes
    and props readable with TypeScript's own tools.
 3. **Flutter**: what MF Designer already does by hand (the analyzer for the API, ARB for texts, Widgetbook as the
@@ -93,3 +143,6 @@ parameter or a token the mirror doesn't know.
 - Hosted (a URL per team, comments shared) or self-hosted only (the repo is the source of truth)?
 - How much should the agent do on its own: mirror every screen on `init`, or one at a time on request?
 - Licensing and naming of the kit: is it HeroCanvas's look, or does it take the app's from day one?
+- Which extension points come first (panels, toolbar tools, handoff formats), and which pieces can be ejected?
+- Until the package exists: keep "Use this template" in the README (with the update command), or ask for a clone with
+  an `upstream` remote?
