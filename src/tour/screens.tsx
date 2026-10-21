@@ -16,6 +16,7 @@ export const WELCOME: Omit<DeckCardProps, 'count' | 'top' | 'style' | 'action'>[
   { tint: 'indigo', kicker: 'Everywhere', title: 'Every device, every theme.', text: 'Phones, foldables and tablets side by side, in light and dark, in every language.', art: <Illustration name="devices" /> },
   { tint: 'pink', kicker: 'Proposals', title: 'Change it in versions.', text: 'Ideas stay apart from the app as it is, to compare before anything ships.', art: <Illustration name="versions" /> },
   { tint: 'yellow', kicker: 'Handoff', title: 'Hand it off in code’s terms.', text: 'A spec with your own component names and tokens, ready for whoever builds it.', art: <Illustration name="handoff" /> },
+  { tint: 'teal', kicker: 'Capture', title: 'Show it off.', text: 'Any screen as an image or a video: the device turned in 3D, its color, light and shadow. For a deck, a store page, a post.', art: <Illustration name="capture" /> },
   { tint: 'ink', kicker: 'Next', title: 'Start with the Tour.', text: `${STEPS.length} short stops to try every part on the interface around this device.`, art: <Illustration name="tour" /> },
 ];
 

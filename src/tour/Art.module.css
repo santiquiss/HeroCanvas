@@ -421,3 +421,106 @@
     animation: none;
   }
 }
+
+/* Capture: a phone turned in 3D on its floor, in a camera's frame, recording. */
+.viewfinder {
+  width: 204px;
+  height: 180px;
+}
+.viewfinder i {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 0 solid rgba(255, 255, 255, 0.85);
+}
+.viewfinder i:nth-child(1) {
+  left: 0;
+  top: 0;
+  border-width: 3px 0 0 3px;
+  border-top-left-radius: 8px;
+}
+.viewfinder i:nth-child(2) {
+  right: 0;
+  top: 0;
+  border-width: 3px 3px 0 0;
+  border-top-right-radius: 8px;
+}
+.viewfinder i:nth-child(3) {
+  left: 0;
+  bottom: 0;
+  border-width: 0 0 3px 3px;
+  border-bottom-left-radius: 8px;
+}
+.viewfinder i:nth-child(4) {
+  right: 0;
+  bottom: 0;
+  border-width: 0 3px 3px 0;
+  border-bottom-right-radius: 8px;
+}
+.stage {
+  width: 92px;
+  height: 176px;
+  perspective: 500px;
+}
+.turned {
+  border: 3px solid #111318;
+  transform: rotateY(-24deg) rotateX(8deg) rotateZ(5deg);
+  box-shadow:
+    -14px 18px 28px rgba(0, 40, 50, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+.floor {
+  position: absolute;
+  left: -18px;
+  right: -26px;
+  bottom: -14px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 30, 40, 0.35), transparent);
+}
+.segments > .segmentTeal {
+  color: var(--app-teal);
+}
+.rec {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font: 700 12px ui-monospace, Menlo, monospace;
+}
+.rec i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff3b30;
+  animation: rec 1.2s ease-in-out infinite;
+}
+@keyframes rec {
+  50% {
+    opacity: 0.35;
+  }
+}
+.swatches {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.swatches i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.swatches .swatchOn {
+  box-shadow:
+    0 0 0 2px var(--app-teal),
+    0 0 0 4px #ffffff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rec i {
+    animation: none;
+  }
+}

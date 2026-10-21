@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.20.1-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.21.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**

@@ -6,6 +6,13 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.21.0 — 2026-10-21
+
+- **A Capture card on Welcome**: "Show it off.", before the tour's card, with its illustration (a phone turned in 3D
+  in a camera's frame, Image or Video, recording, the device's colors). `Illustration` takes `capture`; the deck's
+  cards take a teal tint.
+- **Larger illustrations on tablets**: they grow with their card up to 1.6× (1.25× before).
+
 ## 0.20.1 — 2026-10-21
 
 - **Welcome on tablets**: its deck takes more of the screen (up to 580 wide and 790 tall, from an iPad mini up), and

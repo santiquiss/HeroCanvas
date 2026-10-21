@@ -1,5 +1,5 @@
 // Welcome's illustrations, one per card of its deck: code becoming a screen, the devices and themes, versions to
-// compare, a handoff spec, the tour's stops around a phone. Drawn on a 300×220 box, scaled to the room the card leaves them; their pieces pop in when
+// compare, a handoff spec, a screen captured in 3D, the tour's stops around a phone. Drawn on a 300×220 box, scaled to the room the card leaves them; their pieces pop in when
 // their card comes to the top (TourKit's DeckCard sets `data-top`).
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
@@ -9,14 +9,14 @@ import { STEPS } from './steps';
 import { IconTile } from './TourKit';
 import styles from './Art.module.css';
 
-export type ArtName = 'code' | 'devices' | 'versions' | 'handoff' | 'tour';
+export type ArtName = 'code' | 'devices' | 'versions' | 'handoff' | 'capture' | 'tour';
 
 const W = 300;
 const H = 220;
 
 const at = (left: number | string, top: number | string, extra: CSSProperties = {}): CSSProperties => ({ left, top, ...extra });
 
-/** One of Welcome's illustrations, as large as fits its parent (never more than 1.25×). */
+/** One of Welcome's illustrations, as large as fits its parent (up to 1.6×, on a tablet's card). */
 export function Illustration({ name }: { name: ArtName }) {
   const hc = useComponent('Illustration', { name });
   const fit = useRef<HTMLDivElement>(null);
@@ -25,7 +25,7 @@ export function Illustration({ name }: { name: ArtName }) {
     const outer = fit.current;
     const inner = box.current;
     if (!outer || !inner) return;
-    const size = () => inner.style.setProperty('--art-scale', String(Math.min(1.25, outer.clientWidth / W, outer.clientHeight / H)));
+    const size = () => inner.style.setProperty('--art-scale', String(Math.min(1.6, outer.clientWidth / W, outer.clientHeight / H)));
     size();
     const ro = new ResizeObserver(size);
     ro.observe(outer);
@@ -45,6 +45,7 @@ const LABELS: Record<ArtName, string> = {
   devices: 'A tablet and two phones, in light and dark, in several languages',
   versions: 'The live screen beside a proposal, with versions to switch',
   handoff: 'A handoff spec of a component, with its props, tokens and spacing',
+  capture: 'A phone turned in 3D in a camera’s frame, recording a video',
   tour: 'A phone with the tour’s stops around it',
 };
 
@@ -160,6 +161,33 @@ const ART: Record<Exclude<ArtName, 'tour'>, ReactNode> = {
         <span className={styles.line} style={{ width: '80%' }} />
         <span className={styles.line} style={{ width: '70%' }} />
         <span className={styles.button} />
+      </div>
+    </>
+  ),
+  capture: (
+    <>
+      <div className={`${styles.pop} ${styles.viewfinder}`} style={at(48, 40)}>
+        <i />
+        <i />
+        <i />
+        <i />
+      </div>
+      <div className={`${styles.pop} ${styles.d1} ${styles.stage}`} style={at(104, 44)}>
+        <span className={styles.floor} />
+        <Phone className={styles.turned} style={{ position: 'absolute', inset: 0 }} block="var(--app-teal)" button />
+      </div>
+      <div className={`${styles.pop} ${styles.d2} ${styles.segments}`} style={at(0, 0, { right: 0, width: 'fit-content', margin: '0 auto' })}>
+        <span>Image</span>
+        <span className={`${styles.segmentOn} ${styles.segmentTeal}`}>Video</span>
+      </div>
+      <div className={`${styles.pop} ${styles.d3} ${styles.rec}`} style={at(60, 52)}>
+        <i />
+        <span>0:04</span>
+      </div>
+      <div className={`${styles.pop} ${styles.d3} ${styles.swatches}`} style={at(266, 104)}>
+        <i style={{ background: '#d9dbe0' }} />
+        <i className={styles.swatchOn} style={{ background: '#2b2f38' }} />
+        <i style={{ background: '#f2994a' }} />
       </div>
     </>
   ),
