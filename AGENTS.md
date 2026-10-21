@@ -51,10 +51,14 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **Pages by their role**: wherever the designer lists pages, a page's icon is its level's (`ROLE_ICONS`,
   `src/nav/stack.ts`: tab, push, cover, boot), the same for every app; never the app's own icons, which may be
   missing or not drawable.
-- **The tour stands in for an app**: with none connected (`NO_APP`, `src/nav/pages.tsx`), HeroCanvas shows its own
-  (`src/tour`: Welcome, and a page per part of the designer, built like an app's). A new part of the designer gets a
-  step in `src/tour/steps.ts`; a panel or mode the tour has nothing for says what it shows instead (`empty` in
-  `src/tools/registry.ts`, `src/sim/NoAppMode.tsx`).
+- **The tour stands in for an app**: with none connected (`NO_APP`, `src/nav/noApp.ts`), HeroCanvas shows its own
+  (`src/tour`): its pages, navigation, components with their stories, and its theme as `--app-*` tokens
+  (`src/tour/theme.css`), so every mode has something real. A new part of the designer gets a step in
+  `src/tour/steps.ts`.
+- **A component against the code, in three words**: **Matches code**, **Differs from code**, or **Local** (only in
+  HeroCanvas, not in the app's code). Where it came from (a Figma file, another design tool, a proposal) is a note,
+  never a state of its own; tiers (Atoms…) show only when Figma or the code gives them. Tokens the same: no code
+  connector, no "not in the code".
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done

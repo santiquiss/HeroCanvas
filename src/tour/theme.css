@@ -1,0 +1,85 @@
+/* The tour's look as an app's theme (the format of app/theme.css): iOS's system colors, type ramp and corners as the
+   `--app-*` tokens, so Tokens lists them, Inspect names them and the device's text size scales its type. Applied only
+   while no app is connected (design/appTheme.ts); read as text, never imported as a stylesheet. */
+
+[data-theme] {
+  /* Space: iOS's 4-point grid, with its 16 and 20 margins. */
+  --app-space-xs: 4px;
+  --app-space-s: 8px;
+  --app-space-m: 12px;
+  --app-space-l: 16px;
+  --app-space-xl: 20px;
+  --app-space-xxl: 28px;
+  --app-space-xxxl: 36px;
+  --app-space-huge: 48px;
+  /* Corners: a Settings icon, a button, a card, an inset grouped list (iOS 26), a sheet, a capsule. */
+  --app-radius-s: 7px;
+  --app-radius-m: 12px;
+  --app-radius-l: 16px;
+  --app-radius-xl: 26px;
+  --app-radius-xxl: 34px;
+  --app-radius-full: 999px;
+  /* Type: iOS's text styles (Large Title, Title 1, Title 2, Headline, Body, Subheadline, Footnote), SF Pro. */
+  --app-font-large-title: 700 34px/41px -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  --app-font-title: 700 28px/34px -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  --app-font-heading: 700 22px/28px -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  --app-font-subheading: 600 17px/22px -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  --app-font-body: 400 17px/22px -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  --app-font-label: 400 15px/20px -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  --app-font-caption: 400 13px/18px -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  --app-scrim: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='light'] {
+  /* Grouped backgrounds, labels and separators: iOS's system colors. */
+  --app-page: #f2f2f7;
+  --app-surface: #ffffff;
+  --app-text: #000000;
+  --app-text-secondary: rgba(60, 60, 67, 0.6);
+  --app-text-muted: rgba(60, 60, 67, 0.3);
+  --app-icon: #000000;
+  --app-border: rgba(60, 60, 67, 0.29);
+  --app-primary: #007aff;
+  --app-on-primary: #ffffff;
+  --app-secondary: rgba(120, 120, 128, 0.12);
+  --app-on-secondary: #007aff;
+  --app-pressed: rgba(120, 120, 128, 0.12);
+  --app-danger: #ff3b30;
+  --app-success: #34c759;
+  --app-info: #007aff;
+  --app-handle: #c7c7cc;
+  --app-elevation: 0 6px 18px rgba(0, 0, 0, 0.12);
+  /* iOS's other system tints, for the Settings-style icons. */
+  --app-indigo: #5856d6;
+  --app-purple: #af52de;
+  --app-pink: #ff2d55;
+  --app-orange: #ff9500;
+  --app-teal: #30b0c7;
+  --app-gray: #8e8e93;
+}
+
+[data-theme='dark'] {
+  --app-page: #000000;
+  --app-surface: #1c1c1e;
+  --app-text: #ffffff;
+  --app-text-secondary: rgba(235, 235, 245, 0.6);
+  --app-text-muted: rgba(235, 235, 245, 0.3);
+  --app-icon: #ffffff;
+  --app-border: rgba(84, 84, 88, 0.65);
+  --app-primary: #0a84ff;
+  --app-on-primary: #ffffff;
+  --app-secondary: rgba(120, 120, 128, 0.24);
+  --app-on-secondary: #0a84ff;
+  --app-pressed: rgba(120, 120, 128, 0.24);
+  --app-danger: #ff453a;
+  --app-success: #30d158;
+  --app-info: #0a84ff;
+  --app-handle: #545458;
+  --app-elevation: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --app-indigo: #5e5ce6;
+  --app-purple: #bf5af2;
+  --app-pink: #ff375f;
+  --app-orange: #ff9f0a;
+  --app-teal: #40c8e0;
+  --app-gray: #8e8e93;
+}

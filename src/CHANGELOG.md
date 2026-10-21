@@ -6,6 +6,20 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.13.0 — 2026-10-21
+
+- **A component against the code, in three words**: Matches code, Differs from code, or **Local** (only in
+  HeroCanvas, not in the app's code), which replaces "Not in code" and its "build it". Where it came from is a note,
+  not a state. A component's page shows its state beside its name; tiers (Atoms…) only when Figma or the code gives
+  them, else one list, Components (no more "Local" as a group).
+- **The tour in Components and Tokens**: its nine components have stories (all Local), and its look is a theme of
+  `--app-*` tokens with iOS's values (`src/tour/theme.css`), so Tokens lists them and the device's text size scales its
+  type through its text styles.
+- **Tokens without a code connector**: no more "Not in the code" in red on every token; the tour's say Local, an
+  app's say nothing until a connector names them.
+- **Fix**: Tokens read none of the space, corner and type tokens (a comment before their block hid it): they show now.
+- **Contract**: none for a team's app.
+
 ## 0.12.0 — 2026-10-21
 
 - **The tour is the starting point, on `main`**: the Tasks sample app is gone (it's kept in the `sample-tasks` tag), and so

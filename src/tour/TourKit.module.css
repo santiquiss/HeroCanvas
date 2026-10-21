@@ -1,66 +1,26 @@
-/* The tour after iOS: its system colors (light, and dark under the screen's data-theme), the type ramp in pt scaled
-   by the device's text size (--text-scale, --text-scale-display), SF Pro where the system has it. */
+/* The tour's components after iOS, drawn with the app tokens its theme sets (src/tour/theme.css): its system colors,
+   its text styles (scaled with the device's text size), its corners. */
 .screen {
-  --ios-bg: #f2f2f7;
-  --ios-cell: #ffffff;
-  --ios-label: #000000;
-  --ios-label-2: rgba(60, 60, 67, 0.6);
-  --ios-label-3: rgba(60, 60, 67, 0.3);
-  --ios-separator: rgba(60, 60, 67, 0.29);
-  --ios-fill: rgba(120, 120, 128, 0.12);
-  --ios-blue: #007aff;
-  --ios-indigo: #5856d6;
-  --ios-purple: #af52de;
-  --ios-pink: #ff2d55;
-  --ios-orange: #ff9500;
-  --ios-green: #34c759;
-  --ios-teal: #30b0c7;
-  --ios-gray: #8e8e93;
-  --ios-font: -apple-system, 'SF Pro Text', 'SF Pro', system-ui, 'Helvetica Neue', sans-serif;
-  --ios-display: -apple-system, 'SF Pro Display', 'SF Pro', system-ui, 'Helvetica Neue', sans-serif;
   position: relative;
   height: 100%;
-  font-family: var(--ios-font);
   -webkit-font-smoothing: antialiased;
-}
-:global([data-theme='dark']) .screen {
-  --ios-bg: #000000;
-  --ios-cell: #1c1c1e;
-  --ios-label: #ffffff;
-  --ios-label-2: rgba(235, 235, 245, 0.6);
-  --ios-label-3: rgba(235, 235, 245, 0.3);
-  --ios-separator: rgba(84, 84, 88, 0.65);
-  --ios-fill: rgba(120, 120, 128, 0.24);
-  --ios-blue: #0a84ff;
-  --ios-indigo: #5e5ce6;
-  --ios-purple: #bf5af2;
-  --ios-pink: #ff375f;
-  --ios-orange: #ff9f0a;
-  --ios-green: #30d158;
-  --ios-teal: #40c8e0;
-  --ios-gray: #8e8e93;
 }
 .scroll {
   height: 100%;
   overflow-y: auto;
   scrollbar-width: none;
-  background: var(--ios-bg);
-  color: var(--ios-label);
+  background: var(--app-page);
+  color: var(--app-text);
 }
 .content {
   max-width: 640px;
   margin: 0 auto;
 }
 
-/* Large Title: 34 pt bold. */
 .largeTitle {
   margin: 0;
-  padding-bottom: 8px;
-  font-family: var(--ios-display);
-  font-size: calc(34px * var(--text-scale-display, 1));
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  padding-bottom: var(--app-space-s);
+  font: var(--app-font-large-title);
 }
 
 /* A pushed screen's bar: it stays while the page scrolls, the page fading under it. */
@@ -68,8 +28,8 @@
   position: sticky;
   top: 0;
   z-index: 5;
-  padding-bottom: 12px;
-  background: linear-gradient(var(--ios-bg) 70%, transparent);
+  padding-bottom: var(--app-space-m);
+  background: linear-gradient(var(--app-page) 70%, transparent);
 }
 .navBar {
   display: grid;
@@ -77,11 +37,8 @@
   align-items: center;
   min-height: 44px;
 }
-/* Headline: 17 pt semibold. */
 .navTitle {
-  font-size: calc(17px * var(--text-scale, 1));
-  line-height: 1.3;
-  font-weight: 600;
+  font: var(--app-font-subheading);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -103,58 +60,55 @@
   justify-content: center;
   padding: 0;
   border: none;
-  border-radius: 50%;
-  color: var(--ios-label);
+  border-radius: var(--app-radius-full);
+  color: var(--app-icon);
   cursor: pointer;
 }
 .back:active {
   transform: scale(0.94);
 }
 
-/* Inset grouped: a header in footnote gray, the group rounded on the cell color, a footer under it. */
+/* Inset grouped: a header in footnote, the group rounded on the surface, a footer under it. */
 .section {
-  margin-top: 28px;
+  margin-top: var(--app-space-xxl);
+}
+.sectionHeader,
+.sectionFooter {
+  margin: 0;
+  padding: 0 var(--app-space-l);
+  font: var(--app-font-caption);
+  color: var(--app-text-secondary);
 }
 .sectionHeader {
-  margin: 0 0 7px;
-  padding: 0 16px;
-  font-size: calc(13px * var(--text-scale, 1));
-  line-height: 1.38;
-  font-weight: 400;
-  color: var(--ios-label-2);
-}
-.group {
-  border-radius: 26px;
-  background: var(--ios-cell);
-  overflow: hidden;
+  margin-bottom: 7px;
 }
 .sectionFooter {
-  margin: 7px 0 0;
-  padding: 0 16px;
-  font-size: calc(13px * var(--text-scale, 1));
-  line-height: 1.38;
-  color: var(--ios-label-2);
+  margin-top: 7px;
+}
+.group {
+  border-radius: var(--app-radius-xl);
+  background: var(--app-surface);
+  overflow: hidden;
 }
 
-/* A row: 44 pt at least; its separator starts after the icon, as iOS insets it. */
+/* A row: its separator starts after the icon, as iOS insets it. */
 .row {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 14px;
   min-height: 52px;
-  padding: 0 0 0 16px;
+  padding: 0 0 0 var(--app-space-l);
   border: none;
   background: none;
-  color: var(--ios-label);
-  font: inherit;
+  color: var(--app-text);
   text-align: left;
 }
 .tappable {
   cursor: pointer;
 }
 .tappable:active {
-  background: var(--ios-fill);
+  background: var(--app-pressed);
 }
 .rowMain {
   flex: 1;
@@ -162,11 +116,11 @@
   align-self: stretch;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-space-s);
   padding: 11px 14px 11px 0;
 }
 .row + .row .rowMain {
-  box-shadow: inset 0 0.5px 0 var(--ios-separator);
+  box-shadow: inset 0 0.5px 0 var(--app-border);
 }
 .rowTexts {
   flex: 1;
@@ -175,29 +129,24 @@
   flex-direction: column;
   gap: 1px;
 }
-/* Body: 17 pt. */
 .rowTitle {
-  font-size: calc(17px * var(--text-scale, 1));
-  line-height: 1.3;
+  font: var(--app-font-body);
 }
-/* Subheadline: 15 pt, secondary. */
 .rowSubtitle {
-  font-size: calc(15px * var(--text-scale, 1));
-  line-height: 1.33;
-  color: var(--ios-label-2);
+  font: var(--app-font-label);
+  color: var(--app-text-secondary);
 }
 .chevron {
   flex: none;
-  color: var(--ios-label-3);
+  color: var(--app-text-muted);
 }
 .textCell {
   margin: 0;
-  padding: 13px 16px;
-  font-size: calc(17px * var(--text-scale, 1));
-  line-height: 1.3;
+  padding: 13px var(--app-space-l);
+  font: var(--app-font-body);
 }
 .textCell + .textCell {
-  box-shadow: inset 0 0.5px 0 var(--ios-separator);
+  box-shadow: inset 0 0.5px 0 var(--app-border);
 }
 
 /* Settings-style icons: a white symbol on a rounded square of a system tint. */
@@ -209,85 +158,78 @@
   color: #ffffff;
 }
 .blue {
-  background: var(--ios-blue);
+  background: var(--app-primary);
 }
 .indigo {
-  background: var(--ios-indigo);
+  background: var(--app-indigo, var(--app-primary));
 }
 .purple {
-  background: var(--ios-purple);
+  background: var(--app-purple, var(--app-primary));
 }
 .pink {
-  background: var(--ios-pink);
+  background: var(--app-pink, var(--app-danger));
 }
 .orange {
-  background: var(--ios-orange);
+  background: var(--app-orange, var(--app-danger));
 }
 .green {
-  background: var(--ios-green);
+  background: var(--app-success);
 }
 .teal {
-  background: var(--ios-teal);
+  background: var(--app-teal, var(--app-info));
 }
 .gray {
-  background: var(--ios-gray);
+  background: var(--app-gray, var(--app-text-muted));
 }
 
 .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 8px 0;
+  padding: var(--app-space-s) var(--app-space-s) 0;
   text-align: center;
 }
-/* Title 1: 28 pt bold. */
 .heroTitle {
-  margin: 16px 0 0;
-  font-family: var(--ios-display);
-  font-size: calc(28px * var(--text-scale-display, 1));
-  line-height: 1.2;
-  font-weight: 700;
+  margin: var(--app-space-l) 0 0;
+  font: var(--app-font-title);
 }
 .heroSubtitle {
-  margin: 8px 0 0;
-  font-size: calc(17px * var(--text-scale, 1));
-  line-height: 1.3;
-  color: var(--ios-label-2);
+  margin: var(--app-space-s) 0 0;
+  font: var(--app-font-body);
+  color: var(--app-text-secondary);
 }
 
 /* Capsule buttons: 50 pt tall, Headline. */
 .capsule {
   width: 100%;
   min-height: 50px;
-  margin-top: 12px;
-  padding: 0 20px;
+  margin-top: var(--app-space-m);
+  padding: 0 var(--app-space-xl);
   border: none;
-  border-radius: 999px;
-  font: inherit;
-  font-size: calc(17px * var(--text-scale, 1));
-  font-weight: 600;
+  border-radius: var(--app-radius-full);
+  font: var(--app-font-subheading);
   cursor: pointer;
 }
 .capsule:active {
   opacity: 0.8;
 }
 .filled {
-  background: var(--ios-blue);
-  color: #ffffff;
+  background: var(--app-primary);
+  color: var(--app-on-primary);
 }
-.gray.capsule {
-  background: var(--ios-fill);
-  color: var(--ios-blue);
+.tinted {
+  background: var(--app-secondary);
+  color: var(--app-on-secondary);
 }
 
 .prompt {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 16px 16px;
+  margin: 0 var(--app-space-l) var(--app-space-l);
   padding: 10px 10px 10px 14px;
-  border-radius: 16px;
-  background: var(--ios-bg);
+  border-radius: var(--app-radius-l);
+  background: var(--app-page);
 }
 .promptText {
   flex: 1;
@@ -305,10 +247,9 @@
   height: 34px;
   padding: 0 14px;
   border: none;
-  border-radius: 999px;
-  color: var(--ios-blue);
-  font: inherit;
-  font-size: calc(15px * var(--text-scale, 1));
+  border-radius: var(--app-radius-full);
+  color: var(--app-primary);
+  font: var(--app-font-label);
   font-weight: 600;
   cursor: pointer;
 }

@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { CATALOG, catalogUrl } from '../design/catalog';
 import { useDesignRoot } from '../design/DesignContext';
 import { unreplicated, UNREPLICATED_KIND } from '../design/unreplicated';
-import { componentGroups, componentTier, FIGMA, UNUSED_FIGMA, FIGMA_FILE, GROUP_TITLES, MAPPED_FIGMA, type GroupKey } from '../design/figma';
+import { componentGroups, componentTier, FIGMA, UNUSED_FIGMA, FIGMA_FILE, groupTitle, MAPPED_FIGMA, type GroupKey } from '../design/figma';
 import { type Args, type FrameWidth, type StoryModule } from '../design/stories';
 import { ChangeBadge } from '../flow/FlowView';
 import { useSim, useUrlParams, useUrlState } from '../sim/SimContext';
@@ -15,6 +15,7 @@ import { findProposal, proposalChanges, VARIANT_PARAM } from '../proposals';
 import { InspectOverlay } from '../tools/InspectOverlay';
 import { FigmaInfo } from './FigmaInfo';
 import { useLibrary } from '../design/library';
+import { componentState } from '../design/componentState';
 import { componentKind, isBaseComponent, useGalleryNav, useGalleryRoute, useStories } from './route';
 import { UsageStats } from './UsageStats';
 import { useStoryArgs } from './useStoryArgs';
@@ -78,7 +79,10 @@ function ComponentPage({ mod }: { mod: StoryModule<Args> }) {
       {/* The name, its tier and change (the examples' theme floats at the canvas's top right, ThemeSwitch): the rest is in the right panel (Info, Props). */}
       <div className={styles.head}>
         <span className={styles.title}>{mod.component}</span>
-        <span className={styles.badge}>{componentTier(mod.component, (n) => lib?.widget(n)?.tier) ?? entry?.tier ?? 'local'}</span>
+        {/* Its tier when Figma or the code gives one; and where it stands against the code: Matches code, Differs from
+            code, or Local (only here). */}
+        {(componentTier(mod.component, (n) => lib?.widget(n)?.tier) ?? entry?.tier) && <span className={styles.badge}>{componentTier(mod.component, (n) => lib?.widget(n)?.tier) ?? entry?.tier}</span>}
+        {lib && <StateBadge name={mod.component} />}
         {proposalNames.has(mod.component) && <ChangeBadge change={changeOf(mod.component)} />}
       </div>
       <div className={styles.stories}>
@@ -169,7 +173,7 @@ function Overview() {
       {(Object.keys(groups) as GroupKey[]).map((g) =>
         groups[g].length ? (
           <div key={g}>
-            <div className={styles.tier}>{GROUP_TITLES[g]}</div>
+            <div className={styles.tier}>{groupTitle(g, groups)}</div>
             <div className={styles.cards}>
               {[...groups[g]]
                 .sort((a, b) => Number(STORIES.has(b)) - Number(STORIES.has(a)) || a.localeCompare(b))
@@ -254,4 +258,16 @@ function formatValue(v: unknown): string {
   } catch {
     return String(v);
   }
+}
+
+/** Where a component stands against the code, as a badge: its state's label, in its color. */
+function StateBadge({ name }: { name: string }) {
+  const lib = useLibrary();
+  if (!lib) return null;
+  const state = componentState(name, true, lib);
+  return (
+    <span className={styles.badge} style={{ color: state.color, background: 'transparent', boxShadow: `inset 0 0 0 1px ${state.color}` }} title={state.summary || state.label}>
+      {state.label}
+    </span>
+  );
 }

@@ -8,8 +8,6 @@ import { Gallery } from '../gallery/Gallery';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlowView } from '../flow/FlowView';
 import { About } from './About';
-import { NO_APP } from '../nav/pages';
-import { NoAppMode } from './NoAppMode';
 import { useMode, useRememberMode, useSetMode, type Mode } from './modes';
 import { useNavRoot } from '../nav/context';
 import { detailOpenFor } from '../nav/stack';
@@ -350,10 +348,6 @@ function DesignerShell() {
             {/* Components and Tokens: the gallery's pages (a component's examples, or the tokens). */}
             {mode === 'about' ? (
               <About />
-            ) : NO_APP && (mode === 'components' || mode === 'tokens') ? (
-              // No app connected, nothing to show here: what the mode is for (the prototype, Flow and Capture show the
-              // tour).
-              <NoAppMode mode={mode} />
             ) : mode === 'components' || mode === 'tokens' ? (
               <ErrorBoundary label="Gallery" fill resetKey={location.pathname + location.search}>
                 <Gallery />

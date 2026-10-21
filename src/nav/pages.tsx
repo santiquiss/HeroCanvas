@@ -7,8 +7,9 @@ import { TOUR_NAVIGATION } from '../tour/TourNav';
 import { TOUR_PAGES } from '../tour/pages';
 import type { PageDef } from './types';
 
-/** No app connected: the app declares no pages. The designer shows the tour. */
-export const NO_APP = Object.keys(APP_PAGES).length === 0;
+import { NO_APP } from './noApp';
+
+export { NO_APP };
 
 export const BASE_PAGES: Record<string, PageDef> = NO_APP ? TOUR_PAGES : APP_PAGES;
 export const NAVIGATION: AppNavigation = NO_APP ? TOUR_NAVIGATION : APP_NAVIGATION;

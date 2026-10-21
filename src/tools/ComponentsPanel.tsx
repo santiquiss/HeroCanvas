@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { CATALOG } from '../design/catalog';
 import { componentIcon } from '../design/element';
-import { componentGroups, GROUP_TITLES, type GroupKey } from '../design/figma';
+import { componentGroups, GROUP_TITLES, groupTitle, type GroupKey } from '../design/figma';
 import { useGalleryNav, useGalleryRoute, useStories } from '../gallery/route';
 import { COMPONENT_STATUSES, componentState, MISSING_COLOR, statusOf, type ComponentStatus } from '../design/componentState';
 import { useLibrary } from '../design/library';
@@ -118,7 +118,7 @@ export function ComponentsPanel() {
         </div>
       ) : (
         tiers.map((tier) => {
-          const title = GROUP_TITLES[tier];
+          const title = groupTitle(tier, groups);
           const list = names(tier);
           if (!list.length) return null;
           const built = list.filter((n) => STORIES.has(n)).length;

@@ -1,6 +1,7 @@
 // Component stories for the gallery: every story file, the app's (app/), the kit's (src/kit) and the proposals'
 // (proposals/<slug>/components). Add stories = create `<Name>.stories.tsx` beside the component (the format:
 // storyFormat.ts).
+import { NO_APP } from '../nav/noApp';
 import type { Args, Control, StoryModule } from './storyFormat';
 
 export * from './storyFormat';
@@ -16,10 +17,13 @@ export function controlFor(m: StoryModule<Args>, key: string): Control | null {
   return null;
 }
 
-// The kit's stories and the app's (its components, and widgets that live with their screen).
+// The kit's stories and the app's (its components, and widgets that live with their screen); with no app connected,
+// the tour's (src/tour), the app on screen then.
+const tourModules = import.meta.glob('../tour/*.stories.tsx', { eager: true });
 const modules = {
   ...import.meta.glob('../kit/*.stories.tsx', { eager: true }),
   ...import.meta.glob('@app/**/*.stories.tsx', { eager: true }),
+  ...(NO_APP ? tourModules : {}),
 } as Record<string, { default: StoryModule<Args> }>;
 const proposalModules = import.meta.glob('/proposals/*/components/*.stories.tsx', { eager: true }) as Record<string, { default: StoryModule<Args> }>;
 

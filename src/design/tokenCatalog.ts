@@ -4,10 +4,11 @@
 //
 // `figma` and `code`: the token's name in the design file and in the app's code, when a connector gives them
 // (none yet: the token's own name, and null).
+import { APP_THEME_CSS } from './appTheme';
 import kitCss from '../kit/tokens.css?raw';
 import { CODE_TEXT_STYLES, type CodeTextStyle } from './textStyles';
 
-const appCss = Object.values(import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
+const appCss = APP_THEME_CSS;
 
 export type TokenKind = 'color' | 'number' | 'text';
 export type Mode = 'light' | 'dark';
@@ -64,7 +65,8 @@ export interface TokenGroup {
 function block(selector: RegExp): Map<string, string> {
   const out = new Map<string, string>();
   for (const css of [kitCss, appCss])
-    for (const m of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    // Comments out first: one before a block would be read as part of its selector.
+    for (const m of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^}]*)\}/g)) {
       if (!selector.test(m[1].trim())) continue;
       for (const d of m[2].matchAll(/--(app-[\w-]+)\s*:\s*([^;]+);/g)) out.set(d[1], d[2].trim());
     }

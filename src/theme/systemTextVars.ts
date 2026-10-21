@@ -1,10 +1,11 @@
 // The app's text styles (its `--app-font-*` tokens) under the system's text settings (sim/systemText): the custom
 // properties a screen sets on its root so every text written with a style follows the size the user picked and Bold
 // Text. A size written in px doesn't: that's how a fixed size shows.
+import { APP_THEME_CSS } from '../design/appTheme';
 import kitCss from '../kit/tokens.css?raw';
 import { boldWeight, scaleSize, textSizeFor, type TextSystem } from '../sim/systemText';
 
-const appCss = Object.values(import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
+const appCss = APP_THEME_CSS;
 
 /** The sizes the two scales for off-style text are taken at: body text, and display text. */
 const BODY = 15;

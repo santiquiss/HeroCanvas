@@ -2,6 +2,7 @@
 // the CSS variable, how the app's code reads it), each copyable, and its value with the primitive it points to. A
 // table has Light and Dark columns only when its tokens change with the theme. A token the code doesn't have is
 // marked: that's a change to ask for.
+import { NO_APP } from '../nav/noApp';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
@@ -38,7 +39,8 @@ export function TokensView({ group: id }: { group: string }) {
         </div>
         <p className={styles.note}>
           {group.note}.{' '}
-          {system && (
+          {!CODE_LINKED && (NO_APP ? 'HeroCanvas’s own, for its tour: local tokens, not an app’s.' : 'Not linked to the code yet: a code connector shows how the code names each one.')}
+          {system && CODE_LINKED && (
             <>
               In the code: <span className={styles.mono}>{group.codeAccess}.<i>name</i></span>
               {CODE_TOKENS_COMMIT ? ` (${CODE_TOKENS_COMMIT})` : ''}
@@ -70,6 +72,29 @@ export function TokensView({ group: id }: { group: string }) {
 }
 
 /** Groups of the system (the code has a name for each): the palette, the type scale and Other don't. */
+/** Whether a code connector says how the code names the tokens: until one does, no token is "not in the code". */
+const CODE_LINKED = TOKEN_GROUPS.some((g) => !!g.codeAccess || g.tokens.some((t) => t.code !== null));
+
+/**
+ * A token's name in the code. With a connector, it or "Not in the code"; without one, the tour's are Local (HeroCanvas's
+ * own) and an app's unknown yet.
+ */
+function CodeCell({ code }: { code: string | null }) {
+  if (code)
+    return (
+      <td>
+        <Copy text={code} label={member(code)} />
+      </td>
+    );
+  if (CODE_LINKED)
+    return (
+      <td>
+        <span className={styles.missing}>Not in the code</span>
+      </td>
+    );
+  return <td>{NO_APP ? <span className={styles.local}>Local</span> : <span className={styles.local} title="No code connector yet">—</span>}</td>;
+}
+
 const isSystem = (g: TokenGroup) => !['palette', 'type-scale', 'other'].includes(g.id);
 
 /** A titled table with its column headers and widths (fixed, so a group's tables line up; the rest share what's left). */
@@ -122,7 +147,7 @@ function TokenTable({ title, tokens, group, marked }: { title: string; tokens: T
           <td>
             <Name figma={t.figma} css={`var(--${t.name})`} />
           </td>
-          {system && <td>{t.code ? <Copy text={t.code} label={member(t.code)} /> : <span className={styles.missing}>Not in the code</span>}</td>}
+          {system && <CodeCell code={t.code} />}
           {modes.map((m) => (
             <td key={m} className={styles.valueCell}>
               <span className={styles.mono}>{show(t.value[m], t.kind)}</span>
@@ -202,7 +227,7 @@ function TextStyleTable({ list, marked }: { list: TextStyleToken[]; marked: stri
             <td>
               <Name figma={s.figma} />
             </td>
-            <td>{s.code ? <Copy text={s.code} label={member(s.code)} /> : <span className={styles.missing}>Not in the code</span>}</td>
+            <CodeCell code={s.code} />
             {cell(p.size)}
             {cell(p.lineHeight)}
             {cell(p.weight)}
@@ -228,7 +253,7 @@ function ElevationTable({ levels, marked }: { levels: ElevationToken[]; marked: 
           <td>
             <Name figma={e.figma} />
           </td>
-          <td>{e.code ? <Copy text={e.code} label={member(e.code)} /> : <span className={styles.missing}>Not in the code</span>}</td>
+          <CodeCell code={e.code} />
           <td className={styles.valueCell}>
             {/* One shadow per line (the commas inside rgba() aren't separators). */}
             {e.shadows.light.split(/,\s*(?![^(]*\))/).map((s, i) => (

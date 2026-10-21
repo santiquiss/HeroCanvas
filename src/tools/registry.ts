@@ -32,20 +32,17 @@ export interface ToolDef {
   whileInspecting?: boolean;
   /** Drawn in its tab after the title: something to see without opening it (the proposal's change counts). */
   badge?: ComponentType;
-  /** With no app connected (the tour shows): what it shows once there is one, in its place (EmptyHint), for a tool the
-   * tour has nothing for. */
-  empty?: string;
 }
 
 export const TOOLS: ToolDef[] = [
   { id: 'pages', title: 'Pages', icon: 'account_tree', side: 'left', component: PagesPanel, modes: ['prototype'] },
-  { id: 'components', title: 'Components', icon: 'widgets', side: 'left', component: ComponentsPanel, modes: ['components'], empty: 'Your app’s components, by the names its code uses, each with its stories.' },
-  { id: 'tokens', title: 'Tokens', icon: 'palette', side: 'left', component: TokensPanel, modes: ['tokens'], empty: 'Your app’s design tokens by group: colors, spacing, radii, type.' },
+  { id: 'components', title: 'Components', icon: 'widgets', side: 'left', component: ComponentsPanel, modes: ['components'] },
+  { id: 'tokens', title: 'Tokens', icon: 'palette', side: 'left', component: TokensPanel, modes: ['tokens'] },
   // The layers of what's on the canvas: a screen in the prototype, the component's examples in Components.
   { id: 'layers', title: 'Layers', icon: 'layers', side: 'left', component: LayersPanel, modes: ['prototype', 'components'] },
   // A component's page, in Components: what to know about it, then its props to read and to change.
-  { id: 'info', title: 'Info', icon: 'info', side: 'right', component: ComponentInfoPanel, modes: ['components'], badge: ComponentStateBadge, empty: 'What to know about the picked component: where the app uses it, and how it matches the code and the design.' },
-  { id: 'props', title: 'Props', icon: 'tune', side: 'right', component: ControlsPanel, modes: ['components'], empty: 'The picked component’s props, to read and to change while you look.' },
+  { id: 'info', title: 'Info', icon: 'info', side: 'right', component: ComponentInfoPanel, modes: ['components'], badge: ComponentStateBadge },
+  { id: 'props', title: 'Props', icon: 'tune', side: 'right', component: ControlsPanel, modes: ['components'] },
   { id: 'inspect', title: 'Inspect', icon: 'ads_click', side: 'right', component: InspectPanel, whileInspecting: true },
   { id: 'page', title: 'Page', icon: 'info', side: 'right', component: PageInspector, modes: ['prototype'] },
   { id: 'scenarios', title: 'Scenarios', icon: 'science', side: 'right', component: ScenariosPanel, modes: ['prototype', 'flow'] },

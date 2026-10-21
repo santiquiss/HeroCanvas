@@ -53,7 +53,7 @@ describe('a class of named constructors (kinds)', () => {
     declareProps(FAKE, { kinds: [KIND] });
     try {
       const state = componentState(FAKE, true, lib);
-      expect(state.label).toBe('Differs from the code');
+      expect(state.label).toBe('Differs from code');
       expect(state.reasons.map((r) => r.text)).toEqual([`${KIND} · A test look`]);
     } finally {
       declareProps(FAKE, {});

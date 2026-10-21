@@ -219,3 +219,9 @@
   color: var(--hc-canvas-muted);
   font-size: 11px;
 }
+
+/* A token only HeroCanvas has (the tour's), or one whose code name no connector gives yet: said quietly. */
+.local {
+  color: var(--ui-text-subtle);
+  font-size: 12px;
+}

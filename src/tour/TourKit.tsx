@@ -1,6 +1,6 @@
 // The tour's components (HeroCanvas's own app, shown while no app is connected), after iOS: large titles, inset
 // grouped lists, Settings-style icon tiles, capsule buttons, Liquid Glass on what floats. Instrumented (useComponent)
-// so Inspect and Layers name them. Sizes on iOS's type ramp, scaled with the device's text size (--text-scale).
+// so Inspect and Layers name them. Drawn with the app tokens the tour's theme sets (theme.css: iOS's values).
 import { useState, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import { useComponent } from '../design/component';
@@ -134,7 +134,7 @@ export function Hero({ icon, title, subtitle }: { icon: ReactNode; title: string
 export function CapsuleButton({ title, filled = true, onPressed }: { title: string; filled?: boolean; onPressed: () => void }) {
   const hc = useComponent('CapsuleButton', { title, filled, onPressed });
   return (
-    <button {...hc} className={`${styles.capsule} ${filled ? styles.filled : styles.gray}`} onClick={onPressed}>
+    <button {...hc} className={`${styles.capsule} ${filled ? styles.filled : styles.tinted}`} onClick={onPressed}>
       {title}
     </button>
   );

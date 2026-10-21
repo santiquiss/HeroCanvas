@@ -99,6 +99,16 @@ export const GROUP_TITLES: Record<GroupKey, string> = {
 };
 
 /**
+ * A group's title. "Local" there means no tier (nothing, Figma or the code, gave one): with every component in it,
+ * it's just the components; beside tiered ones, the rest.
+ */
+export function groupTitle(g: GroupKey, groups: Record<GroupKey, string[]>): string {
+  if (g !== 'local') return GROUP_TITLES[g];
+  const tiered = (Object.keys(groups) as GroupKey[]).some((k) => k !== 'local' && k !== 'unreplicated' && groups[k].length);
+  return tiered ? 'Other' : 'Components';
+}
+
+/**
  * Component names for the gallery by tier: Figma's components (names and tiers from Figma, the current naming
  * decision), then the component catalog's and the simulator's that Figma doesn't name, each in its tier (the code's,
  * else the catalog's); Local only for what nothing gives a tier.

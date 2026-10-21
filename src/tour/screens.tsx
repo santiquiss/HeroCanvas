@@ -7,7 +7,7 @@ import { STEPS, type TourStep } from './steps';
 import { CapsuleButton, Hero, IconTile, ListRow, PromptField, Screen, Section, TextCell } from './TourKit';
 import styles from './screens.module.css';
 
-const HOW = [
+export const HOW = [
   { icon: 'link', tint: 'blue', title: 'Connect your app', subtitle: 'Your agent reads its code and mirrors it here' },
   { icon: 'devices', tint: 'indigo', title: 'See it everywhere', subtitle: 'Every screen on every device, in light and dark' },
   { icon: 'call_split', tint: 'pink', title: 'Propose changes', subtitle: 'Kept apart, in versions to compare' },
@@ -51,7 +51,7 @@ export function TourScreen() {
   );
 }
 
-const WAYS = [
+export const WAYS = [
   {
     header: 'Recommended',
     icon: 'code',

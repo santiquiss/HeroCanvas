@@ -2,6 +2,7 @@
 // it matches the code's component library; amber, it differs (props the widget doesn't have, or a look unlike the code, declared
 // beside it: simulatorProps); blue, the app builds it itself; gray, drawn here only, or (lighter) missing in the
 // simulator; or (lightest, apart) not replicated on purpose (design/unreplicated).
+import { NO_APP } from '../nav/noApp';
 import { proposalsAdding } from '../proposals';
 import { APP_WIDGETS, WORK } from './handoff';
 import type { Library } from './library';
@@ -44,7 +45,7 @@ export function componentState(name: string, built: boolean, lib: Library): Comp
     const accepted = kinds.length ? kinds.flatMap((k) => acceptedDifferences(k).map((a) => ({ ...a, key: `${k} · ${a.key}`, text: `${k} · ${a.text}` }))) : acceptedDifferences(name);
     const n = accepted.length;
     return reasons.length
-      ? { color: WORK.differs.color, label: 'Differs from the code', summary: '', reasons, accepted }
+      ? { color: WORK.differs.color, label: 'Differs from code', summary: '', reasons, accepted }
       : {
           color: WORK.reuse.color,
           label: n ? `${WORK.reuse.badge} · ${n} ${n === 1 ? 'difference' : 'differences'} accepted` : WORK.reuse.badge,
@@ -82,15 +83,17 @@ export function componentState(name: string, built: boolean, lib: Library): Comp
           ...extra,
         };
   }
+  // With no app connected, the components on screen are the tour's: HeroCanvas's own, nothing to build.
+  if (NO_APP) return { color: WORK.build.color, label: WORK.build.label, summary: 'HeroCanvas’s own, part of its tour: not an app’s. Once your app is connected, its components show here, each matching its code or not.', ...none };
   return { color: WORK.build.color, label: WORK.build.label, summary: WORK.build.hint, ...none };
 }
 
 /** The states a component can be in, as the Components list filters them: each its dot's color. */
 export const COMPONENT_STATUSES = [
-  { key: 'matches', label: 'Matches the code', color: WORK.reuse.color },
-  { key: 'differs', label: 'Differs', color: WORK.differs.color },
+  { key: 'matches', label: 'Matches code', color: WORK.reuse.color },
+  { key: 'differs', label: 'Differs from code', color: WORK.differs.color },
   { key: 'app', label: 'In the app', color: WORK.app.color },
-  { key: 'build', label: 'Not in code', color: WORK.build.color },
+  { key: 'build', label: 'Local', color: WORK.build.color },
   { key: 'missing', label: 'Missing in the simulator', color: MISSING_COLOR },
   { key: 'unreplicated', label: 'Not replicated', color: UNREPLICATED_COLOR },
 ] as const;

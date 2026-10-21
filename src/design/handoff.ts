@@ -32,7 +32,8 @@ export const WORK: Record<Work, { label: string; badge: string; hint: string; co
   change: { label: 'Changed in this proposal', badge: 'Differs', hint: 'It exists in the library; this proposal changes it.', color: CHANGE.changed.color },
   new: { label: 'New in this proposal', badge: 'New', hint: 'Not in the library yet: build it.', color: CHANGE.new.color },
   app: { label: 'In the app, not in the library', badge: 'In app', hint: 'The app builds it itself, not with a component of its library: until it moves into the library, the app’s is the reference.', color: '#2563eb' },
-  build: { label: 'Not in code', badge: 'Not in code', hint: 'Drawn here, in neither the library nor the app: build it, or it stays part of the screen.', color: '#9aa0a8' },
+  // Only here: not in the app's code (yet). Where it came from (a design file, a proposal) is a note, not a state.
+  build: { label: 'Local', badge: 'Local', hint: 'Only in HeroCanvas, not in the app’s code: drawn here, from a design or for a proposal.', color: '#9aa0a8' },
 };
 
 export { APP_WIDGETS };

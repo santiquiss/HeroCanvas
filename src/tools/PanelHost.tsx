@@ -1,9 +1,7 @@
 import { useEffect, useState, type PointerEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Icon } from '../components/Icon';
-import { EmptyHint } from '../components/EmptyHint';
 import { useDesignRoot } from '../design/DesignContext';
-import { NO_APP } from '../nav/pages';
 import { useSimQuery, type Mode } from '../sim/modes';
 import { TOOLS } from './registry';
 import styles from './Panel.module.css';
@@ -103,14 +101,7 @@ export function PanelHost({
         ))}
       </div>
       <div className={styles.body}>
-        {/* No app connected: in each tool's place, what it shows once there is one. */}
-        {NO_APP && active.empty ? (
-          <EmptyHint icon={active.icon} title={active.title}>
-            {active.empty}
-          </EmptyHint>
-        ) : (
-          <C />
-        )}
+        <C />
       </div>
     </aside>
   );
