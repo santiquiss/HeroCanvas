@@ -4,8 +4,8 @@ import { LargeTitle } from './TourKit';
 
 export default stories({
   component: 'LargeTitle',
-  args: { title: 'Welcome', top: 0 },
+  args: { title: 'Tour' },
   width: 'content',
-  render: ({ title, top }) => <LargeTitle title={title} top={top} />,
+  render: ({ title }) => <LargeTitle title={title} />,
   stories: [{ name: 'Tab' }, { name: 'Long', args: { title: 'Get Started' } }],
 });

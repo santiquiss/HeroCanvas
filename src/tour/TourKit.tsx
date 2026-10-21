@@ -1,7 +1,7 @@
 // The tour's components (HeroCanvas's own app, shown while no app is connected), after iOS: large titles, inset
 // grouped lists, Settings-style icon tiles, capsule buttons, Liquid Glass on what floats. Instrumented (useComponent)
 // so Inspect and Layers name them. Drawn with the app tokens the tour's theme sets (theme.css: iOS's values).
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode, type Ref, type UIEvent } from 'react';
 import { Icon } from '../components/Icon';
 import { useComponent } from '../design/component';
 import { useNav } from '../nav/context';
@@ -13,9 +13,12 @@ import styles from './TourKit.module.css';
 export type Tint = 'blue' | 'indigo' | 'purple' | 'pink' | 'orange' | 'yellow' | 'green' | 'teal' | 'gray';
 
 /**
- * A screen: a tab's root opens with a large title; a pushed screen has a navigation bar with a glass back button and
- * its title inline. The page's grouped background, its side margins from the simulator's layout. `plain`: no title
- * and no scroll, its content laid out in the screen's height (a screen that opens with its own, like Welcome).
+ * A screen, as iOS lays one out. A tab's root opens with an empty bar over a large title at the left; scrolled, its
+ * content goes under the bar, which blurs it (iOS 26's soft scroll edge: glass fading out downward, no hairline), and
+ * once the large title is under the bar too, its title shows in it, small and centered. A pushed screen's bar has a
+ * glass back button and its title inline from the start. The bar stays at the top. The page's grouped background, its
+ * side margins from the simulator's layout. `plain`: no title and no scroll, its content laid out in the screen's
+ * height (a screen that opens with its own, like Welcome).
  */
 export function Screen({ title, plain = false, children }: { title: string; plain?: boolean; children: ReactNode }) {
   const { layout } = useSim();
@@ -23,42 +26,69 @@ export function Screen({ title, plain = false, children }: { title: string; plai
   const padL = usePadL();
   const padR = usePadR();
   const root = nav.def(nav.ref.id).level === 'tab' && nav.index === 0;
+  const large = useRef<HTMLHeadingElement>(null);
+  // `under`: content has scrolled under the bar (its glass shows); `collapsed`: the large title has too (the bar's own
+  // title shows).
+  const [edge, setEdge] = useState({ under: false, collapsed: !root });
+  const onScroll = (e: UIEvent<HTMLDivElement>) => {
+    const top = e.currentTarget.scrollTop;
+    const under = top > 1;
+    const collapsed = !root || (!!large.current && top >= large.current.offsetHeight - 6);
+    if (under !== edge.under || collapsed !== edge.collapsed) setEdge({ under, collapsed });
+  };
   // A plain screen keeps clear of the tab bar only (the tour has no search pill, nothing scrolls under it), so its
   // content has all the room.
   return (
     <div className={styles.screen}>
-      <div className={`${styles.scroll} ${plain ? styles.plain : ''}`} style={{ paddingLeft: padL, paddingRight: padR, paddingTop: plain ? layout.padT : undefined, paddingBottom: plain ? layout.padB - SEARCH_BAR_H - 24 : root ? layout.padB : layout.padBPush }}>
-        {plain ? null : root ? (
-          <LargeTitle title={title} top={layout.padT} />
-        ) : (
-          <div className={styles.navArea} style={{ paddingTop: layout.headerY - 22 }}>
-            <NavigationBar title={title} onBack={nav.back} />
+      <div
+        className={`${styles.scroll} ${plain ? styles.plain : ''}`}
+        style={{ paddingLeft: padL, paddingRight: padR, paddingTop: plain ? layout.padT : undefined, paddingBottom: plain ? layout.padB - SEARCH_BAR_H - 24 : root ? layout.padB : layout.padBPush }}
+        onScroll={plain ? undefined : onScroll}
+      >
+        {!plain && (
+          // The bar spans the screen's width (over the side margins), its row where every page's header sits.
+          <div className={`${styles.bar} ${edge.under ? styles.barUnder : ''}`} style={{ margin: `0 ${-padR}px 0 ${-padL}px`, padding: `${layout.headerY - 22}px ${padR}px 0 ${padL}px` }}>
+            <span className={styles.barGlass} aria-hidden />
+            <NavigationBar title={title} onBack={root ? undefined : nav.back} titleShown={edge.collapsed} />
           </div>
         )}
-        <div className={styles.content}>{children}</div>
+        <div className={styles.content}>
+          {root && !plain && <LargeTitle title={title} titleRef={large} />}
+          {children}
+        </div>
       </div>
     </div>
   );
 }
 
-export function LargeTitle({ title, top }: { title: string; top: number }) {
+/** A tab's title, large, at the left: where its screen opens (the bar takes it over once it scrolls under). */
+export function LargeTitle({ title, titleRef }: { title: string; titleRef?: Ref<HTMLHeadingElement> }) {
   const hc = useComponent('LargeTitle', { title });
   return (
-    <h1 {...hc} className={styles.largeTitle} style={{ paddingTop: top }}>
+    <h1 {...hc} ref={titleRef} className={styles.largeTitle}>
       {title}
     </h1>
   );
 }
 
-/** A pushed screen's bar: back as a glass circle (iOS 26), the title inline in the middle. */
-export function NavigationBar({ title, onBack }: { title: string; onBack: () => void }) {
-  const hc = useComponent('NavigationBar', { title, onBack });
+/**
+ * A screen's bar: its title small and centered (`titleShown`: a tab's root shows it only once its large title has
+ * scrolled away); on a pushed screen, back as a glass circle at the left (iOS 26).
+ */
+export function NavigationBar({ title, onBack, titleShown = true }: { title: string; onBack?: () => void; titleShown?: boolean }) {
+  const hc = useComponent('NavigationBar', { title, onBack, titleShown });
   return (
     <header {...hc} className={styles.navBar}>
-      <button className={`${styles.glass} ${styles.back}`} aria-label="Back" onClick={onBack}>
-        <Icon name="arrow_back_ios_new" size={20} />
-      </button>
-      <span className={styles.navTitle}>{title}</span>
+      {onBack ? (
+        <button className={`${styles.glass} ${styles.back}`} aria-label="Back" onClick={onBack}>
+          <Icon name="arrow_back_ios_new" size={20} />
+        </button>
+      ) : (
+        <span />
+      )}
+      <span className={`${styles.navTitle} ${titleShown ? styles.navTitleShown : ''}`} aria-hidden={!titleShown}>
+        {title}
+      </span>
       <span />
     </header>
   );

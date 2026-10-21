@@ -35,20 +35,38 @@
   justify-content: center;
 }
 
+/* iOS's large title: 34 bold at the content's left, under the empty bar. */
 .largeTitle {
   margin: 0;
-  padding-bottom: var(--app-space-s);
-  font: var(--app-font-title);
-  text-align: center;
+  padding: 2px 0 var(--app-space-s);
+  font: var(--app-font-large-title);
 }
 
-/* A pushed screen's bar: it stays while the page scrolls, the page fading under it. */
-.navArea {
+/* The bar, fixed at the top while the page scrolls under it. Its glass, iOS 26's soft scroll edge: what's under it
+   blurred, fading out downward (no hairline), shown once the content goes under. */
+.bar {
   position: sticky;
   top: 0;
   z-index: 5;
-  padding-bottom: var(--app-space-m);
-  background: linear-gradient(var(--app-page) 70%, transparent);
+  padding-bottom: var(--app-space-s);
+}
+.barGlass {
+  position: absolute;
+  inset: 0 0 -18px;
+  background: color-mix(in srgb, var(--app-page) 72%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.8);
+  backdrop-filter: blur(14px) saturate(1.8);
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 30px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 30px), transparent);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+.barUnder .barGlass {
+  opacity: 1;
+}
+.bar > header {
+  position: relative;
 }
 .navBar {
   display: grid;
@@ -62,6 +80,16 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 200ms ease,
+    translate 200ms ease;
+}
+/* A tab's title shows in its bar once the large title is under it, as a quick fade. */
+.navTitleShown {
+  opacity: 1;
+  translate: none;
 }
 
 /* Liquid Glass (theme.css's --glass-*): what floats over the content. */
