@@ -91,7 +91,7 @@ if (from.endsWith('.xcassets')) {
   walk(from, (p, dir) => {
     if (dir) return;
     const folder = basename(dirname(p));
-    if (/\.xml$/.test(p) && /^drawable/.test(folder)) return void skipped.push(relative(from, p));
+    if (p.endsWith('.xml') && folder.startsWith('drawable')) return void skipped.push(relative(from, p));
     if (!IMAGE.test(p)) return;
     const d = dens.findIndex((x) => folder.includes(x));
     const key = /^(drawable|mipmap)/.test(folder) ? basename(p) : relative(from, p);

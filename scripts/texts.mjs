@@ -67,7 +67,7 @@ function convert(file) {
 const walk = (p) => {
   if (statSync(p).isDirectory()) {
     for (const f of readdirSync(p)) if (f !== 'node_modules' && !f.startsWith('.')) walk(join(p, f));
-  } else if (/\.(strings|xcstrings|arb)$/.test(p) || basename(p) === 'strings.xml' || (/\.json$/.test(p) && /(locales?|i18n|lang|translations?)[\\/]/i.test(p))) convert(p);
+  } else if (/\.(strings|xcstrings|arb)$/.test(p) || basename(p) === 'strings.xml' || (p.endsWith('.json') && /(locales?|i18n|lang|translations?)[\\/]/i.test(p))) convert(p);
 };
 for (const s of sources) walk(s);
 
