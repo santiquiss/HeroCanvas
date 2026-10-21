@@ -15,7 +15,7 @@ import { BASE_LANGUAGE, LANG_PARAM, LANGUAGES, languageIn } from '../sim/languag
 import { LAUNCH } from '../nav/pages';
 import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
-import { PersonaPicker, usePersonaParam } from './PersonaPicker';
+import { NoPersonas, PersonaPicker, usePersonaParam } from './PersonaPicker';
 
 interface Option {
   value: string;
@@ -30,17 +30,16 @@ export function ScenariosPanel() {
 
   return (
     <>
-      {persona && (
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>
-            Persona
-            <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-              every page
-            </span>
-          </div>
-          <PersonaPicker persona={persona} onPick={pick} />
+      {/* Always there: with no personas, the default user and how to make some. */}
+      <div className={styles.section}>
+        <div className={styles.sectionTitle}>
+          Persona
+          <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
+            every page
+          </span>
         </div>
-      )}
+        {persona ? <PersonaPicker persona={persona} onPick={pick} /> : <NoPersonas />}
+      </div>
 
       <LanguageSection />
 
@@ -132,9 +131,23 @@ function LanguageSection() {
   return (
     <div className={styles.section}>
       <Title label="Language" hint="system" params={[LANG_PARAM]} />
-      <Row label="Language" note="A device of a set can have its own: its header’s language.">
-        <Select label="Language" value={language} onChange={(v) => patch({ [LANG_PARAM]: v === BASE_LANGUAGE ? null : v })} options={LANGUAGES.map((l) => ({ value: l.id, label: l.name }))} />
-      </Row>
+      {LANGUAGES.length > 1 ? (
+        <Row label="Language" note="A device of a set can have its own: its header’s language.">
+          <Select label="Language" value={language} onChange={(v) => patch({ [LANG_PARAM]: v === BASE_LANGUAGE ? null : v })} options={LANGUAGES.map((l) => ({ value: l.id, label: l.name }))} />
+        </Row>
+      ) : (
+        // One language: nothing to pick yet; how to add more instead.
+        <>
+          <Row label="Language">
+            <span className={styles.muted}>{LANGUAGES[0].name}</span>
+          </Row>
+          <p className={styles.sectionHint}>
+            The screens are in one language. To try them in more, ask your agent to add your app’s languages: “Add
+            Spanish and Portuguese to my app.” Each screen’s texts get translated in the mirror, and then each device can
+            show its own.
+          </p>
+        </>
+      )}
     </div>
   );
 }

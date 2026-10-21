@@ -1040,3 +1040,17 @@
 .row:hover .launchPlay {
   color: var(--ui-text);
 }
+
+/* No personas yet: the default user, not a menu. A section with nothing to pick yet says how to get some (sectionHint). */
+.personaStatic {
+  cursor: default;
+}
+.personaStatic:hover {
+  background: none;
+}
+.sectionHint {
+  margin: 8px 2px 0;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  line-height: 17px;
+}

@@ -6,6 +6,13 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.25.0 — 2026-10-21
+
+- **Scenarios › Persona is always there**: with no personas, it shows the one user every app has ("User", anyone with
+  the app's sample data) and what personas are, with what to ask the agent to make some.
+- **One language, no language picker**: a device's header drops its language when the app has only one, and
+  Scenarios › Language shows it with how to add more (ask the agent for the app's languages).
+
 ## 0.24.1 — 2026-10-21
 
 - **The comment cursor on every device**: with several devices on the canvas, their touch pointers stayed on in

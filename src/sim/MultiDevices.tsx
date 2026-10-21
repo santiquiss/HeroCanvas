@@ -559,7 +559,8 @@ export function MultiDevices({
                     onRotate={() => update(i, { land: !it.land })}
                     grip={{ onPointerDown: (e) => dragStart(i, e), onPointerMove: dragMove, onPointerUp: dragEnd, onPointerCancel: dragEnd }}
                     design={{ value: it.design, onPick: (design) => update(i, { design }) }}
-                    language={{ value: it.lang, onPick: (lang) => update(i, { lang }) }}
+                    // A language of its own only when the app has more than one to show.
+                    language={LANGUAGES.length > 1 ? { value: it.lang, onPick: (lang) => update(i, { lang }) } : undefined}
                     onRemove={() => remove(i)}
                   />
                   {/* Touching a device makes it the active one, before the touch reaches the app. In Inspect, so does

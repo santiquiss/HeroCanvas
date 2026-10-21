@@ -72,7 +72,7 @@ export function PersonaPicker({ persona, onPick }: { persona: Persona; onPick: (
 }
 
 /** Avatar, then name, then who they are. */
-function PersonaRow({ persona: p }: { persona: Persona }) {
+export function PersonaRow({ persona: p }: { persona: Persona }) {
   return (
     <>
       {p.avatar ? <img className={styles.personaAvatar} src={`${import.meta.env.BASE_URL}${p.avatar}`} alt="" /> : <span className={`${styles.personaAvatar} ${styles.personaInitial}`}>{p.name.charAt(0)}</span>}
@@ -82,6 +82,28 @@ function PersonaRow({ persona: p }: { persona: Persona }) {
         </span>
         {p.description && <span className={styles.personaTagline}>{p.description}</span>}
       </span>
+    </>
+  );
+}
+
+/** Who the screens show when the app has no personas: anyone, with the app's own sample data. */
+export const DEFAULT_USER: Persona = { id: 'user', name: 'User', description: 'Anyone using the app, with its sample data' };
+
+/**
+ * The persona section with no personas yet: the one user every app has, and what personas are and how they're made
+ * (the new-persona skill), so the section is there to find before there's anything to pick.
+ */
+export function NoPersonas() {
+  return (
+    <>
+      <div className={`${styles.persona} ${styles.personaStatic}`}>
+        <PersonaRow persona={DEFAULT_USER} />
+      </div>
+      <p className={styles.sectionHint}>
+        Personas are who the app is tried as: a new user with nothing yet, someone on a paid plan, an admin with a busy
+        team. Each brings their own data, and every screen shows theirs. Ask your agent to create them: “Create personas
+        for my app.”
+      </p>
     </>
   );
 }
