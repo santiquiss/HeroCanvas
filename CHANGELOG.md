@@ -5,6 +5,19 @@ HeroCanvas's versions. The number shows in the toolbar (package.json `version`);
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.4.0 — 2026-10-21
+
+- **The team's code and the tool, apart** (as Laravel's skeleton and framework): `app/` and `proposals/` at the root
+  are the team's, `src/` is the tool's and what updates replace. The README's layout and AGENTS.md say which is which.
+- **The contract**:
+  - The app and proposals import the tool only as `herocanvas` (`src/index.ts`, the public API: the same import
+    once the tool is a package). A test fails on an import reaching into `src/`.
+  - The tool reads the app as `@app`. Moved: `src/app` → `app/`; proposals `src/proposals/<slug>` →
+    `proposals/<slug>`; the saved screen config `src/nav/screen-config.json` → `app/screen-config.json`; `AppConfig`,
+    `AppNavigation` and `Persona` from `app/types.ts` to the tool (`herocanvas`).
+- **Developer experience doc**: the Laravel model, and when it's 1.0: when the contract stops changing, not when the
+  features feel done.
+
 ## 0.3.1 — 2026-10-21
 
 - **Developer experience doc**: how a team's copy gets HeroCanvas's updates (template, clone, an update command, a

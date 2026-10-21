@@ -1,7 +1,7 @@
 // The screens' language: a code the connected app knows (app.languages), set for the whole canvas (`?lang=`) or per
 // device in a set. The simulator only carries it; the app reads it (useLanguage) and writes its texts in it.
 import { createContext, useContext } from 'react';
-import { appConfig as app } from '../app/config';
+import { appConfig as app } from '@app/config';
 
 export type Language = string;
 

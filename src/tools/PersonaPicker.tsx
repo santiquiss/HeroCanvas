@@ -2,7 +2,7 @@
 // name, who they are). Closes on a pick, Escape or a click outside; arrows move between rows.
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useSearchParams } from 'react-router';
-import type { Persona } from '../app/types';
+import type { Persona } from '../contract';
 import { Icon } from '../components/Icon';
 import { DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/persona';
 import { useUrlPatch } from '../sim/SimContext';

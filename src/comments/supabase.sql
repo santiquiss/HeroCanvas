@@ -13,7 +13,7 @@ create table if not exists public.comments (
   design text not null check (char_length(design) between 1 and 40),
   -- the proposal's version (a, b…), or null
   variant text check (char_length(variant) <= 20),
-  -- the page id (src/app/pages.tsx)
+  -- the page id (app/pages.tsx)
   page text not null check (char_length(page) between 1 and 80),
   -- the view it was left on (route + query)
   link text not null check (char_length(link) <= 4000),

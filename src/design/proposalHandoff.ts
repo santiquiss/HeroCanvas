@@ -40,7 +40,7 @@ export interface HandoffInput {
 
 const fence = (source: string, language: string) => `\`\`\`${language}\n${source.trimEnd()}\n\`\`\``;
 
-/** The component's constructor, from the parameters the code connector read (src/app/connectors). */
+/** The component's constructor, from the parameters the code connector read (app/connectors). */
 export function codeSignature(w: Pick<ApiWidget, 'name' | 'params'>): string {
   const params = w.params.map((p) => `  ${p.required ? 'required ' : ''}${p.type ?? 'dynamic'} ${p.name}${p.default != null ? ` = ${p.default}` : ''},`);
   return `${w.name}(${params.length ? `{\n${params.join('\n')}\n}` : ''})`;
@@ -118,7 +118,7 @@ export function proposalHandoff(input: HandoffInput): string {
   const add = (...lines: string[]) => out.push(...lines);
 
   add(`# Handoff ${p.id}: ${p.meta.title}`, '');
-  add(`- **Proposal**: \`${p.id}\` (its permanent reference; in \`src/proposals/${p.folder}/\`) · status \`${p.meta.status}\`${p.meta.author ? ` · by ${p.meta.author}` : ''} · created ${p.meta.created}`);
+  add(`- **Proposal**: \`${p.id}\` (its permanent reference; in \`proposals/${p.folder}/\`) · status \`${p.meta.status}\`${p.meta.author ? ` · by ${p.meta.author}` : ''} · created ${p.meta.created}`);
   if (version) add(`- **Version to implement**: ${version.id.toUpperCase()} · ${version.label}`);
   add("- **Where it is implemented**: the app's code; reusable components in its component library");
   add(`- **Designed against the code at**: ${input.libraryCommit ? `commit \`${input.libraryCommit}\`` : 'an unknown commit'}. If the files named below changed since, say so before going on.`);
@@ -169,7 +169,7 @@ export function proposalHandoff(input: HandoffInput): string {
   }
 
   add('## Specification', '');
-  add(notes || `_The proposal has no specification yet (\`src/proposals/${p.folder}/${HANDOFF_NOTES_FILE}\`). Ask for it before implementing: this file alone only says what changes, not how._`, '');
+  add(notes || `_The proposal has no specification yet (\`proposals/${p.folder}/${HANDOFF_NOTES_FILE}\`). Ask for it before implementing: this file alone only says what changes, not how._`, '');
 
   const otherIds = others.map((v) => v.id);
   const states = input.stories.map((s) => ({ ...s, names: statesFor(s.names, otherIds) })).filter((s) => s.names.length);

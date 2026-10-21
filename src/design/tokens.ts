@@ -1,5 +1,5 @@
 // Maps computed colors back to token names: the screens' aliases in theme.css and the app's color tokens
-// (`--app-*`: src/kit/tokens.css, src/app/theme.css), per theme.
+// (`--app-*`: src/kit/tokens.css, app/theme.css), per theme.
 import themeCss from '../theme/theme.css?raw';
 import { TOKEN_GROUPS } from './tokenCatalog';
 

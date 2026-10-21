@@ -3,7 +3,7 @@
 import kitCss from '../kit/tokens.css?raw';
 import { declaredValue } from './declared';
 
-const appCss = Object.values(import.meta.glob('../app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
+const appCss = Object.values(import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
 
 export interface CodeTextStyle {
   /** The CSS variable, without `--` (`app-font-body`). */

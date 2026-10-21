@@ -323,7 +323,7 @@ function canvasDisplays(search: URLSearchParams): { device: Device; display: Dis
 
 /**
  * Whether the current page turns with the device, on the displays of the canvas (every display in All devices). Read
- * only: orientation is set in code (`landscape` in the manifest, src/app/pages.tsx).
+ * only: orientation is set in code (`landscape` in the manifest, app/pages.tsx).
  */
 function LandscapeSupport({ id }: { id: string }) {
   const nav = useNavRoot();
@@ -337,7 +337,7 @@ function LandscapeSupport({ id }: { id: string }) {
   const value = !turning.length ? 'Not supported · portrait only' : turning.length === displays.length ? 'Supported' : `Supported on ${turning.map(name).join(', ')}`;
   return (
     <>
-      <span className={styles.k} title="Whether the page turns with the device. Set in code: landscape, in src/app/pages.tsx">
+      <span className={styles.k} title="Whether the page turns with the device. Set in code: landscape, in app/pages.tsx">
         Landscape
       </span>
       <span className={styles.v}>{value}</span>
@@ -373,7 +373,7 @@ function SideColumnSection({ id }: { id: string }) {
 
 /**
  * Where the page's config comes from, and the actions to move it between layers:
- *   unsaved (URL) → Save as default (screen-config.json) → Make code default (src/app/pages.tsx)
+ *   unsaved (URL) → Save as default (screen-config.json) → Make code default (app/pages.tsx)
  *   Revert to code default drops what was saved. The two destructive actions ask for confirmation inline.
  */
 function SaveBar({ id }: { id: string }) {
@@ -409,7 +409,7 @@ function SaveBar({ id }: { id: string }) {
         </span>
         {!confirm && unsaved && (
           <>
-            <button className={styles.btn} disabled={!writable || busy} title={tip(proposal ? `Save in the proposal (src/proposals/${proposal.folder}/config.json)` : 'Save for everyone in src/nav/screen-config.json; the code stays as is')} onClick={() => run(() => save(id))}>
+            <button className={styles.btn} disabled={!writable || busy} title={tip(proposal ? `Save in the proposal (proposals/${proposal.folder}/config.json)` : 'Save for everyone in app/screen-config.json; the code stays as is')} onClick={() => run(() => save(id))}>
               <Icon name="save" size={14} />
               {proposal ? 'Save to proposal' : 'Save as default'}
             </button>
@@ -419,7 +419,7 @@ function SaveBar({ id }: { id: string }) {
           </>
         )}
         {!confirm && !proposal && (unsaved || isSaved) && (
-          <button className={styles.btn} disabled={!writable || busy} title={tip('Write these values into the page in src/app/pages.tsx')} onClick={() => setConfirm('code')}>
+          <button className={styles.btn} disabled={!writable || busy} title={tip('Write these values into the page in app/pages.tsx')} onClick={() => setConfirm('code')}>
             <Icon name="code" size={14} />
             Make code default
           </button>
@@ -438,7 +438,7 @@ function SaveBar({ id }: { id: string }) {
               ? proposal
                 ? 'Remove this page from the proposal config? It goes back to the base.'
                 : 'Delete the saved values of this page? It goes back to what the code says.'
-              : `Write these values into src/app/pages.tsx as the code default?${splitOff ? ' List–detail is off: it will be removed from the code.' : ''}`}
+              : `Write these values into app/pages.tsx as the code default?${splitOff ? ' List–detail is off: it will be removed from the code.' : ''}`}
           </span>
           <div style={{ display: 'flex', gap: 6 }}>
             <button

@@ -4,7 +4,7 @@ import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, t
 import { DesignOverride } from '../design/overridable';
 import { composePages } from '../nav/manifest';
 import { findProposal } from '../proposals';
-import { navigation } from '../app';
+import { navigation } from '@app';
 const { SideNav, SideRail, TabBar } = navigation;
 import { Icon } from '../components/Icon';
 import { ErrorBoundary } from '../components/ErrorBoundary';

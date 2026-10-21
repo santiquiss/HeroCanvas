@@ -1,7 +1,7 @@
 // The app's component catalog (its Storybook or similar), from a connector
-// (src/app/connectors/catalog.json): the reference for component *names* and taxonomy, and links to each use case.
-const raw = (Object.values(import.meta.glob('../app/connectors/catalog.json', { eager: true, import: 'default' }))[0] as Node[] | undefined) ?? [];
-const files = import.meta.glob('../app/connectors/catalog-url.json', { eager: true, import: 'default' }) as Record<string, { url: string }>;
+// (app/connectors/catalog.json): the reference for component *names* and taxonomy, and links to each use case.
+const raw = (Object.values(import.meta.glob('@app/connectors/catalog.json', { eager: true, import: 'default' }))[0] as Node[] | undefined) ?? [];
+const files = import.meta.glob('@app/connectors/catalog-url.json', { eager: true, import: 'default' }) as Record<string, { url: string }>;
 const CATALOG_URL = Object.values(files)[0]?.url ?? '';
 export type Tier = 'token' | 'atom' | 'molecule' | 'organism';
 

@@ -7,7 +7,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { authorLetters, defaultAuthorLetters, nextProposalCode } from '../src/proposals/code.ts';
 
-const DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../src/proposals');
+const DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../proposals');
 const taken = readdirSync(DIR, { withFileTypes: true })
   .filter((e) => e.isDirectory() && existsSync(join(DIR, e.name, 'proposal.json')))
   .map((e) => JSON.parse(readFileSync(join(DIR, e.name, 'proposal.json'), 'utf8')).code)

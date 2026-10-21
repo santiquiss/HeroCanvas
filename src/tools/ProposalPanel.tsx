@@ -136,7 +136,7 @@ function BaseView() {
           />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
-          <button className={styles.btn} disabled={!writable || !title.trim() || !code} title={writable ? `Creates src/proposals/${slugify(title || 'proposal')}/` : 'Needs the dev server (npm run dev)'} onClick={create}>
+          <button className={styles.btn} disabled={!writable || !title.trim() || !code} title={writable ? `Creates proposals/${slugify(title || 'proposal')}/` : 'Needs the dev server (npm run dev)'} onClick={create}>
             <Icon name="add" size={14} />
             Create
           </button>
@@ -260,7 +260,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Files</div>
         <div className={styles.mono} style={{ color: 'var(--ui-text-2)', lineHeight: '17px' }}>
-          src/proposals/{p.folder}/
+          proposals/{p.folder}/
           <br />· proposal.json, config.json — from the app
           <br />· pages.tsx — new / replaced pages (code)
           <br />· components/ — new components + stories

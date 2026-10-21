@@ -4,7 +4,7 @@
 import kitCss from '../kit/tokens.css?raw';
 import { boldWeight, scaleSize, textSizeFor, type TextSystem } from '../sim/systemText';
 
-const appCss = Object.values(import.meta.glob('../app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
+const appCss = Object.values(import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
 
 /** The sizes the two scales for off-style text are taken at: body text, and display text. */
 const BODY = 15;

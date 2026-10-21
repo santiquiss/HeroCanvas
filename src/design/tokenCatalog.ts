@@ -1,5 +1,5 @@
 // The connected app's design tokens, for the Tokens view and Inspect: each `--app-*` variable the screens are drawn
-// with (src/kit/tokens.css, and the app's own theme, src/app/theme.css, which overrides it), its value in light and
+// with (src/kit/tokens.css, and the app's own theme, app/theme.css, which overrides it), its value in light and
 // dark, and the token it points to. Grouped by what they are: colors, space, corners, type, effects.
 //
 // `figma` and `code`: the token's name in the design file and in the app's code, when a connector gives them
@@ -7,7 +7,7 @@
 import kitCss from '../kit/tokens.css?raw';
 import { CODE_TEXT_STYLES, type CodeTextStyle } from './textStyles';
 
-const appCss = Object.values(import.meta.glob('../app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
+const appCss = Object.values(import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
 
 export type TokenKind = 'color' | 'number' | 'text';
 export type Mode = 'light' | 'dark';

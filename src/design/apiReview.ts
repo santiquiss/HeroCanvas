@@ -1,13 +1,13 @@
 // Naming review of the app's component API, for the handoff: parameters whose name breaks a convention, with a
 // suggestion. Rules, so it stays current as the API is read again; plus notes kept by hand
-// (src/app/connectors/api-review.json) for what a rule can't see. Shown in Inspect's code API.
+// (app/connectors/api-review.json) for what a rule can't see. Shown in Inspect's code API.
 
-/** An optional file a connector writes (src/app/connectors/<name>), or `fallback` when there's none. */
+/** An optional file a connector writes (app/connectors/<name>), or `fallback` when there's none. */
 function optional<T>(files: Record<string, unknown>, fallback: T): T {
   const hit = Object.values(files)[0];
   return (hit as T | undefined) ?? fallback;
 }
-const notes = optional(import.meta.glob('../app/connectors/api-review.json', { eager: true, import: 'default' }), { widgets: {}, params: {} });
+const notes = optional(import.meta.glob('@app/connectors/api-review.json', { eager: true, import: 'default' }), { widgets: {}, params: {} });
 import type { ApiParam, ApiWidget } from './library';
 
 export interface ReviewNote {

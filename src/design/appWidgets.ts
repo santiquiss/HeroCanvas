@@ -1,5 +1,5 @@
 // Components the app builds on its own, outside its component library: where they live in its code, and their tier
-// for the gallery. Kept by the app (src/app/connectors/app-widgets.json); no imports, so the gallery's tiers
+// for the gallery. Kept by the app (app/connectors/app-widgets.json); no imports, so the gallery's tiers
 // (design/figma) and the handoff (design/handoff) both read it.
 export interface AppWidget {
   widget: string;
@@ -12,6 +12,6 @@ export interface AppWidget {
   tier?: 'atom' | 'molecule' | 'organism';
 }
 
-const files = import.meta.glob('../app/connectors/app-widgets.json', { eager: true, import: 'default' }) as Record<string, Record<string, AppWidget>>;
+const files = import.meta.glob('@app/connectors/app-widgets.json', { eager: true, import: 'default' }) as Record<string, Record<string, AppWidget>>;
 
 export const APP_WIDGETS: Record<string, AppWidget> = Object.values(files)[0] ?? {};

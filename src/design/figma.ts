@@ -1,17 +1,17 @@
 // The design file's components and the code ↔ design map, for the gallery and Inspect. Both come from a design
-// connector (src/app/connectors/figma-components.json: the file's components and their options; code-map.json: which
+// connector (app/connectors/figma-components.json: the file's components and their options; code-map.json: which
 // code component each one is, and how they differ). Without them the gallery lists the app's components alone.
 import { APP_WIDGETS } from './appWidgets';
 import { UNREPLICATED } from './unreplicated';
 
-/** An optional file a connector writes (src/app/connectors/<name>), or `fallback` when there's none. */
+/** An optional file a connector writes (app/connectors/<name>), or `fallback` when there's none. */
 function optional<T>(files: Record<string, unknown>, fallback: T): T {
   const hit = Object.values(files)[0];
   return (hit as T | undefined) ?? fallback;
 }
 
-const inventory = optional(import.meta.glob('../app/connectors/figma-components.json', { eager: true, import: 'default' }), { file: '', exportedAt: '', components: [] as unknown[] });
-const codeMap = optional(import.meta.glob('../app/connectors/code-map.json', { eager: true, import: 'default' }), { map: [] as unknown[] });
+const inventory = optional(import.meta.glob('@app/connectors/figma-components.json', { eager: true, import: 'default' }), { file: '', exportedAt: '', components: [] as unknown[] });
+const codeMap = optional(import.meta.glob('@app/connectors/code-map.json', { eager: true, import: 'default' }), { map: [] as unknown[] });
 
 export interface FigmaProp {
   name: string;

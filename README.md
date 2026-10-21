@@ -2,7 +2,7 @@
 
 # HeroCanvas
 
-<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.3.1-3b6fd8"></a>
+<a href="CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.4.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
@@ -24,15 +24,15 @@ honest; you look at the canvas, try the scenarios, and say what to change.
 ## How it works
 
 ```
- your app's code ──read──▶  agent  ──writes──▶  src/app (the mirror)  ──▶  the canvas
+ your app's code ──read──▶  agent  ──writes──▶  app (the mirror)  ──▶  the canvas
  (any stack, untouched)     (Claude)            pages, components,          devices, flows, scenarios,
                                                 tokens, texts, data         proposals, Inspect, comments
 ```
 
-1. **The mirror** (`src/app`) is your app as it is today: one page per screen at its route, your components with
+1. **The mirror** (`app/`) is your app as it is today: one page per screen at its route, your components with
    your names and props, your tokens as `--app-*` variables, your texts in every language, mock data per persona.
 2. **The tool** reads only that mirror. It knows nothing about your app beyond it, so it works the same for any app.
-3. **Proposals** (`src/proposals`) are changes to the mirror, kept apart: new pages, replaced components, versions A
+3. **Proposals** (`proposals/`) are changes to the mirror, kept apart: new pages, replaced components, versions A
    and B to compare, and a `handoff.md` for whoever builds it.
 
 ## Get started
@@ -63,7 +63,7 @@ Tasks app, pick another persona or language in **Scenarios**, open **Flow** to s
 press **Inspect** and point at a component.
 
 Tasks is a sample: a small task manager whose people, projects and tasks are made up (all in
-`src/app/data/sample.ts`). It's there to show what HeroCanvas does, and connecting your app replaces it.
+`app/data/sample.ts`). It's there to show what HeroCanvas does, and connecting your app replaces it.
 
 ### 3. Make it yours
 
@@ -81,9 +81,9 @@ claude
 ```
 
 The agent follows the `connect-app` skill: it detects your stack, reads your routes, theme, navigation and texts, and
-replaces the sample app with your app's mirror — every screen as a placeholder page first. Then it mirrors the screens one
-at a time, starting with the one you pick, and shows you each before the next. Your app's code is only read, never
-changed.
+replaces the sample app with your app's mirror — every screen as a placeholder page first. Then it mirrors the
+screens one at a time, starting with the one you pick, and shows you each before the next. Your app's code is only
+read, never changed.
 
 ### 5. Design
 
@@ -132,13 +132,20 @@ Other agents can read the same files: they're plain Markdown.
 
 ## Project layout
 
+Like Laravel's skeleton and framework: some folders are yours, one is the tool's.
+
 ```
-herocanvas.config.ts   the tool's name, logo and brand color
-src/app/               your app's mirror: config.ts, pages.tsx, nav/, components/, screens/, data/, theme.css
-src/proposals/         changes to it, one folder each
-src/kit/               the overlays the simulator presents with (sheet, dialog, menu, snackbar), on your tokens
-src/sim, src/tools,    the tool itself: simulator, panels, Flow, gallery, Capture, comments, Inspect
-src/flow, …
+Yours                  HeroCanvas's updates never touch these
+  app/                 your app's mirror: config.ts, pages.tsx, nav/, components/, screens/, data/, theme.css
+  proposals/           changes to it, one folder each
+  herocanvas.config.ts the tool's name, logo and brand color
+  brand/               the logo
+
+The tool's             don't edit: it's what updates replace (and, one day, an npm package)
+  src/                 simulator, panels, Flow, gallery, Capture, comments, Inspect, the kit
+  src/index.ts         its public API: all app/ and proposals/ import, as `from 'herocanvas'`
+  scripts/, public/
+
 docs/                  design notes (the developer experience)
 .claude/skills/        procedures for the agent
 ```

@@ -2,7 +2,7 @@
 //
 //   GET  /__hc/status            → { writable: true }
 //   POST /__hc/write { path, data } → writes `data` as pretty JSON to `path` (relative to the project root)
-//   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in src/app/pages.tsx
+//   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in app/pages.tsx
 //                                    (`null` removes the field; omitted fields are left alone)
 //
 // Guard rails: only JSON, only under ALLOWED paths, and only same-origin requests that carry the
@@ -13,7 +13,7 @@ import { dirname, relative, resolve, sep } from 'node:path';
 import type { Plugin } from 'vite';
 
 /** Files and folders the app may write. */
-const ALLOWED = ['src/nav/screen-config.json', 'src/proposals/'];
+const ALLOWED = ['app/screen-config.json', 'proposals/'];
 
 function allowed(root: string, path: string): string | null {
   const abs = resolve(root, path);
@@ -22,7 +22,7 @@ function allowed(root: string, path: string): string | null {
   return ALLOWED.some((a) => (a.endsWith('/') ? rel.startsWith(a) : rel === a)) ? abs : null;
 }
 
-const MANIFEST = 'src/app/pages.tsx';
+const MANIFEST = 'app/pages.tsx';
 
 /** A JS value as a TS literal in the manifest's style: `{ a: 1, b: 'x' }`. */
 function literal(v: unknown): string {

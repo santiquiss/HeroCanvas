@@ -1,6 +1,6 @@
 # Developer experience: connecting any app to HeroCanvas
 
-A first proposal to think through, not a decision. HeroCanvas today shows one app (the sample app, `src/app`) built in its
+A first proposal to think through, not a decision. HeroCanvas today shows one app (the sample app, `app/`) built in its
 own React. The goal: a team with an app in React, React Native, Flutter, SwiftUI or Jetpack Compose installs it,
 connects their app in minutes, and from then on designs, reviews and hands off on a canvas that matches their code.
 
@@ -13,7 +13,7 @@ component gallery. None of it knows the app: it reads it through the app boundar
 
 ## The boundary (what exists today)
 
-An app gives HeroCanvas four things (`src/app`):
+An app gives HeroCanvas four things (`app/`):
 
 | | What | Where |
 |---|---|---|
@@ -22,7 +22,7 @@ An app gives HeroCanvas four things (`src/app`):
 | Navigation | Its tab bar, rail and Duo column | `nav/` (`AppNavigation`) |
 | Look | Its tokens (`--app-*`): colors per theme, space, radii, type, elevation | `theme.css` over `src/kit/tokens.css` |
 
-And, optionally, what its code says, through **connectors** (`src/app/connectors/*.json`): the components' API
+And, optionally, what its code says, through **connectors** (`app/connectors/*.json`): the components' API
 (names and parameters), a design file's inventory and its map to the code, a component catalog, notes for the API
 review. Inspect, the gallery and the handoff use them when they're there.
 
@@ -85,8 +85,8 @@ replace the first and never touch the second. How well that works depends on how
 | | How they got it | How they update | What goes wrong |
 |---|---|---|---|
 | **Template** (today's README) | "Use this template": a new repo, one commit, no shared history | A merge with `--allow-unrelated-histories` | Git can't tell who changed what: nearly every file conflicts. In practice, nobody updates |
-| **Clone or fork** | History shared with HeroCanvas | `git pull upstream main` | The tool's folders merge cleanly; `src/app` conflicts whenever the sample app changes (it shares the folder with theirs); `package.json`, `CHANGELOG.md` and the README always conflict. A fork of a public repo is public |
-| **Update command** | Any of the above | `npx herocanvas update`: the tool's folders replaced by a release's; `src/app`, `src/proposals` and `herocanvas.config.ts` left alone | Nothing in the tool, as long as they didn't edit it. Their app may need changes when the contract does |
+| **Clone or fork** | History shared with HeroCanvas | `git pull upstream main` | The tool's folders merge cleanly; `app/` conflicts whenever the sample app changes (it shares the folder with theirs); `package.json`, `CHANGELOG.md` and the README always conflict. A fork of a public repo is public |
+| **Update command** | Any of the above | `npx herocanvas update`: the tool's folders replaced by a release's; `app/`, `proposals/` and `herocanvas.config.ts` left alone | Nothing in the tool, as long as they didn't edit it. Their app may need changes when the contract does |
 | **Package** | `npm install herocanvas`; their repo holds only the config, the app and the proposals | `npm install herocanvas@latest` | Only what the contract breaks, which semver announces |
 
 The contract is what the tool reads from the app: `AppConfig`, the page manifest, `AppNavigation`, the `--app-*`
@@ -102,6 +102,35 @@ conflicts with their app.
 
 **Proposed path**: the update command and the skill now, while the repo is still private, so no one ends up with a
 copy that can't be updated; the package next (Order, step 1). The skill carries over unchanged.
+
+### The model: Laravel
+
+Laravel splits a project in two. The skeleton (`laravel new`: routes, controllers, config, views) is yours from the
+first day and Laravel never touches it again. The framework lives in `vendor/` and updates with `composer update`;
+you never edit it.
+
+| Laravel | HeroCanvas |
+|---|---|
+| `laravel/framework`, in `vendor/` | The tool: `src/` today, the npm package later |
+| `laravel new` writes the skeleton | `npx herocanvas init` writes `herocanvas.config.ts`, the sample app and `proposals/` |
+| `app/`, `routes/`, `config/` are yours | `app/`, `proposals/`, `herocanvas.config.ts` and `brand/` are yours |
+| `vendor:publish` copies a view to change it | Ejecting a piece |
+| The upgrade guide, Laravel Shift | The changelog, the `update-herocanvas` skill |
+
+Laravel adds features in every release and updating stays easy: what barely moves is how your code meets the
+framework. Same here. **What has to hold still is the contract** (what the app imports from `herocanvas` and gives
+it back); everything inside the tool (panels, Flow, Inspect, Capture) can keep growing, since it arrives with the
+update.
+
+### When it's 1.0
+
+Not when the features feel done (that may never come), but **when the contract stops changing**: it went through
+several releases untouched. While in 0.x, breaking it is fine; each break is in the changelog. At 1.0 the package is
+published and the contract follows semver.
+
+The split comes first, in the repo as it is: the team's code at the root (`app/`, `proposals/`), the tool in `src/`,
+and the app importing the tool only through `herocanvas` (`src/index.ts`, the same import the package will have).
+Living with it every day is what proves it, so publishing the package becomes a formality.
 
 ## Changing the tool itself
 
@@ -129,7 +158,7 @@ where it stops being something one team maintains.
 ## Order
 
 1. **The boundary as a package**: HeroCanvas as an npm package (the tool) and the app as a folder it's pointed at
-   (`herocanvas.config.ts`), instead of a fork with `src/app` replaced. Everything else depends on this. Before it,
+   (`herocanvas.config.ts`), instead of a fork with `app/` replaced. Everything else depends on this. Before it,
    while the repo is private: the update command and skill (see Updates).
 2. **React (web) and React Native / Expo**: the most popular stacks, mirror and live from the same language, routes
    and props readable with TypeScript's own tools.

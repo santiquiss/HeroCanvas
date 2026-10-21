@@ -1,8 +1,8 @@
 // Who's using the app in the screens: one of the connected app's personas (appConfig.personas), picked in the
 // Scenarios panel and kept in the URL (`?persona=`, none: the first). The simulator only carries it; the app reads
 // it (usePersona, or the param) and shows that person's data.
-import { appConfig } from '../app/config';
-import type { Persona } from '../app/types';
+import { appConfig } from '@app/config';
+import type { Persona } from '../contract';
 import { useUrlParams } from './SimContext';
 
 export const PERSONA_PARAM = 'persona';

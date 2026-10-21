@@ -1,6 +1,6 @@
 // Proposals: design explorations / new features on top of the base design.
 //
-//   src/proposals/<slug>/
+//   proposals/<slug>/
 //     proposal.json        meta: title, status, author, created, description   (editable from the app)
 //     config.json          screen config overrides for this proposal            (saved from the app)
 //     pages.tsx            optional: `export default proposal({ pages, components, params, variants })`: new or
@@ -121,7 +121,7 @@ export function proposal(code: ProposalCode): ProposalCode {
 export interface Proposal {
   /** Its code (`meta.code`): the proposal's identity everywhere in the designer and in `?proposal=`. */
   id: string;
-  /** Its folder in src/proposals/: where its files are. A name for people; it can be renamed. */
+  /** Its folder in proposals/: where its files are. A name for people; it can be renamed. */
   folder: string;
   meta: ProposalMeta;
   pages: Record<string, PageDef | null>;

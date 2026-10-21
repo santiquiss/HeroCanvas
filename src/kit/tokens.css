@@ -1,4 +1,4 @@
-/* The tokens a connected app gives its screens (the app's theme writes them, src/app/theme.css): the kit's overlays
+/* The tokens a connected app gives its screens (the app's theme writes them, app/theme.css): the kit's overlays
    and the simulator read only these, so any app's look reaches them. Each screen root carries data-theme; these are
    the defaults when an app leaves one out. Colors per theme; sizes and type for both. */
 

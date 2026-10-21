@@ -1,8 +1,8 @@
 // A component's props that the app's code has no parameter for must be declared beside it (design/simulatorProps:
 // the simulator's alone, or a difference to agree on), so the handoff knows which to leave out and the gallery which
 // components differ from the code. A proposal's added parameters count as declared (its `params`). Checked against the
-// code's API when a connector gives it (src/app/connectors/components-api.json); without one, nothing to check.
-const api = (Object.values(import.meta.glob('../app/connectors/components-api.json', { eager: true, import: 'default' }))[0] as { widgets: unknown[] } | undefined) ?? { widgets: [] };
+// code's API when a connector gives it (app/connectors/components-api.json); without one, nothing to check.
+const api = (Object.values(import.meta.glob('@app/connectors/components-api.json', { eager: true, import: 'default' }))[0] as { widgets: unknown[] } | undefined) ?? { widgets: [] };
 import { proposedParams } from '../design/handoff';
 import { componentInstance } from '../design/component';
 import { propDecl } from '../design/simulatorProps';

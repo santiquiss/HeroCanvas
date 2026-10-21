@@ -138,7 +138,7 @@ function Overview() {
       <div className={styles.head}>
         <span className={styles.title}>Components</span>
       </div>
-      {/* Coverage against Figma only with its inventory connected (src/app/connectors). */}
+      {/* Coverage against Figma only with its inventory connected (app/connectors). */}
       {figmaNames.length > 0 && (
         <>
           <p className={styles.note} style={{ marginBottom: 0 }}>

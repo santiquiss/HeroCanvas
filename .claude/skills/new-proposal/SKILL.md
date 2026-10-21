@@ -1,16 +1,16 @@
 ---
 name: new-proposal
-description: Design a change to the connected app as a HeroCanvas proposal (src/proposals/<slug>) - new or replaced pages and components, versions to compare, and the handoff spec for whoever builds it - without touching the mirror of the app as it is. Use when the person wants to explore, propose, redesign or add a feature, or asks for "a version" of a screen.
+description: Design a change to the connected app as a HeroCanvas proposal (proposals/<slug>) - new or replaced pages and components, versions to compare, and the handoff spec for whoever builds it - without touching the mirror of the app as it is. Use when the person wants to explore, propose, redesign or add a feature, or asks for "a version" of a screen.
 ---
 
 # A proposal
 
-The mirror (`src/app`) is the app **as it is**. A change to it is a **proposal**: its own folder that declares only
+The mirror (`app/`) is the app **as it is**. A change to it is a **proposal**: its own folder that declares only
 what it adds or changes, picked in the toolbar, shared by link (`?proposal=PJ-3`), compared side by side with the app
 as it is (Compare), and handed off with a specification.
 
 ```
-src/proposals/<yyyy-mm-slug>/
+proposals/<yyyy-mm-slug>/
   proposal.json   code, title, status, author, created, summary, description, ticket
   pages.tsx       export default proposal({ pages, components, variants })   (optional)
   components/     new or replaced components, with their stories              (optional)
@@ -29,9 +29,9 @@ the mirror (`mirror-screen`). Ask if it isn't clear.
 - `proposal.json`: the code, a title, `status: 'draft'`, the author, today's date, a one-sentence summary.
 - **Pages**: a new page, or a base page replaced by id (spread it to change only some fields:
   `{ ...BASE_PAGES.today, component: TodayV2 }`). **Components**: replace one the screens render with `overridable`
-  (`src/design/overridable.tsx`), or add new ones in `components/`. **Versions** (`variants`: A, B…) to compare
+  (from `herocanvas`), or add new ones in `components/`. **Versions** (`variants`: A, B…) to compare
   designs of the same change.
-- Never copy the mirror: import from `src/app` what doesn't change.
+- Never copy the mirror: import from `app/` what doesn't change (relative imports), and from the tool only `herocanvas`.
 
 ## 3. The handoff
 

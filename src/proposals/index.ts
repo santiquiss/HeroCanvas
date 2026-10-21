@@ -1,23 +1,23 @@
-// Proposal registry: every folder in src/proposals/ with a proposal.json. Picked up automatically.
+// Proposal registry: every folder in proposals/ (the project's root) with a proposal.json. Picked up automatically.
 // A proposal is known by its code (proposals/code.ts), not by its folder: `id` is the code.
 import { PROPOSAL_LOOKUP } from '../design/overridableRegistry';
 import type { ScreenConfig } from '../nav/screenConfig';
 import { parseProposalCode } from './code';
 import type { Proposal, ProposalCode, ProposalMeta } from './types';
 
-const metas = import.meta.glob('./*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>;
-const configs = import.meta.glob('./*/config.json', { eager: true, import: 'default' }) as Record<string, ScreenConfig>;
-const codes = import.meta.glob('./*/pages.tsx', { eager: true, import: 'default' }) as Record<string, ProposalCode>;
+const metas = import.meta.glob('/proposals/*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>;
+const configs = import.meta.glob('/proposals/*/config.json', { eager: true, import: 'default' }) as Record<string, ScreenConfig>;
+const codes = import.meta.glob('/proposals/*/pages.tsx', { eager: true, import: 'default' }) as Record<string, ProposalCode>;
 /** The components each proposal has stories for, by its folder: a story file is named after its component. Not loaded. */
-const storyFiles = Object.keys(import.meta.glob('./*/components/*.stories.tsx'));
-const storiesIn = (folder: string) => storyFiles.filter((f) => f.split('/')[1] === folder).map((f) => f.split('/').pop()!.replace(/\.stories\.tsx$/, ''));
+const storyFiles = Object.keys(import.meta.glob('/proposals/*/components/*.stories.tsx'));
+const storiesIn = (folder: string) => storyFiles.filter((f) => f.split('/')[2] === folder).map((f) => f.split('/').pop()!.replace(/\.stories\.tsx$/, ''));
 
-const slugOf = (path: string) => path.split('/')[1];
+const slugOf = (path: string) => path.split('/')[2];
 
 export const PROPOSALS: Proposal[] = Object.entries(metas)
   .map(([path, meta]) => {
     const folder = slugOf(path);
-    const code = codes[`./${folder}/pages.tsx`];
+    const code = codes[`/proposals/${folder}/pages.tsx`];
     return {
       // Without a code (a proposal.json written by hand: `npm test` fails on it) the folder stands in.
       id: meta.code || folder,
@@ -30,7 +30,7 @@ export const PROPOSALS: Proposal[] = Object.entries(metas)
       params: code?.params ?? {},
       widgets: code?.widgets ?? [],
       variants: Object.entries(code?.variants ?? {}).map(([vid, v]) => ({ id: vid, ...v })),
-      config: configs[`./${folder}/config.json`] ?? {},
+      config: configs[`/proposals/${folder}/config.json`] ?? {},
       layout: code?.layout ?? {},
     };
   })
@@ -157,7 +157,7 @@ export function findProposal(id: string | null | undefined): Proposal | null {
 }
 
 /** Project paths a proposal writes from the app, by its folder. */
-export const proposalPath = (folder: string, file: 'proposal.json' | 'config.json') => `src/proposals/${folder}/${file}`;
+export const proposalPath = (folder: string, file: 'proposal.json' | 'config.json') => `proposals/${folder}/${file}`;
 
 /** URL-safe folder name from a title, prefixed with the year-month: "2026-10-settings-sections". */
 export function slugify(title: string, date = new Date()): string {

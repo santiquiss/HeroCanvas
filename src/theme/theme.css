@@ -1,4 +1,4 @@
-/* The screens' base colors, from the connected app's tokens (src/kit/tokens.css, src/app/theme.css): what the
+/* The screens' base colors, from the connected app's tokens (src/kit/tokens.css, app/theme.css): what the
    simulator itself paints a screen with (its page, its text). And the liquid glass the app's navigation floats on. */
 [data-theme] {
   --pg: var(--app-page);

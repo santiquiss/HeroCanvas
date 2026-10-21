@@ -1,13 +1,13 @@
 // The app's components as its developers have them: each one and its parameters, read from the app's code by a code
-// connector (src/app/connectors/components-api.json: React props, SwiftUI or Compose parameters, Flutter
+// connector (app/connectors/components-api.json: React props, SwiftUI or Compose parameters, Flutter
 // constructors). The simulator's components take these names and props; where one is still called otherwise,
-// src/app/connectors/name-map.json says so. Without a connector, Inspect shows the simulator's props alone.
+// app/connectors/name-map.json says so. Without a connector, Inspect shows the simulator's props alone.
 //
 // The API can be large and only Inspect needs it: it loads on first use (`useLibrary`), in its own chunk.
 import { useEffect, useState } from 'react';
 
-const names = (Object.values(import.meta.glob('../app/connectors/name-map.json', { eager: true, import: 'default' }))[0] as { map: Record<string, string> } | undefined) ?? { map: {} };
-const apiFile = Object.values(import.meta.glob('../app/connectors/components-api.json', { import: 'default' }))[0] as (() => Promise<unknown>) | undefined;
+const names = (Object.values(import.meta.glob('@app/connectors/name-map.json', { eager: true, import: 'default' }))[0] as { map: Record<string, string> } | undefined) ?? { map: {} };
+const apiFile = Object.values(import.meta.glob('@app/connectors/components-api.json', { import: 'default' }))[0] as (() => Promise<unknown>) | undefined;
 
 export interface ApiParam {
   name: string;

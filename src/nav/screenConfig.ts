@@ -1,13 +1,13 @@
 // Per-screen configuration, in layers (later wins):
 //   1. the manifest (app/pages.tsx, + the active proposal's pages) — code defaults
 //   2. nav/screen-config.json                                      — saved project defaults (Page panel → Save)
-//   3. src/proposals/<id>/config.json                               — the active proposal's config (Save while active)
+//   3. proposals/<id>/config.json                               — the active proposal's config (Save while active)
 //   4. the URL (`cfg={"projects":{"split":false}}`)                — unsaved changes, shareable
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { patchManifest, writeJson } from '../persist/devApi';
 import { findProposal, proposalPath } from '../proposals';
-import savedJson from './screen-config.json';
+import savedJson from '@app/screen-config.json';
 import { displayId, sizeClass, type Device, type Display } from '../devices/devices';
 import { isFullScreen, type Landscape, type PageDef, type SideColumn, type SplitConfig } from './types';
 
@@ -71,7 +71,7 @@ export function resolveLandscape(setting: Landscape | undefined, device: Device,
 
 export const supportsLandscape = (setting: Landscape | undefined, device: Device, display: Display) => resolveLandscape(setting, device, display).on;
 
-export const SAVED_CONFIG_PATH = 'src/nav/screen-config.json';
+export const SAVED_CONFIG_PATH = 'app/screen-config.json';
 const SAVED: ScreenConfig = savedJson as ScreenConfig;
 
 /** Saved project defaults merged under the URL overrides, per page. */
@@ -134,7 +134,7 @@ export function useScreenConfigLayers() {
   };
 
   /**
-   * Write the page's effective config into the manifest (src/app/pages.tsx) — it becomes the code default —
+   * Write the page's effective config into the manifest (app/pages.tsx) — it becomes the code default —
    * then drop its saved and URL layers, which now match the code.
    */
   const makeCodeDefault = async (id: string, def: PageDef) => {

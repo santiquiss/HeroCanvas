@@ -25,7 +25,7 @@ export function useCanWrite(): boolean {
   return ok;
 }
 
-/** Rewrite fields of one page in the manifest (src/app/pages.tsx). `null` removes a field. */
+/** Rewrite fields of one page in the manifest (app/pages.tsx). `null` removes a field. */
 export async function patchManifest(page: string, fields: { split?: unknown; sideColumn?: unknown; landscape?: unknown }): Promise<void> {
   const r = await fetch('/__hc/manifest', { method: 'POST', headers: HEADERS, body: JSON.stringify({ page, ...fields }) });
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? `HTTP ${r.status}`);

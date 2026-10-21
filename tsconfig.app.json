@@ -21,7 +21,14 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* The tool and the team's code (vite.config.ts's aliases) */
+    "paths": {
+      "herocanvas": ["./src/index.ts"],
+      "@app": ["./app/index.ts"],
+      "@app/*": ["./app/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "app", "proposals"]
 }

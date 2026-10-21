@@ -67,7 +67,7 @@ describe('proposalHandoff', () => {
   it('names the version, the component in the code and its constructor', () => {
     const text = proposalHandoff(versions('b'));
     expect(text).toMatch(/^# Handoff PT-5: Rail with labels/);
-    expect(text).toContain('in `src/proposals/2026-10-rail-labels/`');
+    expect(text).toContain('in `proposals/2026-10-rail-labels/`');
     expect(text).toContain('**Version to implement**: B · Material rail');
     expect(text).toContain('### Changed component: `NavigationRail`');
     expect(text).toContain('- In the code: `components/navigation_rail.ts`');
