@@ -55,12 +55,13 @@ let played = false;
  * The launch on one device's screen (`root`, its element): whether to play it now, its phase, and the overlay to draw
  * over the screen. The screen's content goes in LaunchPhaseCtx (launchPhase.ts) with `phase`, for useLaunchPhase().
  */
-export function useLaunch(LAUNCH: LaunchConfig | undefined, root: HTMLElement | null, theme: 'light' | 'dark') {
+export function useLaunch(LAUNCH: LaunchConfig | undefined, root: HTMLElement | null, theme: 'light' | 'dark', atHome = true) {
   const still = useStill();
   const get = useUrlParams();
   const playback = (get(LAUNCH_PARAM) as LaunchPlayback | null) ?? 'once';
   const run = useRuns();
-  const should = () => !!LAUNCH && !still && playback !== 'off' && (playback === 'always' || !played);
+  // On its own it plays only where the app starts (`atHome`, read when the screen mounts); a replay plays it anywhere.
+  const should = () => !!LAUNCH && !still && atHome && playback !== 'off' && (playback === 'always' || !played);
   const [phase, setPhase] = useState<LaunchPhase>(() => (should() ? 'screen' : 'done'));
   // A replay plays it again, whatever the playback: it's asked for. Against the last replay seen, not a first-run
   // flag: effects run twice on mount in development (StrictMode), which would read as a replay.

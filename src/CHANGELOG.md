@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.23.6 — 2026-10-21
+
+- **The launch plays only where the app starts**: opening (or reloading) on any other page, a tour step, another
+  tab, goes straight to it, as an app restored there would. Replay (Pages, Scenarios) still plays it anywhere.
+
 ## 0.23.5 — 2026-10-21
 
 - **The ring of the + beside the devices a touch softer** (20% of the icon's color, from 30%).

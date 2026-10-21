@@ -4,7 +4,7 @@ import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, t
 import { DesignOverride } from '../design/overridable';
 import { composePages } from '../nav/manifest';
 import { findProposal } from '../proposals';
-import { LAUNCH, NAVIGATION } from '../nav/pages';
+import { HOME, LAUNCH, NAVIGATION } from '../nav/pages';
 import { useLaunch } from './launch';
 import { LaunchPhaseCtx } from './launchPhase';
 const { SideNav, SideRail, TabBar } = NAVIGATION;
@@ -208,8 +208,9 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
   const { stack } = nav;
   const { setRoot, captureProps, inspect } = useDesignRoot();
   const [screen, setScreen] = useState<HTMLDivElement | null>(null);
-  // The app's launch on a cold start (sim/launch): its phase for the screens, its overlay over them.
-  const launch = useLaunch(LAUNCH, screen, theme);
+  // The app's launch on a cold start (sim/launch): its phase for the screens, its overlay over them. Only when the
+  // app opens on its first screen, as a cold start does: a page deeper in (a reload there) opens straight on it.
+  const launch = useLaunch(LAUNCH, screen, theme, stack.length === 1 && stack[0].id === HOME);
   const a11y = useAccessibility();
   const textVars = useMemo(() => systemTextVars(textSystemOf(L.os), a11y.textSize, a11y.boldText), [L.os, a11y.textSize, a11y.boldText]);
   // Where the sheets a page keeps itself go (screenLayer.tsx).
