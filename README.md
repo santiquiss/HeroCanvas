@@ -138,6 +138,11 @@ Talk to the agent about what you see on the canvas:
 Share any view by its link (**Share**: the device, page, scenario and proposal are in the URL), leave **comments** on
 the canvas, and export images or videos with **Capture**.
 
+### 6. Share it with your team
+
+Deploy your copy to get a public link (Vercel, Netlify, your own servers): your team opens the canvas in a browser,
+leaves comments and reviews proposals, with nothing to install. See [Deploy](#deploy-a-link-for-your-team).
+
 ## Working with the agent
 
 `AGENTS.md` is the agent's guide to this codebase (Claude Code reads it through `CLAUDE.md`). Procedures it follows
@@ -216,11 +221,36 @@ scripts and dependencies, and prints the changelog. `app/`, `proposals/`, `heroc
 never touched; a **Contract** item in the changelog says what to adapt in them. Then `npm install` and the checks.
 Versions come from this repository's tags, fetched with your git credentials; a fork: `--from <git url>`.
 
-## Deploy
+## Deploy: a link for your team
 
-`npx vite build` makes a static site in `dist/`: any static host serves it (links use the hash, so no rewrite rules).
-Comments stay in each browser until you connect a Supabase project (`src/comments/supabase.json` and
-`supabase.sql`).
+HeroCanvas builds into a plain static site, so it can live anywhere. Put it online and your whole team (designers,
+developers, product, reviewers) opens the same canvas from a link: no install, nothing to run. Every link inside it
+(a screen, a device, a scenario, a proposal) is shareable as it is.
+
+```
+npm run build        # the site, in dist/
+```
+
+**Vercel** (or any host like it, in a few clicks):
+
+1. Push your copy to GitHub, then on [vercel.com](https://vercel.com) choose **Add New › Project** and import it.
+2. Vercel detects Vite: the build command is `npm run build`, the output `dist`. Deploy.
+3. That's it: every push to `main` updates the link, and each branch gets a preview link of its own (handy for a
+   proposal under review).
+
+**Netlify** and **Cloudflare Pages** work the same way (build `npm run build`, publish `dist`). **Your own stack**:
+build anywhere (your CI, a Dockerfile) and serve `dist/` from any static server or bucket (nginx, S3 and CloudFront,
+Firebase Hosting…). Links use the URL's hash, so no rewrite rules are needed. Serve it at the root of its domain or
+subdomain (`design.yourcompany.com`), not under a path.
+
+Good to know:
+
+- **It's a place to look, not to edit.** Changes are made where your agent runs, then pushed: the link updates on its
+  own. Saving to project files works only with `npm run dev`.
+- **Keep it private.** Your app's unreleased designs are on it: put the link behind your host's protection (Vercel's
+  Deployment Protection, Netlify's password protection, Cloudflare Access) or your company's login.
+- **Shared comments** need a database: until you connect one, each browser keeps its own. Ask your agent to set up
+  Supabase with `src/comments/supabase.sql` and `src/comments/supabase.json`.
 
 ## Develop HeroCanvas itself
 
