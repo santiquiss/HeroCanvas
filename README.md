@@ -2,8 +2,8 @@
 
 # HeroCanvas
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.27.0-3b6fd8"></a>
-<a href="LICENSE"><img alt="License: PolyForm Shield 1.0.0" src="https://img.shields.io/badge/license-PolyForm%20Shield-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.28.0-3b6fd8"></a>
+<a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 
 **Design your app's screens in code, with an AI agent, on a canvas of real devices.**
 
@@ -193,7 +193,6 @@ the tool's, on its page (the ⓘ at the bottom of the left rail) with the licens
 
 Made by [Santiago Quiss](https://github.com/santiquiss) and [Agus Salas](https://github.com/salasagustina-ds).
 
-Source-available under the [PolyForm Shield License 1.0.0](LICENSE): use it, change it and share it freely, for
-yourself or your company, to design any app, commercial ones included. What it doesn't allow is offering a product that
-competes with HeroCanvas (selling it, hosting it as a service, a rival tool built from it). Keep the `Required Notice`
-line of `LICENSE` with any copy. Your own code (`app/`, `proposals/`) is yours.
+Open source under the [Apache License 2.0](LICENSE): use it, change it and share it freely, for yourself or your
+company, commercial uses included. Any copy or project built from it keeps the license and the [`NOTICE`](NOTICE) file,
+which names its creators. Your own code (`app/`, `proposals/`) is yours.

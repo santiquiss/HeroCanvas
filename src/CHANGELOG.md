@@ -6,6 +6,13 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.28.0 — 2026-10-21
+
+- **Apache License 2.0**, instead of PolyForm Shield: open source, free to use, change and share, commercial uses
+  included. A `NOTICE` file names its creators, Santiago Quiss and Agus Salas, and any copy or project built from it
+  keeps it (the license's section 4(d)); nothing has to show in an app's interface. The README, the About page and
+  `package.json` say so; updates bring `NOTICE` too.
+
 ## 0.27.0 — 2026-10-21
 
 - **Inspect speaks no one framework**: sizes are Fill, Hug or Fixed and how (the room left in its parent, stretched

@@ -8,7 +8,7 @@ import { useSetMode } from './modes';
 import styles from './About.module.css';
 
 const REPO = 'https://github.com/santiquiss/HeroCanvas';
-const LICENSE = 'https://polyformproject.org/licenses/shield/1.0.0';
+const LICENSE = 'https://www.apache.org/licenses/LICENSE-2.0';
 /** Who made it, with their GitHub profiles. */
 const AUTHORS = [
   { name: 'Santiago Quiss', url: 'https://github.com/santiquiss' },
@@ -50,12 +50,12 @@ export function About() {
             </a>
           </p>
           <p>
-            Free to use, change and share under the{' '}
+            Open source under the{' '}
             <a href={LICENSE} target="_blank" rel="noreferrer">
-              PolyForm Shield License 1.0.0
+              Apache License 2.0
             </a>
-            , for any app, commercial ones included, except to offer a product that competes with HeroCanvas. Keep its
-            copyright notice with any copy.
+            : free to use, change and share, commercial uses included. Any copy or project built from it keeps its
+            NOTICE, which names its creators.
           </p>
         </section>
         <h2 className={styles.section}>Changelog</h2>
