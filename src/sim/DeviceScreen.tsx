@@ -4,8 +4,8 @@ import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, t
 import { DesignOverride } from '../design/overridable';
 import { composePages } from '../nav/manifest';
 import { findProposal } from '../proposals';
-import { navigation } from '@app';
-const { SideNav, SideRail, TabBar } = navigation;
+import { NAVIGATION } from '../nav/pages';
+const { SideNav, SideRail, TabBar } = NAVIGATION;
 import { Icon } from '../components/Icon';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Dialog, Popover, Sheet, Snackbar, SNACKBAR_MS, sheetMaxWidth, type AnchorRect } from '../kit';

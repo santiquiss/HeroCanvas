@@ -10,7 +10,6 @@ import { useProposalParam } from '../tools/ProposalPanel';
 import { ProposalMenu } from './ProposalMenu';
 import { VersionButton } from './Changelog';
 import { useCommentsUi } from '../comments';
-import { NO_APP } from '../nav/pages';
 import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
@@ -21,9 +20,9 @@ interface ToolbarProps {
   mode: Mode;
 }
 
-function Chip({ active, onClick, title, disabled, children }: { active?: boolean; onClick: () => void; title?: string; disabled?: boolean; children: React.ReactNode }) {
+function Chip({ active, onClick, title, children }: { active?: boolean; onClick: () => void; title?: string; children: React.ReactNode }) {
   return (
-    <button className={`${styles.chip} ${active ? styles.active : ''}`} onClick={onClick} title={title} disabled={disabled}>
+    <button className={`${styles.chip} ${active ? styles.active : ''}`} onClick={onClick} title={title}>
       {children}
     </button>
   );
@@ -61,13 +60,13 @@ export function Toolbar(props: ToolbarProps) {
       {/* The actions on the right, closer together than the bar's own spacing. */}
       <div className={styles.actions}>
       {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && (
-        <Chip active={inspect} onClick={() => setInspect(!inspect)} disabled={NO_APP} title={NO_APP ? 'Inspect: point at anything on a screen to see its component, props and tokens. Once your app is connected.' : 'Inspect components (I)'}>
+        <Chip active={inspect} onClick={() => setInspect(!inspect)} title="Inspect components (I)">
           <Icon name="ads_click" size={18} />
           Inspect
         </Chip>
       )}
       {props.mode === 'prototype' && !capture && (
-        <Chip active={commenting} onClick={() => setCommenting(!commenting)} disabled={NO_APP} title={NO_APP ? 'Comment: pin a note for your team on a spot of a screen. Once your app is connected.' : 'Comment: click on the screen to leave one (C)'}>
+        <Chip active={commenting} onClick={() => setCommenting(!commenting)} title="Comment: click on the screen to leave one (C)">
           <Icon name="add_comment" size={18} />
           Comment
         </Chip>
@@ -96,7 +95,7 @@ function ShareButton() {
   }, [copied]);
   const share = () => navigator.clipboard.writeText(window.location.href).then(() => setCopied(true));
   return (
-    <button className={styles.share} onClick={share} disabled={NO_APP} title={NO_APP ? 'Share: a link to exactly this view (device, page, scenario, proposal). Once your app is connected.' : 'Copy a link to this view'}>
+    <button className={styles.share} onClick={share} title="Copy a link to this view">
       <Icon name={copied ? 'check' : 'link'} size={18} />
       {copied ? 'Link copied' : 'Share'}
     </button>

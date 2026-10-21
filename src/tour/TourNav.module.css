@@ -1,0 +1,113 @@
+/* The tour's navigation, like an app's: liquid glass (theme.css's --glass-*), a sliding pill on the selected tab. */
+.glass {
+  background: var(--glass-fill);
+  box-shadow: var(--glass-box-shadow);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  backdrop-filter: var(--glass-backdrop);
+}
+
+/* The selected tab's pill, sliding to the picked tab with a little overshoot. */
+.tabSel {
+  position: absolute;
+  border-radius: var(--app-radius-full);
+  background: var(--app-pressed);
+  pointer-events: none;
+  transition:
+    left 420ms cubic-bezier(0.34, 1.32, 0.64, 1),
+    top 420ms cubic-bezier(0.34, 1.32, 0.64, 1),
+    opacity 200ms ease;
+}
+
+/* Phones: the bar floats over the page's bottom, at most 390 wide. */
+.bottomBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 26;
+  display: flex;
+  justify-content: center;
+  padding: var(--app-space-huge) 20px 0;
+  pointer-events: none;
+}
+.barTabs {
+  position: relative;
+  flex: 1;
+  max-width: 390px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  padding: var(--app-space-xs);
+  border-radius: var(--app-radius-full);
+  pointer-events: auto;
+}
+.barTab {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 54px;
+  padding: 6px var(--app-space-s) 7px;
+  border: none;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.barLabel {
+  position: relative;
+  align-self: stretch;
+  font: 500 11px/13px Inter, system-ui, sans-serif;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tablets: the rail, a column of tabs, over the pages pushed beside it and under covers. */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--app-space-m) var(--app-space-huge);
+  pointer-events: none;
+}
+.columnTabs {
+  position: relative;
+  width: 48px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--app-space-xs);
+  border-radius: var(--app-radius-full);
+  pointer-events: auto;
+}
+.sideTab {
+  position: relative;
+  height: 56px;
+  padding: 0;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* The iPhone Duo: the column in its strip at the right. */
+.sideCol {
+  position: absolute;
+  width: 48px;
+  z-index: 45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabSel {
+    transition: none;
+  }
+}

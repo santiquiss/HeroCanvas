@@ -1,5 +1,5 @@
-// A mode's canvas with no app connected, for the modes with nothing to show without one (the prototype, Flow and
-// Capture show the welcome screen): what the mode shows once there is one, centered where it would be.
+// A mode's canvas with no app connected, for the modes the tour has nothing for (the prototype, Flow and Capture
+// show the tour): what the mode shows once there is one, centered where it would be.
 import { EmptyHint } from '../components/EmptyHint';
 import styles from './NoAppMode.module.css';
 

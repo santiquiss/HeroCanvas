@@ -1,0 +1,58 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: var(--app-space-xl);
+  text-align: center;
+}
+.logo {
+  border-radius: 15px;
+}
+.heroTitle {
+  margin: var(--app-space-l) 0 0;
+  font: var(--app-font-title);
+}
+.heroLead {
+  margin: var(--app-space-s) 0 0;
+  font: var(--app-font-body);
+  color: var(--app-text-muted);
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-m);
+  margin-top: var(--app-space-xl);
+}
+.card {
+  margin-top: var(--app-space-m);
+  border-radius: var(--app-radius-l);
+  background: var(--app-surface);
+  overflow: hidden;
+}
+.card > * + * {
+  box-shadow: inset 0 1px 0 var(--app-border);
+}
+.intro {
+  margin: 0 0 var(--app-space-s);
+  font: var(--app-font-body);
+  color: var(--app-text-muted);
+}
+.stepIcon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: var(--app-primary);
+  color: var(--app-on-primary);
+}
+.stepTitle {
+  margin: var(--app-space-l) 0 0;
+  font: var(--app-font-title);
+}
+.stepBody {
+  margin: var(--app-space-m) 0 0;
+  font: var(--app-font-body);
+  color: var(--app-text-secondary);
+}

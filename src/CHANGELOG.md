@@ -6,6 +6,16 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.11.0 — 2026-10-21
+
+- **The tour**: with no app connected, HeroCanvas shows an app of its own (`src/tour`), declared and built like any
+  app: a Welcome tab with the ways to connect yours, and a Tour tab with a page per part of HeroCanvas (devices, light
+  and dark, Inspect and Layers, Pages and Flow, Scenarios, proposals and comments, Capture), each saying what it is
+  and what to try on the interface around the device, then on to the next.
+- **Everything works on it**: Pages and Layers list the tour's pages and components, Inspect names them, the Page
+  panel, Scenarios, Comments, Live and Share are on again, Flow lays the tour out, Capture shoots it, and devices
+  compare side by side (a tab bar on phones, a rail on tablets). Components and Tokens still say what they show.
+
 ## 0.10.0 — 2026-10-21
 
 - **The welcome is a screen**: with no app connected, the devices show HeroCanvas's welcome as an app screen (on the

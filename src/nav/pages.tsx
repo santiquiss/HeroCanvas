@@ -1,16 +1,15 @@
-// The connected app's pages (app/pages.tsx), as the tools read them. With none (no app connected yet: the `empty`
-// branch), one page of the tool's own stands in, so the whole designer still shows, each part saying what it's for.
-import { BASE_PAGES as APP_PAGES } from '@app';
-import { NoAppScreen } from '../sim/NoAppScreen';
+// The connected app's pages (app/pages.tsx) and navigation, as the tools read them. With none (no app connected yet:
+// the `empty` branch), HeroCanvas's own tour stands in (src/tour): a small app of its own, so every part of the
+// designer has something real to show while explaining itself.
+import { BASE_PAGES as APP_PAGES, navigation as APP_NAVIGATION } from '@app';
+import type { AppNavigation } from '../contract';
+import { TOUR_NAVIGATION } from '../tour/TourNav';
+import { TOUR_PAGES } from '../tour/pages';
 import type { PageDef } from './types';
 
-/** No app connected: the app declares no pages. The designer shows in its empty mode. */
+/** No app connected: the app declares no pages. The designer shows the tour. */
 export const NO_APP = Object.keys(APP_PAGES).length === 0;
 
-/** The page that stands in for the app's while there's none: HeroCanvas's welcome, with the ways to begin. */
-const START: Record<string, PageDef> = {
-  start: { path: '/start', level: 'tab', title: 'Welcome', component: NoAppScreen, status: 'placeholder' },
-};
-
-export const BASE_PAGES: Record<string, PageDef> = NO_APP ? START : APP_PAGES;
+export const BASE_PAGES: Record<string, PageDef> = NO_APP ? TOUR_PAGES : APP_PAGES;
+export const NAVIGATION: AppNavigation = NO_APP ? TOUR_NAVIGATION : APP_NAVIGATION;
 export { HOME } from './home';

@@ -352,7 +352,7 @@ function DesignerShell() {
               <About />
             ) : NO_APP && (mode === 'components' || mode === 'tokens') ? (
               // No app connected, nothing to show here: what the mode is for (the prototype, Flow and Capture show the
-              // welcome screen).
+              // tour).
               <NoAppMode mode={mode} />
             ) : mode === 'components' || mode === 'tokens' ? (
               <ErrorBoundary label="Gallery" fill resetKey={location.pathname + location.search}>

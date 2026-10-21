@@ -51,9 +51,10 @@ The person's app's own repository is read, never edited: everything goes in Hero
 - **Pages by their role**: wherever the designer lists pages, a page's icon is its level's (`ROLE_ICONS`,
   `src/nav/stack.ts`: tab, push, cover, boot), the same for every app; never the app's own icons, which may be
   missing or not drawable.
-- **Empty mode explains**: with no app connected (`NO_APP`, `src/nav/pages.tsx`) the designer still shows, each part
-  saying what it's for. A new panel declares its `empty` line in `src/tools/registry.ts`; a new mode, its hint in
-  `src/sim/NoAppMode.tsx`; a control that needs an app is disabled with a title saying what it does.
+- **The tour stands in for an app**: with none connected (`NO_APP`, `src/nav/pages.tsx`), HeroCanvas shows its own
+  (`src/tour`: Welcome, and a page per part of the designer, built like an app's). A new part of the designer gets a
+  step in `src/tour/steps.ts`; a panel or mode the tour has nothing for says what it shows instead (`empty` in
+  `src/tools/registry.ts`, `src/sim/NoAppMode.tsx`).
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done
