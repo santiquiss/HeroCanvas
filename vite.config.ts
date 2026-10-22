@@ -36,6 +36,9 @@ export default defineConfig({
     environment: 'happy-dom',
     include: ['{src,app,proposals}/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs'],
     setupFiles: ['src/test/setup.ts'],
+    // No module cache between runs: it keeps an import.meta.glob's old list (proposals/, stories, pages), so a
+    // proposal or a story added since fails as missing until the cache is cleared.
+    fsModuleCache: false,
     // Stylesheets the code reads as text (`?raw`): the designer's theme, the kit's tokens and the app's (its theme,
     // its components and screens, the proposals'). Vitest leaves every other stylesheet (the designer's own UI) empty.
     css: { include: [/src\/theme\/[\w-]+\.css/, /src\/kit\/.+\.css/, /\/(app|proposals)\/.+\.css/] },

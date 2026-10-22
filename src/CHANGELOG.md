@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.38.1 — 2026-10-22
+
+- `npm test` no longer keeps Vitest's module cache between runs: it kept the old list of proposals, stories and pages,
+  so a team's first proposal failed as having no handoff until the cache was cleared.
+
+**Contract**
+
+- None.
+
 ## 0.38.0 — 2026-10-22
 
 Tokens and themes beyond light and dark:
