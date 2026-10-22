@@ -6,6 +6,21 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.45.0 — 2026-10-22
+
+- **An app's side panel** (`appConfig.sidePanel`): a page that opens beside the screens rather than over them, an
+  assistant or a chat, kept as a state over the tabs (`?<param>=1`). Where the screen splits (a tablet, the open iPhone
+  Duo) it's a panel fixed on the right, drifting in and out, and the app keeps its area on the left; on phones it covers
+  the tab the user was on, with no tab bar (tablet-size screens keep theirs). A link to its page opens it over Home.
+- A test keeps the app's settings (`app/config`) from loading the API back, which would meet them half loaded.
+
+**Contract**
+
+- New: `AppConfig.sidePanel` (`{ page, param? }`) and `useSidePanel()` from `herocanvas` (`on`, `open`, `close`,
+  `toggle`). The page reads `useInPanel()` to draw itself as the panel. Nothing to adapt.
+- `app/config.ts` may not import `herocanvas`, however deep (a test fails on it): constants it shares with the screens
+  go in a module of their own, free of imports.
+
 ## 0.44.2 — 2026-10-22
 
 - **An app's own test setup**: `npm test` runs `app/test/setup.ts` after the tool's, when the app has one: stand-ins

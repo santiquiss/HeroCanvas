@@ -78,6 +78,12 @@ Which devices the app is made for, so the designer offers only those (`DeviceTar
 tablet-only `<supports-screens>` narrows it); React Native and Flutter by the platform folders they ship (`ios/`,
 `android/`); a web app, every device. Say what you set, and leave it out when the code doesn't narrow it.
 
+### A side panel (`appConfig.sidePanel`)
+
+An assistant or a chat that opens beside the screens rather than over them (a tablet's panel on the right, the tab
+covered on a phone), kept as a state over the tabs (`?<param>=1`): declare its page (`{ page, param }`). The page reads
+`useInPanel()` to draw itself as the panel (a close instead of back); the navigation opens it with `useSidePanel()`.
+
 ### The launch (`appConfig.launch`)
 
 If the app has a launch screen, declare it (`LaunchConfig`, the same four phases on every platform: the **screen**,

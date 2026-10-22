@@ -10,6 +10,7 @@
 //
 // `window.__shot` is what the script drives: `ready()` once the screens have settled, `act(steps)` (shotActions.ts),
 // `finish()` before the picture, `rect()` the area to cut.
+import { sidePanelOnIn } from '../../nav/sidePanel';
 import { APP_THEME_PARAM, appearanceIn, findAppTheme } from '../../sim/appThemes';
 import { designLayout, railFoldedIn, VARIANT_PARAM } from '../../design/overridableRegistry';
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
@@ -70,7 +71,7 @@ export function ShotShell() {
     const supported = supportsLandscape(landscapeFor(top.id, n.def(top.id), cfg), device, display);
     // The rail and the room beside it as its design has them (Before is Live's).
     const design = designLayout(n.proposal?.id, n.proposal ? search.get(VARIANT_PARAM) : null, railFoldedIn(search));
-    return computeLayout({ display, land, supported, detailOpen: detailOpenFor(n.pages, n.stack), video, ...design });
+    return computeLayout({ display, land, supported, detailOpen: detailOpenFor(n.pages, n.stack, sidePanelOnIn(search)), video, ...design });
   };
   const compare = search.get(SHOT_COMPARE_PARAM) === '1';
   const live = useMemo(() => (compare ? liveNavFor(nav, pathname, search) : null), [compare, nav, pathname, search]);

@@ -1,5 +1,6 @@
 // The app viewport: theme root, base tab, push layers (or the split panel), covers, overlays and system chrome.
 // Every entry of the navigation stack is its own layer, so navigation can go any number of levels deep.
+import { SIDE_PANEL_PAGE, useSidePanel } from '../nav/sidePanel';
 import { appConfig } from '@app/config';
 import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { DesignOverride } from '../design/overridable';
@@ -23,7 +24,7 @@ import { sideColumnFor, splitFor, useScreenConfig, type ScreenConfig } from '../
 import type { PageDef, PageRef, SplitConfig } from '../nav/types';
 import { ChangesOverlay } from './ChangesOverlay';
 import { LocateFlash } from './locate';
-import { anchoredFloats, listDetailActive, phoneMotion, tallSheetTop, type Layout } from './layout';
+import { anchoredFloats, listDetailActive, phoneMotion, tallSheetTop, tasksKeepNav, type Layout } from './layout';
 import { EASE, EXIT_MS, PAGE_MS, SWAP, TAB_IN_MS } from './motion';
 import { screenRegions } from './regions';
 import { boxInScreen, counterpartIn } from './anchor';
@@ -291,7 +292,13 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   // Every layer's box comes from the regions (src/sim/regions.ts).
   // A root that's a list–detail of its own (a sidebar app) never sends its pages to the tablet's side panel: side by
   // side they go in its detail pane (baseSplit, below); one at a time they slide over it, as on a phone.
-  const regions = screenRegions(L);
+  // The app's side panel (nav/sidePanel): where the screen splits, a panel fixed on the right and the app keeps its
+  // area on the left; elsewhere it takes the base, over the tab the user was on.
+  const panelOn = useSidePanel().on && !boot;
+  const regions = screenRegions(L, panelOn);
+  const panelInBase = panelOn && !regions.panel;
+  // The panel stays a moment after it closes, fading out (`present` false).
+  const panelL = usePresence(regions.panel ? [regions.panel] : [], () => 'panel', EXIT_MS);
   const R = nav.def(stack[0].id).split && regions.pushes.inPanel ? { ...regions, pushes: { left: L.railW, width: L.mainW, inPanel: false } } : regions;
   // When the pushes' region moves (the split's right part opening or closing), the pages in it glide
   // from where they were instead of jumping: `glide` is the offset they come from, for one animation. Not on a new
@@ -312,6 +319,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   /** Off the app area's right edge (and its shadow), from a layer's left. */
   const offRight = (left: number) => `translateX(${appW - left + 8}px)`;
   const baseEntry = useMemo(() => ({ ref: stack[0], index: 0 }), [stack]);
+  const panelEntry = useMemo(() => ({ ref: { id: SIDE_PANEL_PAGE ?? stack[0].id, params: {} }, index: 0 }), [stack]);
   const pushed = stack.slice(1, end).map((ref, j) => ({ ref, index: j + 1 }));
   // A root that's a list–detail itself (a sidebar app, SwiftUI's NavigationSplitView), wide enough: what's pushed over
   // it shows in its own detail pane, beside it, and nothing slides over it.
@@ -442,19 +450,23 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         >
           <RightEdgeCtx.Provider value>
             {/* Under a boot page there's no base: it's empty (and not a page for the layers or the scanner). */}
-            <div data-hc-page={boot ? undefined : nav.title(stack[0])} data-page-id={boot ? undefined : stack[0].id} style={base}>
-              {/* The base reaches the right edge unless the tablet split panel is open beside it. */}
-              <RightEdgeCtx.Provider value={!L.dashOpen}>
+            <div
+              data-hc-page={boot ? undefined : panelInBase ? nav.title(panelEntry.ref) : nav.title(stack[0])}
+              data-page-id={boot ? undefined : panelInBase ? panelEntry.ref.id : stack[0].id}
+              style={base}
+            >
+              {/* The base reaches the right edge unless the tablet split panel (or the side panel) is open beside it. */}
+              <RightEdgeCtx.Provider value={!L.dashOpen && !regions.panel}>
                 {/* Another section comes in at once, as iOS and Android switch tabs; an app that fades them
                     (appConfig.layout.tabTransition) gets a short fade up (keyed by the tab). */}
                 <div
-                  key={stack[0].id}
+                  key={panelInBase ? 'panel' : stack[0].id}
                   style={{
                     height: '100%',
                     animation: appConfig.layout?.tabTransition === 'fade' ? `hcTabIn ${TAB_IN_MS}ms ${EASE}` : undefined,
                   }}
                 >
-                  {boot ? null : baseSplit?.split ? <EntryView entry={baseSplit} /> : <PageView entry={baseEntry} />}
+                  {boot ? null : panelInBase ? <PageView entry={panelEntry} /> : baseSplit?.split ? <EntryView entry={baseSplit} /> : <PageView entry={baseEntry} />}
                 </div>
               </RightEdgeCtx.Provider>
             </div>
@@ -581,7 +593,35 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
           </RightEdgeCtx.Provider>
         </div>
 
-        {!boot && L.bottomNav && <TabBar />}
+        {panelL.map((p) => (
+          // The side panel where the screen splits: fixed on the right, drifting in and out with a fade.
+          <div
+            key={p.key}
+            data-hc-page={nav.title(panelEntry.ref)}
+            data-page-id={panelEntry.ref.id}
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: p.item.left,
+              width: p.item.width,
+              zIndex: Z.panel,
+              overflow: 'clip',
+              background: 'var(--app-page)',
+              animation: p.present ? `hcPanelIn ${PAGE_MS}ms ${EASE}` : `hcPanelOut ${PAGE_MS}ms ${EASE} forwards`,
+              pointerEvents: p.present ? undefined : 'none',
+            }}
+          >
+            <DetailPanelCtx.Provider value>
+              <PageOpenCtx.Provider value={p.present}>
+                <PageView entry={panelEntry} />
+              </PageOpenCtx.Provider>
+            </DetailPanelCtx.Provider>
+          </div>
+        ))}
+
+        {/* The side panel over a phone's whole screen is a task of its own: no tab bar. Tablet-size screens keep it. */}
+        {!boot && L.bottomNav && (!panelInBase || tasksKeepNav(L)) && <TabBar />}
         {!boot && L.sideNav && sideColumn === 'nav' && (
           <div {...{ [SIDE_NAV_ATTR]: '' }} style={{ display: 'contents' }}>
             <SideNav />

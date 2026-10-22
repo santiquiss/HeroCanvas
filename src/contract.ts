@@ -99,6 +99,14 @@ export interface AppConfig {
    * the app's own typeface, not the designer's.
    */
   fonts?: string[];
+  /**
+   * A page that opens beside the others rather than over them (an assistant, a chat), as a state over the tabs:
+   * `?<param>=1` (`param`: the page's id when unset), which only its own toggles turn off. On phones and narrow layouts it
+   * takes the base, over the tab the user was on; where the screen splits (a tablet, the open iPhone Duo) it's a panel
+   * fixed on the right and the app keeps its area on the left. A link to the page opens it so, over Home. The page
+   * reads whether it's the panel with useInPanel; the app's navigation opens and closes it with useSidePanel.
+   */
+  sidePanel?: { page: string; param?: string };
   /** What the app shows while it starts (LaunchConfig). None: it opens straight on its first screen. */
   launch?: LaunchConfig;
   /** The room its screens give its navigation (ScreenLayout): a wider rail, one that folds. None: the defaults. */

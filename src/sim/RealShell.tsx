@@ -2,6 +2,7 @@
 // designer around it, and no drawn system (the device shows its own status, home indicator and keyboard). The layout
 // is the same one every device of the canvas gets, from a display made of what this one reports (sim/realDevice).
 // On by itself on a phone or when installed on the home screen; `?real=1` / `?real=0` say so either way.
+import { sidePanelOnIn } from '../nav/sidePanel';
 import { schemeIn } from './appThemes';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
@@ -59,7 +60,7 @@ export function RealShell() {
   const video = search.get('video') === '1';
   const proposal = search.get('proposal');
   const variant = search.get(VARIANT_PARAM);
-  const detailOpen = detailOpenFor(pages, stack);
+  const detailOpen = detailOpenFor(pages, stack, sidePanelOnIn(search));
   const top = stack[stack.length - 1];
 
   const { w, h, angle } = view;

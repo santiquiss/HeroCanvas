@@ -1,4 +1,5 @@
 // Top toolbar + scaled device frame. Simulator state (device, display, land, theme) lives in the URL.
+import { sidePanelOnIn } from '../nav/sidePanel';
 import { systemBack } from './back';
 import { schemeIn } from './appThemes';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -97,7 +98,7 @@ function DesignerShell() {
   const [search, setSearch] = useSearchParams();
   const { stack, def, pages } = useNavRoot();
   // The split panel opens for push pages (covers sit above everything).
-  const detailOpen = detailOpenFor(pages, stack);
+  const detailOpen = detailOpenFor(pages, stack, sidePanelOnIn(search));
   // `device=all`: every device side by side (prototype mode); the rest of the shell uses the default device.
   // Capture (`?capture=1`) shows one device: All devices and a set give way to their first.
   const captureParam = search.get('capture') === '1';

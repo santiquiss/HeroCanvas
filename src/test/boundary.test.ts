@@ -58,3 +58,29 @@ describe('the public API loads without the app’s pages', () => {
     expect(pages).toEqual([]);
   });
 });
+
+// The app's settings load with the tool (the API's own modules read them): app/config may not load the API back, or
+// the tool meets the settings half loaded ("Cannot access 'app' before initialization").
+const APP = import.meta.glob<string>(['/app/**/*.{ts,tsx}', '!/app/**/*.test.{ts,tsx}'], { eager: true, query: '?raw', import: 'default' });
+
+describe('the app’s settings load without the tool', () => {
+  it('app/config never imports herocanvas, however deep', () => {
+    const seen = new Set<string>();
+    const back: string[] = [];
+    const walk = (f: string, path: string[]) => {
+      if (seen.has(f) || !(f in APP)) return;
+      seen.add(f);
+      for (const m of APP[f].matchAll(/^(?:import|export)(?!\s+type\b)[^'"\n]*?(?:from\s+)?'([^']+)'/gm)) {
+        const spec = m[1].split('?')[0];
+        if (spec === 'herocanvas' || spec.startsWith('herocanvas/')) back.push([...path, f].join(' > '));
+        else if (spec.startsWith('.')) {
+          const base = resolve(f, spec);
+          const hit = ['', '.ts', '.tsx', '/index.ts', '/index.tsx'].map((e) => base + e).find((p) => p in APP);
+          if (hit) walk(hit, [...path, f]);
+        }
+      }
+    };
+    walk('/app/config.ts', []);
+    expect(back).toEqual([]);
+  });
+});

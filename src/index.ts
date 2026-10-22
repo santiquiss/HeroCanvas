@@ -26,6 +26,7 @@ export { dropDownItemsOf, useActionSheet } from './sim/actionSheet';
 export { NAV_COMPACT_ATTR, NAV_SAVING_ATTR, SIDE_NAV_ATTR, useColumnBar, useColumnCompact, useColumnNav, usePageOpen, type InColumn } from './sim/columnBar';
 export { useInPanel, useNav, useNavRoot, useSplit, type Nav } from './nav/context';
 export { useFlow } from './nav/flow';
+export { useSidePanel } from './nav/sidePanel';
 export { useLaunchPhase, type LaunchPhase } from './sim/launchPhase';
 
 // The simulator's services a richer screen reaches for: the system's camera and photo picker, a sheet of a page's own

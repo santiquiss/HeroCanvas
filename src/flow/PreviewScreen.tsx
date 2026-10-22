@@ -2,6 +2,7 @@
 // chain) and layout, rendered by the real DeviceScreen in preview mode. `query`: a fixed state the page reads instead
 // of the URL (a flow's step). `still`: frozen, for thumbnails. `overlays`: with the sheets and dialogs the page opens (where-used thumbnails, which show
 // what opening them shows).
+import { useSidePanel } from '../nav/sidePanel';
 import { useMemo } from 'react';
 import { NavCtx, useNavRoot, type Nav } from '../nav/context';
 import { HOME } from '../nav/pages';
@@ -53,7 +54,8 @@ export function PreviewScreen({
     }),
     [root, PAGES, stack],
   );
-  const layout = useMemo(() => makeLayout(detailOpenFor(PAGES, stack), page.id), [makeLayout, stack, PAGES, page.id]);
+  const panelOn = useSidePanel().on;
+  const layout = useMemo(() => makeLayout(detailOpenFor(PAGES, stack, panelOn), page.id), [makeLayout, stack, PAGES, page.id, panelOn]);
   const screen = (
     <NavCtx.Provider value={nav}>
       <SimProvider layout={layout} theme={theme}>

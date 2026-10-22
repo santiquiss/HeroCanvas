@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { SIDE_PANEL_PAGE, SIDE_PANEL_PARAM } from './sidePanel';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { appConfig } from '@app/config';
 import { findProposal } from '../proposals';
@@ -44,6 +45,15 @@ export function NavProvider({ children }: { children: ReactNode }) {
     },
     [navigate, search, stack, pages],
   );
+
+  // The side panel is a state over the tabs (nav/sidePanel), not a page of the stack: a link to its page opens Home
+  // with it on.
+  useEffect(() => {
+    if (!SIDE_PANEL_PAGE || !SIDE_PANEL_PARAM || stack[0].id !== SIDE_PANEL_PAGE) return;
+    const q = new URLSearchParams(search);
+    q.set(SIDE_PANEL_PARAM, '1');
+    navigate(`${stackUrl(pages, [{ id: HOME, params: {} }]).path}?${q}`, { replace: true });
+  }, [stack, search, pages, navigate]);
 
   const nav = useMemo<Nav>(() => {
     const top = stack.length - 1;
