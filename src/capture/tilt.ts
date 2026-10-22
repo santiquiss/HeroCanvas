@@ -3,6 +3,8 @@
 // is what you saw).
 
 /** Degrees around the horizontal (x: top away, positive) and vertical (y: right side away, positive) axes. */
+import { t } from '../i18n/ui';
+
 export interface Tilt {
   x: number;
   y: number;
@@ -16,11 +18,11 @@ export const PERSPECTIVE = 2400;
 
 /** The angles a click away, from facing furthest left to furthest right (facing you is Reset). */
 export const TILT_PRESETS: { label: string; tilt: Tilt }[] = [
-  { label: 'Side left', tilt: { x: 4, y: 38 } },
-  { label: 'Left', tilt: { x: 6, y: 18 } },
-  { label: 'Lean back', tilt: { x: 22, y: 0 } },
-  { label: 'Right', tilt: { x: 6, y: -18 } },
-  { label: 'Side right', tilt: { x: 4, y: -38 } },
+  { label: t('Side left'), tilt: { x: 4, y: 38 } },
+  { label: t('Left'), tilt: { x: 6, y: 18 } },
+  { label: t('Lean back'), tilt: { x: 22, y: 0 } },
+  { label: t('Right'), tilt: { x: 6, y: -18 } },
+  { label: t('Side right'), tilt: { x: 4, y: -38 } },
 ];
 
 export const isFlat = (t: Tilt) => !t.x && !t.y;

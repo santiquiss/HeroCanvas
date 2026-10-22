@@ -14,6 +14,8 @@ export interface HeroCanvasConfig {
   logo: string;
   /** The brand color per interface theme; unset: from the logo. */
   brand?: { light: string; dark: string };
+  /** The language of HeroCanvas's own interface (its panels, menus and buttons): `en` (default) or `es`. */
+  language?: 'en' | 'es';
 }
 
 type RGB = [number, number, number];

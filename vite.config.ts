@@ -30,7 +30,7 @@ export default defineConfig({
   // src/CHANGELOG.md). The build's id (when it was built, or
   // when the dev server started): what's derived from the code and cached in the browser (the page index) is keyed
   // on it, so a new build doesn't read a stale cache.
-  define: { __APP_VERSION__: JSON.stringify(pkg.version), __HC_VERSION__: JSON.stringify(hcVersion.version), __BUILD_ID__: JSON.stringify(String(Date.now())) },
+  define: { __APP_VERSION__: JSON.stringify(pkg.version), __HC_VERSION__: JSON.stringify(hcVersion.version), __HC_LANGUAGE__: JSON.stringify(hc.language ?? 'en'), __BUILD_ID__: JSON.stringify(String(Date.now())) },
   // `npm test`: the logic's unit tests (and the scripts': npm run shot's arguments) and the smoke test (every page, every story renders), in a DOM of happy-dom.
   test: {
     environment: 'happy-dom',

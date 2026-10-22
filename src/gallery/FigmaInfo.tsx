@@ -2,6 +2,7 @@
 import { Icon } from '../components/Icon';
 import { figmaComponent, STATUS_LABEL, type FigmaComponent, type FigmaProp, type MapEntry } from '../design/figma';
 import styles from './Gallery.module.css';
+import { plural, t } from '../i18n/ui';
 
 export function FigmaInfo({ entries, figmaOnly }: { entries: MapEntry[]; figmaOnly?: FigmaComponent }) {
   if (figmaOnly) return <div className={styles.figmaList}><FigmaCard title={figmaOnly.name} component={figmaOnly} /></div>;
@@ -21,7 +22,7 @@ function FigmaCard({ title, entry, component }: { title: string; entry?: MapEntr
     <div className={styles.figma}>
       <div className={styles.figmaHead}>
         <Icon name="design_services" size={16} />
-        <span className={styles.figmaTitle}>{entry ? `${title} → ${entry.figma ?? 'not in Figma'}` : `${title} · in Figma`}</span>
+        <span className={styles.figmaTitle}>{entry ? `${title} → ${entry.figma ?? t('not in Figma')}` : t('{name} · in Figma', { name: title })}</span>
         {st && (
           <span className={styles.status} style={{ background: st.color }}>
             {st.label}
@@ -29,7 +30,7 @@ function FigmaCard({ title, entry, component }: { title: string; entry?: MapEntr
         )}
         {component && (
           <a className={styles.link} href={component.figmaUrl} target="_blank" rel="noreferrer">
-            Open in Figma
+            {t('Open in Figma')}
             <Icon name="open_in_new" size={14} />
           </a>
         )}
@@ -47,12 +48,12 @@ function FigmaCard({ title, entry, component }: { title: string; entry?: MapEntr
                     </span>
                   ))
                 ) : (
-                  <span className={styles.dim}>{p.type === 'bool' ? 'on / off' : p.type === 'text' ? (p.default ? `text · “${p.default}”` : 'text') : p.type}</span>
+                  <span className={styles.dim}>{p.type === 'bool' ? t('on / off') : p.type === 'text' ? (p.default ? t('text · “{value}”', { value: String(p.default) }) : t('text')) : p.type}</span>
                 )}
               </span>
             </div>
           ))}
-          {component.variants && <span className={styles.dim}>{component.variants.length} variants</span>}
+          {component.variants && <span className={styles.dim}>{plural(component.variants.length, '{n} variant', '{n} variants')}</span>}
         </div>
       )}
       {entry?.diff && <p className={styles.figmaDiff}>{entry.diff}</p>}

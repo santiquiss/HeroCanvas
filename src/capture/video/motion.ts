@@ -5,6 +5,7 @@
 // export samples it frame by frame, the canvas plays it, and a test can check it. Within the turn the angle sliders
 // allow (TILT_MAX).
 import { FLAT, TILT_MAX, type Tilt } from '../tilt';
+import { t } from '../../i18n/ui';
 
 /** Eases the end only: it arrives and settles. */
 const easeOut = (t: number) => 1 - (1 - t) ** 3;
@@ -95,11 +96,11 @@ const FAR = 70;
 
 /** The Ins: each arrives at the resting angle, where it stands and at its size, fully in view. */
 const IN_STEP_LIST: Step<InId>[] = [
-  { id: 'none', label: 'None', note: 'It starts already in the middle motion', offset: null, seconds: 0 },
+  { id: 'none', label: t('None'), note: t('It starts already in the middle motion'), offset: null, seconds: 0 },
   {
     id: 'drop',
-    label: 'Drop in',
-    note: 'Comes down from above, leaning back a touch, appearing as it comes',
+    label: t('Drop in'),
+    note: t('Comes down from above, leaning back a touch, appearing as it comes'),
     offset: (t) => tilt(10 * (1 - easeOutQuint(t)), 0),
     move: (t) => ({ dy: -FAR * (1 - easeOutQuint(t)) }),
     fade: 0.35,
@@ -107,8 +108,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'rise',
-    label: 'Rise up',
-    note: 'Comes up from below, leaning forward a touch',
+    label: t('Rise up'),
+    note: t('Comes up from below, leaning forward a touch'),
     offset: (t) => tilt(-12 * (1 - easeOutQuint(t)), 0),
     move: (t) => ({ dy: FAR * (1 - easeOutQuint(t)) }),
     fade: 0.35,
@@ -116,8 +117,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'float',
-    label: 'Float in',
-    note: 'Drifts up a little and grows into place, softly',
+    label: t('Float in'),
+    note: t('Drifts up a little and grows into place, softly'),
     offset: () => FLAT,
     move: (t) => ({ dy: NEAR * (1 - easeOut(t)), scale: 1 - 0.04 * (1 - easeOut(t)) }),
     fade: 0.35,
@@ -125,8 +126,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'zoom',
-    label: 'Zoom in',
-    note: 'Grows into place from a little smaller',
+    label: t('Zoom in'),
+    note: t('Grows into place from a little smaller'),
     offset: () => FLAT,
     move: (t) => ({ scale: 1 - 0.18 * (1 - easeOutQuint(t)) }),
     fade: 0.35,
@@ -135,8 +136,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'swing',
-    label: 'Swing in',
-    note: 'Comes in from the side, turned, and faces you',
+    label: t('Swing in'),
+    note: t('Comes in from the side, turned, and faces you'),
     offset: (t) => {
       const left = 1 - easeOut(t);
       return tilt(8 * left, 38 * left);
@@ -147,8 +148,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'flip',
-    label: 'Flip up',
-    note: 'Lifts as if from a table, with a small bounce',
+    label: t('Flip up'),
+    note: t('Lifts as if from a table, with a small bounce'),
     // A spring: past the resting angle and back, settled before its end.
     offset: (t) => {
       const k = clamp01(t / 0.9);
@@ -161,8 +162,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'spin',
-    label: 'Spin in',
-    note: 'Turns on its axis into place, a little past and back',
+    label: t('Spin in'),
+    note: t('Turns on its axis into place, a little past and back'),
     offset: (t) => tilt(0, -42 * (1 - easeOutBack(clamp01(t)))),
     move: (t) => ({ scale: 1 - 0.08 * (1 - easeOut(t)) }),
     fade: 0.3,
@@ -170,8 +171,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'tumble',
-    label: 'Tumble in',
-    note: 'Comes in from the top corner, tilted both ways, and settles',
+    label: t('Tumble in'),
+    note: t('Comes in from the top corner, tilted both ways, and settles'),
     offset: (t) => {
       const left = 1 - easeOutQuint(t);
       return tilt(16 * left, -24 * left);
@@ -185,8 +186,8 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'pendulum',
-    label: 'Pendulum',
-    note: 'Swings side to side, slowing until it rests',
+    label: t('Pendulum'),
+    note: t('Swings side to side, slowing until it rests'),
     offset: (t) => {
       const k = clamp01(t);
       // Two swings, each smaller than the last: the reach shrinks to nothing at the end, with no speed left.
@@ -198,48 +199,48 @@ const IN_STEP_LIST: Step<InId>[] = [
   },
   {
     id: 'pop',
-    label: 'Pop',
-    note: 'Grows quickly from small, a little past and back',
+    label: t('Pop'),
+    note: t('Grows quickly from small, a little past and back'),
     offset: () => FLAT,
     move: (t) => ({ scale: 0.6 + 0.4 * easeOutBack(clamp01(t), 2.2) }),
     fade: 0.2,
     seconds: 0.5,
     icon: 'open_in_full',
   },
-  { id: 'fade', label: 'Fade', note: 'Only appears: no motion', offset: () => FLAT, fade: 1, seconds: 0.5, icon: 'gradient' },
+  { id: 'fade', label: t('Fade'), note: t('Only appears: no motion'), offset: () => FLAT, fade: 1, seconds: 0.5, icon: 'gradient' },
 ];
 export const IN_STEPS = IN_STEP_LIST;
 
 export const MID_STEPS: Step<MidId>[] = [
-  { id: 'still', label: 'No motion: facing', note: 'Facing you, not moving: to show an interaction on the screen', offset: () => FLAT, seconds: 0 },
-  { id: 'angle', label: 'No motion: custom angle', note: 'Holds the angle you set: turn the device on the canvas, or with Angle', offset: () => FLAT, seconds: 0, icon: '3d_rotation' },
-  { id: 'sway', label: 'Sway', note: 'Gently back and forth', offset: (t) => tilt(3 * Math.sin(TAU * t * 2), 14 * Math.sin(TAU * t)), seconds: 6 },
-  { id: 'orbit', label: 'Orbit', note: 'Goes slowly around, as if looking around it', offset: (t) => tilt(8 * Math.sin(TAU * t), 16 * Math.cos(TAU * t)), seconds: 8 },
-  { id: 'figure8', label: 'Figure 8', note: 'Traces a slow sideways eight', offset: (t) => tilt(6 * Math.sin(2 * TAU * t), 18 * Math.sin(TAU * t)), seconds: 10 },
+  { id: 'still', label: t('No motion: facing'), note: t('Facing you, not moving: to show an interaction on the screen'), offset: () => FLAT, seconds: 0 },
+  { id: 'angle', label: t('No motion: custom angle'), note: t('Holds the angle you set: turn the device on the canvas, or with Angle'), offset: () => FLAT, seconds: 0, icon: '3d_rotation' },
+  { id: 'sway', label: t('Sway'), note: t('Gently back and forth'), offset: (t) => tilt(3 * Math.sin(TAU * t * 2), 14 * Math.sin(TAU * t)), seconds: 6 },
+  { id: 'orbit', label: t('Orbit'), note: t('Goes slowly around, as if looking around it'), offset: (t) => tilt(8 * Math.sin(TAU * t), 16 * Math.cos(TAU * t)), seconds: 8 },
+  { id: 'figure8', label: t('Figure 8'), note: t('Traces a slow sideways eight'), offset: (t) => tilt(6 * Math.sin(2 * TAU * t), 18 * Math.sin(TAU * t)), seconds: 10 },
   {
     id: 'float',
-    label: 'Float',
-    note: 'Bobs gently up and down, as if on water',
+    label: t('Float'),
+    note: t('Bobs gently up and down, as if on water'),
     offset: (t) => tilt(2 * Math.sin(TAU * t + Math.PI / 2), 0),
     move: (t) => ({ dy: -8 * Math.sin(TAU * t) }),
     seconds: 4,
   },
-  { id: 'breathe', label: 'Breathe', note: 'Grows and shrinks, barely, like a breath', offset: () => FLAT, move: (t) => ({ scale: 1 + 0.025 * Math.sin(TAU * t) }), seconds: 5, icon: 'expand_content' },
-  { id: 'rock', label: 'Rock', note: 'Leans back and forth, top toward you and away', offset: (t) => tilt(10 * Math.sin(TAU * t), 2 * Math.sin(2 * TAU * t)), seconds: 6 },
-  { id: 'wobble', label: 'Wobble', note: 'Small lively turns, every which way', offset: (t) => tilt(4 * Math.sin(2 * TAU * t) + 2 * Math.sin(3 * TAU * t), 6 * Math.sin(TAU * t) + 3 * Math.sin(4 * TAU * t)), seconds: 4 },
-  { id: 'look', label: 'Look around', note: 'Turns slowly to one side and the other, wider than a sway', offset: (t) => tilt(4 * Math.sin(2 * TAU * t), 28 * Math.sin(TAU * t)), seconds: 10 },
+  { id: 'breathe', label: t('Breathe'), note: t('Grows and shrinks, barely, like a breath'), offset: () => FLAT, move: (t) => ({ scale: 1 + 0.025 * Math.sin(TAU * t) }), seconds: 5, icon: 'expand_content' },
+  { id: 'rock', label: t('Rock'), note: t('Leans back and forth, top toward you and away'), offset: (t) => tilt(10 * Math.sin(TAU * t), 2 * Math.sin(2 * TAU * t)), seconds: 6 },
+  { id: 'wobble', label: t('Wobble'), note: t('Small lively turns, every which way'), offset: (t) => tilt(4 * Math.sin(2 * TAU * t) + 2 * Math.sin(3 * TAU * t), 6 * Math.sin(TAU * t) + 3 * Math.sin(4 * TAU * t)), seconds: 4 },
+  { id: 'look', label: t('Look around'), note: t('Turns slowly to one side and the other, wider than a sway'), offset: (t) => tilt(4 * Math.sin(2 * TAU * t), 28 * Math.sin(TAU * t)), seconds: 10 },
   {
     id: 'drift',
-    label: 'Drift',
-    note: 'Slides slowly side to side, turning with it',
+    label: t('Drift'),
+    note: t('Slides slowly side to side, turning with it'),
     offset: (t) => tilt(0, 10 * Math.sin(TAU * t)),
     move: (t) => ({ dx: 14 * Math.sin(TAU * t) }),
     seconds: 8,
   },
   {
     id: 'hover',
-    label: 'Hover',
-    note: 'Floats up and down while it turns a little',
+    label: t('Hover'),
+    note: t('Floats up and down while it turns a little'),
     offset: (t) => tilt(3 * Math.sin(TAU * t), 8 * Math.sin(2 * TAU * t)),
     move: (t) => ({ dy: -6 * Math.sin(2 * TAU * t) }),
     seconds: 8,
@@ -267,17 +268,17 @@ function outOf(id: OutId, from: Step<InId>, label: string, note: string): Step<O
 const inStep = (id: InId) => IN_STEP_LIST.find((x) => x.id === id)!;
 
 export const OUT_STEPS: Step<OutId>[] = [
-  { id: 'none', label: 'None', note: 'It ends in the middle motion', offset: null, seconds: 0 },
-  outOf('lift', inStep('drop'), 'Lift away', 'Rises out of the picture, fading as it goes'),
-  outOf('drop', inStep('rise'), 'Drop out', 'Sinks out of the picture, fading as it goes'),
-  outOf('float', inStep('float'), 'Float out', 'Drifts down a little and shrinks away, softly'),
-  outOf('zoom', inStep('zoom'), 'Zoom out', 'Shrinks away'),
-  outOf('swing', inStep('swing'), 'Swing out', 'Turns away to the side'),
-  outOf('lay', inStep('flip'), 'Lay down', 'Goes back down as if onto a table'),
-  outOf('spin', inStep('spin'), 'Spin out', 'Turns away on its axis'),
-  outOf('tumble', inStep('tumble'), 'Tumble out', 'Tilts away to the top corner'),
-  outOf('pop', inStep('pop'), 'Pop out', 'Shrinks quickly away'),
-  outOf('fade', inStep('fade'), 'Fade', 'Only disappears: no motion'),
+  { id: 'none', label: t('None'), note: t('It ends in the middle motion'), offset: null, seconds: 0 },
+  outOf('lift', inStep('drop'), t('Lift away'), t('Rises out of the picture, fading as it goes')),
+  outOf('drop', inStep('rise'), t('Drop out'), t('Sinks out of the picture, fading as it goes')),
+  outOf('float', inStep('float'), t('Float out'), t('Drifts down a little and shrinks away, softly')),
+  outOf('zoom', inStep('zoom'), t('Zoom out'), t('Shrinks away')),
+  outOf('swing', inStep('swing'), t('Swing out'), t('Turns away to the side')),
+  outOf('lay', inStep('flip'), t('Lay down'), t('Goes back down as if onto a table')),
+  outOf('spin', inStep('spin'), t('Spin out'), t('Turns away on its axis')),
+  outOf('tumble', inStep('tumble'), t('Tumble out'), t('Tilts away to the top corner')),
+  outOf('pop', inStep('pop'), t('Pop out'), t('Shrinks quickly away')),
+  outOf('fade', inStep('fade'), t('Fade'), t('Only disappears: no motion')),
 ];
 
 /** The fade of a step at `t`: an In's from nothing over its first `fade`, an Out's to nothing over its last. */

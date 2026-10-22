@@ -1,6 +1,7 @@
 // The interaction recording's state, for Capture (SimulatorShell holds it: the canvas faces the device while it
 // records; the panel starts, stops and shows it). The seconds go to state ten times a second, not every frame.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { t } from '../../i18n/ui';
 import { dropRecording, startRecording, type Recording, type RecordingSession } from './recording';
 
 export type RecordingState =
@@ -30,7 +31,7 @@ export function useRecording(): InteractionRecording {
     if (!s) return;
     session.current = null;
     s.stop().then(
-      (recording) => setState(recording ? { status: 'ready', recording } : { status: 'idle', error: 'Nothing was recorded' }),
+      (recording) => setState(recording ? { status: 'ready', recording } : { status: 'idle', error: t('Nothing was recorded') }),
       (e) => setState({ status: 'idle', error: e instanceof Error ? e.message : String(e) }),
     );
   }, []);

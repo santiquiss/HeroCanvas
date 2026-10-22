@@ -14,6 +14,7 @@ import {
 } from "../proposals";
 import { useProposalParam } from "../tools/ProposalPanel";
 import { REAL_PARAM } from "./realDevice";
+import { t } from "../i18n/ui";
 import styles from "./RealShell.module.css";
 
 export function RealControls({
@@ -54,13 +55,13 @@ export function RealControls({
       <div
         className={styles.panel}
         role="dialog"
-        aria-label="Designer controls"
+        aria-label={t('Designer controls')}
       >
         <div className={styles.head}>
           <span>HeroCanvas</span>
           <button
             className={styles.close}
-            aria-label="Close"
+            aria-label={t('Close')}
             onClick={() => onClose()}
           >
             <Icon name="close" size={18} />
@@ -68,7 +69,7 @@ export function RealControls({
         </div>
         <div className={styles.info}>{info}</div>
         <label className={styles.row}>
-          <span>Page</span>
+          <span>{t('Page')}</span>
           <select
             className={styles.select}
             value={pages.some(([id]) => id === top.id) ? top.id : ""}
@@ -88,18 +89,18 @@ export function RealControls({
           </select>
         </label>
         <div className={styles.row}>
-          <span>Theme</span>
+          <span>{t('Theme')}</span>
           <span className={styles.seg}>
             <button aria-pressed={!dark} onClick={() => set("theme", null)}>
-              Light
+              {t('Light')}
             </button>
             <button aria-pressed={dark} onClick={() => set("theme", "dark")}>
-              Dark
+              {t('Dark')}
             </button>
           </span>
         </div>
         {PERSONAS.length > 0 && <label className={styles.row}>
-          <span>Persona</span>
+          <span>{t('Persona')}</span>
           <select
             className={styles.select}
             value={findPersona(search.get(PERSONA_PARAM))?.id}
@@ -113,13 +114,13 @@ export function RealControls({
           </select>
         </label>}
         <label className={styles.row}>
-          <span>Design</span>
+          <span>{t('Design')}</span>
           <select
             className={styles.select}
             value={proposal?.id ?? ""}
             onChange={(e) => setProposal(e.target.value || null)}
           >
-            <option value="">Live</option>
+            <option value="">{t('Live')}</option>
             {listedProposals(proposal?.id).map((p) => (
               <option key={p.id} value={p.id}>
                 {proposalLabel(p)}
@@ -129,7 +130,7 @@ export function RealControls({
         </label>
         {proposal && proposal.variants.length > 1 && (
           <label className={styles.row}>
-            <span>Version</span>
+            <span>{t('Version')}</span>
             <select
               className={styles.select}
               value={search.get(VARIANT_PARAM) ?? proposal.variants[0].id}
@@ -148,10 +149,10 @@ export function RealControls({
             className={styles.btn}
             onClick={() => window.location.reload()}
           >
-            Reload
+            {t('Reload')}
           </button>
           <button className={styles.btn} onClick={() => set(REAL_PARAM, "0")}>
-            Open the designer
+            {t('Open the designer')}
           </button>
         </div>
       </div>

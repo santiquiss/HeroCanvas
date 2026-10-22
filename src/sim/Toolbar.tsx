@@ -10,6 +10,7 @@ import { useProposalParam } from '../tools/ProposalPanel';
 import { ProposalMenu } from './ProposalMenu';
 import { VersionButton } from './Changelog';
 import { useCommentsUi } from '../comments';
+import { t } from '../i18n/ui';
 import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
@@ -44,7 +45,7 @@ export function Toolbar(props: ToolbarProps) {
   return (
     <div className={styles.toolbar}>
       {/* Each panel's toggle at its own edge, as in Figma. */}
-      <button className={styles.panelBtn} title="Toggle left panel" onClick={props.onToggleLeft}>
+      <button className={styles.panelBtn} title={t('Toggle left panel')} onClick={props.onToggleLeft}>
         <Icon name={props.leftOpen ? 'left_panel_close' : 'left_panel_open'} size={18} />
       </button>
       {/* The logo, the modes and HeroCanvas's own version are the rail's (ModeRail); this copy's version stays here,
@@ -60,21 +61,21 @@ export function Toolbar(props: ToolbarProps) {
       {/* The actions on the right, closer together than the bar's own spacing. */}
       <div className={styles.actions}>
       {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && (
-        <Chip active={inspect} onClick={() => setInspect(!inspect)} title="Inspect components (I)" tour="inspect">
+        <Chip active={inspect} onClick={() => setInspect(!inspect)} title={t('Inspect components (I)')} tour="inspect">
           <Icon name="ads_click" size={18} />
-          Inspect
+          {t('Inspect')}
         </Chip>
       )}
       {props.mode === 'prototype' && !capture && (
-        <Chip active={commenting} onClick={() => setCommenting(!commenting)} title="Comment: click on the screen to leave one (C)" tour="comment">
+        <Chip active={commenting} onClick={() => setCommenting(!commenting)} title={t('Comment: click on the screen to leave one (C)')} tour="comment">
           <Icon name="add_comment" size={18} />
-          Comment
+          {t('Comment')}
         </Chip>
       )}
       {/* Capture is in the mode rail (ModeRail). */}
       {/* Capture's picture is exported, not linked: a link here wouldn't bring it. */}
       {!capture && <ShareButton />}
-      <button className={styles.panelBtn} title="Toggle right panel" onClick={props.onToggleRight}>
+      <button className={styles.panelBtn} title={t('Toggle right panel')} onClick={props.onToggleRight}>
         <Icon name={props.rightOpen ? 'right_panel_close' : 'right_panel_open'} size={18} />
       </button>
       </div>
@@ -90,14 +91,14 @@ function ShareButton() {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (!copied) return;
-    const t = setTimeout(() => setCopied(false), 1800);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setCopied(false), 1800);
+    return () => clearTimeout(timer);
   }, [copied]);
   const share = () => navigator.clipboard.writeText(window.location.href).then(() => setCopied(true));
   return (
-    <button className={styles.share} onClick={share} title="Copy a link to this view">
+    <button className={styles.share} onClick={share} title={t('Copy a link to this view')}>
       <Icon name={copied ? 'check' : 'link'} size={18} />
-      {copied ? 'Link copied' : 'Share'}
+      {copied ? t('Link copied') : t('Share')}
     </button>
   );
 }
@@ -110,11 +111,11 @@ function VariantPicker() {
   if (!p?.variants.length) return null;
   const on = activeVariant(p, variant)!;
   return (
-    <label className={styles.select} title={on.description ? `${on.label}: ${on.description}` : 'Version of the proposal'}>
+    <label className={styles.select} title={on.description ? `${on.label}: ${on.description}` : t('Version of the proposal')}>
       <span className={styles.variantKey}>{on.id.toUpperCase()}</span>
       <span>{on.label}</span>
       {/* The first is the default: the unset param. */}
-      <select value={on.id} onChange={(e) => setVariant(e.target.value === p.variants[0].id ? null : e.target.value)} aria-label="Version">
+      <select value={on.id} onChange={(e) => setVariant(e.target.value === p.variants[0].id ? null : e.target.value)} aria-label={t('Version')}>
         {p.variants.map((v) => (
           <option key={v.id} value={v.id}>
             {v.id.toUpperCase()} · {v.label}

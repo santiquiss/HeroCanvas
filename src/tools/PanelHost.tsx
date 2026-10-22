@@ -5,6 +5,7 @@ import { useDesignRoot } from '../design/DesignContext';
 import { useSimQuery, type Mode } from '../sim/modes';
 import { TOOLS } from './registry';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 const KEY = 'hc.panels';
 
@@ -125,7 +126,7 @@ export function ResizeEdge({ side, width, onWidth }: { side: 'left' | 'right'; w
   return (
     <div
       className={`${styles.resize} ${styles[side === 'left' ? 'resizeL' : 'resizeR']} ${drag ? styles.resizing : ''}`}
-      title="Drag to resize · double-click to reset"
+      title={t('Drag to resize · double-click to reset')}
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={() => setDrag(null)}

@@ -7,6 +7,7 @@ import { useCommentScope, useCommentsUi } from './CommentsContext';
 import { useComments } from './store';
 import { openByPage } from './threads';
 import styles from './CommentsEager.module.css';
+import { plural } from '../i18n/ui';
 
 export { CommentsProvider, useCommenting, useCommentsUi } from './CommentsContext';
 
@@ -55,7 +56,7 @@ export function CommentsBadge() {
 export function PageCommentCount({ page }: { page: string }) {
   const n = useOpenCounts().get(page) ?? 0;
   return n ? (
-    <span className={styles.flowCount} title={`${n} open ${n === 1 ? 'comment' : 'comments'}`}>
+    <span className={styles.flowCount} title={plural(n, '{n} open comment', '{n} open comments')}>
       <Icon name="chat_bubble" size={11} fill />
       {n}
     </span>

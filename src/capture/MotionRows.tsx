@@ -6,6 +6,7 @@ import { Icon } from '../components/Icon';
 import { EDGE_SECONDS, hasIn, hasOut, IN_STEPS, MID_SECONDS, MID_STEPS, OUT_STEPS, stepMotion, type Sequence, type Step } from './video/motion';
 import { MotionGlyph } from './video/MotionGlyph';
 import styles from './MotionRows.module.css';
+import { t } from '../i18n/ui';
 
 /** Seconds as the rows show them: `1.4 s`, `6 s`. */
 const secs = (v: number) => `${Number(v.toFixed(1))} s`;
@@ -16,11 +17,11 @@ export function MotionRows({ sequence, recorded, onChange }: { sequence: Sequenc
   return (
     <>
       {/* Loop: one motion, repeating without a seam. Once: In, the middle, Out, from start to end. */}
-      <div className={styles.modes} role="radiogroup" aria-label="Playback">
+      <div className={styles.modes} role="radiogroup" aria-label={t('Playback')}>
         {(
           [
-            ['loop', 'Loop', 'repeat', 'One motion, repeating without a seam'],
-            ['once', 'Once', 'arrow_right_alt', 'Plays once, start to end: In, the middle, Out'],
+            ['loop', t('Loop'), 'repeat', t('One motion, repeating without a seam')],
+            ['once', t('Once'), 'arrow_right_alt', t('Plays once, start to end: In, the middle, Out')],
           ] as const
         ).map(([v, label, icon, title]) => (
           <button key={v} role="radio" aria-checked={sequence.mode === v} className={`${styles.mode} ${sequence.mode === v ? styles.on : ''}`} onClick={() => set({ mode: v })} title={title}>
@@ -32,7 +33,7 @@ export function MotionRows({ sequence, recorded, onChange }: { sequence: Sequenc
       <div className={styles.rows}>
         {once && (
           <Row
-            label="In"
+            label={t('In')}
             steps={IN_STEPS}
             value={sequence.in}
             // A motion picked starts at its own length.
@@ -43,20 +44,20 @@ export function MotionRows({ sequence, recorded, onChange }: { sequence: Sequenc
           />
         )}
         <Row
-          label={once ? 'Middle' : 'Motion'}
+          label={once ? t('Middle') : t('Motion')}
           steps={MID_STEPS}
           middle
           value={sequence.mid}
           onPick={(x) => set({ mid: x.id })}
           // With a recording, what In and Out leave of it.
           seconds={recorded != null ? Math.max(0, recorded - (hasIn(sequence) ? sequence.inSeconds : 0) - (hasOut(sequence) ? sequence.outSeconds : 0)) : sequence.midSeconds}
-          fixed={recorded != null ? (once ? 'What In and Out leave of the recording' : 'The recording’s length') : undefined}
+          fixed={recorded != null ? (once ? t('What In and Out leave of the recording') : t('The recording’s length')) : undefined}
           options={MID_SECONDS}
           onSeconds={(midSeconds) => set({ midSeconds })}
         />
         {once && (
           <Row
-            label="Out"
+            label={t('Out')}
             steps={OUT_STEPS}
             value={sequence.out}
             onPick={(x) => set({ out: x.id, ...(x.offset ? { outSeconds: x.seconds } : {}) })}
@@ -66,7 +67,7 @@ export function MotionRows({ sequence, recorded, onChange }: { sequence: Sequenc
           />
         )}
       </div>
-      {sequence.mid === 'angle' && <p className={styles.hint}>Holds the angle you set: drag beside the device on the canvas, even while it plays, or use Angle below.</p>}
+      {sequence.mid === 'angle' && <p className={styles.hint}>{t('Holds the angle you set: drag beside the device on the canvas, even while it plays, or use Angle below.')}</p>}
     </>
   );
 }
@@ -100,7 +101,7 @@ function Row<Id extends string>({
     <div className={styles.row}>
       <span className={styles.rowLabel}>{label}</span>
       <Dropdown
-        label={`${label} motion`}
+        label={t('{step} motion', { step: label })}
         across
         trigger={
           <>
@@ -134,7 +135,7 @@ function Row<Id extends string>({
         )}
       </Dropdown>
       {seconds == null ? (
-        <span className={styles.length} aria-label={`${label} length`}>
+        <span className={styles.length} aria-label={t('{step} length', { step: label })}>
           —
         </span>
       ) : fixed ? (
@@ -142,7 +143,7 @@ function Row<Id extends string>({
           {secs(seconds)}
         </span>
       ) : (
-        <Dropdown label={`${label} length`} narrow trigger={<span className={styles.name}>{secs(seconds)}</span>}>
+        <Dropdown label={t('{step} length', { step: label })} narrow trigger={<span className={styles.name}>{secs(seconds)}</span>}>
           {(close) =>
             options.map((v) => (
               <button

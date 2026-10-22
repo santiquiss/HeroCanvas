@@ -14,6 +14,7 @@ import { ProposalPanel } from './ProposalPanel';
 import { ScenariosPanel } from './ScenariosPanel';
 import { TokensPanel } from './TokensPanel';
 import { ComponentInfoPanel, ComponentStateBadge } from './ComponentInfoPanel';
+import { t } from '../i18n/ui';
 
 export interface ToolDef {
   id: string;
@@ -35,18 +36,18 @@ export interface ToolDef {
 }
 
 export const TOOLS: ToolDef[] = [
-  { id: 'pages', title: 'Pages', icon: 'account_tree', side: 'left', component: PagesPanel, modes: ['prototype'] },
-  { id: 'components', title: 'Components', icon: 'widgets', side: 'left', component: ComponentsPanel, modes: ['components'] },
-  { id: 'tokens', title: 'Tokens', icon: 'palette', side: 'left', component: TokensPanel, modes: ['tokens'] },
+  { id: 'pages', title: t('Pages'), icon: 'account_tree', side: 'left', component: PagesPanel, modes: ['prototype'] },
+  { id: 'components', title: t('Components'), icon: 'widgets', side: 'left', component: ComponentsPanel, modes: ['components'] },
+  { id: 'tokens', title: t('Tokens'), icon: 'palette', side: 'left', component: TokensPanel, modes: ['tokens'] },
   // The layers of what's on the canvas: a screen in the prototype, the component's examples in Components.
-  { id: 'layers', title: 'Layers', icon: 'layers', side: 'left', component: LayersPanel, modes: ['prototype', 'components'] },
+  { id: 'layers', title: t('Layers'), icon: 'layers', side: 'left', component: LayersPanel, modes: ['prototype', 'components'] },
   // A component's page, in Components: what to know about it, then its props to read and to change.
-  { id: 'info', title: 'Info', icon: 'info', side: 'right', component: ComponentInfoPanel, modes: ['components'], badge: ComponentStateBadge },
-  { id: 'props', title: 'Props', icon: 'tune', side: 'right', component: ControlsPanel, modes: ['components'] },
-  { id: 'inspect', title: 'Inspect', icon: 'ads_click', side: 'right', component: InspectPanel, whileInspecting: true },
-  { id: 'page', title: 'Page', icon: 'info', side: 'right', component: PageInspector, modes: ['prototype'] },
-  { id: 'scenarios', title: 'Scenarios', icon: 'science', side: 'right', component: ScenariosPanel, modes: ['prototype', 'flow'] },
+  { id: 'info', title: t('Info'), icon: 'info', side: 'right', component: ComponentInfoPanel, modes: ['components'], badge: ComponentStateBadge },
+  { id: 'props', title: t('Props'), icon: 'tune', side: 'right', component: ControlsPanel, modes: ['components'] },
+  { id: 'inspect', title: t('Inspect'), icon: 'ads_click', side: 'right', component: InspectPanel, whileInspecting: true },
+  { id: 'page', title: t('Page'), icon: 'info', side: 'right', component: PageInspector, modes: ['prototype'] },
+  { id: 'scenarios', title: t('Scenarios'), icon: 'science', side: 'right', component: ScenariosPanel, modes: ['prototype', 'flow'] },
   // Its panel loads when the tab opens; the tab counts the open threads.
-  { id: 'comments', title: 'Comments', icon: 'chat_bubble', side: 'right', component: CommentsTool, modes: ['prototype', 'flow'], badge: CommentsBadge },
-  { id: 'proposal', title: 'Proposal', icon: 'call_split', side: 'right', component: ProposalPanel, modes: ['prototype', 'flow'], badge: ProposalChangeCounts },
+  { id: 'comments', title: t('Comments'), icon: 'chat_bubble', side: 'right', component: CommentsTool, modes: ['prototype', 'flow'], badge: CommentsBadge },
+  { id: 'proposal', title: t('Proposal'), icon: 'call_split', side: 'right', component: ProposalPanel, modes: ['prototype', 'flow'], badge: ProposalChangeCounts },
 ];

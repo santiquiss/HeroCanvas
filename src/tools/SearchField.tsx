@@ -4,6 +4,7 @@
 import { useRef, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 export function SearchField({ value, placeholder, onChange, action }: { value: string; placeholder: string; onChange: (value: string) => void; action?: ReactNode }) {
   const input = useRef<HTMLInputElement>(null);
@@ -23,7 +24,7 @@ export function SearchField({ value, placeholder, onChange, action }: { value: s
           onKeyDown={(e) => e.key === 'Escape' && value && (e.stopPropagation(), clear())}
         />
         {value && (
-          <button className={styles.searchClear} title="Clear search" aria-label="Clear search" onClick={clear}>
+          <button className={styles.searchClear} title={t('Clear search')} aria-label={t('Clear search')} onClick={clear}>
             <Icon name="close" size={14} />
           </button>
         )}

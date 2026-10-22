@@ -4,6 +4,7 @@ import { HashRouter, Route, Routes } from 'react-router';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { NavProvider } from './nav/NavProvider';
 import { SimulatorShell } from './sim/SimulatorShell';
+import { t } from './i18n/ui';
 import './kit/tokens.css';
 import './theme/theme.css';
 // The tool's brand colors (herocanvas.config.ts, scripts/vite/brand.ts).
@@ -33,7 +34,7 @@ createRoot(document.getElementById('root')!).render(
               fill
               actions={
                 <button onClick={() => window.location.assign(window.location.pathname + '#/')} style={{ height: 26, padding: '0 10px', borderRadius: 6, border: '1px solid #d9a3a3', background: '#fff', color: '#7a1d1d', font: 'inherit', fontWeight: 600, cursor: 'pointer' }}>
-                  Back to the start
+                  {t('Back to the start')}
                 </button>
               }
             >

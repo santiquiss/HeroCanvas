@@ -28,6 +28,7 @@ export interface ScreenPlayback {
 import styles from './CaptureStage.module.css';
 import bar from '../sim/Toolbar.module.css';
 import { Icon } from '../components/Icon';
+import { t } from '../i18n/ui';
 
 /** How long the view takes to settle on a new fit. */
 const REFIT_MS = 380;
@@ -496,17 +497,17 @@ export function CapturePreviewBar({
     <div className={bar.zoomBar} data-canvas-ui>
       {!bare && (
         <>
-          <button className={`${bar.chip} ${crop ? bar.active : ''}`} onClick={() => onCrop(!crop)} title={crop ? 'Hide the crop: the whole device, nothing veiled' : 'Preview the crop: veil what the file leaves out'}>
+          <button className={`${bar.chip} ${crop ? bar.active : ''}`} onClick={() => onCrop(!crop)} title={crop ? t('Hide the crop: the whole device, nothing veiled') : t('Preview the crop: veil what the file leaves out')}>
             <Icon name="crop" size={16} />
-            <span>Preview crop</span>
+            <span>{t('Preview crop')}</span>
           </button>
           <span className={bar.viewSep} />
         </>
       )}
       {(
         [
-          ['fit', 'Fit', 'Fit the picture to the canvas'],
-          ['actual', 'Actual pixels', 'The picture at its real size: a pixel of the file a pixel of the screen'],
+          ['fit', t('Fit'), t('Fit the picture to the canvas')],
+          ['actual', t('Actual pixels'), t('The picture at its real size: a pixel of the file a pixel of the screen')],
         ] as const
       ).map(([v, label, title]) => (
         <button key={v} className={`${bar.chip} ${preview === v ? bar.active : ''}`} onClick={() => onPreview(v)} title={title}>
@@ -572,20 +573,21 @@ export function RecordingBadge({ seconds, starting, onStop }: { seconds: number;
     <div className={styles.recording} role="status" data-canvas-ui>
       <span className={styles.recDot} aria-hidden />
       {starting ? (
-        <span>Waiting for permission…</span>
+        <span>{t('Waiting for permission…')}</span>
       ) : (
         <>
           {/* Figures of one width: the time counts up without the pill twitching. */}
           <span>
-            Recording · <span className={styles.recTime}>{seconds.toFixed(1)} s</span>
+            {t('Recording')} · <span className={styles.recTime}>{seconds.toFixed(1)} s</span>
           </span>
           <span className={styles.recSep} aria-hidden />
           <span>
-            Press <kbd className={styles.kbd}>Esc</kbd> to stop
+            {/* The key in the sentence where the language puts it. */}
+            {t('Press {key} to stop').split('{key}').map((part, i) => (i ? [<kbd key="k" className={styles.kbd}>Esc</kbd>, part] : part))}
           </span>
-          <button className={styles.recStop} onClick={onStop} title="Stop recording (Esc)">
+          <button className={styles.recStop} onClick={onStop} title={t('Stop recording (Esc)')}>
             <Icon name="stop" size={14} fill />
-            <span>Stop</span>
+            <span>{t('Stop')}</span>
           </button>
         </>
       )}

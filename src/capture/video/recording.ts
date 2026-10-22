@@ -3,6 +3,7 @@
 // restricted to it, as the browser paints it, animations and blurs included); each frame is encoded as it comes
 // (WebCodecs, VP9) and kept in memory, compressed. The taps are logged beside it, in the frame's points, to be drawn
 // over the screen (taps.ts). Asking to record the tab is the browser's own prompt: one click each time.
+import { t } from '../../i18n/ui';
 import { muxMp4 } from './mp4';
 import type { Tap } from './taps';
 
@@ -66,7 +67,7 @@ async function encoderConfig(width: number, height: number): Promise<VideoEncode
     if (codec.startsWith('avc1')) c.avc = { format: 'avc' };
     if ((await VideoEncoder.isConfigSupported(c).catch(() => ({ supported: false }))).supported) return c;
   }
-  throw new Error(`This browser can't encode video at ${width} × ${height} px`);
+  throw new Error(t("This browser can't encode video at {width} × {height} px", { width, height }));
 }
 
 /**
@@ -97,7 +98,7 @@ async function firstOfShape(reader: ReadableStreamDefaultReader<VideoFrame>, asp
  * browser's own "stop sharing"); `onError` if it breaks on the way.
  */
 export async function startRecording(frame: HTMLElement, onTick: (seconds: number) => void, onEnd: () => void, onError: (e: unknown) => void): Promise<RecordingSession> {
-  if (!canRecord()) throw new Error("This browser can't record the device's screen (it needs Chrome)");
+  if (!canRecord()) throw new Error(t("This browser can't record the device's screen (it needs Chrome)"));
   const stream = await navigator.mediaDevices.getDisplayMedia({
     video: { frameRate: 60 },
     audio: false,
@@ -140,7 +141,7 @@ export async function startRecording(frame: HTMLElement, onTick: (seconds: numbe
     }
     if (!first) {
       console.info(`[Capture] no frames of the device (${Math.round(box.width)}×${Math.round(box.height)}); came: ${[...new Set(seen)].join(', ') || 'none'}`);
-      throw new Error("Chrome didn't send frames of the device");
+      throw new Error(t("Chrome didn't send frames of the device"));
     }
   } catch (e) {
     track.stop();

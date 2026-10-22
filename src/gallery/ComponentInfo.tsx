@@ -26,6 +26,7 @@ import { compress } from './FigmaInfo';
 import { useGalleryNav } from './route';
 import { PanelSection } from '../tools/PanelSection';
 import styles from './ComponentInfo.module.css';
+import { plural, t } from '../i18n/ui';
 
 /** The Info tab (Components, right panel): where it's used, the implementation notes, the links. */
 export function ComponentInfo({ mod }: { mod: StoryModule<Args> }) {
@@ -39,10 +40,13 @@ export function ComponentInfo({ mod }: { mod: StoryModule<Args> }) {
   );
 }
 
-/** A part of the page: a section of the right panel, opened and closed from its title (as Inspect's). */
-function Card({ title, icon, aside, children }: { title: string; icon: string; aside?: ReactNode; children: ReactNode }) {
+/**
+ * A part of the page: a section of the right panel, opened and closed from its title (as Inspect's). `id`: the English
+ * name it's remembered by (open or closed), whatever the interface's language.
+ */
+function Card({ id, title, icon, aside, children }: { id: string; title: string; icon: string; aside?: ReactNode; children: ReactNode }) {
   return (
-    <PanelSection id={`component-${title.toLowerCase().replace(/\W+/g, '-')}`} title={title} icon={icon} aside={aside}>
+    <PanelSection id={`component-${id}`} title={title} icon={icon} aside={aside}>
       {children}
     </PanelSection>
   );
@@ -59,7 +63,7 @@ export function Status({ name }: { name: string }) {
   const [, setProposal] = useProposalParam();
   const state = lib && componentState(name, true, lib);
   return (
-    <Card title="Status" icon="flag">
+    <Card id="status" title={t('Status')} icon="flag">
       {state ? (
         <>
           <div className={styles.state} style={{ '--state': state.color } as React.CSSProperties}>
@@ -76,7 +80,7 @@ export function Status({ name }: { name: string }) {
             )}
             {state.where && (
               <div className={styles.where}>
-                <span className={styles.whereHead}>Where in the app</span>
+                <span className={styles.whereHead}>{t('Where in the app')}</span>
                 <span>{state.where.widget}</span>
                 {state.where.files.map((f) => (
                   <span key={f} className={styles.mono}>
@@ -87,9 +91,9 @@ export function Status({ name }: { name: string }) {
             )}
             {state.proposals && state.proposals.length > 0 && (
               <div className={styles.where}>
-                <span className={styles.whereHead}>Specified in</span>
+                <span className={styles.whereHead}>{t('Specified in')}</span>
                 {state.proposals.map((p) => (
-                  <button key={p.code} className={styles.proposalLink} title="Open the proposal" onClick={() => setProposal(p.code)}>
+                  <button key={p.code} className={styles.proposalLink} title={t('Open the proposal')} onClick={() => setProposal(p.code)}>
                     {p.code} · {p.title}
                   </button>
                 ))}
@@ -98,7 +102,7 @@ export function Status({ name }: { name: string }) {
           </div>
           {state.accepted.length > 0 && (
             <div className={styles.acceptedList}>
-              <span className={styles.usedHead}>Accepted · {state.accepted.length}</span>
+              <span className={styles.usedHead}>{t('Accepted · {n}', { n: state.accepted.length })}</span>
               {state.accepted.map((d) => (
                 <div key={d.key} className={styles.acceptedItem}>
                   <Icon name="check_circle" size={14} />
@@ -129,7 +133,7 @@ export type FieldFor = (key: string, param?: ApiParam) => ReactNode | null;
 /** A default as the app writes it, without its enum's name: `small` for `AvatarSize.small`. */
 // A default that's a constant of the package's (`LogoConstraints.defaultWidth`) names no value: left out.
 export const defaultLabel = (p: ApiParam) =>
-  p.default != null && !/^[A-Z]\w*(Constraints|Styles|Sizes|Constants|Dimensions)\./.test(p.default) ? `default ${p.default.replace(/^[A-Z]\w*\./, '')}` : '';
+  p.default != null && !/^[A-Z]\w*(Constraints|Styles|Sizes|Constants|Dimensions)\./.test(p.default) ? t('default {value}', { value: p.default.replace(/^[A-Z]\w*\./, '') }) : '';
 
 /** A parameter's type (a nullable `?` dropped: nullable reads from its control) and its default, for a row with no control. */
 export function typeLabel(p: ApiParam): string {
@@ -155,11 +159,11 @@ export function Props({ mod, story, args, field, reset }: { mod: StoryModule<Arg
   const received = useReceivedProps(mod.component, [story, JSON.stringify(args)]);
   const value = (k: string, set = args[k] != null, param?: ApiParam) => field?.(k, param) ?? (set ? <span className={styles.mono}>{fmt(args[k])}</span> : <span className={styles.muted}>—</span>);
   const typeOf = (k: string) => controlFor(mod, k)?.type ?? typeof mod.args[k];
-  if (!lib) return <Card title="Props" icon="tune">{<Spinner size={12} />}</Card>;
+  if (!lib) return <Card id="props" title="Props" icon="tune">{<Spinner size={12} />}</Card>;
   if (!widget) {
     return (
-      <Card title="Props" icon="tune" aside={<>simulator · not in the code{reset}</>}>
-        {field && <span className={styles.editing}>“{story}” · click another example to edit it</span>}
+      <Card id="props" title="Props" icon="tune" aside={<>{t('simulator · not in the code')}{reset}</>}>
+        {field && <span className={styles.editing}>{t('“{story}” · click another example to edit it', { story })}</span>}
         <div className={styles.params}>
           {Object.keys(mod.args).map((k) => (
             <Param key={k} name={k} type={field ? '' : typeOf(k)} value={value(k)} />
@@ -190,52 +194,52 @@ export function Props({ mod, story, args, field, reset }: { mod: StoryModule<Arg
   const why = propDecl(mod.component);
   return (
     <>
-      <Card title="Props" icon="tune" aside={<>code · {inputs.length} {inputs.length === 1 ? 'parameter' : 'parameters'}{reset}</>}>
+      <Card id="props" title="Props" icon="tune" aside={<>{plural(inputs.length, 'code · {n} parameter', 'code · {n} parameters')}{reset}</>}>
         <div className={styles.ctors}>
           {widget.constructors.map((c) => (
-            <span key={c} className={`${styles.chip} ${c === (constructor ?? widget.name) ? styles.chipOn : ''}`} title={c === (constructor ?? widget.name) ? `“${story}” uses this constructor` : undefined}>
+            <span key={c} className={`${styles.chip} ${c === (constructor ?? widget.name) ? styles.chipOn : ''}`} title={c === (constructor ?? widget.name) ? t('“{story}” uses this constructor', { story }) : undefined}>
               {c.replace(widget.name, '') || widget.name}
             </span>
           ))}
         </div>
         <Review note={widgetReview(widget)} />
-        {field && <span className={styles.editing}>“{story}” · click another example to edit it</span>}
+        {field && <span className={styles.editing}>{t('“{story}” · click another example to edit it', { story })}</span>}
         <div className={styles.params}>
           {choosers.map((k) => (
-            <Param key={k} name={k} type="the constructor" value={value(k)} />
+            <Param key={k} name={k} type={t('the constructor')} value={value(k)} />
           ))}
           {taken.map((p) => (
             <Param key={p.name} name={p.name} strong={p.required} badge={<ParamBadges p={p} />} type={field ? defaultLabel(p) : typeLabel(p)} mono note={<Review note={paramReview(widget, p)} />} value={value(p.name, p.set, p)} />
           ))}
           {proposed.map((p) => (
-            <Param key={p.name} name={p.name} extra badge={<span className={styles.proposed} title={`Not in the widget yet: ${p.proposal} adds it (its handoff.md)`}>{p.proposal}</span>} type={field ? '' : typeOf(p.name)} value={value(p.name)} />
+            <Param key={p.name} name={p.name} extra badge={<span className={styles.proposed} title={t('Not in the widget yet: {proposal} adds it (its handoff.md)', { proposal: p.proposal })}>{p.proposal}</span>} type={field ? '' : typeOf(p.name)} value={value(p.name)} />
           ))}
           {extra.map((k) => (
-            <Param key={k} name={k} extra badge={<span className={styles.differs} title={why.differs?.[k] ?? 'The widget has no parameter for it: to agree on with design and the app'}>differs</span>} type={field ? '' : typeOf(k)} value={value(k)} />
+            <Param key={k} name={k} extra badge={<span className={styles.differs} title={why.differs?.[k] ?? t('The widget has no parameter for it: to agree on with design and the app')}>{t('differs')}</span>} type={field ? '' : typeOf(k)} value={value(k)} />
           ))}
           {accepted.map((k) => (
-            <Param key={k} name={k} badge={<span className={styles.acceptedBadge} title={`Accepted as it is: ${acceptanceOf(mod.component, k)?.reason ?? ''}`}>accepted</span>} type={field ? '' : typeOf(k)} value={value(k)} />
+            <Param key={k} name={k} badge={<span className={styles.acceptedBadge} title={t('Accepted as it is: {reason}', { reason: acceptanceOf(mod.component, k)?.reason ?? '' })}>{t('accepted')}</span>} type={field ? '' : typeOf(k)} value={value(k)} />
           ))}
           {simulator.map((k) => (
-            <Param key={k} name={k} badge={<span className={styles.simOnly} title="Only the simulator needs it: not a difference, not in the handoff">simulator</span>} type={field ? '' : typeOf(k)} value={value(k)} note={why.simulator?.[k] && <span className={styles.paramNote}>{why.simulator[k]}</span>} />
+            <Param key={k} name={k} badge={<span className={styles.simOnly} title={t('Only the simulator needs it: not a difference, not in the handoff')}>{t('simulator')}</span>} type={field ? '' : typeOf(k)} value={value(k)} note={why.simulator?.[k] && <span className={styles.paramNote}>{why.simulator[k]}</span>} />
           ))}
         </div>
         {exampleOnly.length > 0 && (
           <>
-            <span className={styles.paramsGroup} title={`The simulator's controls for the examples, not props of ${mod.component}: they set the example up (which callbacks it gets, a child's text, whether it's open)`}>
-              Simulator controls · {exampleOnly.length}
+            <span className={styles.paramsGroup} title={t("The simulator's controls for the examples, not props of {component}: they set the example up (which callbacks it gets, a child's text, whether it's open)", { component: mod.component })}>
+              {t('Simulator controls · {n}', { n: exampleOnly.length })}
             </span>
             <div className={styles.params}>
               {exampleOnly.map((k) => (
-                <Param key={k} name={k} badge={<span className={styles.simOnly} title="Only the simulator's: it sets the example up, the component doesn't receive it">simulator</span>} type={field ? '' : typeOf(k)} value={value(k)} />
+                <Param key={k} name={k} badge={<span className={styles.simOnly} title={t("Only the simulator's: it sets the example up, the component doesn't receive it")}>{t('simulator')}</span>} type={field ? '' : typeOf(k)} value={value(k)} />
               ))}
             </div>
           </>
         )}
         {notTaken.length > 0 && (
           <>
-            <span className={styles.paramsGroup} title={`The simulator's ${mod.component} doesn't take these yet: they can't be set here`}>
-              Not in the simulator yet · {notTaken.length}
+            <span className={styles.paramsGroup} title={t("The simulator's {component} doesn't take these yet: they can't be set here", { component: mod.component })}>
+              {t('Not in the simulator yet · {n}', { n: notTaken.length })}
             </span>
             <div className={styles.params}>
               {notTaken.map((p) => (
@@ -246,14 +250,14 @@ export function Props({ mod, story, args, field, reset }: { mod: StoryModule<Arg
         )}
       </Card>
       {callbacks.length > 0 && (
-        <Card title="Callbacks" icon="bolt" aside="set by the screen">
+        <Card id="callbacks" title="Callbacks" icon="bolt" aside={t('set by the screen')}>
           <div className={styles.params}>
             {callbacks.map((p) => (
               <Param key={p.name} name={p.name} strong={p.required} badge={<ParamBadges p={p} />} type={typeLabel(p)} mono note={<Review note={paramReview(widget, p)} />} />
             ))}
           </div>
           <span className={styles.muted} style={{ display: 'block', marginTop: 8, fontSize: 11, lineHeight: '15px' }}>
-            The examples show each call beside their name when it fires.
+            {t('The examples show each call beside their name when it fires.')}
           </span>
         </Card>
       )}
@@ -265,10 +269,10 @@ export function Props({ mod, story, args, field, reset }: { mod: StoryModule<Arg
 function ParamBadges({ p }: { p: ApiParam }) {
   return (
     <>
-      {p.required && <span className={styles.req}>required</span>}
+      {p.required && <span className={styles.req}>{t('required')}</span>}
       {p.deprecated && (
-        <span className={styles.req} title="Deprecated in the code: still there, not for new code">
-          deprecated
+        <span className={styles.req} title={t('Deprecated in the code: still there, not for new code')}>
+          {t('deprecated')}
         </span>
       )}
     </>
@@ -342,24 +346,24 @@ function UsedIn({ name }: { name: string }) {
     if (p.sheet) openSheetLink(p.sheet);
   };
   return (
-    <Card title="Used in" icon="account_tree" aside={index ? `${pageCount} ${pageCount === 1 ? 'page' : 'pages'}` : undefined}>
+    <Card id="used-in" title={t('Used in')} icon="account_tree" aside={index ? plural(pageCount, '{n} page', '{n} pages') : undefined}>
       {!index ? (
         <div className={styles.loading}>
           <span>
-            <Spinner size={12} /> Finding the pages it's on{scanning != null ? ` · ${Math.round(scanning * 100)}%` : '…'}
+            <Spinner size={12} /> {scanning != null ? t("Finding the pages it's on · {pct}%", { pct: Math.round(scanning * 100) }) : t("Finding the pages it's on…")}
           </span>
           <ProgressLine value={scanning ?? 0} />
         </div>
       ) : !places.length ? (
-        <p className={styles.muted}>Not on a page as it loads, nor in a sheet a page declares (it may be in a dialog, a state or a sheet not declared).</p>
+        <p className={styles.muted}>{t('Not on a page as it loads, nor in a sheet a page declares (it may be in a dialog, a state or a sheet not declared).')}</p>
       ) : (
         <>
           {all.inside.length > 0 && (
             <>
-              <span className={styles.usedHead}>In components · {all.inside.length}</span>
+              <span className={styles.usedHead}>{t('In components · {n}', { n: all.inside.length })}</span>
               <div className={styles.places}>
                 {all.inside.map(([parent, n]) => (
-                  <button key={parent} className={styles.place} onClick={() => openComponent(parent)} title={`${times(n)} inside ${parent} across the pages: open ${parent}`}>
+                  <button key={parent} className={styles.place} onClick={() => openComponent(parent)} title={t('{times} inside {parent} across the pages: open {parent}', { times: times(n), parent })}>
                     <Icon name={componentIcon(parent)} size={14} className={styles.placeIcon} />
                     <span>{parent}</span>
                     <Times n={n} />
@@ -371,10 +375,10 @@ function UsedIn({ name }: { name: string }) {
           )}
           {sheets.size > 0 && (
             <>
-              <span className={styles.usedHead}>In sheets · {sheets.size}</span>
+              <span className={styles.usedHead}>{t('In sheets · {n}', { n: sheets.size })}</span>
               <div className={styles.places}>
                 {[...sheets.values()].map((p) => (
-                  <button key={`${p.id} ${p.sheet}`} className={styles.place} onClick={() => open(p)} title={`Open ${pageName(nav.pages, p.id)} with its ${sheetLabel(p.sheet!)} sheet`}>
+                  <button key={`${p.id} ${p.sheet}`} className={styles.place} onClick={() => open(p)} title={t('Open {page} with its {sheet} sheet', { page: pageName(nav.pages, p.id), sheet: sheetLabel(p.sheet!) })}>
                     <Icon name={pageIcon(nav.pages[p.id])} size={14} className={styles.placeIcon} />
                     <span>
                       {pageName(nav.pages, p.id)}
@@ -387,12 +391,12 @@ function UsedIn({ name }: { name: string }) {
               </div>
             </>
           )}
-          <span className={styles.usedHead}>On pages · {pages.size}</span>
+          <span className={styles.usedHead}>{t('On pages · {n}', { n: pages.size })}</span>
           {pages.size ? (
             <div className={styles.places}>
               {[...pages].map(([id, list]) =>
                 list.length === 1 && !list[0].label ? (
-                  <button key={id} className={styles.place} onClick={() => open(list[0])} title={`Open ${pageName(nav.pages, id)} and point at ${name}`}>
+                  <button key={id} className={styles.place} onClick={() => open(list[0])} title={t('Open {page} and point at {name}', { page: pageName(nav.pages, id), name })}>
                     <Icon name={pageIcon(nav.pages[id])} size={14} className={styles.placeIcon} />
                     <span>{pageName(nav.pages, id)}</span>
                     <Times n={list[0].count} />
@@ -404,7 +408,7 @@ function UsedIn({ name }: { name: string }) {
               )}
             </div>
           ) : (
-            <p className={styles.muted}>{sheets.size ? 'Not on a page itself: only in its sheets.' : 'Never on its own: always inside a component.'}</p>
+            <p className={styles.muted}>{sheets.size ? t('Not on a page itself: only in its sheets.') : t('Never on its own: always inside a component.')}</p>
           )}
         </>
       )}
@@ -422,7 +426,7 @@ function Variants({ icon, title, list, onOpen }: { icon: string; title: string; 
         <Icon name={icon} size={14} className={styles.placeIcon} />
         <span>
           {title}
-          <span className={styles.muted}> · {list.length} variants</span>
+          <span className={styles.muted}> · {plural(list.length, '{n} variant', '{n} variants')}</span>
         </span>
         <span className={styles.times}>{eachTimes(list)}</span>
         <Icon name="arrow_forward" size={14} />
@@ -444,12 +448,12 @@ function Variants({ icon, title, list, onOpen }: { icon: string; title: string; 
   );
 }
 
-const times = (n = 1) => (n === 1 ? 'once' : `${n} times`);
+const times = (n = 1) => plural(n, 'once', '{n} times');
 
 /** Across a page's variants: "once each" when they all have the same, else the total. */
 function eachTimes(list: PagePlace[]): string {
   const counts = list.map((p) => p.count ?? 1);
-  return counts.every((c) => c === counts[0]) ? `${times(counts[0])} each` : `${counts.reduce((a, b) => a + b, 0)} times in all`;
+  return counts.every((c) => c === counts[0]) ? t('{times} each', { times: times(counts[0]) }) : t('{n} times in all', { n: counts.reduce((a, b) => a + b, 0) });
 }
 
 /** How many times it's on a page. */
@@ -471,7 +475,7 @@ export function Notes({ name }: { name: string }) {
   const todo = maps.flatMap((m) => m.todo);
   if (!maps.length && !figma) return null;
   return (
-    <Card title="Notes" icon="sticky_note_2">
+    <Card id="notes" title={t('Notes')} icon="sticky_note_2">
       {maps.filter(inFigma).map((m) => (
         <div key={m.code} className={styles.mapping}>
           <span className={styles.label}>Figma</span>
@@ -480,7 +484,7 @@ export function Notes({ name }: { name: string }) {
       ))}
       {about.length > 0 && (
         <div className={styles.mapping}>
-          <span className={styles.label}>About</span>
+          <span className={styles.label}>{t('About')}</span>
           {about.map((t) => (
             <p key={t} className={styles.about}>
               {t}
@@ -490,7 +494,7 @@ export function Notes({ name }: { name: string }) {
       )}
       {figma && (figma.props.length > 0 || !!figma.variants?.length) && (
         <div className={styles.mapping}>
-          <span className={styles.label}>Options</span>
+          <span className={styles.label}>{t('Options')}</span>
           <div className={styles.options}>
             {compress(figma.props).map((p) => (
               <div key={p.name} className={styles.option}>
@@ -504,17 +508,17 @@ export function Notes({ name }: { name: string }) {
                     ))}
                   </span>
                 ) : (
-                  <span className={styles.muted}>{p.type === 'bool' ? 'on / off' : p.type}</span>
+                  <span className={styles.muted}>{p.type === 'bool' ? t('on / off') : p.type}</span>
                 )}
               </div>
             ))}
-            {figma.variants && <span className={styles.muted}>{figma.variants.length} variants in Figma</span>}
+            {figma.variants && <span className={styles.muted}>{plural(figma.variants.length, '{n} variant in Figma', '{n} variants in Figma')}</span>}
           </div>
         </div>
       )}
       {diffs.length > 0 && (
         <div className={styles.mapping}>
-          <span className={styles.label}>Differences</span>
+          <span className={styles.label}>{t('Differences')}</span>
           <ul className={styles.bullets}>
             {diffs.map((d) => (
               <li key={d}>{d}</li>
@@ -524,7 +528,7 @@ export function Notes({ name }: { name: string }) {
       )}
       {todo.length > 0 && (
         <div className={styles.mapping}>
-          <span className={styles.label}>To do</span>
+          <span className={styles.label}>{t('To do')}</span>
           <ul className={styles.todo}>
             {todo.map((t) => (
               <li key={t}>{t}</li>
@@ -552,7 +556,7 @@ function Links({ name }: { name: string }) {
   const figUrl = fig?.figmaUrl ?? (entry && figmaUrl(entry));
   if (!entry && !figUrl && !widget) return null;
   return (
-    <Card title="Links" icon="link">
+    <Card id="links" title={t('Links')} icon="link">
       <div className={styles.links}>
         {figUrl && (
           <a className={styles.link} href={figUrl} target="_blank" rel="noreferrer">
@@ -568,7 +572,7 @@ function Links({ name }: { name: string }) {
           <>
             <a className={styles.link} href={catalogUrl(entry)} target="_blank" rel="noreferrer">
               <Icon name="menu_book" size={16} />
-              <span>Catalog</span>
+              <span>{t('Catalog')}</span>
               <Icon name="open_in_new" size={14} />
             </a>
             {entry.useCases.length > 1 && (
@@ -593,7 +597,7 @@ function CopyPath({ path }: { path: string }) {
   return (
     <button
       className={styles.link}
-      title="Copy the file's path in the code"
+      title={t("Copy the file's path in the code")}
       onClick={() => {
         void navigator.clipboard?.writeText(path);
         setDone(true);
@@ -602,7 +606,7 @@ function CopyPath({ path }: { path: string }) {
     >
       <Icon name="code" size={16} />
       <span className={styles.path}>
-        Code
+        {t('Code')}
         <span className={`${styles.muted} ${styles.mono}`}> · {path}</span>
       </span>
       <Icon name={done ? 'check' : 'content_copy'} size={14} />

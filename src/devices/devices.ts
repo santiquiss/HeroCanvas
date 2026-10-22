@@ -2,6 +2,7 @@
 // it: DEVICES is what the designer offers, ALL_DEVICES every one (a real phone is matched against them all).
 import { appConfig } from '@app/config';
 import type { DeviceTargets } from '../contract';
+import { t } from '../i18n/ui';
 
 export type DeviceOS = 'ios' | 'android' | 'ipad';
 
@@ -128,33 +129,33 @@ export const ALL_DEVICES: Device[] = [
     id: 'ipse',
     name: 'iPhone SE',
     type: 'phone',
-    displays: [D('main', 'Display', 375, 667, 'ios', 0, 20, { ends: 90, bodyR: 62, cutout: 'none', homeButton: true, statusH: 20 })],
+    displays: [D('main', t('Display'), 375, 667, 'ios', 0, 20, { ends: 90, bodyR: 62, cutout: 'none', homeButton: true, statusH: 20 })],
   },
   // The base iPhone: the most common iOS width, a notch (no Dynamic Island).
-  { id: 'ip16e', name: 'iPhone 16e', type: 'phone', displays: [D('main', 'Display', 390, 844, 'ios', 47, 12, { cutout: 'notch', statusH: 47 })] },
-  { id: 'ip17', name: 'iPhone 17 Pro', type: 'phone', displays: [D('main', 'Display', 402, 874, 'ios', 55, 12)] },
+  { id: 'ip16e', name: 'iPhone 16e', type: 'phone', displays: [D('main', t('Display'), 390, 844, 'ios', 47, 12, { cutout: 'notch', statusH: 47 })] },
+  { id: 'ip17', name: 'iPhone 17 Pro', type: 'phone', displays: [D('main', t('Display'), 402, 874, 'ios', 55, 12)] },
   // The 17 Pro's size and screen (6.3″, 2622×1206 at 3×), in new colors (capture/models). A smaller Dynamic Island:
   // 13.49 mm wide against the 17 Pro's 20.76 mm (reported before launch; Apple gives no size), 82 at the 17 Pro's
   // ~6 points per mm (its 20.76 mm is our 124). Face ID moved under the display.
-  { id: 'ip18', name: 'iPhone 18 Pro', type: 'phone', displays: [D('main', 'Display', 402, 874, 'ios', 55, 12, { islandW: ISLAND_18_PRO })] },
+  { id: 'ip18', name: 'iPhone 18 Pro', type: 'phone', displays: [D('main', t('Display'), 402, 874, 'ios', 55, 12, { islandW: ISLAND_18_PRO })] },
   // The largest iPhone.
-  { id: 'ip17pm', name: 'iPhone 17 Pro Max', type: 'phone', displays: [D('main', 'Display', 440, 956, 'ios', 62, 12)] },
+  { id: 'ip17pm', name: 'iPhone 17 Pro Max', type: 'phone', displays: [D('main', t('Display'), 440, 956, 'ios', 62, 12)] },
   // The 17 Pro Max's size and screen, in the 18 Pro's colors and with its smaller Dynamic Island.
-  { id: 'ip18pm', name: 'iPhone 18 Pro Max', type: 'phone', displays: [D('main', 'Display', 440, 956, 'ios', 62, 12, { islandW: ISLAND_18_PRO })] },
+  { id: 'ip18pm', name: 'iPhone 18 Pro Max', type: 'phone', displays: [D('main', t('Display'), 440, 956, 'ios', 62, 12, { islandW: ISLAND_18_PRO })] },
   // 360 wide: the most common Android width (1080×2340 at 3×).
-  { id: 'gs25', name: 'Galaxy S25', type: 'phone', displays: [D('main', 'Display', 360, 780, 'android', 40, 12)] },
+  { id: 'gs25', name: 'Galaxy S25', type: 'phone', displays: [D('main', t('Display'), 360, 780, 'android', 40, 12)] },
   // The best-selling mid-range: 1080×2340 at 2.625× (as its A55 and A54 siblings).
-  { id: 'ga56', name: 'Galaxy A56', type: 'phone', displays: [D('main', 'Display', 412, 892, 'android', 36, 13)] },
+  { id: 'ga56', name: 'Galaxy A56', type: 'phone', displays: [D('main', t('Display'), 412, 892, 'android', 36, 13)] },
   // 412 wide, the other usual Android width: 1440×3120 at 3.5×.
-  { id: 'gs25u', name: 'Galaxy S25 Ultra', type: 'phone', displays: [D('main', 'Display', 412, 891, 'android', 24, 12)] },
-  { id: 'p10', name: 'Pixel 10 Pro', type: 'phone', displays: [D('main', 'Display', 427, 952, 'android', 44, 12)] },
+  { id: 'gs25u', name: 'Galaxy S25 Ultra', type: 'phone', displays: [D('main', t('Display'), 412, 891, 'android', 24, 12)] },
+  { id: 'p10', name: 'Pixel 10 Pro', type: 'phone', displays: [D('main', t('Display'), 427, 952, 'android', 44, 12)] },
   {
     id: 'zf7',
     name: 'Galaxy Z Fold 7',
     type: 'foldable',
     displays: [
-      D('outer', 'Outer 6.5″', 360, 840, 'android', 26, 14),
-      D('inner', 'Inner 8″', 656, 728, 'android', 22, 10, foldInner),
+      D('outer', t('Outer {size}', { size: '6.5″' }), 360, 840, 'android', 26, 14),
+      D('inner', t('Inner {size}', { size: '8″' }), 656, 728, 'android', 22, 10, foldInner),
     ],
   },
   {
@@ -162,8 +163,8 @@ export const ALL_DEVICES: Device[] = [
     name: 'Galaxy Z Fold 8',
     type: 'foldable',
     displays: [
-      D('outer', 'Outer 5.5″', 416, 657, 'android', 26, 14),
-      D('inner', 'Inner 7.6″', 616, 816, 'android', 22, 10, foldInner),
+      D('outer', t('Outer {size}', { size: '5.5″' }), 416, 657, 'android', 26, 14),
+      D('inner', t('Inner {size}', { size: '7.6″' }), 616, 816, 'android', 22, 10, foldInner),
     ],
   },
   {
@@ -171,8 +172,8 @@ export const ALL_DEVICES: Device[] = [
     name: 'Pixel 10 Pro Fold',
     type: 'foldable',
     displays: [
-      D('outer', 'Outer 6.4″', 360, 788, 'android', 34, 13),
-      D('inner', 'Inner 8″', 692, 717, 'android', 24, 10, foldInner),
+      D('outer', t('Outer {size}', { size: '6.4″' }), 360, 788, 'android', 34, 13),
+      D('inner', t('Inner {size}', { size: '8″' }), 692, 717, 'android', 24, 10, foldInner),
     ],
   },
   {
@@ -180,8 +181,8 @@ export const ALL_DEVICES: Device[] = [
     name: 'Pixel 11 Pro Fold',
     type: 'foldable',
     displays: [
-      D('outer', 'Outer 6.5″', 360, 780, 'android', 34, 13),
-      D('inner', 'Inner 8″', 692, 717, 'android', 24, 10, foldInner),
+      D('outer', t('Outer {size}', { size: '6.5″' }), 360, 780, 'android', 34, 13),
+      D('inner', t('Inner {size}', { size: '8″' }), 692, 717, 'android', 24, 10, foldInner),
     ],
   },
   {
@@ -190,8 +191,8 @@ export const ALL_DEVICES: Device[] = [
     name: 'Galaxy Z Flip 7',
     type: 'foldable',
     displays: [
-      D('inner', 'Inner 6.9″', 360, 840, 'android', 28, 12),
-      D('cover', 'Cover 4.1″', 316, 349, 'android', 36, 14),
+      D('inner', t('Inner {size}', { size: '6.9″' }), 360, 840, 'android', 28, 12),
+      D('cover', t('Cover {size}', { size: '4.1″' }), 316, 349, 'android', 36, 14),
     ],
   },
   {
@@ -202,7 +203,7 @@ export const ALL_DEVICES: Device[] = [
       // Sizes and radii from the Xcode 27.2 simulator (iPhone Duo capabilities.plist): outer 466×678 pt, radius 59 / 8 on
       // the hinge side; inner 669×951 pt (2007×2853 px @3x), radius 55.
       // Bars on the side (HIG "vertical controls") on the outer display, and on the inner one in landscape.
-      D('outer', 'Outer 5.4″', 466, 678, 'ios', 59, 12, {
+      D('outer', t('Outer {size}', { size: '5.4″' }), 466, 678, 'ios', 59, 12, {
         nav: { portrait: 'column', landscape: 'column' },
         compact: true,
         hinge: { edge: 'left', r: 8 },
@@ -211,7 +212,7 @@ export const ALL_DEVICES: Device[] = [
         // iOS's safeAreaInsets.bottom on this display, in portrait and in landscape (Xcode 27.1 simulator).
         columnSafeBottom: 34,
       }),
-      D('inner', 'Inner 7.6″', 669, 951, 'ipad', 55, 10, {
+      D('inner', t('Inner {size}', { size: '7.6″' }), 669, 951, 'ipad', 55, 10, {
         rot: true,
         nav: { portrait: 'bottom', landscape: 'column' },
         padX: 24,
@@ -222,13 +223,13 @@ export const ALL_DEVICES: Device[] = [
     ],
   },
   // The smallest iPad: between a phone and a tablet (one column next to the rail).
-  { id: 'ipadmini', name: 'iPad mini', type: 'tablet', displays: [D('main', 'Display', 744, 1133, 'ipad', 22, 20, { rot: true })] },
+  { id: 'ipadmini', name: 'iPad mini', type: 'tablet', displays: [D('main', t('Display'), 744, 1133, 'ipad', 22, 20, { rot: true })] },
   // The best-selling iPad (A16).
-  { id: 'ipad', name: 'iPad', type: 'tablet', displays: [D('main', 'Display', 820, 1180, 'ipad', 25, 22, { rot: true })] },
+  { id: 'ipad', name: 'iPad', type: 'tablet', displays: [D('main', t('Display'), 820, 1180, 'ipad', 25, 22, { rot: true })] },
   // The usual Android tablet: 1600×2560 at 2×.
-  { id: 'gtabs9', name: 'Galaxy Tab S9', type: 'tablet', displays: [D('main', 'Display', 800, 1280, 'android', 18, 20, { rot: true })] },
-  { id: 'ipad11', name: 'iPad Pro 11″', type: 'tablet', displays: [D('main', 'Display', 834, 1210, 'ipad', 26, 22, { rot: true })] },
-  { id: 'ipad13', name: 'iPad Pro 13″', type: 'tablet', displays: [D('main', 'Display', 1032, 1376, 'ipad', 26, 22, { rot: true })] },
+  { id: 'gtabs9', name: 'Galaxy Tab S9', type: 'tablet', displays: [D('main', t('Display'), 800, 1280, 'android', 18, 20, { rot: true })] },
+  { id: 'ipad11', name: 'iPad Pro 11″', type: 'tablet', displays: [D('main', t('Display'), 834, 1210, 'ipad', 26, 22, { rot: true })] },
+  { id: 'ipad13', name: 'iPad Pro 13″', type: 'tablet', displays: [D('main', t('Display'), 1032, 1376, 'ipad', 26, 22, { rot: true })] },
 ];
 
 /**
@@ -241,13 +242,13 @@ export interface DeviceGroup {
   has: (device: Device, display: Display) => boolean;
 }
 const GROUPS: DeviceGroup[] = [
-  { id: 'all', label: 'All devices', has: () => true },
+  { id: 'all', label: t('All devices'), has: () => true },
   // iPads too (iPadOS): Apple's devices against Android's.
   { id: 'ios', label: 'iOS', has: (_, x) => x.os !== 'android' },
   { id: 'android', label: 'Android', has: (_, x) => x.os === 'android' },
-  { id: 'phones', label: 'Phones', has: (d) => d.type === 'phone' },
-  { id: 'foldables', label: 'Foldables', has: (d) => d.type === 'foldable' },
-  { id: 'tablets', label: 'Tablets', has: (d) => d.type === 'tablet' },
+  { id: 'phones', label: t('Phones'), has: (d) => d.type === 'phone' },
+  { id: 'foldables', label: t('Foldables'), has: (d) => d.type === 'foldable' },
+  { id: 'tablets', label: t('Tablets'), has: (d) => d.type === 'tablet' },
 ];
 
 /** A device's platform: iOS for iPhones and iPads (iPadOS), else Android. */

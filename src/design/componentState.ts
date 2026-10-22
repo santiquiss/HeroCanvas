@@ -8,6 +8,7 @@ import { APP_WIDGETS, WORK } from './handoff';
 import type { Library } from './library';
 import { acceptedDifferences, declaredDifferences, kindsOf, lookDifferences, type Acceptance } from './simulatorProps';
 import { UNREPLICATED, UNREPLICATED_KIND } from './unreplicated';
+import { plural, t } from '../i18n/ui';
 
 export interface ComponentState {
   color: string;
@@ -32,8 +33,8 @@ export const UNREPLICATED_COLOR = '#e8eaed';
 export function componentState(name: string, built: boolean, lib: Library): ComponentState {
   const none = { reasons: [], accepted: [] };
   const skip = UNREPLICATED[name];
-  if (!built && skip) return { color: UNREPLICATED_COLOR, label: `Not replicated · ${UNREPLICATED_KIND[skip.kind]}`, summary: skip.reason, ...none };
-  if (!built) return { color: MISSING_COLOR, label: 'Missing in the simulator', summary: 'Not built here yet: it has no stories.', ...none };
+  if (!built && skip) return { color: UNREPLICATED_COLOR, label: t('Not replicated · {kind}', { kind: UNREPLICATED_KIND[skip.kind] }), summary: skip.reason, ...none };
+  if (!built) return { color: MISSING_COLOR, label: t('Missing in the simulator'), summary: t('Not built here yet: it has no stories.'), ...none };
   // A class of named constructors (Message) is its kinds: their differences, each under its widget's name.
   const kinds = lib.widget(name) ? [] : kindsOf(name).filter((k) => lib.widget(k));
   if (lib.widget(name) || kinds.length) {
@@ -45,10 +46,10 @@ export function componentState(name: string, built: boolean, lib: Library): Comp
     const accepted = kinds.length ? kinds.flatMap((k) => acceptedDifferences(k).map((a) => ({ ...a, key: `${k} · ${a.key}`, text: `${k} · ${a.text}` }))) : acceptedDifferences(name);
     const n = accepted.length;
     return reasons.length
-      ? { color: WORK.differs.color, label: 'Differs from code', summary: '', reasons, accepted }
+      ? { color: WORK.differs.color, label: t('Differs from code'), summary: '', reasons, accepted }
       : {
           color: WORK.reuse.color,
-          label: n ? `${WORK.reuse.badge} · ${n} ${n === 1 ? 'difference' : 'differences'} accepted` : WORK.reuse.badge,
+          label: n ? plural(n, '{badge} · {n} difference accepted', '{badge} · {n} differences accepted', { badge: WORK.reuse.badge }) : WORK.reuse.badge,
           summary: '',
           reasons,
           accepted,
@@ -61,41 +62,41 @@ export function componentState(name: string, built: boolean, lib: Library): Comp
     const where = { widget: app.widget, files: [app.file, ...(app.also ?? [])] };
     const proposals = proposalsAdding(name).map((p) => ({ code: p.id, title: p.meta.title }));
     const extra = { reasons, accepted: acceptedDifferences(name), where, proposals };
-    if (reasons.length) return { color: WORK.differs.color, label: 'Differs from the app', summary: 'The app draws it on its own; here it’s drawn as Figma has it, unlike the app in:', ...extra };
+    if (reasons.length) return { color: WORK.differs.color, label: t('Differs from the app'), summary: t('The app draws it on its own; here it’s drawn as Figma has it, unlike the app in:'), ...extra };
     if (app.platform)
       return {
         color: WORK.reuse.color,
-        label: 'The platform’s own component',
-        summary: 'Not a component of the app’s or its library’s: the platform draws it, set as the app sets it. Nothing to build.',
+        label: t('The platform’s own component'),
+        summary: t('Not a component of the app’s or its library’s: the platform draws it, set as the app sets it. Nothing to build.'),
         ...extra,
       };
     return proposals.length
       ? {
           color: WORK.app.color,
-          label: 'In the app · ready for the library',
-          summary: 'The app draws it on its own, not with a component of its library. Here it’s a component, and a proposal specifies it to move into the library; until it does, the app’s is the reference.',
+          label: t('In the app · ready for the library'),
+          summary: t('The app draws it on its own, not with a component of its library. Here it’s a component, and a proposal specifies it to move into the library; until it does, the app’s is the reference.'),
           ...extra,
         }
       : {
           color: WORK.app.color,
-          label: 'In the app · not in the library',
-          summary: 'The app draws it on its own, not with a component of its library. Here it’s a component; no proposal moves it into the library yet, so the app’s is the reference.',
+          label: t('In the app · not in the library'),
+          summary: t('The app draws it on its own, not with a component of its library. Here it’s a component; no proposal moves it into the library yet, so the app’s is the reference.'),
           ...extra,
         };
   }
   // With no app connected, the components on screen are the tour's: HeroCanvas's own, nothing to build.
-  if (NO_APP) return { color: WORK.build.color, label: WORK.build.label, summary: 'HeroCanvas’s own, part of its tour: not an app’s. Once your app is connected, its components show here, each matching its code or not.', ...none };
+  if (NO_APP) return { color: WORK.build.color, label: WORK.build.label, summary: t('HeroCanvas’s own, part of its tour: not an app’s. Once your app is connected, its components show here, each matching its code or not.'), ...none };
   return { color: WORK.build.color, label: WORK.build.label, summary: WORK.build.hint, ...none };
 }
 
 /** The states a component can be in, as the Components list filters them: each its dot's color. */
 export const COMPONENT_STATUSES = [
-  { key: 'matches', label: 'Matches code', color: WORK.reuse.color },
-  { key: 'differs', label: 'Differs from code', color: WORK.differs.color },
-  { key: 'app', label: 'In the app', color: WORK.app.color },
-  { key: 'build', label: 'Local', color: WORK.build.color },
-  { key: 'missing', label: 'Missing in the simulator', color: MISSING_COLOR },
-  { key: 'unreplicated', label: 'Not replicated', color: UNREPLICATED_COLOR },
+  { key: 'matches', label: t('Matches code'), color: WORK.reuse.color },
+  { key: 'differs', label: t('Differs from code'), color: WORK.differs.color },
+  { key: 'app', label: t('In the app'), color: WORK.app.color },
+  { key: 'build', label: t('Local'), color: WORK.build.color },
+  { key: 'missing', label: t('Missing in the simulator'), color: MISSING_COLOR },
+  { key: 'unreplicated', label: t('Not replicated'), color: UNREPLICATED_COLOR },
 ] as const;
 
 export type ComponentStatus = (typeof COMPONENT_STATUSES)[number]['key'];

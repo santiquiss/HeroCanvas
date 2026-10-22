@@ -8,6 +8,7 @@ import { PROPOSALS } from '../proposals';
 import { STATUSES, type Proposal } from '../proposals/types';
 import { StatusDot, useProposalParam } from '../tools/ProposalPanel';
 import surface from '../theme/surface.module.css';
+import { plural, t, UI_LANGUAGE } from '../i18n/ui';
 import styles from './ProposalMenu.module.css';
 
 /** Live's icon: the app as it is on the phone today. */
@@ -20,7 +21,7 @@ function shortDate(iso: string): string {
   const d = new Date(`${iso}T12:00:00`);
   if (Number.isNaN(d.getTime())) return iso;
   const sameYear = d.getFullYear() === new Date().getFullYear();
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) });
+  return d.toLocaleDateString(UI_LANGUAGE === 'es' ? 'es' : 'en-US', { month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) });
 }
 
 export function ProposalMenu() {
@@ -67,15 +68,15 @@ export function ProposalMenu() {
     <div ref={root} className={styles.root} onKeyDown={open ? onKey : undefined}>
       {/* Back to Live in one click, beside the proposal on screen. */}
       {active && (
-        <button className={styles.back} title="Back to Live" onClick={() => setCurrent(null)}>
+        <button className={styles.back} title={t('Back to Live')} onClick={() => setCurrent(null)}>
           <Icon name="arrow_back" size={16} />
-          <span>Live</span>
+          <span>{t('Live')}</span>
         </button>
       )}
       <button
         data-tour="proposals"
         className={`${styles.trigger} ${active ? styles.triggerProposal : ''} ${open ? styles.triggerOpen : ''}`}
-        title="Design: what's live, or a proposal"
+        title={t("Design: what's live, or a proposal")}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={id}
@@ -83,11 +84,11 @@ export function ProposalMenu() {
       >
         {active ? <StatusDot status={active.meta.status} /> : <Icon name={LIVE_ICON} size={16} />}
         {active && <span className={styles.code}>{active.id}</span>}
-        <span className={styles.triggerTitle}>{active?.meta.title ?? 'Live'}</span>
+        <span className={styles.triggerTitle}>{active?.meta.title ?? t('Live')}</span>
         <Icon name="expand_more" size={18} />
       </button>
       {open && (
-        <div ref={list} id={id} className={styles.menu} role="listbox" aria-label="Design">
+        <div ref={list} id={id} className={styles.menu} role="listbox" aria-label={t('Design')}>
           {/* Live on the table's grid, in one line: its check, its icon under the codes, its name and line under the titles. */}
           <button role="option" aria-selected={!active} className={`${styles.row} ${styles.cols} ${styles.liveRow} ${!active ? styles.rowOn : ''}`} onClick={() => pick(null)}>
             <Check on={!active} />
@@ -95,8 +96,8 @@ export function ProposalMenu() {
               <Icon name={LIVE_ICON} size={18} color="var(--ui-text-2)" />
             </span>
             <span className={`${styles.liveText} ${styles.span}`}>
-              <span className={styles.title}>Live</span>
-              <span className={styles.liveLine}>What the app is today</span>
+              <span className={styles.title}>{t('Live')}</span>
+              <span className={styles.liveLine}>{t('What the app is today')}</span>
             </span>
           </button>
           {/* No proposals to list: what one is and how to make it (or, all archived, where they are). */}
@@ -105,21 +106,21 @@ export function ProposalMenu() {
               <span className={surface.emptyIcon}>
                 <Icon name="lightbulb" size={24} />
               </span>
-              <span className={surface.emptyTitle}>{archived.length ? 'No active proposals' : 'No proposals yet'}</span>
+              <span className={surface.emptyTitle}>{archived.length ? t('No active proposals') : t('No proposals yet')}</span>
               <span className={surface.emptyBody}>
                 {archived.length
-                  ? `${archived.length === 1 ? 'The only one is' : `All ${archived.length} are`} archived: show them below.`
-                  : 'A proposal is a change to the app, kept apart from it: new or changed screens, versions to compare, a handoff for whoever builds it. Start one in the Proposal panel, or ask your agent.'}
+                  ? plural(archived.length, 'The only one is archived: show them below.', 'All {n} are archived: show them below.')
+                  : t('A proposal is a change to the app, kept apart from it: new or changed screens, versions to compare, a handoff for whoever builds it. Start one in the Proposal panel, or ask your agent.')}
               </span>
             </div>
           ) : (
             <div className={`${styles.cols} ${styles.colHead}`} aria-hidden>
               <span />
-              <span>Code</span>
-              <span>Proposal · {shown.length}</span>
-              <span>Status</span>
-              <span>Created by</span>
-              <span>Date</span>
+              <span>{t('Code')}</span>
+              <span>{t('Proposal · {count}', { count: shown.length })}</span>
+              <span>{t('Status')}</span>
+              <span>{t('Created by')}</span>
+              <span>{t('Date')}</span>
             </div>
           )}
           {shown.map((p) => {
@@ -133,7 +134,7 @@ export function ProposalMenu() {
                 <span className={styles.what}>
                   <span className={styles.title}>
                     {p.meta.title}
-                    {versions > 0 && <span className={styles.versions}>{versions} versions</span>}
+                    {versions > 0 && <span className={styles.versions}>{plural(versions, '{n} version', '{n} versions')}</span>}
                   </span>
                   {(p.meta.summary ?? p.meta.description) && <span className={styles.summary}>{p.meta.summary ?? p.meta.description}</span>}
                 </span>
@@ -152,7 +153,7 @@ export function ProposalMenu() {
           {archived.length > 0 && (
             <button className={styles.footer} onClick={() => setShowArchived((a) => !a)}>
               <Icon name={showArchived ? 'visibility_off' : 'inventory_2'} size={14} />
-              <span>{showArchived ? 'Hide archived' : `Show archived (${archived.length})`}</span>
+              <span>{showArchived ? t('Hide archived') : t('Show archived ({count})', { count: archived.length })}</span>
             </button>
           )}
         </div>

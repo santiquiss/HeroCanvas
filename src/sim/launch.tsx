@@ -11,6 +11,7 @@ import { spring, useStill } from '../kit/motion';
 import type { LaunchPhase } from './launchPhase';
 import { useUrlParams } from './SimContext';
 import styles from './launch.module.css';
+import { t } from '../i18n/ui';
 
 export const LAUNCH_PARAM = 'launch';
 
@@ -29,9 +30,9 @@ const useRuns = () =>
   );
 export type LaunchPlayback = 'once' | 'always' | 'off';
 export const LAUNCH_PLAYBACK: { value: LaunchPlayback; label: string }[] = [
-  { value: 'once', label: 'Once' },
-  { value: 'always', label: 'Every time' },
-  { value: 'off', label: 'Off' },
+  { value: 'once', label: t('Once') },
+  { value: 'always', label: t('Every time') },
+  { value: 'off', label: t('Off') },
 ];
 
 const ENTER = { spring: spring(0.55, 0.32), fade: { easing: 'ease-out', ms: 320 } };

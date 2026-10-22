@@ -20,6 +20,7 @@ import { modeOf } from '../sim/modes';
 import { useUrlState } from '../sim/SimContext';
 import { STATUSES, ticketUrl, type Proposal, type ProposalMeta, type ProposalStatus } from '../proposals/types';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 const field: React.CSSProperties = { width: '100%', padding: '4px 6px', border: '1px solid #dfe2e6', borderRadius: 6, font: 'inherit', fontSize: 12 };
 
@@ -85,7 +86,7 @@ function BaseView() {
   const code = letters ? nextProposalCode(PROPOSALS.map((p) => p.id), letters) : '';
   const create = async () => {
     const folder = slugify(title);
-    if (PROPOSALS.some((p) => p.folder === folder)) return setError(`"${folder}" already exists`);
+    if (PROPOSALS.some((p) => p.folder === folder)) return setError(t('"{folder}" already exists', { folder }));
     // Its permanent reference: the author's next number (proposals/code.ts).
     const meta: ProposalMeta = { code, title: title.trim(), status: 'draft', created: new Date().toISOString().slice(0, 10), author: author.trim(), description: '' };
     rememberAuthor({ name: author.trim(), letters });
@@ -101,13 +102,13 @@ function BaseView() {
   return (
     <>
       <div className={styles.section}>
-        <div style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px', marginBottom: 4 }}>Live</div>
+        <div style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px', marginBottom: 4 }}>{t('Live')}</div>
         <p className={styles.muted} style={{ margin: 0 }}>
-          What's live in the app today. Proposals add or change pages, components and screen config on top of it, without copying it.
+          {t("What's live in the app today. Proposals add or change pages, components and screen config on top of it, without copying it.")}
         </p>
       </div>
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Proposals</div>
+        <div className={styles.sectionTitle}>{t('Proposals')}</div>
         {listed.length ? (
           listed.map((p) => (
             <div key={p.id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => setProposal(p.id)}>
@@ -118,27 +119,27 @@ function BaseView() {
             </div>
           ))
         ) : (
-          <span className={styles.muted}>None yet</span>
+          <span className={styles.muted}>{t('None yet')}</span>
         )}
       </div>
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>New proposal</div>
-        <input style={field} placeholder="Title, e.g. Project sections" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <div className={styles.sectionTitle}>{t('New proposal')}</div>
+        <input style={field} placeholder={t('Title, e.g. Project sections')} value={title} onChange={(e) => setTitle(e.target.value)} />
         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-          <input style={field} placeholder="Your name" value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input style={field} placeholder={t('Your name')} value={author} onChange={(e) => setAuthor(e.target.value)} />
           <input
             style={{ ...field, width: 56, flex: 'none', textAlign: 'center' }}
-            placeholder={defaultAuthorLetters(author) || 'Letters'}
-            title="Your letters in the code of your proposals (PJ-12): by default, the first letter of your name. Use two or three if someone else has the same"
+            placeholder={defaultAuthorLetters(author) || t('Letters')}
+            title={t('Your letters in the code of your proposals (PJ-12): by default, the first letter of your name. Use two or three if someone else has the same')}
             maxLength={MAX_AUTHOR_LETTERS}
             value={ownLetters}
             onChange={(e) => setOwnLetters(authorLetters(e.target.value))}
           />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
-          <button className={styles.btn} disabled={!writable || !title.trim() || !code} title={writable ? `Creates proposals/${slugify(title || 'proposal')}/` : 'Needs the dev server (npm run dev)'} onClick={create}>
+          <button className={styles.btn} disabled={!writable || !title.trim() || !code} title={writable ? t('Creates {folder}', { folder: `proposals/${slugify(title || 'proposal')}/` }) : t('Needs the dev server (npm run dev)')} onClick={create}>
             <Icon name="add" size={14} />
-            Create
+            {t('Create')}
           </button>
           {title.trim() && (
             <span className={`${styles.mono} ${styles.muted}`}>
@@ -173,20 +174,20 @@ function ActiveProposal({ p }: { p: Proposal }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
           <StatusDot status={meta.status} />
           <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: '20px' }}>{p.meta.title}</span>
-          <button className={styles.btn} onClick={() => setProposal(null)} title="Back to what's live">
-            Live
+          <button className={styles.btn} onClick={() => setProposal(null)} title={t("Back to what's live")}>
+            {t('Live')}
           </button>
         </div>
         <div className={styles.kv} style={{ alignItems: 'center' }}>
-          <span className={styles.k} title="Its permanent reference: links carry it. It doesn't change when the title or the folder do">
-            Code
+          <span className={styles.k} title={t("Its permanent reference: links carry it. It doesn't change when the title or the folder do")}>
+            {t('Code')}
           </span>
           <span className={styles.mono}>{p.id}</span>
-          <span className={styles.k}>Status</span>
+          <span className={styles.k}>{t('Status')}</span>
           <span>{(STATUSES.find((x) => x.id === meta.status) ?? STATUSES[0]).label}</span>
           {meta.ticket && (
             <>
-              <span className={styles.k}>Ticket</span>
+              <span className={styles.k}>{t('Ticket')}</span>
               <a className={styles.mono} href={ticketUrl(meta.ticket)} target="_blank" rel="noreferrer">
                 {meta.ticket}
               </a>
@@ -194,45 +195,45 @@ function ActiveProposal({ p }: { p: Proposal }) {
           )}
           {meta.author && (
             <>
-              <span className={styles.k}>Author</span>
+              <span className={styles.k}>{t('Author')}</span>
               <span>{meta.author}</span>
             </>
           )}
-          <span className={styles.k}>Created</span>
+          <span className={styles.k}>{t('Created')}</span>
           <span className={styles.mono}>{meta.created}</span>
-          <span className={styles.k}>Folder</span>
+          <span className={styles.k}>{t('Folder')}</span>
           <span className={styles.mono}>{p.folder}</span>
         </div>
         {meta.summary && <p style={{ margin: '8px 0 0', fontWeight: 600 }}>{meta.summary}</p>}
         {meta.description && <p style={{ margin: '8px 0 0', color: 'var(--ui-text-2)' }}>{meta.description}</p>}
         <p className={styles.muted} style={{ margin: '8px 0 0' }}>
-          Edited in code: <span className={styles.mono}>proposal.json</span>
+          {t('Edited in code:')} <span className={styles.mono}>proposal.json</span>
         </p>
       </div>
 
       {p.variants.length > 0 && <Variants p={p} />}
 
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Pages</div>
+        <div className={styles.sectionTitle}>{t('Pages')}</div>
         {pageIds.length ? (
           pageIds.map((id) => {
             const def = nav.pages[id];
             const variant = def.variants?.()[0];
             return (
-              <div key={id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => nav.open(id, variant?.params)} title="Open">
+              <div key={id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => nav.open(id, variant?.params)} title={t('Open')}>
                 <ChangeBadge change={nav.change(id)!} />
                 <span className={styles.name}>{def.name ?? (typeof def.title === 'string' ? def.title : id)}</span>
-                <span className={styles.muted}>{!BASE_PAGES[id] ? 'new page' : p.pages[id] ? (p.config[id] ? 'page + config' : 'page') : 'config'}</span>
+                <span className={styles.muted}>{!BASE_PAGES[id] ? t('new page') : p.pages[id] ? (p.config[id] ? t('page + config') : t('page')) : t('config')}</span>
               </div>
             );
           })
         ) : (
-          <span className={styles.muted}>No page changes yet</span>
+          <span className={styles.muted}>{t('No page changes yet')}</span>
         )}
       </div>
 
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Components</div>
+        <div className={styles.sectionTitle}>{t('Components')}</div>
         {/* What this version replaces on the screens, then the components the proposal adds (stories only). */}
         {changes.components.length ? (
           changes.components.map((c) => (
@@ -240,7 +241,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
               key={c.name}
               className={`${styles.row} ${c.name === openName ? styles.current : ''}`}
               style={{ paddingLeft: 4 }}
-              title="Open in the gallery"
+              title={t('Open in the gallery')}
               onClick={() => openComponent(c.name)}
             >
               <ChangeBadge change={c.scope === 'added' ? 'new' : componentKind(c.name, lib)} />
@@ -251,20 +252,20 @@ function ActiveProposal({ p }: { p: Proposal }) {
             </div>
           ))
         ) : (
-          <span className={styles.muted}>No component changes yet</span>
+          <span className={styles.muted}>{t('No component changes yet')}</span>
         )}
       </div>
 
       <HandoffSection p={p} />
 
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Files</div>
+        <div className={styles.sectionTitle}>{t('Files')}</div>
         <div className={styles.mono} style={{ color: 'var(--ui-text-2)', lineHeight: '17px' }}>
           proposals/{p.folder}/
-          <br />· proposal.json, config.json — from the app
-          <br />· pages.tsx — new / replaced pages (code)
-          <br />· components/ — new components + stories
-          <br />· {HANDOFF_NOTES_FILE} — the specification for whoever implements it
+          <br />· proposal.json, config.json — {t('from the app')}
+          <br />· pages.tsx — {t('new / replaced pages (code)')}
+          <br />· components/ — {t('new components + stories')}
+          <br />· {HANDOFF_NOTES_FILE} — {t('the specification for whoever implements it')}
         </div>
       </div>
     </>
@@ -320,24 +321,26 @@ function HandoffSection({ p }: { p: Proposal }) {
 
   return (
     <div className={styles.section}>
-      <div className={styles.sectionTitle}>Handoff for agents</div>
+      <div className={styles.sectionTitle}>{t('Handoff for agents')}</div>
       <p className={styles.muted} style={{ margin: '0 0 8px', lineHeight: '16px' }}>
-        A file of instructions to implement {version ? `version ${version.id.toUpperCase()}` : 'the proposal'} in the app: what changes and where it is in the app's code, the specification (
-        {HANDOFF_NOTES_FILE}) and how to check it. No simulator code in it. Built on the spot, from the proposal as it is.
+        {t("A file of instructions to implement {target} in the app: what changes and where it is in the app's code, the specification ({file}) and how to check it. No simulator code in it. Built on the spot, from the proposal as it is.", {
+          target: version ? t('version {id}', { id: version.id.toUpperCase() }) : t('the proposal'),
+          file: HANDOFF_NOTES_FILE,
+        })}
       </p>
       {!hasProposalNotes(p.folder) && (
         <p style={{ margin: '0 0 8px', lineHeight: '16px', color: 'var(--ui-amber-text)' }}>
-          {HANDOFF_NOTES_FILE} is missing: without the specification the file says what changes, not how. Ask the agent to write it.
+          {t('{file} is missing: without the specification the file says what changes, not how. Ask the agent to write it.', { file: HANDOFF_NOTES_FILE })}
         </p>
       )}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         <button className={styles.btn} onClick={() => run('copied', (text) => navigator.clipboard.writeText(text))}>
           <Icon name={done === 'copied' ? 'check' : 'content_copy'} size={14} />
-          {done === 'copied' ? 'Copied' : 'Copy instructions'}
+          {done === 'copied' ? t('Copied') : t('Copy instructions')}
         </button>
         <button className={styles.btn} onClick={() => run('saved', download)}>
           <Icon name={done === 'saved' ? 'check' : 'download'} size={14} />
-          {done === 'saved' ? 'Downloaded' : 'Download .md'}
+          {done === 'saved' ? t('Downloaded') : t('Download .md')}
         </button>
       </div>
       {error && <span style={{ color: 'var(--ui-red-text)' }}>{error}</span>}
@@ -352,9 +355,9 @@ function Variants({ p }: { p: Proposal }) {
   return (
     <div className={styles.section}>
       <div className={styles.sectionTitle}>
-        Versions
+        {t('Versions')}
         <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-          {p.variants.length} to compare
+          {t('{count} to compare', { count: p.variants.length })}
         </span>
       </div>
       <div className={styles.parts}>

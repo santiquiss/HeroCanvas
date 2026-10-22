@@ -52,6 +52,7 @@ import { TouchPointer } from './TouchPointer';
 import { NO_APP } from '../nav/noApp';
 import { TourBeacons } from '../tour/Beacons';
 import styles from './SimulatorShell.module.css';
+import { t } from '../i18n/ui';
 
 /**
  * Measures the stage. A callback ref, because the stage element is replaced when switching
@@ -341,7 +342,7 @@ function DesignerShell() {
           <div className={styles.workspace}>
             {/* About is a page to read: no panels beside it. */}
             {prefs.left && mode !== 'about' && (
-              <ErrorBoundary label="Left panel" resetKey={location.pathname}>
+              <ErrorBoundary label={t('Left panel')} resetKey={location.pathname}>
                 {/* Capture keeps Pages: the screen to shoot, picked without leaving it. */}
                 <div className={styles.lockable} data-locked={recordingNow || undefined} inert={recordingNow}>
                   <PanelHost side="left" mode={mode} prefs={prefs} update={updatePrefs} only={capture ? ['pages'] : undefined} />
@@ -354,11 +355,11 @@ function DesignerShell() {
             {mode === 'about' ? (
               <About />
             ) : mode === 'components' || mode === 'tokens' ? (
-              <ErrorBoundary label="Gallery" fill resetKey={location.pathname + location.search}>
+              <ErrorBoundary label={t('Gallery')} fill resetKey={location.pathname + location.search}>
                 <Gallery />
               </ErrorBoundary>
             ) : mode === 'flow' ? (
-              <ErrorBoundary label="Flow" fill resetKey={location.search}>
+              <ErrorBoundary label={t('Flow')} fill resetKey={location.search}>
                 <FlowView makeLayout={makeLayout} />
               </ErrorBoundary>
             ) : multi ? (
@@ -517,7 +518,7 @@ function DesignerShell() {
               />
               )
             ) : prefs.right && mode !== 'about' && (
-              <ErrorBoundary label="Right panel" resetKey={location.pathname}>
+              <ErrorBoundary label={t('Right panel')} resetKey={location.pathname}>
                 <PanelHost side="right" mode={mode} prefs={prefs} update={updatePrefs} />
               </ErrorBoundary>
             )}

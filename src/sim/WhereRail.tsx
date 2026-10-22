@@ -19,6 +19,7 @@ import { usePageIndex, useScanProgress, type PagePlace } from './pageIndex';
 import { ProgressLine, Spinner } from '../components/Loading';
 import { SharedSimProvider, useUrlPatch } from './SimContext';
 import shell from './SimulatorShell.module.css';
+import { plural, t } from '../i18n/ui';
 import styles from './WhereRail.module.css';
 
 /** The rail's width (WhereRail.module.css), for what floats on the canvas beside it. */
@@ -77,11 +78,11 @@ export function WhereRail({ name, makeLayout }: { name: string; makeLayout: (det
   }, [name, index]);
 
   return (
-    <aside className={styles.rail} aria-label={`Where ${name} is`}>
+    <aside className={styles.rail} aria-label={t('Where {name} is', { name })}>
       <div className={styles.head}>
         <span className={styles.title}>
           {changed.length > 1 ? (
-            <label className={styles.pick} title="Another component this version changes">
+            <label className={styles.pick} title={t('Another component this version changes')}>
               <select value={name} onChange={(e) => pick(e.target.value)}>
                 {changed.map((n) => (
                   <option key={n}>{n}</option>
@@ -95,16 +96,16 @@ export function WhereRail({ name, makeLayout }: { name: string; makeLayout: (det
           )}
           <span className={styles.count}>
             {index ? (
-              `${places.length} ${places.length === 1 ? 'place' : 'places'}`
+              plural(places.length, '{n} place', '{n} places')
             ) : (
               <>
-                <Spinner size={11} /> Finding places{scanning != null ? ` · ${Math.round(scanning * 100)}%` : '…'}
+                <Spinner size={11} /> {t('Finding places')}{scanning != null ? ` · ${Math.round(scanning * 100)}%` : '…'}
               </>
             )}
           </span>
           {!index && <ProgressLine value={scanning ?? 0} />}
         </span>
-        <button className={styles.close} title="Close" onClick={close}>
+        <button className={styles.close} title={t('Close')} onClick={close}>
           <Icon name="close" size={16} />
         </button>
       </div>
@@ -121,7 +122,7 @@ export function WhereRail({ name, makeLayout }: { name: string; makeLayout: (det
             onOpen={() => open(p)}
           />
         ))}
-        {index && !places.length && <p className={styles.empty}>Not on a page as it loads (a sheet, a dialog, a state).</p>}
+        {index && !places.length && <p className={styles.empty}>{t('Not on a page as it loads (a sheet, a dialog, a state).')}</p>}
       </div>
     </aside>
   );
@@ -172,7 +173,7 @@ function Thumb({
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onOpen())}
         className={`${styles.thumb} ${current ? styles.current : ''}`}
         style={{ width: THUMB_W, height: fb.h * k, borderRadius: corners }}
-        title={`Open ${title}${place.label ? ` · ${place.label}` : ''}`}
+        title={t('Open {page}', { page: place.label ? `${title} · ${place.label}` : title })}
         onClick={onOpen}
       >
         <span
@@ -184,7 +185,7 @@ function Thumb({
           }}
         >
           {seen && (
-            <ErrorBoundary label={`Thumbnail ${place.id}`}>
+            <ErrorBoundary label={t('Thumbnail {page}', { page: place.id })}>
               {/* Its own shared state: the sheets it opens on arrival (a numpad) are its own. */}
               <SharedSimProvider fixed>
                 <PreviewScreen page={place} query={query} makeLayout={makeLayout} overlays still />

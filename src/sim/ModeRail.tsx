@@ -7,17 +7,18 @@ import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import type { Mode } from './modes';
 import { setUiTheme, useUiTheme } from './uiTheme';
+import { t } from '../i18n/ui';
 import styles from './ModeRail.module.css';
 
 type RailMode = Mode | 'capture';
 
 export const MODES: { mode: RailMode; label: string; icon: string }[] = [
-  { mode: 'prototype', label: 'Prototype', icon: 'smartphone' },
-  { mode: 'flow', label: 'Flow', icon: 'account_tree' },
-  { mode: 'components', label: 'Components', icon: 'widgets' },
-  { mode: 'tokens', label: 'Tokens', icon: 'palette' },
+  { mode: 'prototype', label: t('Prototype'), icon: 'smartphone' },
+  { mode: 'flow', label: t('Flow'), icon: 'account_tree' },
+  { mode: 'components', label: t('Components'), icon: 'widgets' },
+  { mode: 'tokens', label: t('Tokens'), icon: 'palette' },
   // The device as an image for marketing, turned in 3D; the right panel becomes its settings (src/capture).
-  { mode: 'capture', label: 'Capture', icon: 'photo_camera' },
+  { mode: 'capture', label: t('Capture'), icon: 'photo_camera' },
 ];
 
 export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra?: Record<string, string>) => void }) {
@@ -49,7 +50,7 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [capture]);
   return (
-    <nav className={styles.rail} aria-label="Modes">
+    <nav className={styles.rail} aria-label={t('Modes')}>
       {/* The logo (herocanvas.config.ts) at 64px, made by scripts/vite/brand.ts: a square app icon, rounded like one. */}
       <span className={styles.brand} title="HeroCanvas">
         <img src={`${import.meta.env.BASE_URL}assets/logo-64.png`} alt="HeroCanvas" width={28} height={28} style={{ borderRadius: 7 }} />
@@ -60,24 +61,24 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
             <button data-tour={`mode-${m}`} className={`${styles.item} ${current === m ? styles.on : ''}`} aria-label={label} aria-current={current === m ? 'page' : undefined} onClick={() => go(m)}>
               <Icon name={icon} size={20} fill={current === m} />
               <span className={styles.tip} role="tooltip">
-                {m === 'capture' && capture ? 'Capture · Esc to leave' : label}
+                {m === 'capture' && capture ? t('Capture · Esc to leave') : label}
               </span>
             </button>
           </li>
         ))}
       </ul>
       {/* At the bottom: HeroCanvas itself, opening its page (About: version, credits, license, changelog). */}
-      <button className={`${styles.item} ${styles.end} ${current === 'about' ? styles.on : ''}`} aria-label={`About HeroCanvas ${__HC_VERSION__}`} aria-current={current === 'about' ? 'page' : undefined} onClick={() => go('about')}>
+      <button className={`${styles.item} ${styles.end} ${current === 'about' ? styles.on : ''}`} aria-label={t('About HeroCanvas {version}', { version: __HC_VERSION__ })} aria-current={current === 'about' ? 'page' : undefined} onClick={() => go('about')}>
         <Icon name="info" size={20} fill={current === 'about'} />
         <span className={styles.tip} role="tooltip">
-          About HeroCanvas {__HC_VERSION__}
+          {t('About HeroCanvas {version}', { version: __HC_VERSION__ })}
         </span>
       </button>
       {/* The interface's theme (not the screens': the view bar's Light / Dark). */}
-      <button data-tour="ui-theme" className={styles.item} aria-label={ui === 'dark' ? 'Light interface' : 'Dark interface'} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
+      <button data-tour="ui-theme" className={styles.item} aria-label={ui === 'dark' ? t('Light interface') : t('Dark interface')} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
         <Icon name={ui === 'dark' ? 'light_mode' : 'dark_mode'} size={20} />
         <span className={styles.tip} role="tooltip">
-          {ui === 'dark' ? 'Light interface' : 'Dark interface'}
+          {ui === 'dark' ? t('Light interface') : t('Dark interface')}
         </span>
       </button>
     </nav>

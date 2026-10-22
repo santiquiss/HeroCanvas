@@ -8,6 +8,7 @@ import { APP_THEME_CSS } from './appTheme';
 import kitCss from '../kit/tokens.css?raw';
 import { CODE_TEXT_STYLES, type CodeTextStyle } from './textStyles';
 import { THEME_MODES, type ThemeMode } from './themeModes';
+import { t } from '../i18n/ui';
 
 export { THEME_MODES, type ThemeMode };
 
@@ -125,21 +126,21 @@ function build(): TokenGroup[] {
   const fonts = take((n) => n.startsWith('app-font-'));
   const elevation = take((n) => n === 'app-elevation' || n.startsWith('app-elevation-'));
   const colors = take((n) => token(n).kind === 'color' || n === 'app-scrim').map(token);
-  groups.push({ id: 'colors', title: 'Colors', section: 'Colors', note: 'Pages, surfaces, text, icons, actions and states', tokens: colors, sub: () => '' });
-  groups.push({ id: 'spacing', title: 'Space', section: 'Dimensions', note: 'Gaps and padding, on a 4-point scale', tokens: space.sort((a, b) => px(a) - px(b)), sub: () => '' });
-  groups.push({ id: 'radius', title: 'Corner radius', section: 'Dimensions', note: 'Corners', tokens: radius.sort((a, b) => px(a) - px(b)), sub: () => '' });
-  groups.push({ id: 'text-styles', title: 'Text styles', section: 'Type', note: 'Titles, headings, body, labels and captions', tokens: fonts.map(token), codeTextStyles: CODE_TEXT_STYLES, sub: () => '' });
+  groups.push({ id: 'colors', title: t('Colors'), section: 'Colors', note: t('Pages, surfaces, text, icons, actions and states'), tokens: colors, sub: () => '' });
+  groups.push({ id: 'spacing', title: t('Space'), section: 'Dimensions', note: t('Gaps and padding, on a 4-point scale'), tokens: space.sort((a, b) => px(a) - px(b)), sub: () => '' });
+  groups.push({ id: 'radius', title: t('Corner radius'), section: 'Dimensions', note: t('Corners'), tokens: radius.sort((a, b) => px(a) - px(b)), sub: () => '' });
+  groups.push({ id: 'text-styles', title: t('Text styles'), section: 'Type', note: t('Titles, headings, body, labels and captions'), tokens: fonts.map(token), codeTextStyles: CODE_TEXT_STYLES, sub: () => '' });
   groups.push({
     id: 'elevation',
-    title: 'Elevation',
+    title: t('Elevation'),
     section: 'Effects',
-    note: 'Shadows',
+    note: t('Shadows'),
     tokens: [],
     elevations: elevation.map((n) => ({ name: n, figma: n, shadows: perMode((m) => resolve(n, m)), code: null })),
     sub: () => '',
   });
   const rest = take(() => true);
-  if (rest.length) groups.push({ id: 'other', title: 'Other', section: 'Other', note: 'The app’s other variables', tokens: rest.map(token), sub: (t) => t.name.split('-')[1] ?? '' });
+  if (rest.length) groups.push({ id: 'other', title: t('Other'), section: 'Other', note: t('The app’s other variables'), tokens: rest.map(token), sub: (t) => t.name.split('-')[1] ?? '' });
   return groups;
 }
 

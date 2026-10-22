@@ -10,6 +10,7 @@ import { computeLayout, type Layout } from './layout';
 import { usePan } from './usePan';
 import { VIEW_BAR_H, type Arrange, type DeviceSort } from './ViewBar';
 import styles from './SimulatorShell.module.css';
+import { t } from '../i18n/ui';
 
 const LABEL_H = 40;
 const GAP = 40;
@@ -104,13 +105,13 @@ export function AllDevices({
             // Off-canvas devices skip rendering; the intrinsic size keeps the layout (and scroll) unchanged.
             style={{ containIntrinsicSize: `${Math.ceil(b.w * k)}px ${Math.ceil(b.h * k) + LABEL_H}px` }}
           >
-            <button className={styles.allLabel} title={`Open ${device.name}`} onClick={() => onOpen(device, display)}>
+            <button className={styles.allLabel} title={t('Open {device}', { device: device.name })} onClick={() => onOpen(device, display)}>
               <span>{device.name}</span>
               <span className={styles.allSub}>
                 {device.displays.length > 1 ? `${display.label} · ` : ''}
                 {layout.vw}×{layout.vh + layout.videoH}
                 {/* The page doesn't rotate here: the frame turns, the screen stays portrait. */}
-                {layout.rotLocked ? ' · portrait only' : ''}
+                {layout.rotLocked ? ` · ${t('portrait only')}` : ''}
               </span>
             </button>
             <div style={{ position: 'relative', width: b.w * k, height: b.h * k }}>

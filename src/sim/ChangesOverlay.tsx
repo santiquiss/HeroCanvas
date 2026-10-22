@@ -14,6 +14,7 @@ import { useNavRoot } from '../nav/context';
 import { BASE_PAGES } from '../nav/pages';
 import { CHANGES_PARAM, highlightOnly, proposalChanges, type ComponentChangeItem } from '../proposals';
 import { useUrlParams } from './SimContext';
+import { t } from '../i18n/ui';
 import styles from './ChangesOverlay.module.css';
 
 const NOTE_W = 240;
@@ -128,7 +129,11 @@ function Note({ item, at }: { item: ComponentChangeItem; at: CSSProperties }) {
     <div className={styles.note} style={{ ...at, '--hl': CHANGE[kind].color } as CSSProperties} role="tooltip">
       <span className={styles.noteName}>{item.name}</span>
       <span className={styles.noteScope}>
-        {CHANGE[kind].label} in {item.scope === 'version' ? 'this version' : item.scope === 'added' || item.scope === 'params' ? 'the component library' : 'every version'}
+        {item.scope === 'version'
+          ? t('{change} in this version', { change: CHANGE[kind].label })
+          : item.scope === 'added' || item.scope === 'params'
+            ? t('{change} in the component library', { change: CHANGE[kind].label })
+            : t('{change} in every version', { change: CHANGE[kind].label })}
       </span>
       {item.note && <span className={styles.noteText}>{item.note}</span>}
     </div>

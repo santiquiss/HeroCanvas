@@ -17,6 +17,7 @@ import { useMode, useSetMode } from './modes';
 import { usePageIndex, useScanProgress } from './pageIndex';
 import { ProgressLine, Spinner } from '../components/Loading';
 import { useUrlPatch, useUrlState } from './SimContext';
+import { plural, t } from '../i18n/ui';
 import styles from './Toolbar.module.css';
 
 export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
@@ -64,24 +65,24 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
 
   return (
     <div ref={root} className={styles.changes}>
-      <button className={`${styles.chip} ${open ? styles.chipOpen : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} title="What this proposal changes">
+      <button className={`${styles.chip} ${open ? styles.chipOpen : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} title={t('What this proposal changes')}>
         <Icon name="difference" size={18} />
-        {total ? <ChangeCounts counts={count} /> : <span>No changes</span>}
+        {total ? <ChangeCounts counts={count} /> : <span>{t('No changes')}</span>}
       </button>
       {open && (
-        <div className={styles.popover} role="dialog" aria-label="What changes">
-          <div className={styles.popHead}>What changes</div>
+        <div className={styles.popover} role="dialog" aria-label={t('What changes')}>
+          <div className={styles.popHead}>{t('What changes')}</div>
           {p.meta.summary?.trim() && <p className={styles.popSummary}>{p.meta.summary.trim()}</p>}
           {/* Where the components are is still being found: how far along. */}
           {!index && c.components.length > 0 && (
             <div className={styles.popScan}>
-              <span className={styles.popMuted}>Finding where they're used{scanning != null ? ` · ${Math.round(scanning * 100)}%` : '…'}</span>
+              <span className={styles.popMuted}>{t("Finding where they're used")}{scanning != null ? ` · ${Math.round(scanning * 100)}%` : '…'}</span>
               <ProgressLine value={scanning ?? 0} />
             </div>
           )}
-          {!total && <p className={styles.popMuted}>Nothing changes yet: add pages or components to the proposal.</p>}
+          {!total && <p className={styles.popMuted}>{t('Nothing changes yet: add pages or components to the proposal.')}</p>}
           {pages.length > 0 && (
-            <Section title="Pages" count={pages.length}>
+            <Section title={t('Pages')} count={pages.length}>
               {pages.map((pg) => {
                 const def = (nav.pages[pg.id] ?? BASE_PAGES[pg.id]) as PageDef | undefined;
                 return (
@@ -91,8 +92,8 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                     kind={pg.kind}
                     name={pageName({ ...BASE_PAGES, ...nav.pages }, pg.id)}
                     // A removed page is only in Live: nothing to open.
-                    details={pg.kind === 'removed' ? [...pg.details, 'Only in Live'] : pg.details}
-                    title="Open it on the device"
+                    details={pg.kind === 'removed' ? [...pg.details, t('Only in Live')] : pg.details}
+                    title={t('Open it on the device')}
                     onClick={
                       pg.kind === 'removed'
                         ? undefined
@@ -107,7 +108,7 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
             </Section>
           )}
           {c.components.length > 0 && (
-            <Section title="Components" count={c.components.length}>
+            <Section title={t('Components')} count={c.components.length}>
               {c.components.map((cm) => {
                 const where = index?.[cm.name] ?? [];
                 const onPages = new Set(where.map((w) => w.id)).size;
@@ -120,21 +121,21 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                     name={cm.name}
                     details={[
                       `${SCOPE_LABEL[cm.scope].replace(/^./, (ch) => ch.toUpperCase())}${cm.params ? `: ${cm.params.join(', ')}` : ''}${cm.note ? ` · ${cm.note}` : ''}`,
-                      ...(found ? [] : ['Not on a page as it loads (a sheet, a dialog, a state)']),
+                      ...(found ? [] : [t('Not on a page as it loads (a sheet, a dialog, a state)')]),
                     ]}
                     // The card: every place it's on, in the rail beside the canvas (it says "Finding…" while the scan runs).
                     meta={
                       !index ? (
                         <>
-                          <Spinner size={11} /> Finding
+                          <Spinner size={11} /> {t('Finding')}
                         </>
-                      ) : found ? `${onPages} ${onPages === 1 ? 'page' : 'pages'}${where.length > onPages ? ` · ${where.length} screens` : ''}` : undefined
+                      ) : found ? plural(onPages, '{n} page', '{n} pages') + (where.length > onPages ? ` · ${plural(where.length, '{n} screen', '{n} screens')}` : '') : undefined
                     }
-                    title="See every place it's on, beside the canvas"
+                    title={t("See every place it's on, beside the canvas")}
                     onClick={found ? () => showAll(cm.name) : undefined}
                     secondary={{
-                      label: 'Components',
-                      title: 'Open it in Components (the gallery)',
+                      label: t('Components'),
+                      title: t('Open it in Components (the gallery)'),
                       onClick: () => {
                         openComponent(cm.name);
                         setOpen(false);
@@ -251,13 +252,13 @@ export function HighlightButton({ proposalId }: { proposalId: string | null }) {
       className={`${styles.chip} ${styles.highlight} ${on ? styles.highlightOn : ''}`}
       style={colors}
       onClick={() => setHighlight(on ? null : CHANGES_ALL)}
-      title="Outline what this proposal changes on the screens"
+      title={t('Outline what this proposal changes on the screens')}
       aria-pressed={on}
     >
       <span className={styles.check} aria-hidden>
         {on && <Icon name="check" size={13} />}
       </span>
-      Highlight changes
+      {t('Highlight changes')}
     </button>
   );
 }

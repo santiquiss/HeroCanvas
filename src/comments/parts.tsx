@@ -5,9 +5,10 @@ import { Icon } from '../components/Icon';
 import { recalledAuthor, rememberAuthor } from '../persist/author';
 import { useMyOwner } from './owner';
 import { addComment, deleteComment, editComment, newCommentId, setResolved } from './store';
-import { initials, personColor, timeAgo, type Thread } from './threads';
+import { initials, personColor, resolverName, timeAgo, UNKNOWN_RESOLVER, type Thread } from './threads';
 import { MAX_AUTHOR, MAX_BODY, type Comment } from './types';
 import styles from './Comments.module.css';
+import { t } from '../i18n/ui';
 
 export function Avatar({ name, size = 24 }: { name: string; size?: number }) {
   return (
@@ -44,8 +45,8 @@ export function When({ c }: { c: Comment }) {
         {timeAgo(c.createdAt)}
       </span>
       {c.editedAt && (
-        <span className={styles.when} title={`Edited ${new Date(c.editedAt).toLocaleString()}`}>
-          (edited)
+        <span className={styles.when} title={t('Edited {date}', { date: new Date(c.editedAt).toLocaleString() })}>
+          {t('(edited)')}
         </span>
       )}
     </>
@@ -100,7 +101,7 @@ export function OwnActions({ c, onEdit, hover = false }: { c: Comment; onEdit: (
         }
       }}
     >
-      <button className={`${styles.iconBtn} ${styles.more}`} title="More" aria-label="More" aria-haspopup="menu" aria-expanded={!!open} onClick={() => setOpen(open ? null : 'menu')}>
+      <button className={`${styles.iconBtn} ${styles.more}`} title={t('More')} aria-label={t('More')} aria-haspopup="menu" aria-expanded={!!open} onClick={() => setOpen(open ? null : 'menu')}>
         <Icon name="more_horiz" size={18} />
       </button>
       {open === 'menu' && (
@@ -113,24 +114,24 @@ export function OwnActions({ c, onEdit, hover = false }: { c: Comment; onEdit: (
             }}
           >
             <Icon name="edit" size={16} />
-            <span>Edit</span>
+            <span>{t('Edit')}</span>
           </button>
           <button role="menuitem" className={styles.danger} onClick={() => setOpen('confirm')}>
             <Icon name="delete" size={16} />
-            <span>Delete</span>
+            <span>{t('Delete')}</span>
           </button>
         </div>
       )}
       {open === 'confirm' && (
-        <div className={styles.menu} role="alertdialog" aria-label="Delete">
-          <span className={styles.menuNote}>{c.parentId ? 'Delete this comment?' : 'Delete this thread and its replies?'}</span>
+        <div className={styles.menu} role="alertdialog" aria-label={t('Delete')}>
+          <span className={styles.menuNote}>{c.parentId ? t('Delete this comment?') : t('Delete this thread and its replies?')}</span>
           {error && <span className={styles.error}>{error}</span>}
           <div className={styles.menuBar}>
             <button className={styles.plainBtn} onClick={() => setOpen(null)}>
-              Cancel
+              {t('Cancel')}
             </button>
             <button className={styles.dangerBtn} disabled={busy} autoFocus onClick={() => void remove()}>
-              Delete
+              {t('Delete')}
             </button>
           </div>
         </div>
@@ -178,10 +179,10 @@ export function EditField({ c, onDone }: { c: Comment; onDone: () => void }) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={sendOnEnter(() => void save())}
         />
-        <SendButton ready={ready} label="Save" onClick={() => void save()} />
+        <SendButton ready={ready} label={t('Save')} onClick={() => void save()} />
       </div>
       {error && <span className={styles.error}>{error}</span>}
-      <span className={styles.editHint}>↵ to save · Esc to cancel</span>
+      <span className={styles.editHint}>{t('↵ to save · Esc to cancel')}</span>
     </div>
   );
 }
@@ -246,19 +247,19 @@ export function ReplyField({ thread, autoFocus = false }: { thread: Thread; auto
     <div className={styles.replyRow}>
       <Avatar name={name.trim()} />
       <div className={styles.replyMain}>
-        {ask && <input className={styles.nameField} placeholder="Your name" maxLength={MAX_AUTHOR} value={name} onChange={(e) => setName(e.target.value)} />}
+        {ask && <input className={styles.nameField} placeholder={t('Your name')} maxLength={MAX_AUTHOR} value={name} onChange={(e) => setName(e.target.value)} />}
         <div className={styles.field}>
           <textarea
             className={styles.fieldText}
             rows={1}
-            placeholder="Reply"
+            placeholder={t('Reply')}
             maxLength={MAX_BODY}
             autoFocus={autoFocus && !ask}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={sendOnEnter(() => void send())}
           />
-          <SendButton ready={ready} label="Reply" onClick={() => void send()} />
+          <SendButton ready={ready} label={t('Reply')} onClick={() => void send()} />
         </div>
         {error && <span className={styles.error}>{error}</span>}
       </div>
@@ -274,13 +275,13 @@ export function ResolveButton({ thread }: { thread: Thread }) {
     e.stopPropagation();
     setBusy(true);
     try {
-      await setResolved(root.design, root.id, root.resolvedAt ? null : recalledAuthor().name || 'Someone');
+      await setResolved(root.design, root.id, root.resolvedAt ? null : recalledAuthor().name || UNKNOWN_RESOLVER);
     } catch {
       /* undone by the store */
     }
     setBusy(false);
   };
-  const label = root.resolvedAt ? `Resolved by ${root.resolvedBy ?? 'someone'} · reopen` : 'Resolve';
+  const label = root.resolvedAt ? t('Resolved by {name} · reopen', { name: resolverName(root.resolvedBy) }) : t('Resolve');
   return (
     <button className={`${styles.iconBtn} ${root.resolvedAt ? styles.resolved : ''}`} disabled={busy} onClick={(e) => void toggle(e)} title={label} aria-label={label} aria-pressed={!!root.resolvedAt}>
       <Icon name="check_circle" size={20} fill={!!root.resolvedAt} />

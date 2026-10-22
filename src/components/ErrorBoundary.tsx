@@ -1,5 +1,6 @@
 // Keeps a failing component from blanking the whole tool: shows the error where it happened, with a retry.
 import { Component, type ReactNode } from 'react';
+import { t } from '../i18n/ui';
 
 interface Props {
   /** Short name of what failed ("story Primary", "page Settings"). */
@@ -46,14 +47,14 @@ export class ErrorBoundary extends Component<Props, State> {
         }}
       >
         <div style={{ maxWidth: 420, padding: 14, borderRadius: 10, background: '#fff4f4', border: '1px solid #f3c2c2', color: '#7a1d1d', fontSize: 12, lineHeight: '17px' }}>
-          <div style={{ fontWeight: 700, marginBottom: 4 }}>{this.props.label} failed</div>
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>{t('{label} failed', { label: this.props.label })}</div>
           <div style={{ fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 11, wordBreak: 'break-word', marginBottom: 10 }}>{error.message}</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <button
               onClick={() => this.setState({ error: null })}
               style={{ height: 26, padding: '0 10px', borderRadius: 6, border: '1px solid #d9a3a3', background: '#fff', color: '#7a1d1d', font: 'inherit', fontWeight: 600, cursor: 'pointer' }}
             >
-              Try again
+              {t('Try again')}
             </button>
             {this.props.actions}
           </div>

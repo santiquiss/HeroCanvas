@@ -7,6 +7,7 @@
 //   #/tasks/t1                                   → [today, task] (its `parentOf`)
 import { SHOT_PARAMS } from '../capture/shot/params';
 import type { Level, PageDef, PageRef, Params, StateParams } from './types';
+import { t } from '../i18n/ui';
 
 export type Manifest = Record<string, PageDef>;
 
@@ -163,17 +164,20 @@ export function pageName(pages: Manifest, id: string): string {
  * (PagesPanel).
  */
 export const ROLE_ICONS: Record<Level, { icon: string; label: string }> = {
-  tab: { icon: 'smartphone', label: 'Tab: a root of the app’s navigation' },
-  push: { icon: 'smartphone', label: 'Pushed: opens over the page it comes from' },
-  cover: { icon: 'smartphone', label: 'Cover: over the whole screen' },
-  boot: { icon: 'smartphone', label: 'Before the app: welcome, sign-in, onboarding' },
+  tab: { icon: 'smartphone', label: t('Tab: a root of the app’s navigation') },
+  push: { icon: 'smartphone', label: t('Pushed: opens over the page it comes from') },
+  cover: { icon: 'smartphone', label: t('Cover: over the whole screen') },
+  boot: { icon: 'smartphone', label: t('Before the app: welcome, sign-in, onboarding') },
 };
+
+/** A page's role as its badge names it (Flow, Pages), in the interface's language: lowercase, as the badge styles it. */
+export const ROLE_NAMES: Record<Level, string> = { tab: t('tab'), push: t('push'), cover: t('cover'), boot: t('boot') };
 
 export function pageIcon(def: PageDef | undefined): string {
   return ROLE_ICONS[def?.level ?? 'push'].icon;
 }
 
 export function pageTitle(pages: Manifest, ref: PageRef): string {
-  const t = pages[ref.id].title;
-  return typeof t === 'function' ? t(ref.params) : t;
+  const title = pages[ref.id].title;
+  return typeof title === 'function' ? title(ref.params) : title;
 }

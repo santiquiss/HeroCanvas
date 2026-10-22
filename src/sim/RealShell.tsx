@@ -18,6 +18,7 @@ import { SharedSimProvider, SimProvider } from './SimContext';
 import { TouchPointer } from './TouchPointer';
 import { useRealViewport } from './useRealViewport';
 import styles from './RealShell.module.css';
+import { t } from '../i18n/ui';
 
 /** Opened from the home screen (installed), with no browser around it. */
 const standalone = () => !!window.matchMedia?.('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone === true;
@@ -93,7 +94,15 @@ export function RealShell() {
   const [controls, setControls] = useState(false);
   useDeveloperHidden(frame, () => setControls(true));
 
-  const info = `${known ? device.name + (device.displays.length > 1 ? ` · ${display.label}` : '') : 'This device'} · ${w} × ${h} pt · safe area ${st} / ${sr} / ${sb} / ${sl}`;
+  const info = t('{device} · {w} × {h} pt · safe area {top} / {right} / {bottom} / {left}', {
+    device: known ? device.name + (device.displays.length > 1 ? ` · ${display.label}` : '') : t('This device'),
+    w,
+    h,
+    top: st,
+    right: sr,
+    bottom: sb,
+    left: sl,
+  });
   return (
     <DesignProvider scale={1}>
       <SharedSimProvider>

@@ -11,9 +11,10 @@ import { anchorAt, anchorElement, coveredAt, pageLayer, pagesAbove, pointIn, scr
 import { screenScope, useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsContext';
 import { addComment, newCommentId, useCommentsOf } from './store';
 import { Avatar, ReplyField, ResolveButton, sendOnEnter, SendButton, ThreadMessages, useAuthorName } from './parts';
-import { commentLink, threadNumbers, threadsOf, timeAgo } from './threads';
+import { commentLink, resolverName, threadNumbers, threadsOf, timeAgo } from './threads';
 import { MAX_AUTHOR, MAX_BODY, type CommentAnchor, type CommentKind } from './types';
 import styles from './Comments.module.css';
+import { t } from '../i18n/ui';
 
 interface Draft {
   page: string;
@@ -158,18 +159,19 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
       {open && openAt && (
         <Popover key={open.root.id} at={openAt} box={box} width={THREAD_W} onEscape={() => setSelected(null)}>
           <div className={styles.popHead}>
-            <span className={styles.popTitle}>Comment</span>
+            {/* "Comment" the noun, not the toolbar's action (also "Comment" in English): its own key, the number after it. */}
+            <span className={styles.popTitle}>{t('Comment {number}').replace(/\s*\{number\}\s*/, '')}</span>
             <span className={styles.number}>#{numbers.get(open.root.id)}</span>
             <span style={{ flex: 1 }} />
             <ResolveButton thread={open} />
-            <button className={styles.iconBtn} onClick={() => setSelected(null)} title="Close (Esc)" aria-label="Close">
+            <button className={styles.iconBtn} onClick={() => setSelected(null)} title={t('Close (Esc)')} aria-label={t('Close')}>
               <Icon name="close" size={20} />
             </button>
           </div>
           {open.root.resolvedAt && (
             <div className={styles.resolvedNote}>
               <Icon name="check_circle" size={14} fill />
-              Resolved by {open.root.resolvedBy ?? 'someone'} · {timeAgo(open.root.resolvedAt)}
+              {t('Resolved by {name} · {when}', { name: resolverName(open.root.resolvedBy), when: timeAgo(open.root.resolvedAt) })}
             </div>
           )}
           <div className={styles.popBody}>
@@ -250,11 +252,11 @@ function Composer({ onPost }: { onPost: (kind: CommentKind, author: string, body
   };
   return (
     <div className={styles.composer}>
-      {ask && <input className={styles.composerName} placeholder="Your name" maxLength={MAX_AUTHOR} value={name} autoFocus onChange={(e) => setName(e.target.value)} />}
+      {ask && <input className={styles.composerName} placeholder={t('Your name')} maxLength={MAX_AUTHOR} value={name} autoFocus onChange={(e) => setName(e.target.value)} />}
       <textarea
         className={styles.composerText}
         autoFocus={!ask}
-        placeholder="Add a comment"
+        placeholder={t('Add a comment')}
         maxLength={MAX_BODY}
         rows={2}
         value={body}
@@ -264,7 +266,7 @@ function Composer({ onPost }: { onPost: (kind: CommentKind, author: string, body
       {error && <span className={styles.error} style={{ padding: '0 12px 8px' }}>{error}</span>}
       <div className={styles.composerBar}>
         <span />
-        <SendButton ready={ready} label="Post" onClick={() => void post()} />
+        <SendButton ready={ready} label={t('Post')} onClick={() => void post()} />
       </div>
     </div>
   );

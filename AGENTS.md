@@ -73,6 +73,11 @@ The person's app's own repository is read, never edited: everything goes in Hero
   design apps for its platforms, made from the Mac's own copy.
 - **Public files by `import.meta.env.BASE_URL`**, never from `/`: the built site is relative (`base: './'`), so it
   works at a domain's root or under a path (GitHub Pages).
+- **The interface in two languages**: every text HeroCanvas's own interface shows goes through `t('English text')`
+  (`src/i18n/ui.ts`), its Spanish in `src/i18n/es/<area>.json` by the glossary (`src/i18n/GLOSSARY.md`); a test fails
+  on a missing or unused one. Never translate what the app's screens show (they keep the app's languages), nor what's
+  written for developers and agents (handoffs, prompts, exported files). A team picks it in `herocanvas.config.ts`
+  (`language: 'es'`).
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done

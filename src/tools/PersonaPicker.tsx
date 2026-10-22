@@ -8,9 +8,10 @@ import { DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/pe
 import { useUrlPatch } from '../sim/SimContext';
 import surface from '../theme/surface.module.css';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 /** Who the screens show when the app has no personas: anyone, with the app's own sample data. */
-export const ANONYMOUS: Persona = { id: 'anonymous', name: 'Anonymous user', description: 'Anyone, with the app’s sample data' };
+export const ANONYMOUS: Persona = { id: 'anonymous', name: t('Anonymous user'), description: t('Anyone, with the app’s sample data') };
 
 /**
  * The persona in the URL, and picking one (the default is no param). With no personas, the anonymous user: the
@@ -56,7 +57,7 @@ export function PersonaPicker({ persona, onPick }: { persona: Persona; onPick: (
         <Icon name="unfold_more" size={18} color="var(--ui-text-muted)" />
       </button>
       {open && (
-        <div ref={list} className={styles.personaMenu} role="listbox" aria-label="Persona">
+        <div ref={list} className={styles.personaMenu} role="listbox" aria-label={t('Persona')}>
           {(PERSONAS.length ? PERSONAS : [ANONYMOUS]).map((p) => (
             <button
               key={p.id}
@@ -78,11 +79,9 @@ export function PersonaPicker({ persona, onPick }: { persona: Persona; onPick: (
               <span className={surface.emptyIcon}>
                 <Icon name="group" size={22} />
               </span>
-              <span className={surface.emptyTitle}>No personas yet</span>
+              <span className={surface.emptyTitle}>{t('No personas yet')}</span>
               <span className={surface.emptyBody}>
-                Personas are who the app is tried as: a new user with nothing yet, someone on a paid plan, an admin with a
-                busy team. Each brings their own data, and every screen shows theirs. Ask your agent: “Create personas for
-                my app.”
+                {t('Personas are who the app is tried as: a new user with nothing yet, someone on a paid plan, an admin with a busy team. Each brings their own data, and every screen shows theirs. Ask your agent: “Create personas for my app.”')}
               </span>
             </div>
           )}

@@ -20,13 +20,17 @@ import { sequenceDuration, sequenceName } from './video/motion';
 import { MotionRows } from './MotionRows';
 import { canRecord } from './video/recording';
 import type { InteractionRecording } from './video/useRecording';
+import { plural, t } from '../i18n/ui';
 
 const SCALES = [1, 2, 3, 4];
 const TYPES: [DeviceType, string][] = [
-  ['phone', 'Phones'],
-  ['foldable', 'Foldables'],
-  ['tablet', 'Tablets'],
+  ['phone', t('Phones')],
+  ['foldable', t('Foldables')],
+  ['tablet', t('Tablets')],
 ];
+
+/** A light preset's tooltip: where it comes from. */
+const LIGHT_FROM: Record<LightFrom, string> = { left: t('Light from the left'), top: t('Light from the top'), right: t('Light from the right') };
 
 function download(blob: Blob, name: string) {
   const a = document.createElement('a');
@@ -175,7 +179,7 @@ function useAdvanced(): [Record<AdvancedPart, boolean>, (part: AdvancedPart) => 
 /** A section's fine controls behind a small button by its title. */
 function AdvancedButton({ open, onClick, what }: { open: boolean; onClick: () => void; what: string }) {
   return (
-    <button className={`${styles.advanced} ${open ? styles.on : ''}`} onClick={onClick} title={open ? `Hide ${what}` : `Adjust ${what}`} aria-expanded={open}>
+    <button className={`${styles.advanced} ${open ? styles.on : ''}`} onClick={onClick} title={open ? t('Hide {what}', { what }) : t('Adjust {what}', { what })} aria-expanded={open}>
       <Icon name="tune" size={14} />
     </button>
   );
@@ -210,9 +214,9 @@ export function CapturePanel(p: CapturePanelProps) {
   const container = containers.find((c) => c.id === prefs.videoContainer) ?? containers[0];
   // The background the file gets (a format without alpha can't be transparent: white then).
   const alphaNow = video ? !!container?.alpha : format.alpha;
-  const formatLabel = video ? (container?.label ?? 'Video') : format.label;
+  const formatLabel = video ? (container?.label ?? t('Video')) : format.label;
   const bgNow = exportBackground(prefs, alphaNow);
-  const bgName = bgNow === null ? 'Transparent' : (BACKGROUNDS.find((b) => b.color === bgNow)?.name ?? 'Custom');
+  const bgName = bgNow === null ? t('Transparent') : (BACKGROUNDS.find((b) => b.color === bgNow)?.name ?? t('Custom'));
   const ext = prefs.format === 'jpeg' ? 'jpg' : prefs.format;
   // Fit by its scale, Custom by its size.
   const file = `${p.name}${prefs.crop === 'custom' && !bare ? `-${prefs.size[0]}x${prefs.size[1]}` : `@${prefs.scale}x`}.${ext}`;
@@ -258,7 +262,7 @@ export function CapturePanel(p: CapturePanelProps) {
   const blurs = container?.id === 'mp4';
   const record = () =>
     run(async () => {
-      if (!container) throw new Error("This browser doesn't record video");
+      if (!container) throw new Error(t("This browser doesn't record video"));
       setProgress(0);
       setLate(0);
       // The encoder loads on the first export: the panel doesn't carry it.
@@ -322,8 +326,8 @@ export function CapturePanel(p: CapturePanelProps) {
           <div className={`${styles.showRow} ${styles.modes}`}>
             {(
               [
-                ['image', 'Image', 'image', 'A picture of the device at the angle you choose'],
-                ['video', 'Video', 'movie', 'A few seconds of the device moving'],
+                ['image', t('Image'), 'image', t('A picture of the device at the angle you choose')],
+                ['video', t('Video'), 'movie', t('A few seconds of the device moving')],
               ] as const
             ).map(([v, label, icon, title]) => (
               <button key={v} className={`${styles.showBtn} ${prefs.output === v ? styles.on : ''}`} onClick={() => setPrefs({ output: v })} title={title}>
@@ -338,7 +342,7 @@ export function CapturePanel(p: CapturePanelProps) {
         {PERSONAS.length > 0 && (
           <section className={panel.section}>
             <div className={panel.sectionTitle}>
-              <span>Persona</span>
+              <span>{t('Persona')}</span>
             </div>
             <PersonaPicker persona={persona} onPick={pickPersona} />
           </section>
@@ -346,13 +350,13 @@ export function CapturePanel(p: CapturePanelProps) {
 
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Device</span>
+            <span>{t('Device')}</span>
           </div>
           {/* A recorded interaction is this device's screen, in this orientation and theme: they stay as recorded. */}
           {deviceLocked && (
             <p className={`${styles.hint} ${styles.lockHint}`}>
               <Icon name="lock" size={14} />
-              <span>The interaction was recorded on this device. To change it, its orientation or its theme, record the interaction again.</span>
+              <span>{t('The interaction was recorded on this device. To change it, its orientation or its theme, record the interaction again.')}</span>
             </p>
           )}
           <label className={`${styles.select} ${deviceLocked ? styles.locked : ''}`}>
@@ -375,8 +379,8 @@ export function CapturePanel(p: CapturePanelProps) {
           <div className={styles.showRow}>
             {(
               [
-                ['device', '3D device', 'deployed_code', 'The device in 3D: its frame and body, turned, lit, with a shadow'],
-                ['screen', 'Screen only', 'crop_portrait', "Its screen alone, square, no frame: what a screenshot would be"],
+                ['device', t('3D device'), 'deployed_code', t('The device in 3D: its frame and body, turned, lit, with a shadow')],
+                ['screen', t('Screen only'), 'crop_portrait', t('Its screen alone, square, no frame: what a screenshot would be')],
               ] as const
             ).map(([v, label, icon, title]) => (
               <button key={v} className={`${styles.showBtn} ${prefs.frame === v ? styles.on : ''}`} onClick={() => setPrefs({ frame: v })} title={title}>
@@ -392,23 +396,23 @@ export function CapturePanel(p: CapturePanelProps) {
             </div>
           )}
           <div className={styles.pair}>
-            <Seg value={p.land ? 'land' : 'port'} options={[['port', 'Portrait'], ['land', 'Landscape']]} onChange={(v) => (v === 'land') !== p.land && p.onRotate()} disabled={deviceLocked} />
-            <Seg value={p.dark ? 'dark' : 'light'} options={[['light', 'Light'], ['dark', 'Dark']]} onChange={(v) => (v === 'dark') !== p.dark && p.onTheme()} disabled={deviceLocked} />
+            <Seg value={p.land ? 'land' : 'port'} options={[['port', t('Portrait')], ['land', t('Landscape')]]} onChange={(v) => (v === 'land') !== p.land && p.onRotate()} disabled={deviceLocked} />
+            <Seg value={p.dark ? 'dark' : 'light'} options={[['light', t('Light')], ['dark', t('Dark')]]} onChange={(v) => (v === 'dark') !== p.dark && p.onTheme()} disabled={deviceLocked} />
           </div>
           {!bare && (
             <>
           <div className={styles.subTitle}>
-            <span>Color</span>
+            <span>{t('Color')}</span>
             <span className={styles.titleEnd}>
-              <span className={styles.muted}>{p.finishes.find((f) => f.color === p.color)?.name ?? 'Custom'}</span>
-              <AdvancedButton open={advanced.color} onClick={() => toggle('color')} what="the metal's look" />
+              <span className={styles.muted}>{p.finishes.find((f) => f.color === p.color)?.name ?? t('Custom')}</span>
+              <AdvancedButton open={advanced.color} onClick={() => toggle('color')} what={t("the metal's look")} />
             </span>
           </div>
           <div className={styles.swatches}>
             {p.finishes.map((f) => (
               <button key={f.color} className={`${styles.swatch} ${f.color === p.color ? styles.swatchOn : ''}`} style={{ background: f.color }} title={f.name} onClick={() => p.onColor(f.color)} />
             ))}
-            <label className={`${styles.swatch} ${styles.custom} ${p.finishes.some((f) => f.color === p.color) ? '' : styles.swatchOn}`} title="Any color">
+            <label className={`${styles.swatch} ${styles.custom} ${p.finishes.some((f) => f.color === p.color) ? '' : styles.swatchOn}`} title={t('Any color')}>
               <input type="color" value={p.color} onChange={(e) => p.onColor(e.target.value)} />
               <Icon name="palette" size={14} />
             </label>
@@ -416,12 +420,12 @@ export function CapturePanel(p: CapturePanelProps) {
           {advanced.color && (
             <>
           <label className={styles.slider}>
-            <span className={styles.label}>Metallic</span>
+            <span className={styles.label}>{t('Metallic')}</span>
             <input type="range" min={0} max={100} step={5} value={Math.round(p.light.metal * 100)} onChange={(e) => p.onLight({ ...p.light, metal: Number(e.target.value) / 100 })} />
             <span className={styles.num}>{Math.round(p.light.metal * 100)}</span>
           </label>
           <label className={styles.slider}>
-            <span className={styles.label}>Grain</span>
+            <span className={styles.label}>{t('Grain')}</span>
             <input type="range" min={0} max={100} step={5} value={Math.round(p.light.grain * 100)} onChange={(e) => p.onLight({ ...p.light, grain: Number(e.target.value) / 100 })} />
             <span className={styles.num}>{Math.round(p.light.grain * 100)}</span>
           </label>
@@ -434,37 +438,37 @@ export function CapturePanel(p: CapturePanelProps) {
         {!bare && (
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Background</span>
+            <span>{t('Background')}</span>
             <span className={styles.muted}>{bgName}</span>
           </div>
           <div className={styles.swatches}>
             <button
               className={`${styles.swatch} ${styles.transparent} ${prefs.background === null && alphaNow ? styles.swatchOn : ''}`}
               disabled={!alphaNow}
-              title={alphaNow ? 'Transparent' : `${formatLabel} has no transparency`}
+              title={alphaNow ? t('Transparent') : t('{format} has no transparency', { format: formatLabel })}
               onClick={() => setPrefs({ background: null })}
             />
             {BACKGROUNDS.map((b) => (
               <button key={b.color} className={`${styles.swatch} ${bgNow === b.color ? styles.swatchOn : ''}`} style={{ background: b.color }} title={b.name} onClick={() => setPrefs({ background: b.color })} />
             ))}
-            <label className={`${styles.swatch} ${styles.custom} ${bgNow && !BACKGROUNDS.some((b) => b.color === bgNow) ? styles.swatchOn : ''}`} title="Any color">
+            <label className={`${styles.swatch} ${styles.custom} ${bgNow && !BACKGROUNDS.some((b) => b.color === bgNow) ? styles.swatchOn : ''}`} title={t('Any color')}>
               <input type="color" value={bgNow ?? '#ffffff'} onChange={(e) => setPrefs({ background: e.target.value })} />
               <Icon name="palette" size={14} />
             </label>
           </div>
-          {!alphaNow && <p className={styles.hint}>{video ? 'Transparent is only available in WebM.' : 'Transparent is only available in PNG and WebP.'}</p>}
+          {!alphaNow && <p className={styles.hint}>{video ? t('Transparent is only available in WebM.') : t('Transparent is only available in PNG and WebP.')}</p>}
         </section>
         )}
 
         {video && (
           <section className={panel.section} data-keep>
             <div className={panel.sectionTitle}>
-              <span>Interaction</span>
+              <span>{t('Interaction')}</span>
             </div>
             {recState.status === 'recording' || recState.status === 'starting' ? (
               <button className={`${styles.showBtn} ${styles.wide} ${styles.recording}`} onClick={p.interaction.stop}>
                 <Icon name="stop_circle" size={18} />
-                <span>{recState.status === 'starting' ? 'Waiting for permission…' : `Stop · ${recState.seconds.toFixed(1)} s`}</span>
+                <span>{recState.status === 'starting' ? t('Waiting for permission…') : t('Stop · {seconds} s', { seconds: recState.seconds.toFixed(1) })}</span>
               </button>
             ) : (
               // Record (again), and with a recording, a bin beside it that drops it (back to the still screen).
@@ -473,13 +477,13 @@ export function CapturePanel(p: CapturePanelProps) {
                   className={`${styles.showBtn} ${styles.wide}`}
                   disabled={!p.frame || !recordable || busy}
                   onClick={() => p.interaction.start(p.frame!)}
-                  title={recordable ? 'Record what you do in the prototype: tap, swipe, navigate' : 'Recording the device’s screen needs Chrome'}
+                  title={recordable ? t('Record what you do in the prototype: tap, swipe, navigate') : t('Recording the device’s screen needs Chrome')}
                 >
                   <Icon name="radio_button_checked" size={18} />
-                  <span>{recorded ? 'Record again' : 'Record interaction'}</span>
+                  <span>{recorded ? t('Record again') : t('Record interaction')}</span>
                 </button>
                 {recorded && (
-                  <button className={`${styles.iconBtn} ${styles.binBtn}`} onClick={p.interaction.discard} title="Discard the recording: back to the still screen" aria-label="Discard the recording">
+                  <button className={`${styles.iconBtn} ${styles.binBtn}`} onClick={p.interaction.discard} title={t('Discard the recording: back to the still screen')} aria-label={t('Discard the recording')}>
                     <Icon name="delete" size={18} />
                   </button>
                 )}
@@ -492,17 +496,17 @@ export function CapturePanel(p: CapturePanelProps) {
             )}
             {recorded ? (
               <>
-              <div className={`${styles.field} ${styles.longLabel}`} title="How fast the recording plays in the clip: faster makes it shorter">
-                <span className={styles.label}>Playback speed</span>
+              <div className={`${styles.field} ${styles.longLabel}`} title={t('How fast the recording plays in the clip: faster makes it shorter')}>
+                <span className={styles.label}>{t('Playback speed')}</span>
                 <Seg value={prefs.playbackSpeed} options={PLAYBACK_SPEEDS.map((v) => [v, `${v}x`] as [PlaybackSpeed, string])} onChange={(playbackSpeed) => setPrefs({ playbackSpeed })} />
               </div>
-              <Toggle label="Show touches" checked={prefs.showTouches} onChange={(showTouches) => setPrefs({ showTouches })} title="A circle where each finger touches, over the recording" />
+              <Toggle label={t('Show touches')} checked={prefs.showTouches} onChange={(showTouches) => setPrefs({ showTouches })} title={t('A circle where each finger touches, over the recording')} />
               </>
             ) : (
               <p className={styles.hint}>
                 {recState.status === 'idle' && recState.error
-                  ? `Couldn't record: ${recState.error}`
-                  : 'Use the prototype on the canvas while it records: tap, swipe, navigate; press Esc to stop. Chrome asks for permission to record the tab.'}
+                  ? t("Couldn't record: {error}", { error: recState.error })
+                  : t('Use the prototype on the canvas while it records: tap, swipe, navigate; press Esc to stop. Chrome asks for permission to record the tab.')}
               </p>
             )}
           </section>
@@ -511,7 +515,7 @@ export function CapturePanel(p: CapturePanelProps) {
         {video && (
           <section className={panel.section}>
             <div className={panel.sectionTitle}>
-              <span>Motion</span>
+              <span>{t('Motion')}</span>
             </div>
             <MotionRows sequence={prefs.sequence} recorded={playedLength(recorded, prefs.playbackSpeed)} onChange={(sequence) => setPrefs({ sequence })} />
           </section>
@@ -521,16 +525,16 @@ export function CapturePanel(p: CapturePanelProps) {
         {!bare && (!video || prefs.sequence.mid === 'angle') && (
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Angle</span>
+            <span>{t('Angle')}</span>
             <span className={styles.titleEnd}>
               <span className={styles.muted}>
                 {p.tilt.y}° · {p.tilt.x}°
               </span>
-              <AdvancedButton open={advanced.angle} onClick={() => toggle('angle')} what="turn and lean" />
+              <AdvancedButton open={advanced.angle} onClick={() => toggle('angle')} what={t('turn and lean')} />
             </span>
           </div>
           <div className={styles.presets}>
-            <button className={styles.iconBtn} disabled={isFlat(p.tilt)} onClick={() => p.onTilt(FLAT)} title="Reset: face the device">
+            <button className={styles.iconBtn} disabled={isFlat(p.tilt)} onClick={() => p.onTilt(FLAT)} title={t('Reset: face the device')}>
               <Icon name="restart_alt" size={18} />
             </button>
             <span className={styles.presetSep} />
@@ -548,8 +552,8 @@ export function CapturePanel(p: CapturePanelProps) {
           </div>
           {advanced.angle && (
             <>
-              {slider('y', 'Turn')}
-              {slider('x', 'Lean')}
+              {slider('y', t('Turn'))}
+              {slider('x', t('Lean'))}
             </>
           )}
         </section>
@@ -558,30 +562,30 @@ export function CapturePanel(p: CapturePanelProps) {
         {!bare && (
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Light</span>
+            <span>{t('Lighting')}</span>
             <span className={styles.titleEnd}>
               {(lightSide(p.light) !== lightSide(DEFAULT_LIGHT) || p.light.brightness !== DEFAULT_LIGHT.brightness || p.light.shine !== DEFAULT_LIGHT.shine) && (
                 <button className={styles.link} onClick={() => p.onLight({ ...DEFAULT_LIGHT, metal: p.light.metal, grain: p.light.grain })}>
-                  <span>Reset</span>
+                  <span>{t('Reset')}</span>
                 </button>
               )}
-              <AdvancedButton open={advanced.light} onClick={() => toggle('light')} what="the angle, brightness and shine" />
+              <AdvancedButton open={advanced.light} onClick={() => toggle('light')} what={t('the angle, brightness and shine')} />
             </span>
           </div>
           {/* Where the light comes from: three presets across, the section's width; any angle in Advanced. */}
           <div className={`${styles.presetTiles} ${styles.three}`}>
             {(['left', 'top', 'right'] as LightFrom[]).map((f) => (
-              <button key={f} className={`${styles.presetTile} ${presetAt(lightSide(p.light)) === f ? styles.on : ''}`} onClick={() => p.onLight({ ...p.light, from: f, side: undefined })} title={`Light from the ${f}`}>
+              <button key={f} className={`${styles.presetTile} ${presetAt(lightSide(p.light)) === f ? styles.on : ''}`} onClick={() => p.onLight({ ...p.light, from: f, side: undefined })} title={LIGHT_FROM[f]}>
                 <LightGlyph side={PRESET_SIDE[f]} />
-                <span>{{ left: 'Left', top: 'Top', right: 'Right' }[f]}</span>
+                <span>{{ left: t('Left'), top: t('Top'), right: t('Right') }[f]}</span>
               </button>
             ))}
           </div>
           {advanced.light && (
             <>
           {/* Any angle across, the presets on it: -40° left, 0° top, 40° right, up to 60° to a side. */}
-          <label className={styles.slider} title="Where the light is across: the presets are −40°, 0° and 40°">
-            <span className={styles.label}>Angle</span>
+          <label className={styles.slider} title={t('Where the light is across: the presets are −40°, 0° and 40°')}>
+            <span className={styles.label}>{t('Angle')}</span>
             <input
               type="range"
               min={-60}
@@ -597,26 +601,26 @@ export function CapturePanel(p: CapturePanelProps) {
             <span className={styles.num}>{Math.round(lightSide(p.light) * 40)}°</span>
           </label>
           <label className={styles.slider}>
-            <span className={styles.label}>Brightness</span>
+            <span className={styles.label}>{t('Brightness')}</span>
             <input type="range" min={50} max={150} step={5} value={Math.round(p.light.brightness * 100)} onChange={(e) => p.onLight({ ...p.light, brightness: Number(e.target.value) / 100 })} />
             <span className={styles.num}>{Math.round(p.light.brightness * 100)}</span>
           </label>
           <label className={styles.slider}>
-            <span className={styles.label}>Shine</span>
+            <span className={styles.label}>{t('Shine')}</span>
             <input type="range" min={0} max={100} step={5} value={Math.round(p.light.shine * 100)} onChange={(e) => p.onLight({ ...p.light, shine: Number(e.target.value) / 100 })} />
             <span className={styles.num}>{Math.round(p.light.shine * 100)}</span>
           </label>
             </>
           )}
-          <Toggle label="Screen glare" checked={prefs.glare} onChange={(glare) => setPrefs({ glare })} title="A softbox mirrored in the glass, sliding as the device turns" />
+          <Toggle label={t('Screen glare')} checked={prefs.glare} onChange={(glare) => setPrefs({ glare })} title={t('A softbox mirrored in the glass, sliding as the device turns')} />
           {prefs.glare && (
             <>
-              <div className={styles.field} title="Where the lightbox the glass mirrors is: above the scene (more of it as the screen faces up) or below (as it faces down)">
-                <span className={styles.label}>Lightbox</span>
-                <Seg value={prefs.glareSide} options={[['top', 'Above'], ['bottom', 'Below']]} onChange={(v) => setPrefs({ glareSide: v })} />
+              <div className={styles.field} title={t('Where the lightbox the glass mirrors is: above the scene (more of it as the screen faces up) or below (as it faces down)')}>
+                <span className={styles.label}>{t('Lightbox')}</span>
+                <Seg value={prefs.glareSide} options={[['top', t('Above')], ['bottom', t('Below')]]} onChange={(v) => setPrefs({ glareSide: v })} />
               </div>
               <label className={styles.slider}>
-                <span className={styles.label}>Intensity</span>
+                <span className={styles.label}>{t('Intensity')}</span>
                 <input type="range" min={10} max={100} step={5} value={Math.round(prefs.glareStrength * 100)} onChange={(e) => setPrefs({ glareStrength: Number(e.target.value) / 100 })} />
                 <span className={styles.num}>{Math.round(prefs.glareStrength * 100)}</span>
               </label>
@@ -628,7 +632,7 @@ export function CapturePanel(p: CapturePanelProps) {
         {!bare && (
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Shadow</span>
+            <span>{t('Shadow')}</span>
           </div>
           <div className={styles.presetTiles}>
             {SHADOW_PRESETS.map((x) => (
@@ -646,17 +650,17 @@ export function CapturePanel(p: CapturePanelProps) {
           {prefs.shadowPreset === 'custom' && (
             <>
               <label className={styles.slider}>
-                <span className={styles.label}>Softness</span>
+                <span className={styles.label}>{t('Softness')}</span>
                 <input type="range" min={0} max={120} step={2} value={prefs.shadowLook.blur} onChange={(e) => setPrefs({ shadowLook: { ...prefs.shadowLook, blur: Number(e.target.value) } })} />
                 <span className={styles.num}>{prefs.shadowLook.blur}</span>
               </label>
               <label className={styles.slider}>
-                <span className={styles.label}>Distance</span>
+                <span className={styles.label}>{t('Distance')}</span>
                 <input type="range" min={0} max={80} step={2} value={prefs.shadowLook.distance} onChange={(e) => setPrefs({ shadowLook: { ...prefs.shadowLook, distance: Number(e.target.value) } })} />
                 <span className={styles.num}>{prefs.shadowLook.distance}</span>
               </label>
               <label className={styles.slider}>
-                <span className={styles.label}>Opacity</span>
+                <span className={styles.label}>{t('Opacity')}</span>
                 <input type="range" min={0} max={80} step={2} value={Math.round(prefs.shadowLook.opacity * 100)} onChange={(e) => setPrefs({ shadowLook: { ...prefs.shadowLook, opacity: Number(e.target.value) / 100 } })} />
                 <span className={styles.num}>{Math.round(prefs.shadowLook.opacity * 100)}</span>
               </label>
@@ -668,28 +672,28 @@ export function CapturePanel(p: CapturePanelProps) {
 
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Size</span>
+            <span>{t('Size')}</span>
             <span className={styles.muted}>
               {(videoPixels ?? p.pixels)[0]} × {(videoPixels ?? p.pixels)[1]} px
             </span>
           </div>
           {!bare && (
             <div className={styles.field}>
-              <span className={styles.label}>Mode</span>
-              <Seg value={prefs.crop} options={[['fit', 'Auto'], ['custom', 'Fixed']]} onChange={(v) => setPrefs({ crop: v })} />
+              <span className={styles.label}>{t('Mode')}</span>
+              <Seg value={prefs.crop} options={[['fit', t('Auto')], ['custom', t('Fixed')]]} onChange={(v) => setPrefs({ crop: v })} />
             </div>
           )}
           {prefs.crop === 'fit' || bare ? (
             <div className={styles.field}>
-              <span className={styles.label}>Scale</span>
+              <span className={styles.label}>{t('Scale')}</span>
               <Seg value={prefs.scale} options={SCALES.map((s) => [s, `${s}×`] as [number, string])} onChange={(v) => setPrefs({ scale: v })} />
             </div>
           ) : (
             <>
               <div className={styles.field}>
-                <span className={styles.label}>Preset</span>
+                <span className={styles.label}>{t('Preset')}</span>
                 <label className={`${styles.select} ${styles.inline}`}>
-                  <span>{preset ? `${preset.group} · ${preset.label}` : 'Custom'}</span>
+                  <span>{preset ? `${preset.group} · ${preset.label}` : t('Custom')}</span>
                   <select
                     value={preset ? String(SIZE_PRESETS.indexOf(preset)) : 'custom'}
                     onChange={(e) => e.target.value !== 'custom' && setPrefs({ size: SIZE_PRESETS[Number(e.target.value)].size })}
@@ -705,18 +709,18 @@ export function CapturePanel(p: CapturePanelProps) {
                         )}
                       </optgroup>
                     ))}
-                    <option value="custom">Custom</option>
+                    <option value="custom">{t('Custom')}</option>
                   </select>
                   <Icon name="expand_more" size={16} />
                 </label>
               </div>
               <div className={styles.field}>
-                <span className={styles.label}>Pixels</span>
+                <span className={styles.label}>{t('Pixels')}</span>
                 <div className={styles.dims}>
-                  <PixelInput value={prefs.size[0]} onChange={(w) => setPrefs({ size: [w, prefs.size[1]] })} label="Width" />
+                  <PixelInput value={prefs.size[0]} onChange={(w) => setPrefs({ size: [w, prefs.size[1]] })} label={t('Width')} />
                   <span>×</span>
-                  <PixelInput value={prefs.size[1]} onChange={(h) => setPrefs({ size: [prefs.size[0], h] })} label="Height" />
-                  <button className={styles.iconBtn} onClick={() => setPrefs({ size: [prefs.size[1], prefs.size[0]] })} title="Swap width and height">
+                  <PixelInput value={prefs.size[1]} onChange={(h) => setPrefs({ size: [prefs.size[0], h] })} label={t('Height')} />
+                  <button className={styles.iconBtn} onClick={() => setPrefs({ size: [prefs.size[1], prefs.size[0]] })} title={t('Swap width and height')}>
                     <Icon name="swap_horiz" size={16} />
                   </button>
                 </div>
@@ -724,8 +728,8 @@ export function CapturePanel(p: CapturePanelProps) {
             </>
           )}
           {!bare && (
-          <label className={styles.slider} title="Room between the device (and its shadow) and the picture's edges, in the file's pixels">
-            <span className={styles.label}>Padding</span>
+          <label className={styles.slider} title={t("Room between the device (and its shadow) and the picture's edges, in the file's pixels")}>
+            <span className={styles.label}>{t('Padding')}</span>
             <input type="range" min={0} max={600} step={10} value={prefs.padding} onChange={(e) => setPrefs({ padding: Number(e.target.value) })} />
             <span className={styles.num}>{prefs.padding}</span>
           </label>
@@ -734,10 +738,10 @@ export function CapturePanel(p: CapturePanelProps) {
 
         <section className={panel.section}>
           <div className={panel.sectionTitle}>
-            <span>Export</span>
+            <span>{t('Export')}</span>
           </div>
-          <div className={styles.field} title={video ? 'MP4 plays everywhere; WebM keeps a transparent background' : undefined}>
-            <span className={styles.label}>Format</span>
+          <div className={styles.field} title={video ? t('MP4 plays everywhere; WebM keeps a transparent background') : undefined}>
+            <span className={styles.label}>{t('Format')}</span>
             {video ? (
               containers.length > 0 && <Seg value={container.id} options={containers.map((c) => [c.id, c.label] as [VideoContainer, string])} onChange={(v) => setPrefs({ videoContainer: v })} />
             ) : (
@@ -747,22 +751,22 @@ export function CapturePanel(p: CapturePanelProps) {
           {/* A clip's frame rate and motion blur: how it's written, beside its format. */}
           {video && (
             <>
-              <div className={styles.field} title="Frames a second: 60 looks smoother; the file is heavier">
-                <span className={styles.label}>Frames</span>
+              <div className={styles.field} title={t('Frames a second: 60 looks smoother; the file is heavier')}>
+                <span className={styles.label}>{t('Frames')}</span>
                 <Seg value={prefs.fps} options={[[30, '30 fps'], [60, '60 fps']]} onChange={(v) => setPrefs({ fps: v })} />
               </div>
               <Toggle
-                label="Motion blur"
+                label={t('Motion blur')}
                 checked={blurs && prefs.motionBlur}
                 disabled={!blurs}
                 onChange={(motionBlur) => setPrefs({ motionBlur })}
-                title={blurs ? 'Each frame blends the motion of its instant, as a camera does: the turn looks continuous' : 'MP4 only: WebM records in real time'}
+                title={blurs ? t('Each frame blends the motion of its instant, as a camera does: the turn looks continuous') : t('MP4 only: WebM records in real time')}
               />
             </>
           )}
           {!video && prefs.format !== 'png' && (
             <label className={styles.slider}>
-              <span className={styles.label}>Quality</span>
+              <span className={styles.label}>{t('Quality')}</span>
               <input type="range" min={50} max={100} step={1} value={Math.round(prefs.quality * 100)} onChange={(e) => setPrefs({ quality: Number(e.target.value) / 100 })} />
               <span className={styles.num}>{Math.round(prefs.quality * 100)}</span>
             </label>
@@ -775,30 +779,30 @@ export function CapturePanel(p: CapturePanelProps) {
           <div className={styles.actions}>
             <button className={styles.primary} disabled={!p.frame || busy || !container} onClick={record}>
               <Icon name={busy ? 'hourglass_empty' : 'movie'} size={16} />
-              <span>{busy ? `Recording… ${Math.round(progress * 100)}%` : `Export ${container?.label ?? 'video'}`}</span>
+              <span>{busy ? t('Recording… {percent}%', { percent: Math.round(progress * 100) }) : t('Export {format}', { format: container?.label ?? t('video') })}</span>
             </button>
           </div>
         ) : (
         <div className={styles.actions}>
           <button className={styles.primary} disabled={!p.frame || busy} onClick={save}>
             <Icon name={busy ? 'hourglass_empty' : 'download'} size={16} />
-            <span>{busy ? 'Rendering…' : `Export ${format.label}`}</span>
+            <span>{busy ? t('Rendering…') : t('Export {format}', { format: format.label })}</span>
           </button>
-          <button className={styles.copy} disabled={!p.frame || busy} onClick={copy} title="Copy the picture to the clipboard (as PNG)">
+          <button className={styles.copy} disabled={!p.frame || busy} onClick={copy} title={t('Copy the picture to the clipboard (as PNG)')}>
             <Icon name={copied ? 'check' : 'photo_library'} size={16} />
-            <span>{copied ? 'Copied' : 'Copy'}</span>
+            <span>{copied ? t('Copied') : t('Copy')}</span>
           </button>
         </div>
         )}
         <p className={`${styles.hint} ${styles.file}`}>
           {error
-            ? `Couldn't render: ${error}`
+            ? t("Couldn't render: {error}", { error })
             : video
               ? container
                 ? late > 0
-                  ? `${late} frames came out late: the video may stutter. Try a smaller scale.`
+                  ? plural(late, '{n} frame came out late: the video may stutter. Try a smaller scale.', '{n} frames came out late: the video may stutter. Try a smaller scale.')
                   : `${videoFile} · ${videoPixels![0]} × ${videoPixels![1]} px · ${(playedLength(recorded, prefs.playbackSpeed) ?? sequenceDuration(prefs.sequence)).toFixed(1).replace(/\.0$/, '')} s`
-                : "This browser doesn't record video"
+                : t("This browser doesn't record video")
               : `${file} · ${p.pixels[0]} × ${p.pixels[1]} px`}
         </p>
       </div>
@@ -809,7 +813,7 @@ export function CapturePanel(p: CapturePanelProps) {
 /** What a recording holds, under its buttons: how long, how many touches, its size. */
 function recordingSummary(r: { duration: number; taps: { kind: string }[]; width: number; height: number }): string {
   const touches = r.taps.filter((t) => t.kind === 'down').length;
-  return `${r.duration.toFixed(1)} s recorded · ${touches} ${touches === 1 ? 'touch' : 'touches'} · ${r.width} × ${r.height} px`;
+  return `${t('{seconds} s recorded', { seconds: r.duration.toFixed(1) })} · ${plural(touches, '{n} touch', '{n} touches')} · ${r.width} × ${r.height} px`;
 }
 
 /** An option that's on or off, as the other rows: its name in their column, the switch where their controls start. */

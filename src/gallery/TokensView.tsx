@@ -10,6 +10,7 @@ import { Icon } from '../components/Icon';
 import { CODE_TOKENS_COMMIT, findTokenGroup, groupSize, THEME_MODES, TOKEN_GROUPS, type ElevationToken, type TextStyleToken, type ThemeMode, type Token, type TokenGroup, TOKENS_CODE_LINKED } from '../design/tokenCatalog';
 import type { CodeTextStyle } from '../design/textStyles';
 import styles from './TokensView.module.css';
+import { t } from '../i18n/ui';
 
 /** The first theme alone, for a table whose tokens don't change with the theme. */
 const ONE: ThemeMode[] = [THEME_MODES[0]];
@@ -41,12 +42,12 @@ export function TokensView({ group: id }: { group: string }) {
         </div>
         <p className={styles.note}>
           {group.note}.{' '}
-          {!CODE_LINKED && (NO_APP ? 'HeroCanvas’s own, for its tour: local tokens, not an app’s.' : 'Not linked to the code yet: a code connector shows how the code names each one.')}
+          {!CODE_LINKED && (NO_APP ? t('HeroCanvas’s own, for its tour: local tokens, not an app’s.') : t('Not linked to the code yet: a code connector shows how the code names each one.'))}
           {system && CODE_LINKED && (
             <>
-              In the code: <span className={styles.mono}>{group.codeAccess}.<i>name</i></span>
+              {t('In the code:')} <span className={styles.mono}>{group.codeAccess}.<i>name</i></span>
               {CODE_TOKENS_COMMIT ? ` (${CODE_TOKENS_COMMIT})` : ''}
-              {missing > 0 && <span className={styles.missingNote}> · {missing} not in the code</span>}.
+              {missing > 0 && <span className={styles.missingNote}> · {t('{n} not in the code', { n: missing })}</span>}.
             </>
           )}
         </p>
@@ -58,7 +59,7 @@ export function TokensView({ group: id }: { group: string }) {
           <TokenTable key={sub} title={sub && sub[0].toUpperCase() + sub.slice(1)} tokens={tokens} group={group} marked={marked} />
         ))}
         {!!group.codeOnly?.length && (
-          <Table title="Only in the code · no Figma variable" head={['Code']}>
+          <Table title={t('Only in the code · no Figma variable')} head={[t('Code')]}>
             {group.codeOnly.map((f) => (
               <tr key={f}>
                 <td>
@@ -90,10 +91,10 @@ function CodeCell({ code }: { code: string | null }) {
   if (CODE_LINKED)
     return (
       <td>
-        <span className={styles.missing}>Not in the code</span>
+        <span className={styles.missing}>{t('Not in the code')}</span>
       </td>
     );
-  return <td>{NO_APP ? <span className={styles.local}>Local</span> : <span className={styles.local} title="No code connector yet">—</span>}</td>;
+  return <td>{NO_APP ? <span className={styles.local}>{t('Local')}</span> : <span className={styles.local} title={t('No code connector yet')}>—</span>}</td>;
 }
 
 const isSystem = (g: TokenGroup) => !['palette', 'type-scale', 'other'].includes(g.id);
@@ -129,8 +130,8 @@ function TokenTable({ title, tokens, group, marked }: { title: string; tokens: T
   const system = isSystem(group);
   // Colors show their swatch in each theme's column; other tokens their look in a column of its own, first.
   const color = tokens[0]?.kind === 'color';
-  const values = themed ? modes.map((m) => m.label) : ['Value'];
-  const head = [...(color ? [] : ['']), 'Token', ...(system ? ['Code'] : []), ...values];
+  const values = themed ? modes.map((m) => m.label) : [t('Value')];
+  const head = [...(color ? [] : ['']), t('Token'), ...(system ? [t('Code')] : []), ...values];
   const widths = color ? [modes.length > 2 ? '26%' : '34%', system ? '16%' : undefined] : ['96px', system ? '42%' : '50%', system ? '24%' : undefined];
   return (
     <Table title={title} head={head} widths={widths}>
@@ -182,11 +183,11 @@ function Visual({ t, group }: { t: Token; group: TokenGroup }) {
 /** The code's text styles: a sample in the style itself (its font shorthand), its names and its values. */
 function CodeTextStyleTable({ list, marked }: { list: CodeTextStyle[]; marked: string | null }) {
   return (
-    <Table title="The code's text styles" head={['Sample', 'Code', 'Figma', 'Size', 'Line height', 'Weight']} widths={['24%', '22%', '16%']}>
+    <Table title={t("The code's text styles")} head={[t('Sample'), t('Code'), 'Figma', t('Size'), t('Line height'), t('Weight')]} widths={['24%', '22%', '16%']}>
       {list.map((s) => (
         <tr key={s.name} className={s.name === marked ? styles.marked : ''} data-token={s.name}>
           <td className={styles.sample} style={{ font: `var(--${s.name})` }}>
-            The quick brown fox
+            {t('The quick brown fox')}
           </td>
           <td>
             <Copy text={`${s.widget}('')`} label={s.widget} />
@@ -216,13 +217,13 @@ function TextStyleTable({ list, marked }: { list: TextStyleToken[]; marked: stri
     </td>
   );
   return (
-    <Table title="Figma export · text style variables" head={['Sample', 'Style', 'Code', 'Size', 'Line height', 'Weight']} widths={['24%', '18%', '28%']}>
+    <Table title={t('Figma export · text style variables')} head={[t('Sample'), t('Style'), t('Code'), t('Size'), t('Line height'), t('Weight')]} widths={['24%', '18%', '28%']}>
       {list.map((s) => {
         const p = s.props;
         return (
           <tr key={s.name} className={s.name === marked ? styles.marked : ''} data-token={s.name}>
             <td className={styles.sample} style={{ fontFamily: css(p.family), fontSize: px(p.size), fontWeight: weight(p.weight), lineHeight: px(p.lineHeight), letterSpacing: px(p.letterSpacing) }}>
-              The quick brown fox
+              {t('The quick brown fox')}
             </td>
             <td>
               <Name figma={s.figma} />
@@ -243,7 +244,7 @@ function ElevationTable({ levels, marked }: { levels: ElevationToken[]; marked: 
   const themed = levels.some((e) => THEME_MODES.some((m) => e.shadows[m.id] !== e.shadows[first]));
   const modes = themed ? THEME_MODES : ONE;
   return (
-    <Table head={[...(themed ? modes.map((m) => m.label) : ['']), 'Level', 'Code', 'Shadow']} widths={[...modes.map(() => '80px'), '18%', '34%']}>
+    <Table head={[...(themed ? modes.map((m) => m.label) : ['']), t('Level'), t('Code'), t('Shadow')]} widths={[...modes.map(() => '80px'), '18%', '34%']}>
       {levels.map((e) => (
         <tr key={e.name} className={e.name === marked ? styles.marked : ''} data-token={e.name}>
           {modes.map((m) => (
@@ -279,16 +280,16 @@ const member = (code: string) => code.slice(code.lastIndexOf('.') + 1);
 /** A name to reference (or a shorter `label` for it): click copies it. */
 function Copy({ text, label = text }: { text: string; label?: string }) {
   const [done, setDone] = useState(false);
-  const t = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(t.current), []);
+  const timer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
   const copy = () => {
     void navigator.clipboard?.writeText(text);
     setDone(true);
-    window.clearTimeout(t.current);
-    t.current = window.setTimeout(() => setDone(false), 1200);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setDone(false), 1200);
   };
   return (
-    <button className={styles.copy} title={`Copy ${text}`} onClick={copy}>
+    <button className={styles.copy} title={t('Copy {name}', { name: text })} onClick={copy}>
       <span className={styles.mono}>{label}</span>
       <Icon name={done ? 'check' : 'content_copy'} size={13} />
     </button>

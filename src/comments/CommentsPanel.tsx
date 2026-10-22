@@ -1,7 +1,7 @@
 // The Comments panel, as Figma's: a search, the filters (this screen or every page, kinds, resolved) and the threads of
 // what's on screen (Live or the proposal), newest first. A thread opens beside its pin on the canvas and here, where it
 // unfolds with its replies; opening one left on another view takes the canvas there.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Icon } from '../components/Icon';
 import { findDevice } from '../devices/devices';
@@ -12,11 +12,12 @@ import { SearchField } from '../tools/SearchField';
 import { useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsContext';
 import { Avatar, EditField, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
 import { commentsShared, refresh, useComments, useCommentsOf } from './store';
-import { commentLink, filterThreads, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
+import { commentLink, filterThreads, resolverName, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
 import type { Comment } from './types';
 import { openSheetLink } from '../sim/sheetLinks';
 import panel from '../tools/Panel.module.css';
 import styles from './Comments.module.css';
+import { plural, t } from '../i18n/ui';
 
 export default function CommentsPanel() {
   const { design, variant } = useCommentScope();
@@ -50,39 +51,39 @@ export default function CommentsPanel() {
 
   return (
     <>
-      <SearchField value={query} placeholder="Search comments" onChange={setQuery} />
+      <SearchField value={query} placeholder={t('Search comments')} onChange={setQuery} />
       {!commentsShared() && <SharingNote />}
       <div className={styles.filters}>
         <div className={styles.filterRow}>
           {mode === 'prototype' ? (
-            <div className={styles.segmented} role="radiogroup" aria-label="Pages">
+            <div className={styles.segmented} role="radiogroup" aria-label={t('Pages')}>
               {(['page', 'all'] as const).map((s) => (
                 <button key={s} role="radio" aria-checked={scope === s} className={scope === s ? styles.segOn : ''} onClick={() => setScope(s)}>
-                  {s === 'page' ? 'This screen' : 'All pages'}
+                  {s === 'page' ? t('This screen') : t('All pages')}
                 </button>
               ))}
             </div>
           ) : (
-            <span className={panel.muted}>All pages</span>
+            <span className={panel.muted}>{t('All pages')}</span>
           )}
           <label className={styles.check}>
             <input type="checkbox" checked={resolved} onChange={(e) => setResolvedShown(e.target.checked)} />
-            Resolved
+            {t('Resolved')}
           </label>
         </div>
       </div>
       {state.status === 'error' && (
         <div className={`${panel.section} ${styles.error}`}>
-          Couldn't load the comments.{' '}
+          {t("Couldn't load the comments.")}{' '}
           <button className={panel.link} onClick={() => void refresh(design)}>
-            Try again
+            {t('Try again')}
           </button>
           <div className={panel.muted}>{state.error}</div>
         </div>
       )}
       {state.status === 'loading' && !comments.length ? (
         <div className={panel.section}>
-          <span className={panel.muted}>Loading…</span>
+          <span className={panel.muted}>{t('Loading…')}</span>
         </div>
       ) : threads.length ? (
         <div className={styles.cards}>
@@ -93,11 +94,11 @@ export default function CommentsPanel() {
       ) : (
         <div className={styles.empty}>
           <Icon name="chat_bubble" size={20} />
-          <span>{all.length ? 'Nothing with these filters.' : 'No comments yet.'}</span>
+          <span>{all.length ? t('Nothing with these filters.') : t('No comments yet.')}</span>
           {mode === 'prototype' && !commenting && (
             <button className={panel.btn} onClick={() => setCommenting(true)}>
               <Icon name="add_comment" size={14} />
-              Comment (C)
+              {t('Comment (C)')}
             </button>
           )}
         </div>
@@ -141,7 +142,7 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
         {editing ? <EditField c={root} onDone={() => setEditing(false)} /> : <p className={`${styles.text} ${open ? '' : styles.clamp}`}>{root.body}</p>}
         {!open && replies.length > 0 && (
           <span className={styles.replies}>
-            {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+            {plural(replies.length, '{n} reply', '{n} replies')}
           </span>
         )}
       </div>
@@ -150,7 +151,7 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
           {root.resolvedAt && (
             <div className={styles.resolvedNote}>
               <Icon name="check_circle" size={14} fill />
-              Resolved by {root.resolvedBy ?? 'someone'} · {timeAgo(root.resolvedAt)}
+              {t('Resolved by {name} · {when}', { name: resolverName(root.resolvedBy), when: timeAgo(root.resolvedAt) })}
             </div>
           )}
           {replies.map((r) => (
@@ -166,7 +167,7 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
                 openItsSheet(root);
               }}
             >
-              Show where it was left
+              {t('Show where it was left')}
             </button>
           )}
         </div>
@@ -198,19 +199,29 @@ function SharingNote() {
         <Icon name="forum" size={18} />
       </span>
       <div className={styles.noteText}>
-        <strong>Comments stay in this browser for now</strong>
-        <span>To see the team’s and share yours, connect a shared database. Ask your agent for either:</span>
+        <strong>{t('Comments stay in this browser for now')}</strong>
+        <span>{t('To see the team’s and share yours, connect a shared database. Ask your agent for either:')}</span>
         <ul>
           <li>
-            <b>Supabase</b>, ready to go: a free project, the table from <code>src/comments/supabase.sql</code> and its
-            address and key in <code>src/comments/supabase.json</code>.
+            {fill(t('{supabase}, ready to go: a free project, the table from {sql} and its address and key in {json}.'), {
+              supabase: <b>Supabase</b>,
+              sql: <code>src/comments/supabase.sql</code>,
+              json: <code>src/comments/supabase.json</code>,
+            })}
           </li>
           <li>
-            <b>Another database</b> your team already has: the agent writes its adapter in{' '}
-            <code>src/comments/backend.ts</code>.
+            {fill(t('{other} your team already has: the agent writes its adapter in {adapter}.'), {
+              other: <b>{t('Another database')}</b>,
+              adapter: <code>src/comments/backend.ts</code>,
+            })}
           </li>
         </ul>
       </div>
     </div>
   );
+}
+
+/** A translated sentence with parts set in it (bold, code): each `{name}` in `text` becomes `parts[name]`. */
+function fill(text: string, parts: Record<string, ReactNode>): ReactNode {
+  return text.split(/\{(\w+)\}/).map((piece, i) => <Fragment key={i}>{i % 2 ? parts[piece] : piece}</Fragment>);
 }

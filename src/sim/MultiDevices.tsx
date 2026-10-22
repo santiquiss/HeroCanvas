@@ -25,6 +25,7 @@ import { computeLayout, type Layout } from './layout';
 import { usePan } from './usePan';
 import { VIEW_BAR_H } from './ViewBar';
 import styles from './SimulatorShell.module.css';
+import { t } from '../i18n/ui';
 
 /**
  * Canvas margin around the frames, the same above and below so they center on the frames alone: room for the floating
@@ -36,9 +37,9 @@ const SIDE = 64;
 export const deviceGap = (count: number) => (count <= 2 ? 56 : count === 3 ? 40 : 24);
 
 const TYPES: [DeviceType, string][] = [
-  ['phone', 'Phones'],
-  ['foldable', 'Foldables'],
-  ['tablet', 'Tablets'],
+  ['phone', t('Phones')],
+  ['foldable', t('Foldables')],
+  ['tablet', t('Tablets')],
 ];
 
 /** A native device menu (grouped by type) laid invisibly over its children: any click opens it. */
@@ -87,7 +88,7 @@ function DevicePicker({
 /** A version's name: Live, the proposal, or the proposal and its version. */
 function designLabel(design: string): string {
   const c = designChoice(design)!;
-  if (!c.proposal) return 'Live';
+  if (!c.proposal) return t('Live');
   // By its code, or its folder (a set saved before proposals had codes).
   const p = findProposal(c.proposal);
   if (!p) return c.proposal;
@@ -113,13 +114,13 @@ function DesignPicker({ value, onPick, row = false }: { value?: string; onPick: 
   return (
     <label
       className={row ? `${styles.devMenuRow} ${styles.devDesign}` : `${styles.devChip} ${styles.devDesign} ${value ? styles.devChipOn : ''}`}
-      title={value ? `Version on this device: ${designLabel(value)}` : `Version on this device: the global selection (${designLabel(global)})`}
+      title={value ? t('Version on this device: {design}', { design: designLabel(value) }) : t('Version on this device: the global selection ({design})', { design: designLabel(global) })}
     >
       <Icon name="call_split" size={16} />
-      {row && <span className={styles.devMenuLabel}>Version: {value ? designLabel(value) : `${designLabel(global)} (global)`}</span>}
-      <select value={value ?? ''} onChange={(e) => onPick(e.target.value || undefined)} aria-label="Version on this device">
-        <option value="">{designLabel(global)} (Global selection)</option>
-        <option value="live">Live</option>
+      {row && <span className={styles.devMenuLabel}>{value ? t('Version: {design}', { design: designLabel(value) }) : t('Version: {design} (global)', { design: designLabel(global) })}</span>}
+      <select value={value ?? ''} onChange={(e) => onPick(e.target.value || undefined)} aria-label={t('Version on this device')}>
+        <option value="">{t('{name} (Global selection)', { name: designLabel(global) })}</option>
+        <option value="live">{t('Live')}</option>
         {listedProposals(value?.split('~')[0]).map((p) =>
           p.variants.length ? (
             <optgroup key={p.id} label={proposalLabel(p)}>
@@ -151,12 +152,12 @@ function LanguagePicker({ value, onPick, row = false }: { value?: Language; onPi
   return (
     <label
       className={row ? `${styles.devMenuRow} ${styles.devDesign}` : `${styles.devChip} ${styles.devDesign} ${own ? styles.devChipOn : ''}`}
-      title={own ? `Language on this device: ${own.name}` : `Language on this device: the global one (${global.name})`}
+      title={own ? t('Language on this device: {language}', { language: own.name }) : t('Language on this device: the global one ({language})', { language: global.name })}
     >
       <Icon name="translate" size={16} />
-      {row ? <span className={styles.devMenuLabel}>Language: {own ? own.name : `${global.name} (global)`}</span> : own && <span>{own.id}</span>}
-      <select value={value ?? ''} onChange={(e) => onPick((e.target.value || undefined) as Language | undefined)} aria-label="Language on this device">
-        <option value="">{global.name} (Global selection)</option>
+      {row ? <span className={styles.devMenuLabel}>{own ? t('Language: {language}', { language: own.name }) : t('Language: {language} (global)', { language: global.name })}</span> : own && <span>{own.id}</span>}
+      <select value={value ?? ''} onChange={(e) => onPick((e.target.value || undefined) as Language | undefined)} aria-label={t('Language on this device')}>
+        <option value="">{t('{name} (Global selection)', { name: global.name })}</option>
         {LANGUAGES.map((l) => (
           <option key={l.id} value={l.id}>
             {l.name}
@@ -173,7 +174,7 @@ export function AddDeviceButton({ onPick, side }: { onPick: (id: string) => void
   return (
     <DevicePicker
       className={`${styles.addDevice} ${between ? styles.addDeviceSmall : ''}`}
-      title={between ? 'Add a device here' : `Add a device on the ${side}`}
+      title={between ? t('Add a device here') : side === 'left' ? t('Add a device on the left') : t('Add a device on the right')}
       onPick={onPick}
       tour={between ? undefined : 'add-device'}
     >
@@ -292,13 +293,13 @@ export function DeviceHeader({
         ));
       case 'video':
         return (
-          <button key={p} className={`${styles.devChip} ${video ? styles.devChipOn : ''}`} title="Video layout: 16:9 on top, the app below" onClick={onVideo}>
+          <button key={p} className={`${styles.devChip} ${video ? styles.devChipOn : ''}`} title={t('Video layout: 16:9 on top, the app below')} onClick={onVideo}>
             <Icon name="smart_display" size={16} />
           </button>
         );
       case 'rotate':
         return (
-          <button key={p} data-tour="rotate" className={`${styles.devChip} ${land ? styles.devChipOn : ''}`} title={land ? 'Portrait' : 'Landscape'} onClick={onRotate}>
+          <button key={p} data-tour="rotate" className={`${styles.devChip} ${land ? styles.devChipOn : ''}`} title={land ? t('Portrait') : t('Landscape')} onClick={onRotate}>
             <Icon name="screen_rotation" size={16} />
           </button>
         );
@@ -322,14 +323,14 @@ export function DeviceHeader({
         return (
           <button key={p} className={styles.devMenuRow} onClick={closing(() => onVideo?.())}>
             {check(!!video)}
-            <span className={styles.devMenuLabel}>Video layout</span>
+            <span className={styles.devMenuLabel}>{t('Video layout')}</span>
           </button>
         );
       case 'rotate':
         return (
           <button key={p} className={styles.devMenuRow} onClick={closing(onRotate)}>
             {check(land)}
-            <span className={styles.devMenuLabel}>Landscape</span>
+            <span className={styles.devMenuLabel}>{t('Landscape')}</span>
           </button>
         );
       case 'design':
@@ -342,23 +343,23 @@ export function DeviceHeader({
   return (
     <div ref={root} className={`${styles.devHead} ${menu ? styles.devHeadOpen : ''} ${tight ? styles.devHeadTight : ''} ${className ?? ''}`} style={style} data-canvas-ui>
       {grip && (
-        <span className={styles.devGrip} title="Drag to reorder" {...grip}>
+        <span className={styles.devGrip} title={t('Drag to reorder')} {...grip}>
           <Icon name="drag_indicator" size={16} />
         </span>
       )}
-      <DevicePicker className={styles.devName} value={id} title={`${dev.name} · change device`} onPick={onDevice} tour="device-menu">
+      <DevicePicker className={styles.devName} value={id} title={t('{device} · change device', { device: dev.name })} onPick={onDevice} tour="device-menu">
         <span className={styles.devNameText}>{dev.name}</span>
         {!tight && <Icon name="expand_more" size={16} />}
       </DevicePicker>
       {shown.map(chip)}
       {hidden.length > 0 && (
-        <button className={`${styles.devChip} ${menu ? styles.devChipOn : ''}`} title="More" aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
+        <button className={`${styles.devChip} ${menu ? styles.devChipOn : ''}`} title={t('More')} aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
           <Icon name="more_horiz" size={16} />
         </button>
       )}
       {/* Remove, always shown and last of all. */}
       {onRemove && (
-        <button className={styles.devChip} title="Remove" onClick={onRemove}>
+        <button className={styles.devChip} title={t('Remove')} onClick={onRemove}>
           <Icon name="close" size={16} />
         </button>
       )}

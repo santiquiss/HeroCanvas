@@ -4,6 +4,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { Icon } from '../components/Icon';
 import styles from './CheckDropdown.module.css';
+import { t } from '../i18n/ui';
 
 export interface CheckOption<V extends string> {
   value: V;
@@ -25,7 +26,7 @@ export interface CheckDropdownProps<V extends string> {
   allLabel?: string;
 }
 
-export function CheckDropdown<V extends string>({ label, options, selected, onChange, allLabel = 'All' }: CheckDropdownProps<V>) {
+export function CheckDropdown<V extends string>({ label, options, selected, onChange, allLabel = t('All') }: CheckDropdownProps<V>) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -54,7 +55,7 @@ export function CheckDropdown<V extends string>({ label, options, selected, onCh
 
   const toggle = (v: V) => onChange(selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v]);
   const picked = options.filter((o) => selected.includes(o.value));
-  const summary = !picked.length ? allLabel : picked.length === 1 ? picked[0].label : `${picked.length} selected`;
+  const summary = !picked.length ? allLabel : picked.length === 1 ? picked[0].label : t('{count} selected', { count: picked.length });
 
   return (
     <div ref={root} className={styles.root} onKeyDown={open ? onKey : undefined}>
@@ -79,7 +80,7 @@ export function CheckDropdown<V extends string>({ label, options, selected, onCh
             </label>
           ))}
           <button className={styles.clear} disabled={!selected.length} onClick={() => onChange([])}>
-            <span>Show all</span>
+            <span>{t('Show all')}</span>
           </button>
         </div>
       )}

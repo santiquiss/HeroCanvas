@@ -11,6 +11,8 @@ const config: HeroCanvasConfig = {
    * vivid color that covers a good part of it, made dark enough for white text in light and a step lighter in dark.
    */
   // brand: { light: '#0a5cff', dark: '#3d7dff' },
+  /** The interface's language: `en` or `es` (Spanish). The app's screens keep their own languages (app/config.ts). */
+  // language: 'es',
 };
 
 export default config;

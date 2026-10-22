@@ -11,6 +11,7 @@ import { useLibrary } from '../design/library';
 import styles from './Panel.module.css';
 import { SearchField } from './SearchField';
 import { CheckDropdown } from './CheckDropdown';
+import { t } from '../i18n/ui';
 
 type Grouping = 'tiers' | 'az';
 interface ListPrefs {
@@ -87,18 +88,18 @@ export function ComponentsPanel() {
 
   return (
     <>
-      <SearchField placeholder="Search components" value={q} onChange={setQ} />
+      <SearchField placeholder={t('Search components')} value={q} onChange={setQ} />
       <div className={styles.listTools}>
         <CheckDropdown
-          label="State"
+          label={t('State')}
           options={COMPONENT_STATUSES.map((s) => ({ value: s.key, label: s.label, color: s.color, count: counts.get(s.key) ?? 0 }))}
           selected={prefs.statuses}
           onChange={(statuses) => setPrefs({ ...prefs, statuses })}
         />
-        <div className={styles.segment} title="Group by tier, or one list A–Z">
+        <div className={styles.segment} title={t('Group by tier, or one list A–Z')}>
           {(
             [
-              ['tiers', 'Tiers'],
+              ['tiers', t('Tiers')],
               ['az', 'A–Z'],
             ] as const
           ).map(([g, label]) => (
@@ -110,11 +111,11 @@ export function ComponentsPanel() {
       </div>
       <div className={`${styles.row} ${name == null ? styles.current : ''}`} style={{ paddingLeft: 8 }} onClick={() => openComponent(null)}>
         <Icon name="dashboard" size={16} />
-        <span className={styles.name}>Overview</span>
+        <span className={styles.name}>{t('Overview')}</span>
       </div>
       {prefs.grouping === 'az' ? (
         <div style={{ paddingTop: 6 }}>
-          {all.length ? all.map((n) => row(n, statusOf(stateOf(n)) === 'unreplicated')) : <span className={styles.muted} style={{ display: 'block', padding: '6px 12px' }}>No components</span>}
+          {all.length ? all.map((n) => row(n, statusOf(stateOf(n)) === 'unreplicated')) : <span className={styles.muted} style={{ display: 'block', padding: '6px 12px' }}>{t('No components')}</span>}
         </div>
       ) : (
         tiers.map((tier) => {
@@ -130,7 +131,7 @@ export function ComponentsPanel() {
                 className={styles.sectionTitle}
                 style={{ padding: '6px 12px 2px', margin: 0, ...(skipped ? { color: 'var(--ui-text-subtle)', cursor: 'pointer' } : {}) }}
                 onClick={skipped ? () => setShowSkipped(!open) : undefined}
-                title={skipped ? 'Library components not replicated on purpose: text styles, parts drawn inside another component, components the app doesn’t use' : undefined}
+                title={skipped ? t('Library components not replicated on purpose: text styles, parts drawn inside another component, components the app doesn’t use') : undefined}
               >
                 <span style={{ display: 'flex', alignItems: 'center' }}>
                   {skipped && <Icon name={open ? 'expand_more' : 'chevron_right'} size={14} />}

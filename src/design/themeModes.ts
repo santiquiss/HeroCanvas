@@ -2,6 +2,7 @@
 // own; else each of its themes (appConfig.themes), one that forces light or dark as one mode, one that follows the
 // device as two (Name · Light, Name · Dark). The theme picker and the Tokens view's columns both read this list.
 import { appConfig } from '@app/config';
+import { t } from '../i18n/ui';
 
 export interface ThemeMode {
   /** `light`, `dark`, an app theme's id, or `<id>-light` / `<id>-dark`. */
@@ -15,14 +16,14 @@ export interface ThemeMode {
 const THEMES = appConfig.themes ?? [];
 
 export const THEME_MODES: ThemeMode[] = THEMES.length
-  ? THEMES.flatMap((t) =>
-      t.scheme
-        ? [{ id: t.id, label: t.name, scheme: t.scheme, appTheme: t.id }]
-        : (['light', 'dark'] as const).map((s) => ({ id: `${t.id}-${s}`, label: `${t.name} · ${s === 'light' ? 'Light' : 'Dark'}`, scheme: s, appTheme: t.id })),
+  ? THEMES.flatMap((th) =>
+      th.scheme
+        ? [{ id: th.id, label: th.name, scheme: th.scheme, appTheme: th.id }]
+        : (['light', 'dark'] as const).map((s) => ({ id: `${th.id}-${s}`, label: `${th.name} · ${s === 'light' ? t('Light') : t('Dark')}`, scheme: s, appTheme: th.id })),
     )
   : [
-      { id: 'light', label: 'Light', scheme: 'light' },
-      { id: 'dark', label: 'Dark', scheme: 'dark' },
+      { id: 'light', label: t('Light'), scheme: 'light' },
+      { id: 'dark', label: t('Dark'), scheme: 'dark' },
     ];
 
 /** The mode the screens show, from the URL's app theme (`?apptheme=`, none: the first) and scheme (`?theme=`). */

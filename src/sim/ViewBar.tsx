@@ -6,13 +6,14 @@
 import { Icon } from '../components/Icon';
 import { DEVICE_GROUPS, DEVICES, deviceGroup, type Device, type DeviceType, type Display } from '../devices/devices';
 import type { Mode } from './modes';
+import { t } from '../i18n/ui';
 import styles from './Toolbar.module.css';
 
 /** Device menu groups. */
 const DEVICE_TYPES: [DeviceType, string][] = [
-  ['phone', 'Phones'],
-  ['foldable', 'Foldables'],
-  ['tablet', 'Tablets'],
+  ['phone', t('Phones')],
+  ['foldable', t('Foldables')],
+  ['tablet', t('Tablets')],
 ];
 
 /** Room the canvas keeps for the bar at its top. */
@@ -64,9 +65,9 @@ export function ViewBar(p: ViewBarProps) {
   if (p.mode === 'prototype' && !all)
     return (
       <div className={styles.viewBar} style={p.left ? { left: 12 + p.left } : undefined} data-canvas-ui>
-        <GroupPicker title="Compare: devices side by side, at one scale" onPick={p.onCompare}>
+        <GroupPicker title={t('Compare: devices side by side, at one scale')} onPick={p.onCompare}>
           <Icon name="devices" size={18} />
-          <span>Compare</span>
+          <span>{t('Compare')}</span>
         </GroupPicker>
       </div>
     );
@@ -74,11 +75,11 @@ export function ViewBar(p: ViewBarProps) {
     <div className={styles.viewBar} style={p.left ? { left: 12 + p.left } : undefined} data-canvas-ui>
       {all ? (
         <>
-          <Chip onClick={p.onExit} title="Back to the device you compared from">
+          <Chip onClick={p.onExit} title={t('Back to the device you compared from')}>
             <Icon name="close" size={18} />
-            Exit compare
+            {t('Exit compare')}
           </Chip>
-          <GroupPicker title="Which devices" value={p.group} onPick={p.onCompare}>
+          <GroupPicker title={t('Which devices')} value={p.group} onPick={p.onCompare}>
             <Icon name="devices" size={18} />
             <span>{deviceGroup(p.group).label}</span>
           </GroupPicker>
@@ -87,7 +88,7 @@ export function ViewBar(p: ViewBarProps) {
         <label className={styles.select}>
           <Icon name={p.device.displays[0].w >= 600 ? 'tablet' : 'smartphone'} size={18} />
           <span>{p.device.name}</span>
-          <select value={p.device.id} onChange={(e) => p.onDevice(e.target.value)} title="Device">
+          <select value={p.device.id} onChange={(e) => p.onDevice(e.target.value)} title={t('Device')}>
             {DEVICE_TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
               <optgroup key={type} label={label}>
                 {DEVICES.filter((d) => d.type === type).map((d) => (
@@ -103,27 +104,27 @@ export function ViewBar(p: ViewBarProps) {
       )}
       {all && <span className={styles.viewSep} />}
       {all ? (
-        <div className={styles.segment} title="Arrange devices">
-          <Chip active={p.arrange === 'grid'} onClick={() => p.onArrange('grid')} title="Grid">
+        <div className={styles.segment} title={t('Arrange devices')}>
+          <Chip active={p.arrange === 'grid'} onClick={() => p.onArrange('grid')} title={t('Grid')}>
             <Icon name="grid_view" size={18} />
-            Grid
+            {t('Grid')}
           </Chip>
-          <Chip active={p.arrange === 'row'} onClick={() => p.onArrange('row')} title="One row">
+          <Chip active={p.arrange === 'row'} onClick={() => p.onArrange('row')} title={t('One row')}>
             <Icon name="view_carousel" size={18} />
-            Row
+            {t('Row')}
           </Chip>
         </div>
       ) : null}
       {all ? (
-        <label className={styles.select} title="Sort devices">
+        <label className={styles.select} title={t('Sort devices')}>
           <Icon name="sort" size={18} />
-          <span>{{ type: 'Type', os: 'OS', size: 'Size', width: 'Width', height: 'Height' }[p.sort]}</span>
+          <span>{{ type: t('Type'), os: 'OS', size: t('Size'), width: t('Width'), height: t('Height') }[p.sort]}</span>
           <select value={p.sort} onChange={(e) => p.onSort(e.target.value as DeviceSort)}>
-            <option value="type">Sort by type (phones, foldables, tablets), then OS</option>
-            <option value="os">Sort by OS (iOS, Android)</option>
-            <option value="size">Sort by size (smallest area first)</option>
-            <option value="width">Sort by width (narrowest first)</option>
-            <option value="height">Sort by height (shortest first)</option>
+            <option value="type">{t('Sort by type (phones, foldables, tablets), then OS')}</option>
+            <option value="os">{t('Sort by OS (iOS, Android)')}</option>
+            <option value="size">{t('Sort by size (smallest area first)')}</option>
+            <option value="width">{t('Sort by width (narrowest first)')}</option>
+            <option value="height">{t('Sort by height (shortest first)')}</option>
           </select>
           <Icon name="expand_more" size={18} />
         </label>
@@ -138,14 +139,14 @@ export function ViewBar(p: ViewBarProps) {
       {p.mode !== 'components' && (
         <>
           <span className={styles.viewSep} />
-          <Chip active={p.land} onClick={p.onRotate} title="Rotate device">
+          <Chip active={p.land} onClick={p.onRotate} title={t('Rotate device')}>
             <Icon name="screen_rotation" size={18} />
-            {p.land ? 'Landscape' : 'Portrait'}
+            {p.land ? t('Landscape') : t('Portrait')}
           </Chip>
           {p.display.videoSplit && !p.land && !all && (
-            <Chip active={p.video} onClick={p.onVideo} title="Video layout: a 16:9 video on top, the app below">
+            <Chip active={p.video} onClick={p.onVideo} title={t('Video layout: a 16:9 video on top, the app below')}>
               <Icon name="smart_display" size={18} />
-              Video
+              {t('Video')}
             </Chip>
           )}
         </>
@@ -166,7 +167,7 @@ function GroupPicker({ title, value, onPick, children }: { title: string; value?
           e.target.blur();
         }}
       >
-        {!value && <option value="">Compare…</option>}
+        {!value && <option value="">{t('Compare…')}</option>}
         {DEVICE_GROUPS.map((g) => (
           <option key={g.id} value={g.id}>
             {g.label}
@@ -197,13 +198,13 @@ export function ZoomBar({ zoom, fitScale, onZoom }: { zoom: Zoom; fitScale: numb
   };
   return (
     <div className={styles.zoomBar} data-canvas-ui>
-      <button className={styles.zoomBtn} title="Zoom out" disabled={current <= ZOOMS[0] + 0.001} onClick={() => step(-1)}>
+      <button className={styles.zoomBtn} title={t('Zoom out')} disabled={current <= ZOOMS[0] + 0.001} onClick={() => step(-1)}>
         <Icon name="remove" size={18} />
       </button>
-      <label className={`${styles.select} ${styles.zoomSelect}`} title="Zoom">
-        <span>{zoom === 'fit' ? `Fit · ${pct(fitScale)}` : zoom === 1 ? '1:1' : pct(zoom)}</span>
+      <label className={`${styles.select} ${styles.zoomSelect}`} title={t('Zoom')}>
+        <span>{zoom === 'fit' ? t('Fit · {scale}', { scale: pct(fitScale) }) : zoom === 1 ? '1:1' : pct(zoom)}</span>
         <select value={String(zoom)} onChange={(e) => onZoom(e.target.value === 'fit' ? 'fit' : Number(e.target.value))}>
-          <option value="fit">Fit to canvas</option>
+          <option value="fit">{t('Fit to canvas')}</option>
           {ZOOMS.map((z) => (
             <option key={z} value={String(z)}>
               {z === 1 ? '1:1 (100%)' : pct(z)}
@@ -212,10 +213,10 @@ export function ZoomBar({ zoom, fitScale, onZoom }: { zoom: Zoom; fitScale: numb
         </select>
         <Icon name="expand_more" size={18} />
       </label>
-      <button className={styles.zoomBtn} title="Zoom in" disabled={current >= ZOOMS[ZOOMS.length - 1] - 0.001} onClick={() => step(1)}>
+      <button className={styles.zoomBtn} title={t('Zoom in')} disabled={current >= ZOOMS[ZOOMS.length - 1] - 0.001} onClick={() => step(1)}>
         <Icon name="add" size={18} />
       </button>
-      <button className={styles.zoomBtn} title="Fit to canvas" disabled={zoom === 'fit'} onClick={() => onZoom('fit')}>
+      <button className={styles.zoomBtn} title={t('Fit to canvas')} disabled={zoom === 'fit'} onClick={() => onZoom('fit')}>
         <Icon name="fit_screen" size={18} />
       </button>
     </div>

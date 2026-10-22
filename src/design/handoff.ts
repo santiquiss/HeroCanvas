@@ -10,6 +10,7 @@ import type { ApiParam, ApiWidget, Library } from './library';
 import { componentInstance, type ComponentProps } from './component';
 import { PROPOSAL_STORIES } from './stories';
 import { acceptanceOf, declaredDifferences, isSimulatorProp, kindsOf, lookDifferences, propDecl } from './simulatorProps';
+import { t } from '../i18n/ui';
 
 // ---------------------------------------------------------------- The work: reuse, change, build
 
@@ -17,24 +18,24 @@ export type Work = 'reuse' | 'differs' | 'extend' | 'change' | 'new' | 'app' | '
 
 /** `badge`: Inspect's badge beside the name, the component against the code. */
 export const WORK: Record<Work, { label: string; badge: string; hint: string; color: string }> = {
-  reuse: { label: 'In the library', badge: 'Matches code', hint: 'Use it as it is.', color: '#16a34a' },
+  reuse: { label: t('In the library'), badge: t('Matches code'), hint: t('Use it as it is.'), color: '#16a34a' },
   differs: {
-    label: 'In the library, drawn with something it doesn’t have',
-    badge: 'Differs',
-    hint: 'The simulator draws it with props the widget has no parameter for (Code API, below: a Figma option, a size, a state): to agree on with design and the app.',
+    label: t('In the library, drawn with something it doesn’t have'),
+    badge: t('Differs'),
+    hint: t('The simulator draws it with props the widget has no parameter for (Code API, below: a Figma option, a size, a state): to agree on with design and the app.'),
     color: '#d97706',
   },
   extend: {
-    label: 'In the library, with parameters a proposal adds',
-    badge: 'Differs',
-    hint: 'Use the widget; this screen also sets parameters it doesn’t have yet, which a proposal specifies (Code API, below): add them to the widget first.',
+    label: t('In the library, with parameters a proposal adds'),
+    badge: t('Differs'),
+    hint: t('Use the widget; this screen also sets parameters it doesn’t have yet, which a proposal specifies (Code API, below): add them to the widget first.'),
     color: CHANGE.changed.color,
   },
-  change: { label: 'Changed in this proposal', badge: 'Differs', hint: 'It exists in the library; this proposal changes it.', color: CHANGE.changed.color },
-  new: { label: 'New in this proposal', badge: 'New', hint: 'Not in the library yet: build it.', color: CHANGE.new.color },
-  app: { label: 'In the app, not in the library', badge: 'In app', hint: 'The app builds it itself, not with a component of its library: until it moves into the library, the app’s is the reference.', color: '#2563eb' },
+  change: { label: t('Changed in this proposal'), badge: t('Differs'), hint: t('It exists in the library; this proposal changes it.'), color: CHANGE.changed.color },
+  new: { label: t('New in this proposal'), badge: t('New'), hint: t('Not in the library yet: build it.'), color: CHANGE.new.color },
+  app: { label: t('In the app, not in the library'), badge: t('In app'), hint: t('The app builds it itself, not with a component of its library: until it moves into the library, the app’s is the reference.'), color: '#2563eb' },
   // Only here: not in the app's code (yet). Where it came from (a design file, a proposal) is a note, not a state.
-  build: { label: 'Local', badge: 'Local', hint: 'Only in HeroCanvas, not in the app’s code: drawn here, from a design or for a proposal.', color: '#9aa0a8' },
+  build: { label: t('Local'), badge: t('Local'), hint: t('Only in HeroCanvas, not in the app’s code: drawn here, from a design or for a proposal.'), color: '#9aa0a8' },
 };
 
 export { APP_WIDGETS };

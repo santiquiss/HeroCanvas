@@ -7,6 +7,7 @@ import { Icon } from '../components/Icon';
 import { modeSwatch } from '../design/tokenCatalog';
 import { modeIn, modeParams, THEME_MODES, type ThemeMode } from '../design/themeModes';
 import { useUrlParams, useUrlPatch } from './SimContext';
+import { t } from '../i18n/ui';
 import styles from './ThemeSwitch.module.css';
 
 const OWN_THEMES = THEME_MODES.some((m) => m.appTheme);
@@ -19,7 +20,7 @@ export function ThemeSwitch({ floating, className }: { floating?: boolean; class
   const place = `${floating ? styles.floating : ''} ${className ?? ''}`;
   if (OWN_THEMES) return <ThemeDropdown current={current} onPick={pick} className={place} />;
   return (
-    <span className={`${styles.seg} ${place}`} role="group" aria-label="Theme" data-canvas-ui data-tour="screen-theme">
+    <span className={`${styles.seg} ${place}`} role="group" aria-label={t('Theme')} data-canvas-ui data-tour="screen-theme">
       {THEME_MODES.map((m) => (
         <button key={m.id} className={m.id === current.id ? styles.on : ''} onClick={() => pick(m)}>
           <Icon name={m.scheme === 'light' ? 'light_mode' : 'dark_mode'} size={14} />
@@ -65,13 +66,13 @@ function ThemeDropdown({ current, onPick, className }: { current: ThemeMode; onP
   };
   return (
     <span ref={root} className={`${styles.dropdown} ${className}`} data-canvas-ui data-tour="screen-theme" onKeyDown={open ? onKey : undefined}>
-      <button className={styles.trigger} aria-haspopup="listbox" aria-expanded={open} aria-label={`Theme: ${current.label}`} onClick={() => setOpen((o) => !o)}>
+      <button className={styles.trigger} aria-haspopup="listbox" aria-expanded={open} aria-label={t('Theme: {theme}', { theme: current.label })} onClick={() => setOpen((o) => !o)}>
         <Swatch mode={current} />
         <span>{current.label}</span>
         <Icon name="expand_more" size={16} />
       </button>
       {open && (
-        <div ref={list} className={styles.menu} role="listbox" aria-label="Theme">
+        <div ref={list} className={styles.menu} role="listbox" aria-label={t('Theme')}>
           {THEME_MODES.map((m) => (
             <button
               key={m.id}

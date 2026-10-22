@@ -7,6 +7,7 @@ import { findProposal, proposalChanges, VARIANT_PARAM, type ProposalChanges } fr
 import { useUrlParams } from '../sim/SimContext';
 import { CHANGE, type ChangeKind } from './changes';
 import styles from './ChangeCounts.module.css';
+import { t } from '../i18n/ui';
 
 /** The order changes are listed and counted in: new first, then changed, then removed. */
 export const CHANGE_ORDER: ChangeKind[] = ['new', 'changed', 'removed'];
@@ -26,7 +27,7 @@ export function ChangeCounts({ counts, compact = false }: { counts: Record<Chang
   return (
     <span className={`${styles.counts} ${compact ? styles.compact : ''}`}>
       {kinds.map((k) => (
-        <span key={k} className={styles.count} title={`${counts[k]} ${CHANGE[k].label.toLowerCase()}`}>
+        <span key={k} className={styles.count} title={t('{label}: {n}', { label: CHANGE[k].label, n: counts[k] })}>
           <span className={styles.dot} style={{ background: CHANGE[k].color }} />
           {counts[k]}
         </span>

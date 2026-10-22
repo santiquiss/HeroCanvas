@@ -1,5 +1,6 @@
 // Pure helpers over a design's comments: threads, what's open, counts per page, how a date reads.
 import type { Comment, CommentKind } from './types';
+import { t } from '../i18n/ui';
 
 export interface Thread {
   root: Comment;
@@ -50,7 +51,7 @@ export function openByPage(comments: Comment[]): Map<string, number> {
 /** "now", "5m", "3h", "2d", then the date: short, for a list. */
 export function timeAgo(iso: string, now = Date.now()): string {
   const s = Math.max(0, (now - Date.parse(iso)) / 1000);
-  if (s < 60) return 'now';
+  if (s < 60) return t('now');
   if (s < 3600) return `${Math.floor(s / 60)}m`;
   if (s < 86400) return `${Math.floor(s / 3600)}h`;
   if (s < 7 * 86400) return `${Math.floor(s / 86400)}d`;
@@ -91,3 +92,9 @@ export function personColor(name: string): string {
   for (const ch of name.trim().toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return PEOPLE[h % PEOPLE.length];
 }
+
+/** Who resolved a thread when they gave no name: stored as is, in no language, and shown in the interface's. */
+export const UNKNOWN_RESOLVER = 'Someone';
+
+/** A thread's resolver as the interface shows them. */
+export const resolverName = (by: string | null): string => (!by || by === UNKNOWN_RESOLVER ? t('someone') : by);

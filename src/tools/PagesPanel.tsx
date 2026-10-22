@@ -8,15 +8,18 @@ import { useNavRoot } from '../nav/context';
 import { stepOf, stepState } from '../nav/flow';
 import { ChangeBadge } from '../flow/FlowView';
 import type { Manifest } from '../nav/stack';
-import { pageIcon, pageName, ROLE_ICONS, sameRef } from '../nav/stack';
+import { pageIcon, pageName, ROLE_ICONS, ROLE_NAMES, sameRef } from '../nav/stack';
 import type { FlowStep, PageDef, PageRef, PageStatus } from '../nav/types';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
 import { HOME, LAUNCH } from '../nav/pages';
 import { replayLaunch } from '../sim/launch';
+import { t } from '../i18n/ui';
 
 export const STATUS_COLOR: Record<PageStatus, string> = { done: '#16a34a', pending: '#f59e0b', placeholder: '#c4c8ce' };
+/** A page's status as its row shows it (the manifest's words are its ids). */
+export const STATUS_WORD: Record<PageStatus, string> = { done: t('done'), pending: t('pending'), placeholder: t('placeholder') };
 
 const childrenOf = (pages: Manifest, id: string) => Object.keys(pages).filter((k) => pages[k].parent === id && pages[k].level !== 'tab' && !pages[k].modeOf);
 /** Other modes of a page's screen (`modeOf`): listed with it, as its states. */
@@ -38,16 +41,16 @@ export function PagesPanel() {
   // Boot pages (a welcome flow) start before the app: their own group, above the tabs (and under the launch).
   const groups = boots.length || LAUNCH
     ? [
-        ...(boots.length ? [{ label: 'Before the app', roots: boots }] : []),
-        { label: 'App', roots: app },
+        ...(boots.length ? [{ label: t('Before the app'), roots: boots }] : []),
+        { label: t('App'), roots: app },
       ]
     : [{ label: null, roots: app }];
   return (
     <>
       {/* A search shows every match's branch open, whatever is collapsed: nothing to collapse then. */}
-      <SearchField placeholder="Search pages" value={q} onChange={setQ} action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? 'Expand all' : 'Collapse all'} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />} />
+      <SearchField placeholder={t('Search pages')} value={q} onChange={setQ} action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? t('Expand all') : t('Collapse all')} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />} />
       <div style={{ paddingBottom: 12 }}>
-        {LAUNCH && 'launch screen'.includes(query) && <LaunchRow />}
+        {LAUNCH && t('Launch screen').toLowerCase().includes(query) && <LaunchRow />}
         {groups.map((g) => (
           <Fragment key={g.label ?? 'app'}>
             {/* A group's title only while something in it matches the search. */}
@@ -173,7 +176,7 @@ function Row({ depth, def, label, refOf, caret, onCaret, onClick, variant, count
       )}
       {/* A variant (the same screen with other data) or a mode of it: stacked screens, softer than a page's icon. */}
       {variant ? (
-        <span className={styles.variantIcon} title="A variant of this screen">
+        <span className={styles.variantIcon} title={t('A variant of this screen')}>
           <Icon name="auto_awesome_motion" size={16} />
         </span>
       ) : (
@@ -185,8 +188,8 @@ function Row({ depth, def, label, refOf, caret, onCaret, onClick, variant, count
       <span className={styles.name}>{label}</span>
       {count != null && <span className={styles.muted}>{count}</span>}
       {!variant && nav.change(refOf?.id ?? pageIdOf(def, nav.pages)) && <ChangeBadge change={nav.change(refOf?.id ?? pageIdOf(def, nav.pages))!} />}
-      {!variant && def.level !== 'tab' && <span className={styles.badge}>{def.level}</span>}
-      {!variant && <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} title={def.status} />}
+      {!variant && def.level !== 'tab' && <span className={styles.badge}>{ROLE_NAMES[def.level]}</span>}
+      {!variant && <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} title={def.status && STATUS_WORD[def.status]} />}
     </div>
   );
 }
@@ -203,13 +206,13 @@ function LaunchRow() {
   };
   return (
     <>
-      <div className={styles.treeGroup}>Launch</div>
-      <div className={styles.row} style={{ paddingLeft: 8 }} onClick={play} title="Play the launch on every device (again each time)">
+      <div className={styles.treeGroup}>{t('Launch')}</div>
+      <div className={styles.row} style={{ paddingLeft: 8 }} onClick={play} title={t('Play the launch on every device (again each time)')}>
         <span className={styles.caret} />
         <span className={styles.roleIcon}>
           <Icon name="rocket_launch" size={16} />
         </span>
-        <span className={styles.name}>Launch screen</span>
+        <span className={styles.name}>{t('Launch screen')}</span>
         <span className={styles.launchPlay}>
           <Icon name="replay" size={15} />
         </span>

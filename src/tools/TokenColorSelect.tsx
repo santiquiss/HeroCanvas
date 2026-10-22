@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { findToken, TOKEN_GROUPS } from '../design/tokenCatalog';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 const VAR = /^var\(--([\w-]+)\)$/;
 
@@ -59,21 +60,21 @@ export function TokenColorSelect({ value, options, onChange }: { value: string; 
       return (
         <>
           <span className={`${styles.swatch} ${styles.swatchNone}`} />
-          <span className={styles.tokenName}>None</span>
+          <span className={styles.tokenName}>{t('None')}</span>
         </>
       );
-    const t = tokenLabel(o);
+    const tok = tokenLabel(o);
     return (
       <>
-        <span className={styles.swatch} style={{ background: t.swatch }} />
-        <span className={styles.tokenName}>{t.name}</span>
-        {showGroup && <span className={styles.tokenGroup}>{t.group}</span>}
+        <span className={styles.swatch} style={{ background: tok.swatch }} />
+        <span className={styles.tokenName}>{tok.name}</span>
+        {showGroup && <span className={styles.tokenGroup}>{tok.group}</span>}
       </>
     );
   };
   return (
     <div ref={root} className={styles.tokenSelect}>
-      <button className={styles.tokenButton} aria-haspopup="listbox" aria-expanded={open} title={value ? tokenLabel(value).css : 'None'} onClick={() => setOpen(!open)}>
+      <button className={styles.tokenButton} aria-haspopup="listbox" aria-expanded={open} title={value ? tokenLabel(value).css : t('None')} onClick={() => setOpen(!open)}>
         {row(value)}
         <Icon name="expand_more" size={14} />
       </button>

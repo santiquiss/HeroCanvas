@@ -5,15 +5,16 @@ import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
 import { flowTransitions, isVariant, stepOf, stepState } from '../nav/flow';
-import { HOLD_PARAM, stateKeys } from '../nav/stack';
+import { HOLD_PARAM, ROLE_NAMES, stateKeys } from '../nav/stack';
 import { isFullScreen } from '../nav/types';
 import { DEVICES, displayId, findDevice, findDisplay, type Device, type Display } from '../devices/devices';
 import { landscapeFor, sideColumnFor, splitFor, supportsLandscape, useScreenConfigLayers } from '../nav/screenConfig';
 import { listDetailActive, LIST_DETAIL_BOTTOM_NAV_MIN } from '../sim/layout';
 import { parseDevices } from '../sim/deviceSet';
 import { useSim, useUrlPatch } from '../sim/SimContext';
-import { STATUS_COLOR } from './PagesPanel';
+import { STATUS_COLOR, STATUS_WORD } from './PagesPanel';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 export function PageInspector() {
   const nav = useNavRoot();
@@ -41,22 +42,22 @@ export function PageInspector() {
       <div className={styles.section}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: '20px' }}>{nav.title(top)}</span>
-          <span className={styles.badge}>{def.level}</span>
+          <span className={styles.badge}>{ROLE_NAMES[def.level]}</span>
         </div>
         <div className={styles.kv}>
-          <span className={styles.k}>Id</span>
+          <span className={styles.k}>{t('Id')}</span>
           <span className={`${styles.v} ${styles.mono}`}>{top.id}</span>
-          <span className={styles.k}>Path</span>
+          <span className={styles.k}>{t('Path')}</span>
           <span className={`${styles.v} ${styles.mono}`}>{def.path}</span>
-          <span className={styles.k}>Status</span>
+          <span className={styles.k}>{t('Status')}</span>
           <span className={styles.v} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} />
-            {def.status ?? 'placeholder'}
+            {STATUS_WORD[def.status ?? 'placeholder']}
           </span>
           <LandscapeSupport id={top.id} />
           {def.note && (
             <>
-              <span className={styles.k}>Note</span>
+              <span className={styles.k}>{t('Note')}</span>
               <span className={styles.v}>{def.note}</span>
             </>
           )}
@@ -67,7 +68,7 @@ export function PageInspector() {
 
 
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Params</div>
+        <div className={styles.sectionTitle}>{t('Params')}</div>
         {params.length || state.length ? (
           <div className={styles.kv}>
             {params.map(([k, v]) => (
@@ -78,15 +79,15 @@ export function PageInspector() {
             ))}
           </div>
         ) : (
-          <span className={styles.muted}>None</span>
+          <span className={styles.muted}>{t('None')}</span>
         )}
       </div>
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>
-          Open pages
+          {t('Open pages')}
           <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-            {nav.stack.length === 1 ? 'this one' : `${nav.stack.length}, bottom to top`}
+            {nav.stack.length === 1 ? t('this one') : t('{count}, bottom to top', { count: nav.stack.length })}
           </span>
         </div>
         <div className={styles.crumbs}>
@@ -97,12 +98,12 @@ export function PageInspector() {
                 key={i}
                 className={styles.crumb}
                 style={{ paddingLeft: 6 + i * 12, fontWeight: isTop ? 600 : 400 }}
-                title={isTop ? 'This page' : 'Go back to this page'}
+                title={isTop ? t('This page') : t('Go back to this page')}
                 onClick={() => !isTop && nav.setStack(nav.stack.slice(0, i + 1))}
               >
                 <Icon name={i === 0 ? 'home' : 'subdirectory_arrow_right'} size={14} />
                 <span className={styles.name}>{nav.title(r)}</span>
-                <span className={styles.badge}>{nav.def(r.id).level}</span>
+                <span className={styles.badge}>{ROLE_NAMES[nav.def(r.id).level]}</span>
               </button>
             );
           })}
@@ -111,10 +112,10 @@ export function PageInspector() {
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>
-          Link
+          {t('Link')}
           <button className={styles.btn} onClick={copy}>
             <Icon name={copied ? 'check' : 'link'} size={14} />
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? t('Copied') : t('Copy')}
           </button>
         </div>
         <span className={`${styles.mono} ${styles.v}`} style={{ color: 'var(--ui-text-2)' }}>
@@ -123,17 +124,17 @@ export function PageInspector() {
       </div>
 
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>Layout</div>
+        <div className={styles.sectionTitle}>{t('Layout')}</div>
         <div className={styles.kv}>
-          <Pair k="Viewport" v={`${L.vw} × ${L.vh}`} />
-          <Pair k="Class" v={`${L.isTablet ? 'Tablet' : 'Phone'} · ${L.os} · ${L.horizontalSizeClass}${L.land ? ' · landscape' : ''}${L.rotLocked ? ' · rotation locked' : ''}`} />
-          <Pair k="Navigation" v={navigationOf(L)} />
+          <Pair k={t('Viewport')} v={`${L.vw} × ${L.vh}`} />
+          <Pair k={t('Class')} v={`${L.isTablet ? t('Tablet') : t('Phone')} · ${L.os} · ${L.horizontalSizeClass}${L.land ? ` · ${t('landscape')}` : ''}${L.rotLocked ? ` · ${t('rotation locked')}` : ''}`} />
+          <Pair k={t('Navigation')} v={navigationOf(L)} />
           <ListDetailRows />
-          {L.sideNav && <Pair k="Right column" v={sideColumnFor(top.id, def, cfg) === 'nav' ? 'The navigation, under the status' : 'Empty: kept for the status'} />}
-          {L.split && !nav.def(nav.stack[0].id).split && <Pair k="Side panel" v={L.dashOpen ? `Open beside the page · ${L.detailW} wide` : `Opens beside the page when one is pushed · ${L.detailW} wide`} />}
-          <Pair k="Content" v={`${L.contentW}px · ${L.cols} cols`} />
-          <Pair k="Safe area" v={`top ${L.sbH} · bottom ${L.botIn}${L.safeL ? ` · left ${L.safeL}` : ''}`} />
-          {L.reserved && <Pair k="Reserved" v={`top-right ${L.reserved.width}×${L.reserved.height} · header inset ${L.headerInsetR}`} />}
+          {L.sideNav && <Pair k={t('Right column')} v={sideColumnFor(top.id, def, cfg) === 'nav' ? t('The navigation, under the status') : t('Empty: kept for the status')} />}
+          {L.split && !nav.def(nav.stack[0].id).split && <Pair k={t('Side panel')} v={L.dashOpen ? t('Open beside the page · {width} wide', { width: L.detailW }) : t('Opens beside the page when one is pushed · {width} wide', { width: L.detailW })} />}
+          <Pair k={t('Content')} v={t('{width}px · {cols} cols', { width: L.contentW, cols: L.cols })} />
+          <Pair k={t('Safe area')} v={L.safeL ? t('top {top} · bottom {bottom} · left {left}', { top: L.sbH, bottom: L.botIn, left: L.safeL }) : t('top {top} · bottom {bottom}', { top: L.sbH, bottom: L.botIn })} />
+          {L.reserved && <Pair k={t('Reserved')} v={t('top-right {size} · header inset {inset}', { size: `${L.reserved.width}×${L.reserved.height}`, inset: L.headerInsetR })} />}
         </div>
       </div>
     </>
@@ -163,20 +164,20 @@ function FlowSection({ id }: { id: string }) {
   return (
     <div className={styles.section}>
       <div className={styles.sectionTitle}>
-        Flow
+        {t('Flow')}
         <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-          step {i + 1} of {flow.steps.length}
+          {t('step {step} of {count}', { step: i + 1, count: flow.steps.length })}
         </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <button className={styles.btn} style={{ padding: 2 }} title="Previous step" disabled={i === 0} onClick={() => show(flow.steps[i - 1].id)}>
+        <button className={styles.btn} style={{ padding: 2 }} title={t('Previous step')} disabled={i === 0} onClick={() => show(flow.steps[i - 1].id)}>
           <Icon name="chevron_left" size={16} />
         </button>
         <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
           <Icon name={step.kind === 'loading' ? 'hourglass_empty' : 'crop_portrait'} size={16} />
           <span className={styles.name}>{step.label}</span>
         </span>
-        <button className={styles.btn} style={{ padding: 2 }} title="Next step" disabled={i === flow.steps.length - 1} onClick={() => show(flow.steps[i + 1].id)}>
+        <button className={styles.btn} style={{ padding: 2 }} title={t('Next step')} disabled={i === flow.steps.length - 1} onClick={() => show(flow.steps[i + 1].id)}>
           <Icon name="chevron_right" size={16} />
         </button>
       </div>
@@ -186,7 +187,7 @@ function FlowSection({ id }: { id: string }) {
         </div>
       )}
       {states.length > 1 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }} role="radiogroup" aria-label="States">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }} role="radiogroup" aria-label={t('States')}>
           {states.map((v, k) => (
             <button key={v.label} role="radio" aria-checked={k === at} className={`${styles.btn} ${k === at ? styles.btnActive : ''}`} onClick={() => nav.open(id, top.params, stepState(def, step, v))}>
               {v.label}
@@ -195,25 +196,25 @@ function FlowSection({ id }: { id: string }) {
         </div>
       )}
       {held && (
-        <button className={styles.btn} style={{ marginBottom: 8 }} title="Let this loader move on, as in the app" onClick={() => patch({ [HOLD_PARAM]: null })}>
+        <button className={styles.btn} style={{ marginBottom: 8 }} title={t('Let this loader move on, as in the app')} onClick={() => patch({ [HOLD_PARAM]: null })}>
           <Icon name="play_arrow" size={14} />
-          Paused · play
+          {t('Paused · play')}
         </button>
       )}
       <div className={styles.kv}>
-        {out.map((t, k) => (
+        {out.map((tr, k) => (
           <Fragment key={k}>
-            <span className={styles.k}>{t.auto ? 'After' : t.label}</span>
+            <span className={styles.k}>{tr.auto ? t('After') : tr.label}</span>
             <span className={styles.v}>
-              {t.to ? (
-                <button className={styles.link} onClick={() => show(t.to!)}>
-                  {t.auto && `${t.label} → `}
-                  {flow.steps.find((s) => s.id === t.to)?.label ?? t.to}
+              {tr.to ? (
+                <button className={styles.link} onClick={() => show(tr.to!)}>
+                  {tr.auto && `${tr.label} → `}
+                  {flow.steps.find((s) => s.id === tr.to)?.label ?? tr.to}
                 </button>
               ) : (
-                <span className={styles.muted}>leaves the flow</span>
+                <span className={styles.muted}>{t('leaves the flow')}</span>
               )}
-              {t.when && <span className={styles.muted}> · {t.when}</span>}
+              {tr.when && <span className={styles.muted}> · {tr.when}</span>}
             </span>
           </Fragment>
         ))}
@@ -262,11 +263,11 @@ function LandscapeSupport({ id }: { id: string }) {
   const displays = onCanvas.length ? onCanvas : DEVICES.flatMap((device) => device.displays.map((display) => ({ device, display })));
   const turning = displays.filter(({ device, display }) => supportsLandscape(setting, device, display));
   const name = ({ device, display }: { device: Device; display: Display }) => `${device.name}${device.displays.length > 1 ? ` · ${display.label.split(' ')[0]}` : ''}`;
-  const value = !turning.length ? 'Not supported · portrait only' : turning.length === displays.length ? 'Supported' : `Supported on ${turning.map(name).join(', ')}`;
+  const value = !turning.length ? t('Not supported · portrait only') : turning.length === displays.length ? t('Supported') : t('Supported on {devices}', { devices: turning.map(name).join(', ') });
   return (
     <>
-      <span className={styles.k} title="Whether the page turns with the device. Set in code: landscape, in app/pages.tsx">
-        Landscape
+      <span className={styles.k} title={t('Whether the page turns with the device. Set in code: landscape, in app/pages.tsx')}>
+        {t('Landscape')}
       </span>
       <span className={styles.v}>{value}</span>
     </>
@@ -275,8 +276,8 @@ function LandscapeSupport({ id }: { id: string }) {
 
 /** Where the app's navigation is on this display, in words. */
 function navigationOf(L: ReturnType<typeof useSim>['layout']): string {
-  if (L.nav === 'rail' && L.railW <= L.safeL) return 'None of the tool’s: the app’s own (a sidebar, a header)';
-  return { column: 'A column at the right', rail: 'A rail at the left', bottom: 'A bar at the bottom' }[L.nav];
+  if (L.nav === 'rail' && L.railW <= L.safeL) return t('None of the tool’s: the app’s own (a sidebar, a header)');
+  return { column: t('A column at the right'), rail: t('A rail at the left'), bottom: t('A bar at the bottom') }[L.nav];
 }
 
 /**
@@ -298,12 +299,12 @@ function ListDetailRows() {
           const width = isFullScreen(def.level) ? L.vw : def.level === 'tab' ? L.baseW : L.split ? L.detailW : L.mainW;
           const need = L.bottomNav ? Math.max(eff.minWidth, LIST_DETAIL_BOTTOM_NAV_MIN) : eff.minWidth;
           const side = listDetailActive(L, width, eff.minWidth);
-          const list = eff.ratio === 'equal' ? 'half each' : `the list ${eff.masterWidth} wide`;
+          const list = eff.ratio === 'equal' ? t('half each') : t('the list {width} wide', { width: eff.masterWidth });
           return (
             <Pair
               key={r.id}
-              k={`List & detail${nav.stack.filter((x) => nav.def(x.id).split).length > 1 ? ` · ${nav.title(r)}` : ''}`}
-              v={side ? `Side by side here (${list}): ${width} ≥ ${need}` : `One at a time here: side by side from ${need} wide (${width} here)`}
+              k={`${t('List & detail')}${nav.stack.filter((x) => nav.def(x.id).split).length > 1 ? ` · ${nav.title(r)}` : ''}`}
+              v={side ? t('Side by side here ({list}): {width} ≥ {need}', { list, width, need }) : t('One at a time here: side by side from {need} wide ({width} here)', { need, width })}
             />
           );
         })}

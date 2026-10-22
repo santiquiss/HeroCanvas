@@ -8,8 +8,9 @@ import { CHANGE, type ChangeKind } from '../design/changes';
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
-import { pageIcon, pageName, parsePath } from '../nav/stack';
+import { pageIcon, pageName, parsePath, ROLE_NAMES } from '../nav/stack';
 import { lastPrototypeUrl } from '../sim/modes';
+import type { PageStatus } from '../nav/types';
 import type { Layout } from '../sim/layout';
 import { useSim } from '../sim/SimContext';
 import { STATUS_COLOR } from '../tools/PagesPanel';
@@ -20,6 +21,7 @@ import { PageCard } from './PageCard';
 import { PageCommentCount } from '../comments';
 import { PreviewScreen } from './PreviewScreen';
 import styles from './Flow.module.css';
+import { plural, t } from '../i18n/ui';
 
 /** Thumbnail scale relative to the device. */
 const S = 0.32;
@@ -216,18 +218,18 @@ export function FlowView({ makeLayout }: { makeLayout: (detailOpen: boolean, pag
         </div>
       )}
 
-      <div className={styles.hint}>Drag or scroll to pan · ⌘ / Ctrl + scroll to zoom · click a screen to open it</div>
+      <div className={styles.hint}>{t('Drag or scroll to pan · ⌘ / Ctrl + scroll to zoom · click a screen to open it')}</div>
       <div className={styles.zoom} onPointerDown={(e) => e.stopPropagation()}>
-        <button title="Zoom out" onClick={() => zoomBy(1 / 1.25)}>
+        <button title={t('Zoom out')} onClick={() => zoomBy(1 / 1.25)}>
           <Icon name="remove" size={18} />
         </button>
-        <button title="Zoom to 100%" onClick={() => live.current && setView({ ...live.current, k: 1 })}>
+        <button title={t('Zoom to 100%')} onClick={() => live.current && setView({ ...live.current, k: 1 })}>
           {Math.round((view?.k ?? 1) * 100)}%
         </button>
-        <button title="Zoom in" onClick={() => zoomBy(1.25)}>
+        <button title={t('Zoom in')} onClick={() => zoomBy(1.25)}>
           <Icon name="add" size={18} />
         </button>
-        <button title="Fit all" onClick={fit}>
+        <button title={t('Fit all')} onClick={fit}>
           <Icon name="fit_screen" size={18} />
         </button>
       </div>
@@ -331,11 +333,11 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
           <div className={styles.nodeHead}>
             <Icon name={pageIcon(def)} size={16} />
             <span className={styles.name}>{name}</span>
-            {def.level !== 'tab' && <span className={styles.badge}>{def.level}</span>}
-            {def.flow && <span className={styles.badge}>flow · {def.flow.steps.length} steps</span>}
+            {def.level !== 'tab' && <span className={styles.badge}>{ROLE_NAMES[def.level]}</span>}
+            {def.flow && <span className={styles.badge}>{plural(def.flow.steps.length, 'flow · {n} step', 'flow · {n} steps')}</span>}
             {nav.change(id) && <ChangeBadge change={nav.change(id)!} />}
             <PageCommentCount page={id} />
-            <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} title={def.status} />
+            <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} title={def.status && STATUS_WORD[def.status]} />
           </div>
         );
         if (def.flow) {
@@ -354,7 +356,7 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
             <div
               className={`${styles.thumb} ${id === current ? styles.current : ''}`}
               style={{ width: w, height: h, borderRadius: radius }}
-              title={far ? name : 'Open in the prototype'}
+              title={far ? name : t('Open in the prototype')}
               onClick={() => moved.current < 4 && nav.open(id, params)}
             >
               {far ? (
@@ -380,6 +382,9 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
     </>
   );
 });
+
+/** A page's status as its dot's tooltip names it (the words of Pages). */
+const STATUS_WORD: Record<PageStatus, string> = { done: t('done'), pending: t('pending'), placeholder: t('placeholder') };
 
 const clamp = (k: number) => Math.max(0.1, Math.min(2, k));
 
@@ -440,7 +445,7 @@ export function ChangeBadge({ change }: { change: ChangeKind }) {
         flex: 'none',
       }}
     >
-      {change}
+      {CHANGE[change].label}
     </span>
   );
 }

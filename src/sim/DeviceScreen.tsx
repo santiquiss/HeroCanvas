@@ -36,6 +36,7 @@ import { usePresence } from './usePresence';
 import { ScreenLayerCtx } from './screenLayer';
 import { SHEET_ATTR } from './sheetLinks';
 import { sheetPresentation } from './sheetPresentation';
+import { t } from '../i18n/ui';
 
 const T = `transform ${PAGE_MS}ms ${EASE}`;
 const SHADOW = '-8px 0 24px rgba(0,0,0,0.12)';
@@ -129,13 +130,13 @@ function PageView({ entry }: { entry: Entry }) {
   if (!def)
     return (
       <div style={{ padding: 24, color: 'var(--text-normal-muted)', fontSize: 15, lineHeight: '22px', textAlign: 'center' }}>
-        This page isn't in {own?.proposal ? 'this version' : 'Live'}.
+        {own?.proposal ? t("This page isn't in this version.") : t("This page isn't in Live.")}
       </div>
     );
   const C = def.component;
   return (
     <PageScope.Provider value={entry}>
-      <ErrorBoundary label={`Page “${nav.title(entry.ref)}”`} fill resetKey={entryKey(entry)}>
+      <ErrorBoundary label={t('Page “{page}”', { page: nav.title(entry.ref) })} fill resetKey={entryKey(entry)}>
         <C params={entry.ref.params} />
       </ErrorBoundary>
     </PageScope.Provider>
@@ -540,7 +541,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         {!preview && <LocateFlash screen={screen} />}
         {inspect && !preview && L.reserved && (
           <div
-            title="Reserved: corner status. Header controls in this row must avoid it."
+            title={t('Reserved: corner status. Header controls in this row must avoid it.')}
             style={{
               position: 'absolute',
               top: L.reserved.top,
@@ -567,7 +568,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                 whiteSpace: 'nowrap',
               }}
             >
-              Reserved · status
+              {t('Reserved · status')}
             </span>
           </div>
         )}
@@ -640,7 +641,7 @@ function VideoArea({ layout: L }: { layout: Layout }) {
           gap: 8,
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.9 }}>A video playing</span>
+        <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.9 }}>{t('A video playing')}</span>
         <span
           style={{
             height: 3,

@@ -23,6 +23,7 @@ import { useStoryArgs } from './useStoryArgs';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import styles from './Gallery.module.css';
 import { TokensView } from './TokensView';
+import { plural, t } from '../i18n/ui';
 
 export function Gallery() {
   const { name, tokens } = useGalleryRoute();
@@ -60,9 +61,9 @@ function useFrameWidth() {
     if (typeof w === 'number') return { width: w + 32, label: `${w}px` };
     if (w === 'cell') {
       const cell = Math.floor((layout.contentW - 10 * (layout.cols - 1)) / layout.cols);
-      return { width: cell + 32, label: `${cell}px · 1 of ${layout.cols} cols` };
+      return { width: cell + 32, label: t('{w}px · 1 of {cols} cols', { w: cell, cols: layout.cols }) };
     }
-    return { width: layout.contentW + 32, label: `${layout.contentW}px · content` };
+    return { width: layout.contentW + 32, label: t('{w}px · content', { w: layout.contentW }) };
   };
 }
 
@@ -114,7 +115,7 @@ function ComponentPage({ mod }: { mod: StoryModule<Args> }) {
                 )}
               </div>
               <div className={styles.frame} data-hc-page={s.name} style={{ width }}>
-                <ErrorBoundary label={`Story “${s.name}”`} resetKey={JSON.stringify(args)}>
+                <ErrorBoundary label={t('Story “{name}”', { name: s.name })} resetKey={JSON.stringify(args)}>
                   <StoryRender render={() => mod.render(args, ctx)} />
                 </ErrorBoundary>
               </div>
@@ -142,13 +143,13 @@ function Overview() {
   return (
     <>
       <div className={styles.head}>
-        <span className={styles.title}>Components</span>
+        <span className={styles.title}>{t('Components')}</span>
       </div>
       {/* Coverage against Figma only with its inventory connected (app/connectors). */}
       {figmaNames.length > 0 && (
         <>
           <p className={styles.note} style={{ marginBottom: 0 }}>
-            {built} of {figmaNames.length} Figma components built with stories · {FIGMA_FILE.name}, {FIGMA_FILE.exportedAt.slice(0, 10)}. Names and tiers follow Figma.
+            {t('{built} of {total} Figma components built with stories · {file}, {date}. Names and tiers follow Figma.', { built, total: figmaNames.length, file: FIGMA_FILE.name, date: FIGMA_FILE.exportedAt.slice(0, 10) })}
           </p>
           <div className={styles.meter}>
             <div style={{ width: `${(built / figmaNames.length) * 100}%` }} />
@@ -158,7 +159,7 @@ function Overview() {
       <UsageStats built={builtNames} />
       {proposalNames.size > 0 && (
         <div>
-          <div className={styles.tier}>In this proposal</div>
+          <div className={styles.tier}>{t('In this proposal')}</div>
           <div className={styles.cards}>
             {[...proposalNames].map((n) => (
               <button key={n} className={styles.card} onClick={() => openComponent(n)}>
@@ -166,7 +167,7 @@ function Overview() {
                   {n}
                   <ChangeBadge change={changeOf(n)} />
                 </span>
-                <span className={styles.dim}>{plural(STORIES.get(n)!.stories.length, 'story', 'stories')}</span>
+                <span className={styles.dim}>{plural(STORIES.get(n)!.stories.length, '{n} story', '{n} stories')}</span>
               </button>
             ))}
           </div>
@@ -186,8 +187,8 @@ function Overview() {
                     <button key={n} className={`${styles.card} ${mod ? '' : styles.cardOff}`} onClick={() => openComponent(n)}>
                       <span className={styles.cardName}>{n}</span>
                       <span className={styles.dim}>
-                        {mod ? plural(mod.stories.length, 'story', 'stories') : g === 'unreplicated' ? 'not replicated' : 'not built'}
-                        {fig?.variants ? ` · ${plural(fig.variants.length, 'Figma variant', 'Figma variants')}` : ''}
+                        {mod ? plural(mod.stories.length, '{n} story', '{n} stories') : g === 'unreplicated' ? t('not replicated') : t('not built')}
+                        {fig?.variants ? ` · ${plural(fig.variants.length, '{n} Figma variant', '{n} Figma variants')}` : ''}
                       </span>
                     </button>
                   );
@@ -224,8 +225,8 @@ function Missing({ name }: { name: string }) {
         {entry && <span className={styles.badge}>{entry.tier}</span>}
       </div>
       <p className={styles.note}>
-        {skip ? `Not replicated: ${UNREPLICATED_KIND[skip.kind].toLowerCase()}. ${skip.reason}` : 'Not built yet.'}
-        {entry ? ` Catalog use cases: ${entry.useCases.map((u) => u.name).join(', ')}.` : ''}
+        {skip ? t('Not replicated: {kind}. {reason}', { kind: UNREPLICATED_KIND[skip.kind].toLowerCase(), reason: skip.reason }) : t('Not built yet.')}
+        {entry ? ` ${t('Catalog use cases: {cases}.', { cases: entry.useCases.map((u) => u.name).join(', ') })}` : ''}
       </p>
       {fig && !MAPPED_FIGMA.has(name) && (
         <FigmaInfo entries={[]} figmaOnly={fig} />
@@ -233,14 +234,12 @@ function Missing({ name }: { name: string }) {
       {entry && (
         <a className={styles.link} href={catalogUrl(entry)} target="_blank" rel="noreferrer">
           <Icon name="menu_book" size={14} />
-          Open in the catalog
+          {t('Open in the catalog')}
         </a>
       )}
     </>
   );
 }
-
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 /** Renders a story inside its error boundary (the render function runs as a component, so errors are caught). */
 function StoryRender({ render }: { render: () => React.ReactNode }) {

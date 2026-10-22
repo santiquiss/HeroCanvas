@@ -3,6 +3,7 @@
 // code component each one is, and how they differ). Without them the gallery lists the app's components alone.
 import { APP_WIDGETS } from './appWidgets';
 import { UNREPLICATED } from './unreplicated';
+import { t } from '../i18n/ui';
 
 /** An optional file a connector writes (app/connectors/<name>), or `fallback` when there's none. */
 function optional<T>(files: Record<string, unknown>, fallback: T): T {
@@ -79,25 +80,25 @@ export function mappingsFor(code: string): MapEntry[] {
 export const MAPPED_FIGMA = new Set(CODE_MAP.map((m) => m.figma?.split(' › ')[0]).filter(Boolean) as string[]);
 
 export const STATUS_LABEL: Record<MapStatus, { label: string; color: string }> = {
-  same: { label: 'Same name · align options', color: '#16a34a' },
-  renamed: { label: 'Other name in Figma', color: '#0d99ff' },
-  part: { label: 'Part of a Figma component', color: '#7c5cff' },
-  partial: { label: 'Some Figma variants built', color: '#0891b2' },
-  different: { label: 'Significantly different · pending', color: '#f59e0b' },
-  missing: { label: 'Not in Figma · pending', color: '#9aa0a8' },
-  'code-only': { label: 'In code, no Figma frame', color: '#64748b' },
-  unused: { label: 'Figma only: not used in the code', color: '#9aa0a8' },
+  same: { label: t('Same name · align options'), color: '#16a34a' },
+  renamed: { label: t('Other name in Figma'), color: '#0d99ff' },
+  part: { label: t('Part of a Figma component'), color: '#7c5cff' },
+  partial: { label: t('Some Figma variants built'), color: '#0891b2' },
+  different: { label: t('Significantly different · pending'), color: '#f59e0b' },
+  missing: { label: t('Not in Figma · pending'), color: '#9aa0a8' },
+  'code-only': { label: t('In code, no Figma frame'), color: '#64748b' },
+  unused: { label: t('Figma only: not used in the code'), color: '#9aa0a8' },
 };
 
 export type GroupKey = 'atom' | 'molecule' | 'organism' | 'local' | 'unreplicated';
 
 export const GROUP_TITLES: Record<GroupKey, string> = {
-  atom: 'Atoms',
-  molecule: 'Molecules',
-  organism: 'Organisms',
-  local: 'Local',
+  atom: t('Atoms'),
+  molecule: t('Molecules'),
+  organism: t('Organisms'),
+  local: t('Local'),
   /** The component catalog's components the simulator doesn't replicate (design/unreplicated: why), apart from the work. */
-  unreplicated: 'Not replicated',
+  unreplicated: t('Not replicated'),
 };
 
 /**
@@ -107,7 +108,7 @@ export const GROUP_TITLES: Record<GroupKey, string> = {
 export function groupTitle(g: GroupKey, groups: Record<GroupKey, string[]>): string {
   if (g !== 'local') return GROUP_TITLES[g];
   const tiered = (Object.keys(groups) as GroupKey[]).some((k) => k !== 'local' && k !== 'unreplicated' && groups[k].length);
-  return tiered ? 'Other' : 'Components';
+  return tiered ? t('Other') : t('Components');
 }
 
 /**

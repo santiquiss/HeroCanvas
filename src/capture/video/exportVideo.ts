@@ -16,6 +16,7 @@ import { muxMp4, type Mp4Sample } from './mp4';
 import { recordingReader, type Recording } from './recording';
 import { drawTouches, touchesAt } from './taps';
 import { exposure, frameTime, sequenceMotion } from './motion';
+import { t } from '../../i18n/ui';
 import { AVC_CODECS, BLUR_SAMPLES, recordableMime, VIDEO_CONTAINERS, videoPlan, type VideoOptions } from './plan';
 
 /**
@@ -33,7 +34,7 @@ export async function exportVideo(
   recording: { rec: Recording; touches: boolean; /** Playback speed: the recording played this much faster. */ speed: number } | null = null,
 ): Promise<{ blob: Blob; mime: string; late: number }> {
   const mime = recordableMime(o.container);
-  if (!mime) throw new Error(`This browser doesn't record ${o.container.toUpperCase()}`);
+  if (!mime) throw new Error(t("This browser doesn't record {format}", { format: o.container.toUpperCase() }));
   const { tilts, box, pixels, scale: k } = videoPlan(layout, spec, recording ? { ...o, duration: recording.rec.duration / recording.speed } : o);
   const [W, H] = pixels;
   const motion = sequenceMotion(o.sequence, recording ? recording.rec.duration / recording.speed : o.duration, o.rest);
@@ -84,7 +85,7 @@ export async function exportVideo(
   gl.width = W;
   gl.height = H;
   const scene = DeviceScene.create(gl);
-  if (!scene) throw new Error("Without WebGL the device can't be drawn in 3D");
+  if (!scene) throw new Error(t("Without WebGL the device can't be drawn in 3D"));
   const center: [number, number] = [-(box.minX + box.maxX) / 2, -(box.minY + box.maxY) / 2];
 
   const out = document.createElement('canvas');
@@ -192,7 +193,7 @@ async function encodeMp4(canvas: HTMLCanvasElement, draw: (i: number) => Promise
       break;
     }
   }
-  if (!config) throw new Error(`The browser can't encode H.264 at ${width} × ${height} px: try a smaller scale`);
+  if (!config) throw new Error(t("The browser can't encode H.264 at {width} × {height} px: try a smaller scale", { width, height }));
   const samples: Mp4Sample[] = [];
   let avcC: Uint8Array | null = null;
   let failure: unknown = null;

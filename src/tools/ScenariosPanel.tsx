@@ -17,6 +17,10 @@ import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
 import { PersonaPicker, usePersonaParam } from './PersonaPicker';
 import { APP_THEME_PARAM, APP_THEMES, useAppTheme } from '../sim/appThemes';
+import { t } from '../i18n/ui';
+
+/** A theme's forced scheme, as its option says it. */
+const SCHEME_WORD = { light: t('light'), dark: t('dark') };
 
 interface Option {
   value: string;
@@ -28,15 +32,17 @@ export function ScenariosPanel() {
   const [persona, pick] = usePersonaParam();
   // Top page first: the one on screen, then the ones under it (a cover's page still shapes it).
   const pages = [...nav.stack].reverse().filter((r, i, all) => nav.def(r.id).controls?.length && all.findIndex((x) => x.id === r.id) === i);
+  // The sentence around the manifest's key, which stays code.
+  const noControls = t('No page controls yet. Add {code} to its manifest entry: each sets one of its state params.').split('{code}');
 
   return (
     <>
       {/* Always there: with no personas, the anonymous user, its menu saying how to make some. */}
       <div className={styles.section}>
         <div className={styles.sectionTitle}>
-          Persona
+          {t('Persona')}
           <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-            every page
+            {t('every page')}
           </span>
         </div>
         <PersonaPicker persona={persona} onPick={pick} />
@@ -54,7 +60,7 @@ export function ScenariosPanel() {
         const def = nav.def(r.id);
         return (
           <div key={r.id} className={styles.section}>
-            <Title label={nav.title(r)} hint="page" params={def.controls!.map((c) => c.param)} />
+            <Title label={nav.title(r)} hint={t('page')} params={def.controls!.map((c) => c.param)} />
             {def.controls!.map((c) => (
               <Control key={c.param} control={c} />
             ))}
@@ -66,7 +72,9 @@ export function ScenariosPanel() {
         <div className={styles.section}>
           <div className={styles.sectionTitle}>{nav.title(nav.stack[nav.stack.length - 1])}</div>
           <span className={styles.muted} style={{ lineHeight: '16px' }}>
-            No page controls yet. Add <code>controls</code> to its manifest entry: each sets one of its state params.
+            {noControls[0]}
+            <code>controls</code>
+            {noControls[1]}
           </span>
         </div>
       )}
@@ -92,22 +100,22 @@ function AccessibilitySection() {
   const ranges =
     system === 'ios'
       ? [
-          { from: 0, to: ax - 1, label: 'Standard' },
-          { from: ax, to: steps.length - 1, label: 'Accessibility' },
+          { from: 0, to: ax - 1, label: t('Standard') },
+          { from: ax, to: steps.length - 1, label: t('Accessibility') },
         ]
-      : [{ from: 0, to: steps.length - 1, label: 'Android font size' }];
+      : [{ from: 0, to: steps.length - 1, label: t('Android font size') }];
   return (
     <div className={styles.section}>
-      <Title label="Accessibility" hint="system" params={Object.values(ACCESSIBILITY_PARAMS)} />
+      <Title label={t('Accessibility')} hint={t('system')} params={Object.values(ACCESSIBILITY_PARAMS)} />
       <Row
-        label="Text size"
-        below={<StepSlider label="Text size" value={size.id} own={normal} options={steps} ranges={ranges} onChange={(v) => patch({ [ACCESSIBILITY_PARAMS.textSize]: v === normal ? null : v })} />}
-        note={system === 'ios' ? 'The device’s own sizes: iOS’s seven, then the five more it has under Accessibility › Larger Text.' : 'The device’s own sizes: Android’s font size, 85% to 200%.'}
+        label={t('Text size')}
+        below={<StepSlider label={t('Text size')} value={size.id} own={normal} options={steps} ranges={ranges} onChange={(v) => patch({ [ACCESSIBILITY_PARAMS.textSize]: v === normal ? null : v })} />}
+        note={system === 'ios' ? t('The device’s own sizes: iOS’s seven, then the five more it has under Accessibility › Larger Text.') : t('The device’s own sizes: Android’s font size, 85% to 200%.')}
       >
-        <span className={styles.settingValue}>{size.id === normal ? `${size.label} · default` : size.label}</span>
+        <span className={styles.settingValue}>{size.id === normal ? t('{size} · default', { size: size.label }) : size.label}</span>
       </Row>
-      <Row label="Bold text">
-        <Switch label="Bold text" checked={boldText} onChange={(on) => patch({ [ACCESSIBILITY_PARAMS.bold]: on ? 'on' : null })} />
+      <Row label={t('Bold text')}>
+        <Switch label={t('Bold text')} checked={boldText} onChange={(on) => patch({ [ACCESSIBILITY_PARAMS.bold]: on ? 'on' : null })} />
       </Row>
     </div>
   );
@@ -123,14 +131,14 @@ function LaunchSection() {
   const value = search.get(LAUNCH_PARAM) ?? 'once';
   return (
     <div className={styles.section}>
-      <Title label="Launch" hint="app" params={[LAUNCH_PARAM]} />
-      <Row label="Plays" note="The launch screen while the app starts, then its exit into the first screen: on a cold start.">
-        <Select label="Launch plays" value={value} onChange={(v) => patch({ [LAUNCH_PARAM]: v === 'once' ? null : v })} options={LAUNCH_PLAYBACK} />
+      <Title label={t('Launch')} hint={t('app')} params={[LAUNCH_PARAM]} />
+      <Row label={t('Plays')} note={t('The launch screen while the app starts, then its exit into the first screen: on a cold start.')}>
+        <Select label={t('Launch plays')} value={value} onChange={(v) => patch({ [LAUNCH_PARAM]: v === 'once' ? null : v })} options={LAUNCH_PLAYBACK} />
       </Row>
       <div className={styles.setting}>
         <button className={styles.btn} onClick={replayLaunch}>
           <Icon name="replay" size={14} />
-          Replay
+          {t('Replay')}
         </button>
       </div>
     </div>
@@ -142,9 +150,9 @@ function ThemeSection() {
   const [theme, pick] = useAppTheme();
   return (
     <div className={styles.section}>
-      <Title label="Theme" hint="app" params={[APP_THEME_PARAM]} />
-      <Row label="Theme" note="The app’s own themes, as its settings offer them. One made for light or dark sets the screens’ scheme.">
-        <Select label="Theme" value={theme!.id} onChange={pick} options={APP_THEMES.map((t) => ({ value: t.id, label: t.scheme ? `${t.name} · ${t.scheme}` : t.name }))} />
+      <Title label={t('Theme')} hint={t('app')} params={[APP_THEME_PARAM]} />
+      <Row label={t('Theme')} note={t('The app’s own themes, as its settings offer them. One made for light or dark sets the screens’ scheme.')}>
+        <Select label={t('Theme')} value={theme!.id} onChange={pick} options={APP_THEMES.map((th) => ({ value: th.id, label: th.scheme ? `${th.name} · ${SCHEME_WORD[th.scheme]}` : th.name }))} />
       </Row>
     </div>
   );
@@ -157,21 +165,19 @@ function LanguageSection() {
   const language = languageIn(search.get(LANG_PARAM));
   return (
     <div className={styles.section}>
-      <Title label="Language" hint="system" params={[LANG_PARAM]} />
+      <Title label={t('Language')} hint={t('system')} params={[LANG_PARAM]} />
       {LANGUAGES.length > 1 ? (
-        <Row label="Language" note="A device of a set can have its own: its header’s language.">
-          <Select label="Language" value={language} onChange={(v) => patch({ [LANG_PARAM]: v === BASE_LANGUAGE ? null : v })} options={LANGUAGES.map((l) => ({ value: l.id, label: l.name }))} />
+        <Row label={t('Language')} note={t('A device of a set can have its own: its header’s language.')}>
+          <Select label={t('Language')} value={language} onChange={(v) => patch({ [LANG_PARAM]: v === BASE_LANGUAGE ? null : v })} options={LANGUAGES.map((l) => ({ value: l.id, label: l.name }))} />
         </Row>
       ) : (
         // One language: nothing to pick yet; how to add more instead.
         <>
-          <Row label="Language">
+          <Row label={t('Language')}>
             <span className={styles.muted}>{LANGUAGES[0].name}</span>
           </Row>
           <p className={styles.sectionHint}>
-            The screens are in one language. To try them in more, ask your agent to add your app’s languages: “Add
-            Spanish and Portuguese to my app.” Each screen’s texts get translated in the mirror, and then each device can
-            show its own.
+            {t('The screens are in one language. To try them in more, ask your agent to add your app’s languages: “Add Spanish and Portuguese to my app.” Each screen’s texts get translated in the mirror, and then each device can show its own.')}
           </p>
         </>
       )}
@@ -192,9 +198,9 @@ function Title({ label, hint, params }: { label: string; hint: string; params: s
           {hint}
         </span>
       </span>
-      <button className={styles.btn} disabled={!dirty} title="Back to the defaults" onClick={() => patch(Object.fromEntries(params.map((p) => [p, null])))}>
+      <button className={styles.btn} disabled={!dirty} title={t('Back to the defaults')} onClick={() => patch(Object.fromEntries(params.map((p) => [p, null])))}>
         <Icon name="restart_alt" size={14} />
-        Reset
+        {t('Reset')}
       </button>
     </div>
   );
@@ -228,7 +234,7 @@ function Row({ label, overridden, note, below, children }: { label: string; over
       <div className={styles.settingRow}>
         <span className={styles.settingLabel}>
           {label}
-          {overridden && <span className={styles.overriddenDot} title="Overridden: not the persona’s own" />}
+          {overridden && <span className={styles.overriddenDot} title={t('Overridden: not the persona’s own')} />}
         </span>
         {children}
       </div>
@@ -271,7 +277,7 @@ function StepSlider({ label, value, own, options, ranges = [], onChange }: { lab
       <span style={{ fontSize: 10 }}>A</span>
       <span className={styles.stepTrack}>
         <input type="range" aria-label={label} aria-valuetext={options[at(value)]?.label} min={0} max={last} step={1} value={at(value)} style={{ ['--at' as string]: `calc(7px + (100% - 14px) * ${last ? at(value) / last : 0})` }} onChange={(e) => onChange(options[Number(e.target.value)].value)} />
-        <span className={styles.stepOwn} style={{ left: `calc(7px + (100% - 14px) * ${last ? at(own) / last : 0})` }} title="The default" />
+        <span className={styles.stepOwn} style={{ left: `calc(7px + (100% - 14px) * ${last ? at(own) / last : 0})` }} title={t('The default')} />
       </span>
       <span style={{ fontSize: 16 }}>A</span>
     </div>

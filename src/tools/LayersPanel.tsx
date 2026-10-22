@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { CATALOG } from '../design/catalog';
 import { useDesign } from '../design/DesignContext';
-import { componentIcon, elementKind, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, textOf, type Corners } from '../design/element';
+import { componentIcon, elementKind, groupLayout, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, textOf, type Corners } from '../design/element';
 import { APP_WIDGETS } from '../design/handoff';
 import { COMPONENT_STATUSES, componentState, statusOf } from '../design/componentState';
 import { NO_APP } from '../nav/noApp';
@@ -16,12 +16,13 @@ import { componentHint, componentInstance } from '../design/component';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
+import { t } from '../i18n/ui';
 
 /** Layers' legend: the states a component on screen can be in (the app's own widgets' only when it has some). */
 const LEGEND = COMPONENT_STATUSES.filter((s) => (NO_APP ? s.key === 'build' : s.key === 'matches' || s.key === 'differs' || s.key === 'build' || (s.key === 'app' && Object.keys(APP_WIDGETS).length > 0)));
 
 /** The word beside a component's row when it doesn't match the code. */
-const ROW_WORD: Partial<Record<string, string>> = { differs: 'differs', app: 'in app', build: 'local', missing: 'missing', unreplicated: 'not replicated' };
+const ROW_WORD: Partial<Record<string, string>> = { differs: t('differs'), app: t('in app'), build: t('local'), missing: t('missing'), unreplicated: t('not replicated') };
 
 type LNode =
   | { type: 'page'; key: string; label: string; el: HTMLElement }
@@ -117,7 +118,7 @@ function find(el: Element, layers: boolean, query: string): Found[] {
  */
 const TREE = treeOpen<Element>('layers', { weak: true });
 
-/** A box that arranges its children, by how (element.ts kindLabel). */
+/** A box that arranges its children, by how (element.ts groupLayout: English, whatever the interface's language). */
 const GROUP_ICON: Record<string, string> = { Row: 'view_column', Column: 'table_rows', Grid: 'grid_view', Box: 'check_box_outline_blank' };
 
 export function LayersPanel() {
@@ -139,15 +140,15 @@ export function LayersPanel() {
     return keys;
   }, [root, selected, selectedEl, version]);
 
-  if (!tree.length) return <div className={styles.section}>Nothing on screen yet.</div>;
+  if (!tree.length) return <div className={styles.section}>{t('Nothing on screen yet.')}</div>;
   return (
     <>
       {/* A search shows every match with the rows above it open: nothing to collapse then. */}
       <SearchField
-        placeholder="Search layers"
+        placeholder={t('Search layers')}
         value={q}
         onChange={setQ}
-        action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? 'Expand all' : 'Collapse all'} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />}
+        action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? t('Expand all') : t('Collapse all')} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />}
       />
       <div style={{ padding: '6px 0 12px' }}>
         {/* The components' states, as the gallery has them: against the code. With no app, all are Local. */}
@@ -164,7 +165,7 @@ export function LayersPanel() {
           : tree.map((n) => <LayerRow key={n.key} node={n} depth={0} path={path} />)}
         {found && !found.length && (
           <div className={styles.section}>
-            <span className={styles.muted}>No layer matches “{q.trim()}”.</span>
+            <span className={styles.muted}>{t('No layer matches “{query}”.', { query: q.trim() })}</span>
           </div>
         )}
       </div>
@@ -197,7 +198,7 @@ function LayerRow({ node, depth, path, found }: { node: LNode; depth: number; pa
   // Against the code, as the gallery says it (design/componentState): its icon's color, and a word when it isn't a match.
   const status = node.type === 'component' && lib ? statusOf(componentState(node.label, true, lib)) : undefined;
   const state = COMPONENT_STATUSES.find((s) => s.key === status);
-  const icon = node.type === 'page' ? 'web_asset' : node.type === 'text' ? KIND_ICON.text : node.type === 'layer' ? (node.kind === 'group' ? GROUP_ICON[node.label] : undefined) ?? KIND_ICON[node.kind] : entry ? TIER_ICON[entry.tier] : componentIcon(node.label);
+  const icon = node.type === 'page' ? 'web_asset' : node.type === 'text' ? KIND_ICON.text : node.type === 'layer' ? (node.kind === 'group' ? GROUP_ICON[groupLayout(node.el)] : undefined) ?? KIND_ICON[node.kind] : entry ? TIER_ICON[entry.tier] : componentIcon(node.label);
   // On the icon only: the name reads as every other row's.
   const color = node.type === 'component' && !isSel ? state?.color : undefined;
 

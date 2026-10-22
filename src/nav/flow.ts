@@ -7,6 +7,7 @@ import { useCallback, useEffect } from 'react';
 import { useUrlPatch, useUrlState } from '../sim/SimContext';
 import { HOLD_PARAM, stateKeys } from './stack';
 import type { FlowDef, FlowStep, PageDef, Params, StateParams } from './types';
+import { t } from '../i18n/ui';
 
 /** The current step and how to move on. Loaders (`auto`) move on by themselves unless held. */
 export function useFlow(flow: FlowDef) {
@@ -69,6 +70,6 @@ export function flowTransitions(flow: FlowDef): FlowTransition[] {
     if (s.auto) return [{ from: s.id, to: s.auto.to, label: `${(s.auto.ms / 1000).toFixed(1)} s`, auto: true }];
     if (s.next) return s.next.map((n) => ({ from: s.id, ...n }));
     const after = flow.steps[i + 1];
-    return [{ from: s.id, to: after?.id, label: after ? 'Next' : 'Done' }];
+    return [{ from: s.id, to: after?.id, label: after ? t('Next') : t('Done') }];
   });
 }

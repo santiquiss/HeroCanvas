@@ -4,6 +4,7 @@ import { PROPOSAL_LOOKUP } from '../design/overridableRegistry';
 import type { ScreenConfig } from '../nav/screenConfig';
 import { parseProposalCode } from './code';
 import type { Proposal, ProposalCode, ProposalMeta } from './types';
+import { t } from '../i18n/ui';
 
 const metas = import.meta.glob('/proposals/*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>;
 const configs = import.meta.glob('/proposals/*/config.json', { eager: true, import: 'default' }) as Record<string, ScreenConfig>;
@@ -99,7 +100,7 @@ export interface ComponentChangeItem {
 }
 
 /** How the panels name a change's scope. */
-export const SCOPE_LABEL: Record<ComponentChangeItem['scope'], string> = { shared: 'every version', version: 'this version', added: 'added', params: 'adds parameters' };
+export const SCOPE_LABEL: Record<ComponentChangeItem['scope'], string> = { shared: t('every version'), version: t('this version'), added: t('added'), params: t('adds parameters') };
 
 export interface ProposalChanges {
   components: ComponentChangeItem[];
@@ -111,12 +112,12 @@ function pageDetails(p: Proposal, id: string, base: Record<string, unknown> | un
   const out: string[] = [];
   const def = p.pages[id] as Record<string, unknown> | null | undefined;
   if (def && base) {
-    if (def.component !== base.component) out.push('Content changed');
+    if (def.component !== base.component) out.push(t('Content changed'));
     const fields = Object.keys({ ...base, ...def }).filter((k) => k !== 'component' && def[k] !== base[k]);
-    if (fields.length) out.push(`Settings changed: ${fields.join(', ')}`);
+    if (fields.length) out.push(t('Settings changed: {fields}', { fields: fields.join(', ') }));
   }
   const cfg = Object.keys(p.config[id] ?? {});
-  if (cfg.length) out.push(`Layout rules changed: ${cfg.join(', ')}`);
+  if (cfg.length) out.push(t('Layout rules changed: {fields}', { fields: cfg.join(', ') }));
   return out;
 }
 
@@ -139,7 +140,7 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
   const ids = new Set([...Object.keys(p.pages), ...Object.keys(p.config).filter((id) => Object.keys(p.config[id] ?? {}).length)]);
   const pages: PageChangeItem[] = [...ids].map((id) => {
     const base = basePages[id] as Record<string, unknown> | undefined;
-    if (p.pages[id] === null) return { id, kind: 'removed', details: ['Not in this proposal'] };
+    if (p.pages[id] === null) return { id, kind: 'removed', details: [t('Not in this proposal')] };
     if (!base) return { id, kind: 'new', details: [] };
     return { id, kind: 'changed', details: pageDetails(p, id, base) };
   });

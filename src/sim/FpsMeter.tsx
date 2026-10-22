@@ -2,6 +2,7 @@
 // Writes its text straight to the DOM twice a second, so it never re-renders React or costs a frame itself.
 import { useEffect, useRef, useState } from 'react';
 import styles from './SimulatorShell.module.css';
+import { t } from '../i18n/ui';
 
 const KEY = 'hc.fps';
 
@@ -69,7 +70,7 @@ export function FpsMeter() {
 
   if (!on) return null;
   return (
-    <div ref={label} className={styles.fps} title="Frame rate (F to hide)">
+    <div ref={label} className={styles.fps} title={t('Frame rate (F to hide)')}>
       …
     </div>
   );

@@ -3,6 +3,7 @@
 // and the layers a component is made of (Layers' drill-down).
 import { CATALOG } from './catalog';
 import { componentTier } from './figma';
+import { t } from '../i18n/ui';
 
 /**
  * - `text`: it holds text itself.
@@ -17,7 +18,7 @@ import { componentTier } from './figma';
  */
 export type ElementKind = 'text' | 'icon' | 'image' | 'graphic' | 'shape' | 'container' | 'group';
 
-const LABEL: Record<Exclude<ElementKind, 'group'>, string> = { text: 'Text', icon: 'Icon', image: 'Image', graphic: 'Graphic', shape: 'Shape', container: 'Container' };
+const LABEL: Record<Exclude<ElementKind, 'group'>, string> = { text: t('Text'), icon: t('Icon'), image: t('Image'), graphic: t('Graphic'), shape: t('Shape'), container: t('Container') };
 
 /** Material Symbol for a kind (Layers). */
 export const KIND_ICON: Record<ElementKind, string> = { text: 'title', icon: 'star', image: 'image', graphic: 'show_chart', shape: 'circle', container: 'crop_square', group: 'view_agenda' };
@@ -76,11 +77,19 @@ export function boxKind(el: Element, cs: CSSStyleDeclaration = getComputedStyle(
 
 /** The layer's name: its kind, a group by its layout (Row, Column, Grid; Box when it's none of them). */
 export function kindLabel(el: Element, kind: ElementKind = layerKind(el)): string {
-  if (kind !== 'group') return LABEL[kind];
+  return kind !== 'group' ? LABEL[kind] : GROUP_LABEL[groupLayout(el)];
+}
+
+/** How a group lays out its children, in English (an icon's key): Row, Column, Grid, or Box when it's none of them. */
+export type GroupLayout = 'Row' | 'Column' | 'Grid' | 'Box';
+
+export function groupLayout(el: Element): GroupLayout {
   const cs = getComputedStyle(el);
   if (cs.display.includes('flex')) return cs.flexDirection.startsWith('column') ? 'Column' : 'Row';
   return cs.display.includes('grid') ? 'Grid' : 'Box';
 }
+
+const GROUP_LABEL: Record<GroupLayout, string> = { Row: t('Row'), Column: t('Column'), Grid: t('Grid'), Box: t('Box') };
 
 /** The element's size in device points: its layout box, or (an SVG shape, which has none) what it measures at `scale`. */
 export function elementSize(el: Element, scale: number): { w: number; h: number } {
@@ -220,7 +229,6 @@ export function codeSizing(el: Element, axis: 'w' | 'h'): { sizing: Sizing; code
   const s = sizing(el, axis);
   if (!s || !(el instanceof HTMLElement)) return null;
   const w = axis === 'w';
-  const dim = w ? 'width' : 'height';
   const cs = getComputedStyle(el);
   const pcs = getComputedStyle(el.parentElement!);
   const parentFlex = pcs.display.includes('flex');
@@ -229,18 +237,18 @@ export function codeSizing(el: Element, axis: 'w' | 'h'): { sizing: Sizing; code
   const pinned = anchors(el);
   // A text that fills its parent only because CSS blocks do: aligned to the start, it reads the same at its own width
   // (and is cut at the parent's), as a Text with no width set is written.
-  if (s === 'fill' && w && !pinned && !parentFlex && elementKind(el) === 'text' && !textUsesWidth(cs)) return { sizing: 'hug', code: 'Hug · its content' };
+  if (s === 'fill' && w && !pinned && !parentFlex && elementKind(el) === 'text' && !textUsesWidth(cs)) return { sizing: 'hug', code: t('Hug · its content') };
   // In words every stack has (a design tool's Fill, Hug, Fixed), and how: not one framework's names.
   const code = (() => {
-    if (s === 'fill' && pinned) return `Fill · pinned to its parent's ${w ? 'left and right' : 'top and bottom'}`;
+    if (s === 'fill' && pinned) return w ? t('Fill · pinned to its parent’s left and right') : t('Fill · pinned to its parent’s top and bottom');
     if (s === 'fill') {
-      if (parentMain && px(cs.flexGrow) > 0) return 'Fill · the room left in its parent';
-      if (ownMain) return `Fill · its parent's ${dim}`;
-      if (parentFlex && !parentMain) return 'Fill · stretched by its parent';
-      return `Fill · its parent's ${dim}`;
+      if (parentMain && px(cs.flexGrow) > 0) return t('Fill · the room left in its parent');
+      if (ownMain) return w ? t('Fill · its parent’s width') : t('Fill · its parent’s height');
+      if (parentFlex && !parentMain) return t('Fill · stretched by its parent');
+      return w ? t('Fill · its parent’s width') : t('Fill · its parent’s height');
     }
-    if (s === 'hug') return 'Hug · its content';
-    return `Fixed · ${w ? el.offsetWidth : el.offsetHeight}`;
+    if (s === 'hug') return t('Hug · its content');
+    return t('Fixed · {size}', { size: w ? el.offsetWidth : el.offsetHeight });
   })();
   return { sizing: s, code };
 }

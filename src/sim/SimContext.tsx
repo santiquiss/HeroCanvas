@@ -7,6 +7,7 @@ import type { Layout } from './layout';
 import { tappedControl, type SheetKind, type SheetPresentation } from './sheetPresentation';
 import type { StateParams } from '../nav/types';
 import { LANG_PARAM, LanguageCtx, languageIn, type Language } from './language';
+import { t } from '../i18n/ui';
 
 /** What a sheet built on the kit's Sheet (ActionSheet…) needs from the layer. */
 export interface SheetFrame {
@@ -293,7 +294,7 @@ export function SharedSimProvider({ children, fixed = false }: { children: React
   const oos = useCallback(
     (label: string) => (e?: { stopPropagation(): void }) => {
       e?.stopPropagation();
-      toast('Out of scope: ' + label);
+      toast(t('Out of scope: {label}', { label }));
     },
     [toast],
   );

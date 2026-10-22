@@ -14,17 +14,18 @@ import type { ReactNode } from 'react';
 import type { ScreenLayout } from '../contract';
 import type { PageDef } from '../nav/types';
 import type { ScreenConfig } from '../nav/screenConfig';
+import { t } from '../i18n/ui';
 
 export type ProposalStatus = 'draft' | 'review' | 'approved' | 'handed-off' | 'merged' | 'archived';
 
 export const STATUSES: { id: ProposalStatus; label: string; color: string }[] = [
-  { id: 'draft', label: 'Draft', color: '#9aa0a8' },
-  { id: 'review', label: 'In review', color: '#f59e0b' },
-  { id: 'approved', label: 'Approved', color: '#16a34a' },
+  { id: 'draft', label: t('Draft'), color: '#9aa0a8' },
+  { id: 'review', label: t('In review'), color: '#f59e0b' },
+  { id: 'approved', label: t('Approved'), color: '#16a34a' },
   // Its ticket for whoever builds it is created (`ticket`): ready to build.
-  { id: 'handed-off', label: 'Ticket created', color: '#0d99ff' },
-  { id: 'merged', label: 'Merged into base', color: '#7c5cff' },
-  { id: 'archived', label: 'Archived', color: '#c4c8ce' },
+  { id: 'handed-off', label: t('Ticket created'), color: '#0d99ff' },
+  { id: 'merged', label: t('Merged into base'), color: '#7c5cff' },
+  { id: 'archived', label: t('Archived'), color: '#c4c8ce' },
 ];
 
 export interface ProposalMeta {

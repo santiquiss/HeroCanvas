@@ -8,6 +8,7 @@
 import config from './supabase.json';
 import { sha256Hex } from './owner';
 import type { Comment } from './types';
+import { t } from '../i18n/ui';
 
 export interface Backend {
   /** `shared`: everyone sees the same comments; `local`: only this browser. */
@@ -149,7 +150,7 @@ export function localBackend(storage: Pick<Storage, 'getItem' | 'setItem'> | nul
   };
   async function own(id: string, secret: string): Promise<Comment> {
     const c = read().find((x) => x.id === id);
-    if (!c || !c.owner || c.owner !== (await sha256Hex(secret))) throw new Error('Not your comment');
+    if (!c || !c.owner || c.owner !== (await sha256Hex(secret))) throw new Error(t('Not your comment'));
     return c;
   }
 }

@@ -6,6 +6,22 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.39.0 — 2026-10-22
+
+- **HeroCanvas in Spanish**: its whole interface (the panels, the toolbar and menus, Capture, Flow, the gallery and
+  Tokens, comments, proposals) in neutral Latin American Spanish, picked per copy in `herocanvas.config.ts`
+  (`language: 'es'`). English stays the default. The app's screens keep their own languages, and what's written for
+  developers and agents (handoffs, prompts, exported files) stays English.
+- How it's built: `t('English text')` from `src/i18n/ui.ts`, a catalog per area (`src/i18n/es/*.json`) and a glossary
+  (`src/i18n/GLOSSARY.md`); a test fails on a text with no translation, an unused one, or one translated two ways.
+- Capture's light section reads "Lighting"; Tokens' type group reads "Typography".
+- A resolved comment with no name is stored as such and shown in the interface's language.
+
+**Contract**
+
+- `HeroCanvasConfig.language` (new, `herocanvas.config.ts`): nothing to adapt. To have your copy in Spanish, set
+  `language: 'es'` and restart `npm run dev`.
+
 ## 0.38.2 — 2026-10-22
 
 - Agustina Salas, by her full name, as a creator: NOTICE, the About page and the README.

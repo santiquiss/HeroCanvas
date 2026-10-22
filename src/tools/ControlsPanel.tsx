@@ -10,12 +10,13 @@ import { useStoryArgs } from '../gallery/useStoryArgs';
 import { useUrlState } from '../sim/SimContext';
 import styles from './Panel.module.css';
 import { isTokenColorOptions, TokenColorSelect, tokenForColor, tokenLabel } from './TokenColorSelect';
+import { t } from '../i18n/ui';
 
 export function ControlsPanel() {
   const { name } = useGalleryRoute();
   const { stories } = useStories();
   const mod = name ? stories.get(name) : undefined;
-  if (!mod) return <div className={styles.section}>Pick a built component to edit its props.</div>;
+  if (!mod) return <div className={styles.section}>{t('Pick a built component to edit its props.')}</div>;
   return <Controls key={name} mod={mod} />;
 }
 
@@ -47,9 +48,9 @@ function Controls({ mod }: { mod: StoryModule<Args> }) {
       field={field}
       reset={
         dirty && (
-          <button className={styles.btn} style={{ marginLeft: 8, textTransform: 'none', letterSpacing: 0 }} title={`Back to “${story.name}” as written`} onClick={() => reset(story.name)}>
+          <button className={styles.btn} style={{ marginLeft: 8, textTransform: 'none', letterSpacing: 0 }} title={t('Back to “{story}” as written', { story: story.name })} onClick={() => reset(story.name)}>
             <Icon name="restart_alt" size={14} />
-            <span>Reset</span>
+            <span>{t('Reset')}</span>
           </button>
         )
       }
@@ -82,15 +83,15 @@ function Nullable({ isNull, onClear, onSet, children }: { isNull: boolean; onCle
       <span className={styles.muted} style={{ fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 11.5 }}>
         null
       </span>
-      <button className={styles.btn} style={{ marginLeft: 'auto' }} title="Give it a value" onClick={onSet}>
+      <button className={styles.btn} style={{ marginLeft: 'auto' }} title={t('Give it a value')} onClick={onSet}>
         <Icon name="add" size={14} />
-        <span>Set</span>
+        <span>{t('Set')}</span>
       </button>
     </span>
   ) : (
     <span style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
       <span style={{ flex: 1, minWidth: 0 }}>{children}</span>
-      <button className={styles.iconBtn} title="Clear it: null (not passed)" onClick={onClear}>
+      <button className={styles.iconBtn} title={t('Clear it: null (not passed)')} onClick={onClear}>
         <Icon name="close" size={14} />
       </button>
     </span>
@@ -123,7 +124,7 @@ function Field({ control, value, onChange }: { control: Control; value: unknown;
         <select value={String(value)} onChange={(e) => onChange(e.target.value)} style={input}>
           {control.options.map((o) => (
             <option key={o} value={o}>
-              {o || '(none)'}
+              {o || t('(none)')}
             </option>
           ))}
         </select>

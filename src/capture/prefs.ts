@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { DEFAULT_SHADOW, type ExportOptions, type Shadow } from './exportImage';
 import { DEFAULT_SEQUENCE, sequenceOf, type Sequence } from './video/motion';
 import type { VideoContainer } from './video/plan';
+import { t } from '../i18n/ui';
 
 const KEY = 'hc.capture';
 
@@ -50,20 +51,20 @@ export type ShadowPreset = 'none' | 'subtle' | 'medium' | 'large' | 'custom';
 
 /** Shadows a click away: none, a subtle one close under the device, the usual one, a large soft one; or its own. */
 export const SHADOW_PRESETS: { id: ShadowPreset; label: string; look?: Shadow }[] = [
-  { id: 'none', label: 'None' },
-  { id: 'subtle', label: 'Subtle', look: { blur: 24, distance: 10, opacity: 0.2 } },
-  { id: 'medium', label: 'Medium', look: DEFAULT_SHADOW },
-  { id: 'large', label: 'Large', look: { blur: 90, distance: 50, opacity: 0.4 } },
-  { id: 'custom', label: 'Custom' },
+  { id: 'none', label: t('None') },
+  { id: 'subtle', label: t('Subtle'), look: { blur: 24, distance: 10, opacity: 0.2 } },
+  { id: 'medium', label: t('Medium'), look: DEFAULT_SHADOW },
+  { id: 'large', label: t('Large'), look: { blur: 90, distance: 50, opacity: 0.4 } },
+  { id: 'custom', label: t('Custom') },
 ];
 
 /** Backgrounds a click away (besides transparent and any color): white, greys, black. */
 export const BACKGROUNDS: { name: string; color: string }[] = [
-  { name: 'White', color: '#ffffff' },
-  { name: 'Light gray', color: '#f2f3f5' },
-  { name: 'Gray', color: '#d7dade' },
-  { name: 'Dark gray', color: '#3a3d42' },
-  { name: 'Black', color: '#000000' },
+  { name: t('White'), color: '#ffffff' },
+  { name: t('Light gray'), color: '#f2f3f5' },
+  { name: t('Gray'), color: '#d7dade' },
+  { name: t('Dark gray'), color: '#3a3d42' },
+  { name: t('Black'), color: '#000000' },
 ];
 
 /** Sizes a picture is often wanted at: the stores' screenshots, social posts. */
@@ -71,13 +72,13 @@ export const SIZE_PRESETS: { group: string; label: string; size: [number, number
   { group: 'App Store', label: 'iPhone 6.9″', size: [1320, 2868] },
   { group: 'App Store', label: 'iPhone 6.5″', size: [1284, 2778] },
   { group: 'App Store', label: 'iPad 13″', size: [2064, 2752] },
-  { group: 'Google Play', label: 'Phone', size: [1080, 1920] },
-  { group: 'Social', label: 'Instagram post', size: [1080, 1350] },
-  { group: 'Social', label: 'Instagram story', size: [1080, 1920] },
-  { group: 'Social', label: 'Square', size: [1080, 1080] },
-  { group: 'Social', label: 'X / Twitter', size: [1600, 900] },
-  { group: 'Social', label: 'LinkedIn', size: [1200, 627] },
-  { group: 'Social', label: 'Dribbble', size: [1600, 1200] },
+  { group: 'Google Play', label: t('Phone'), size: [1080, 1920] },
+  { group: t('Social'), label: t('Instagram post'), size: [1080, 1350] },
+  { group: t('Social'), label: t('Instagram story'), size: [1080, 1920] },
+  { group: t('Social'), label: t('Square'), size: [1080, 1080] },
+  { group: t('Social'), label: 'X / Twitter', size: [1600, 900] },
+  { group: t('Social'), label: 'LinkedIn', size: [1200, 627] },
+  { group: t('Social'), label: 'Dribbble', size: [1600, 1200] },
 ];
 
 /** The preset a size is (its group and label), if any. */

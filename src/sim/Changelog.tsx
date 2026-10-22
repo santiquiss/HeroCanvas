@@ -3,6 +3,7 @@
 // changelog have their page (About, the rail's ⓘ); the markdown reading here serves both.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
+import { t } from '../i18n/ui';
 import styles from './Changelog.module.css';
 
 /** Inline markdown: **bold**, `code` and [links](url). */
@@ -103,7 +104,7 @@ function Popup({ label, title, panelTitle, children }: { label: ReactNode; title
         <div className={styles.panel} role="dialog" aria-label={panelTitle}>
           <div className={styles.head}>
             <span>{panelTitle}</span>
-            <button className={styles.close} aria-label="Close" onClick={() => setOpen(false)}>
+            <button className={styles.close} aria-label={t('Close')} onClick={() => setOpen(false)}>
               <Icon name="close" size={18} />
             </button>
           </div>
@@ -117,8 +118,8 @@ function Popup({ label, title, panelTitle, children }: { label: ReactNode; title
 /** This copy's version: the team's changelog. */
 export function VersionButton() {
   return (
-    <Popup label={`v${__APP_VERSION__}`} title="This copy's changes (CHANGELOG.md)" panelTitle="Changelog">
-      {APP_BODY ?? <p>No CHANGELOG.md at the project's root: start one to keep track of your mirror and proposals.</p>}
+    <Popup label={`v${__APP_VERSION__}`} title={t("This copy's changes (CHANGELOG.md)")} panelTitle={t('Changelog')}>
+      {APP_BODY ?? <p>{t("No CHANGELOG.md at the project's root: start one to keep track of your mirror and proposals.")}</p>}
     </Popup>
   );
 }

@@ -4,12 +4,13 @@ import { useLibrary } from '../design/library';
 import { ComponentInfo } from '../gallery/ComponentInfo';
 import { useGalleryRoute, useStories } from '../gallery/route';
 import styles from './Panel.module.css';
+import { t } from '../i18n/ui';
 
 export function ComponentInfoPanel() {
   const { name } = useGalleryRoute();
   const { stories } = useStories();
   const mod = name ? stories.get(name) : undefined;
-  if (!mod) return <div className={styles.section}>Pick a built component to see where it’s used and how to implement it.</div>;
+  if (!mod) return <div className={styles.section}>{t('Pick a built component to see where it’s used and how to implement it.')}</div>;
   return <ComponentInfo key={name} mod={mod} />;
 }
 
