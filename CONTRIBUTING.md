@@ -33,6 +33,11 @@ Before you open a pull request:
 Keep pull requests to one change each, with a line on why in the description. The same checks run on every pull
 request (`.github/workflows/checks.yml`), and it's merged once they pass.
 
+## Conduct and security
+
+Everyone here follows the [code of conduct](CODE_OF_CONDUCT.md). A security issue goes privately, never in a public
+issue: [SECURITY.md](SECURITY.md) says how.
+
 ## License
 
 By contributing, you agree that your contribution is licensed under the project's license ([LICENSE](LICENSE)).
