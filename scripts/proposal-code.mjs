@@ -12,6 +12,9 @@ const taken = readdirSync(DIR, { withFileTypes: true })
   .filter((e) => e.isDirectory() && existsSync(join(DIR, e.name, 'proposal.json')))
   .map((e) => JSON.parse(readFileSync(join(DIR, e.name, 'proposal.json'), 'utf8')).code)
   .filter(Boolean);
+// The team's retired codes (proposals/retired.json): never given again.
+const RETIRED = join(DIR, 'retired.json');
+const retired = existsSync(RETIRED) ? JSON.parse(readFileSync(RETIRED, 'utf8')).map((r) => r.code) : [];
 
 const gitName = () => {
   try {
@@ -25,4 +28,4 @@ if (!letters) {
   console.error('proposal:code: whose is it? Pass the author\'s letters: npm run proposal:code -- J');
   process.exit(1);
 }
-console.log(nextProposalCode(taken, letters));
+console.log(nextProposalCode(taken, letters, retired));

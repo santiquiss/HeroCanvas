@@ -14,6 +14,7 @@ import { chainFor, SIM_PARAMS, stackUrl, variantState } from '../nav/stack';
 import { recalledAuthor, rememberAuthor } from '../persist/author';
 import { useCanWrite, writeJson } from '../persist/devApi';
 import { authorLetters, defaultAuthorLetters, MAX_AUTHOR_LETTERS, nextProposalCode } from '../proposals/code';
+import { RETIRED_CODES } from '../proposals/retired';
 import { hasProposalNotes, loadProposalNotes } from '../proposals/sources';
 import { activeVariant, CHANGES_PARAM, findProposal, listedProposals, PROPOSALS, proposalChanges, proposalPath, SCOPE_LABEL, slugify, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import { modeOf } from '../sim/modes';
@@ -83,7 +84,7 @@ function BaseView() {
   const [author, setAuthor] = useState(() => recalledAuthor().name);
   const [ownLetters, setOwnLetters] = useState(() => recalledAuthor().letters);
   const letters = authorLetters(ownLetters) || defaultAuthorLetters(author);
-  const code = letters ? nextProposalCode(PROPOSALS.map((p) => p.id), letters) : '';
+  const code = letters ? nextProposalCode(PROPOSALS.map((p) => p.id), letters, RETIRED_CODES) : '';
   const create = async () => {
     const folder = slugify(title);
     if (PROPOSALS.some((p) => p.folder === folder)) return setError(t('"{folder}" already exists', { folder }));

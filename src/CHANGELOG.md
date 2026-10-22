@@ -6,6 +6,17 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.47.2 — 2026-10-22
+
+- **A team's retired proposal codes are its own** (`proposals/retired.json`): the Proposal panel and
+  `npm run proposal:code` never give one again. They were a list in the tool (`src/proposals/code.ts`), which an update
+  replaces: a copy's retired codes would be lost, and a new proposal could take one.
+
+**Contract**
+
+- New: `proposals/retired.json` (`[{ "code": "PJ-3", "note": "…" }]`). To adapt: a copy that added codes to
+  `RETIRED_CODES` in `src/proposals/code.ts` moves them there.
+
 ## 0.47.1 — 2026-10-22
 
 - **The app's theme reaches the screens again**: since 0.47.0 nothing loaded it, so its aliases and its own tokens

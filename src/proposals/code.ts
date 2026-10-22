@@ -36,13 +36,17 @@ export function parseProposalCode(code: string): { author: string; number: numbe
 }
 
 /**
- * Codes of proposals deleted once done (their record: git and the CHANGELOG), so the next one doesn't take theirs:
- * a code is never reused. Add a proposal's code here when its folder is deleted.
+ * The codes of proposals deleted once done, as the team keeps them (proposals/retired.json: `[{ "code": "PJ-3",
+ * "note": "…" }]`), so the next one doesn't take theirs: a code is never reused. Their record: git and the changelog.
  */
-export const RETIRED_CODES: readonly string[] = [];
+export interface RetiredCode {
+  code: string;
+  /** What it was and where it went (merged into Live in 0.4.0). */
+  note?: string;
+}
 
-/** The author's next code: one more than their highest so far (the retired ones too), from 1. */
-export function nextProposalCode(taken: readonly string[], author: string, retired: readonly string[] = RETIRED_CODES): string {
+/** The author's next code: one more than their highest so far (the retired ones too, `retired`), from 1. */
+export function nextProposalCode(taken: readonly string[], author: string, retired: readonly string[] = []): string {
   const letters = authorLetters(author);
   if (!letters) throw new Error('a proposal code needs the author\'s letters');
   const numbers = [...taken, ...retired].map(parseProposalCode).filter((c) => c?.author === letters).map((c) => c!.number);
