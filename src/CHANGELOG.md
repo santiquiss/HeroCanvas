@@ -6,6 +6,14 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.41.1 — 2026-10-22
+
+- The changelog speaks of HeroCanvas only: no team's copy by name.
+
+**Contract**
+
+- None.
+
 ## 0.41.0 — 2026-10-22
 
 - An app's appearance setting (follow the system, or always light or dark) is declared as itself:
@@ -45,8 +53,6 @@ While in 0.x: the minor number (0.**Y**.0) goes up for new features or architect
 
 ## 0.40.1 — 2026-10-22
 
-From moving Andaremos Designer onto HeroCanvas:
-
 - **A variant by state replaces the page's state**: opening one clears the page's other state (a search's text
   gone when its "Auctions" variant opens), and it's the one shown only while the URL holds exactly its state; its
   thumbnail in Flow shows only that state.
@@ -63,8 +69,7 @@ From moving Andaremos Designer onto HeroCanvas:
 
 ## 0.40.0 — 2026-10-22
 
-What an app does around its pages, declared instead of forked (from moving Andaremos Designer, a Compose app's
-mirror, onto HeroCanvas):
+What an app does around its pages, declared instead of forked:
 
 - **Tabs switch at once**, as on iOS and Android, with no animation; `appConfig.layout.tabTransition: 'fade'` keeps
   the old fade for an app that animates its tabs.
