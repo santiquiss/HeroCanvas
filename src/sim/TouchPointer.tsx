@@ -2,10 +2,12 @@
 // and dragging scrolls whatever is under it, with axis lock, momentum and paging for scroll-snap carousels.
 // A drag cancels the tap, as on a phone. Clicks without movement go through untouched. Mouse only; real touch and the
 // wheel keep their native behavior. Horizontal drags on `[data-swipe-x]` (a swipeable row) are left to it, and drags
-// down on `[data-drag-down]` (a sheet at its top, which they close).
+// down on `[data-drag-down]` (a sheet at its top, which they close). An element that took the press itself (a long
+// press that became a drag, like a photo being reordered) marks itself `[data-held]`: the drag is left to it.
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './SimulatorShell.module.css';
+import { snapPoints, snapTarget } from './snap';
 
 /** Movement (screen px) before a press becomes a drag. */
 const SLOP = 6;
@@ -49,7 +51,7 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
     const toDevice = (dx: number, dy: number) => (rotated ? { x: dy / scale, y: -dx / scale } : { x: dx / scale, y: dy / scale });
 
     let press: { x: number; y: number; target: Element; id: number } | null = null;
-    let drag: { el: HTMLElement | null; axis: Axis; snap: string | null; last: { x: number; y: number }; samples: { t: number; v: number }[] } | null = null;
+    let drag: { el: HTMLElement | null; axis: Axis; snap: string | null; from: number; last: { x: number; y: number }; samples: { t: number; v: number }[] } | null = null;
     let momentum = 0;
 
     // Writes only what changed: with many frames (All devices) most pointers stay hidden and touch nothing.
@@ -99,9 +101,9 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
         if (Math.hypot(dx, dy) < SLOP) return;
         const d = toDevice(dx, dy);
         const axis: Axis = Math.abs(d.x) > Math.abs(d.y) ? 'x' : 'y';
-        // A row that swipes sideways (a dismissible) takes horizontal drags itself; a sheet at its top, drags down (they
-        // close it), while a drag up scrolls its content like any other.
-        if ((axis === 'x' && press.target.closest('[data-swipe-x]')) || (axis === 'y' && d.y > 0 && press.target.closest('[data-drag-down]'))) {
+        // A row that swipes sideways (`data-swipe-x`) takes horizontal drags itself; a sheet at its top, drags down (they
+        // close it: a ModalBottomSheet), while a drag up scrolls its content like any other.
+        if ((axis === 'x' && press.target.closest('[data-swipe-x]')) || (axis === 'y' && d.y > 0 && press.target.closest('[data-drag-down]')) || press.target.closest('[data-held]')) {
           press = null;
           dot.classList.remove(styles.touchDown);
           return;
@@ -112,7 +114,7 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
         const snap = el && getComputedStyle(el).scrollSnapType !== 'none' ? el.style.scrollSnapType : null;
         if (el && snap !== null) el.style.scrollSnapType = 'none';
         // The content follows the finger from where it went down.
-        drag = { el, axis, snap, last: { x: press.x, y: press.y }, samples: [{ t: performance.now(), v: 0 }] };
+        drag = { el, axis, snap, from: el ? (axis === 'y' ? el.scrollTop : el.scrollLeft) : 0, last: { x: press.x, y: press.y }, samples: [{ t: performance.now(), v: 0 }] };
         frame.setPointerCapture(press.id);
         document.body.style.userSelect = 'none';
       }
@@ -125,13 +127,12 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
       while (drag.samples.length && now - drag.samples[0].t > 90) drag.samples.shift();
     };
 
-    const settle = (el: HTMLElement, axis: Axis, v: number, snap: string | null) => {
+    const settle = (el: HTMLElement, axis: Axis, v: number, snap: string | null, from: number) => {
       if (snap !== null) {
-        // Page by where a flick would carry it, then restore snapping once there.
-        const size = axis === 'y' ? el.clientHeight : el.clientWidth;
+        // Rest on the item a flick would carry it to (its own snap position: a card, a page), then restore snapping.
         const pos = axis === 'y' ? el.scrollTop : el.scrollLeft;
-        const max = Math.round((axis === 'y' ? el.scrollHeight : el.scrollWidth) / size) - 1;
-        const page = Math.max(0, Math.min(max, Math.round((pos - v * 160) / size)));
+        // `v` is the finger's velocity: the content scrolls the other way.
+        const target = snapTarget(snapPoints(el, axis), from, pos, -v);
         let done = false;
         const restore = () => {
           if (done) return;
@@ -140,7 +141,8 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
         };
         el.addEventListener('scrollend', restore, { once: true });
         window.setTimeout(restore, 1000);
-        el.scrollTo({ [axis === 'y' ? 'top' : 'left']: page * size, behavior: 'smooth' });
+        if (target === null || target === pos) restore();
+        else el.scrollTo({ [axis === 'y' ? 'top' : 'left']: target, behavior: 'smooth' });
         return;
       }
       let vel = v;
@@ -160,14 +162,14 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
       if (e.pointerType !== 'mouse' || !press) return;
       dot.classList.remove(styles.touchDown);
       if (drag) {
-        const { el, axis, samples, snap } = drag;
+        const { el, axis, samples, snap, from } = drag;
         if (flushRaf && el) {
           cancelAnimationFrame(flushRaf);
           flush(el, axis);
         }
         const span = samples.length > 1 ? samples[samples.length - 1].t - samples[0].t : 0;
         const v = span > 0 ? samples.slice(1).reduce((t, s) => t + s.v, 0) / span : 0;
-        if (el) settle(el, axis, v, snap);
+        if (el) settle(el, axis, v, snap, from);
         // The drag cancels the tap.
         window.addEventListener('click', swallow, { capture: true, once: true });
         window.setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0);

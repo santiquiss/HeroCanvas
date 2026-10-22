@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.40.3 — 2026-10-22
+
+- A carousel dragged with the touch pointer rests on the card it's heading to (its own snap position, one card per
+  flick), not on a screen-wide page that can stop between two cards.
+- An element that took a press itself (a long press that became a drag) marks itself `[data-held]`: the touch pointer
+  leaves the drag to it.
+- Capture: a bar's blur (`backdrop-filter`) on a turned device blurs what's under it, instead of cutting it with a
+  hard edge.
+
+**Contract**
+
+- None.
+
 ## 0.40.2 — 2026-10-22
 
 - A button drawn inline in a sentence (a link that acts: "Read the [terms]") is one of its text's runs, not loose

@@ -37,6 +37,12 @@
   box-shadow: 0 30px 70px rgba(15, 20, 30, 0.3), 0 6px 18px rgba(15, 20, 30, 0.2);
 }
 
+/* Turned in 3D (Capture), Chrome samples a backdrop-filter (a bar's blur) in the wrong place and cuts what's under it
+   with a hard edge. The screen as its own backdrop root keeps the blur inside its flat, untransformed content. */
+.turned [data-device-screen] {
+  will-change: filter;
+}
+
 /* Touch pointer (prototype): the fingertip replaces the cursor over the device. */
 .frame[data-touch],
 .frame[data-touch] * {

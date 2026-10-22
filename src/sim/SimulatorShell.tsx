@@ -308,7 +308,7 @@ function DesignerShell() {
   const frameNode = (
     <div
       ref={setFrameEl}
-      className={styles.frame}
+      className={`${styles.frame} ${capture ? styles.turned : ''}`}
       style={{ ...frameStyle(shownLayout, scale, capture ? tiltCss(shownTilt) : ''), ...(capture ? { zIndex: 1, transition: 'none', boxShadow: 'none' } : {}) }}
       {...screenAttrs({ device: device.id, display: display.key })}
     >
