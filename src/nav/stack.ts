@@ -148,6 +148,21 @@ export function nextQuery(pages: Manifest, prev: URLSearchParams, oldStack: Page
   return q;
 }
 
+/**
+ * The state a variant by state opens with: its own, and the rest of the page's state cleared (a search's text gone
+ * when its "Auctions" variant opens). None for a variant by route only.
+ */
+export function variantState(def: PageDef, variant: { state?: Params }): StateParams | undefined {
+  if (!variant.state) return undefined;
+  return { ...Object.fromEntries((def.state ?? []).map((k) => [k, null])), ...variant.state };
+}
+
+/** Whether a query shows this variant: every state param of the page as the variant has it. */
+export function isVariantState(def: PageDef, get: (key: string) => string | null, variant: { state?: Params }): boolean {
+  if (!variant.state) return true;
+  return (def.state ?? []).every((k) => (get(k) ?? null) === (variant.state![k] ?? null)) && Object.entries(variant.state).every(([k, v]) => get(k) === v);
+}
+
 /** Generic page name (manifest `name`, else a static title, else the id). */
 /** A page's name: its `name`, its title when it's fixed, else its id made readable ("addTask" → "Add task"). */
 export function pageName(pages: Manifest, id: string): string {

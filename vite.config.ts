@@ -30,11 +30,17 @@ export default defineConfig({
   // src/CHANGELOG.md). The build's id (when it was built, or
   // when the dev server started): what's derived from the code and cached in the browser (the page index) is keyed
   // on it, so a new build doesn't read a stale cache.
-  define: { __APP_VERSION__: JSON.stringify(pkg.version), __HC_VERSION__: JSON.stringify(hcVersion.version), __HC_LANGUAGE__: JSON.stringify(hc.language ?? 'en'), __BUILD_ID__: JSON.stringify(String(Date.now())) },
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __HC_VERSION__: JSON.stringify(hcVersion.version),
+    // The tool's own tests read its interface in English, whatever the copy's language.
+    __HC_LANGUAGE__: JSON.stringify(process.env.VITEST ? 'en' : (hc.language ?? 'en')),
+    __BUILD_ID__: JSON.stringify(String(Date.now())),
+  },
   // `npm test`: the logic's unit tests (and the scripts': npm run shot's arguments) and the smoke test (every page, every story renders), in a DOM of happy-dom.
   test: {
     environment: 'happy-dom',
-    include: ['{src,app,proposals}/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs'],
+    include: ['{src,app,proposals}/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs', 'app/**/*.test.mjs'],
     setupFiles: ['src/test/setup.ts'],
     // No module cache between runs: it keeps an import.meta.glob's old list (proposals/, stories, pages), so a
     // proposal or a story added since fails as missing until the cache is cleared.

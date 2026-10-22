@@ -10,7 +10,7 @@ import { CHANGE, HIGHLIGHT, type ChangeKind } from '../design/changes';
 import { componentKind, useGalleryNav } from '../gallery/route';
 import { useNavRoot } from '../nav/context';
 import { BASE_PAGES } from '../nav/pages';
-import { pageIcon, pageName } from '../nav/stack';
+import { pageIcon, pageName, variantState } from '../nav/stack';
 import { CHANGES_ALL, CHANGES_PARAM, PROPOSALS, proposalChanges, SCOPE_LABEL, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import type { PageDef } from '../nav/types';
 import { useMode, useSetMode } from './modes';
@@ -98,7 +98,7 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                       pg.kind === 'removed'
                         ? undefined
                         : () => {
-                            nav.open(pg.id, def?.variants?.()[0]?.params ?? {}, def?.variants?.()[0]?.state);
+                            nav.open(pg.id, def?.variants?.()[0]?.params ?? {}, def && def.variants?.()[0] ? variantState(def, def.variants()[0]) : undefined);
                             setOpen(false);
                           }
                     }

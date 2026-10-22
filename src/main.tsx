@@ -9,6 +9,13 @@ import './kit/tokens.css';
 import './theme/theme.css';
 // The tool's brand colors (herocanvas.config.ts, scripts/vite/brand.ts).
 import 'virtual:hc-brand.css';
+import { appConfig } from '@app/config';
+
+// The app's fonts (appConfig.fonts): its screens' typeface, loaded with the designer.
+for (const href of appConfig.fonts ?? []) {
+  const link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href });
+  document.head.append(link);
+}
 
 // A part loaded on demand (the comments, a panel) that's gone: a new version was deployed since this tab opened, and its
 // files have other names. Loading the page again gets the new version — once, so a part that's really missing still

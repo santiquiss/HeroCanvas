@@ -1,7 +1,7 @@
 // Every page's URL leads back to it (with its params): links, reloads and shared URLs open the same screen.
 import { describe, expect, it } from 'vitest';
 import { composePages } from './manifest';
-import { buildPath, parsePath } from './stack';
+import { buildPath, isVariantState, parsePath, variantState } from './stack';
 
 const pages = composePages(null);
 const refs = Object.entries(pages).flatMap(([id, def]) => {
@@ -24,5 +24,21 @@ describe('page URLs', () => {
   it('no two pages share a path', () => {
     const paths = Object.values(pages).map((d) => d.path);
     expect(new Set(paths).size).toBe(paths.length);
+  });
+});
+
+describe('a variant by state', () => {
+  const def = { state: ['type', 'q'] } as unknown as Parameters<typeof variantState>[0];
+  it('replaces the page’s state, the rest cleared', () => {
+    expect(variantState(def, { state: { type: 'car' } })).toEqual({ type: 'car', q: null });
+    expect(variantState(def, {})).toBeUndefined();
+  });
+  it('is the one shown only while the URL holds exactly its state', () => {
+    const get = (q: string) => (k: string) => new URLSearchParams(q).get(k);
+    expect(isVariantState(def, get('type=car'), { state: { type: 'car' } })).toBe(true);
+    expect(isVariantState(def, get('type=car&q=x'), { state: { type: 'car' } })).toBe(false);
+    expect(isVariantState(def, get('type=car'), { state: {} })).toBe(false);
+    // A control of the app's it turns on (not the page's state) has to hold too.
+    expect(isVariantState(def, get('type=car'), { state: { type: 'car', with_x: '1' } })).toBe(false);
   });
 });

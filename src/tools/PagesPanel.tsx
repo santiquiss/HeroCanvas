@@ -8,7 +8,7 @@ import { useNavRoot } from '../nav/context';
 import { stepOf, stepState } from '../nav/flow';
 import { ChangeBadge } from '../flow/FlowView';
 import type { Manifest } from '../nav/stack';
-import { pageIcon, pageName, ROLE_ICONS, ROLE_NAMES, sameRef } from '../nav/stack';
+import { isVariantState, pageIcon, pageName, ROLE_ICONS, ROLE_NAMES, sameRef, variantState } from '../nav/stack';
 import type { FlowStep, PageDef, PageRef, PageStatus, Params } from '../nav/types';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
@@ -112,7 +112,7 @@ function PageNode({ id, depth, query }: { id: string; depth: number; query: stri
       {expanded && steps.map((st, i) => <StepRows key={st.id} id={id} step={st} n={i + 1} depth={depth + 1} query={query} />)}
       {expanded &&
         shownVariants.map((v) => (
-          <Row key={v.label} depth={depth + 1} def={def} label={v.label} refOf={{ id, params: v.params ?? {} }} state={v.state} caret={null} variant onClick={() => nav.open(id, v.params ?? {}, v.state)} />
+          <Row key={v.label} depth={depth + 1} def={def} label={v.label} refOf={{ id, params: v.params ?? {} }} state={v.state} caret={null} variant onClick={() => nav.open(id, v.params ?? {}, variantState(def, v))} />
         ))}
       {expanded &&
         modes.map((m) => (
@@ -161,7 +161,7 @@ function Row({ depth, def, label, refOf, state, caret, onCaret, onClick, variant
   const top = nav.stack[nav.stack.length - 1];
   const [search] = useSearchParams();
   // A flow's current row is its step's, below it; a variant by state is the one shown only while the URL holds its state.
-  const holds = !state || Object.entries(state).every(([k, v]) => search.get(k) === v);
+  const holds = isVariantState(def, (k) => search.get(k), { state });
   const isCurrent = !!refOf && sameRef(refOf, top) && !def.flow && holds;
   const inStack = !!refOf && nav.stack.some((r) => sameRef(r, refOf));
   const cls = [styles.row, isCurrent ? styles.current : inStack ? styles.inStack : ''].join(' ');

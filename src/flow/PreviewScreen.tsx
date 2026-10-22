@@ -5,7 +5,7 @@
 import { useMemo } from 'react';
 import { NavCtx, useNavRoot, type Nav } from '../nav/context';
 import { HOME } from '../nav/pages';
-import { chainFor, detailOpenFor, pageTitle, stackUrl } from '../nav/stack';
+import { chainFor, detailOpenFor, pageTitle, SIM_PARAMS, stackUrl } from '../nav/stack';
 import type { PageRef, Params } from '../nav/types';
 import { DeviceScreen } from '../sim/DeviceScreen';
 import type { Layout } from '../sim/layout';
@@ -70,7 +70,13 @@ export function PreviewScreen({
   );
   const fixed = useMemo(() => {
     if (!state) return query;
-    const q = new URLSearchParams(query ?? liveSearch());
+    // The designer's params as they are (persona, theme…), and the variant's state, none of the page's own else.
+    const from = query ?? liveSearch();
+    const q = new URLSearchParams();
+    for (const k of SIM_PARAMS) {
+      const v = from.get(k);
+      if (v != null) q.set(k, v);
+    }
     for (const [k, v] of Object.entries(state)) q.set(k, v);
     return q;
   }, [query, state]);

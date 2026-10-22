@@ -9,7 +9,7 @@ const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 
 describe('the brand color', () => {
   it('is the logo’s blue, readable under white text in light, lighter in dark', () => {
-    const { light, dark } = fromLogo(readPng(readFileSync('brand/hc-logo.png')));
+    const { light, dark } = fromLogo(readPng(readFileSync('public/tour/icon.png')));
     const [r, g, b] = rgb(light);
     expect(b).toBeGreaterThan(r + 80);
     expect(b).toBeGreaterThan(g);
@@ -30,7 +30,7 @@ describe('the brand color', () => {
     expect(css).toContain('--hc-on-brand: #ffffff;');
   });
   it('makes the icons at their sizes and the manifest, from the logo', () => {
-    const files = brandFiles({ name: 'Acme', logo: '' }, readPng(readFileSync('brand/hc-logo.png')));
+    const files = brandFiles({ name: 'Acme', logo: '' }, readPng(readFileSync('public/tour/icon.png')));
     expect([...files.keys()]).toEqual(BRAND_FILES);
     for (const [path, n] of [['assets/logo-64.png', 64], ['pwa/icon-180.png', 180], ['pwa/icon-512.png', 512]]) {
       const icon = readPng(files.get(path));

@@ -67,6 +67,11 @@ export interface AppConfig {
   themes?: AppTheme[];
   /** The tab an empty or unknown URL opens. */
   home: string;
+  /**
+   * Stylesheets with the fonts its screens use (a Google Fonts `css2` URL, a font's own CSS), loaded with the designer:
+   * the app's own typeface, not the designer's.
+   */
+  fonts?: string[];
   /** What the app shows while it starts (LaunchConfig). None: it opens straight on its first screen. */
   launch?: LaunchConfig;
   /** The room its screens give its navigation (ScreenLayout): a wider rail, one that folds. None: the defaults. */

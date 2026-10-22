@@ -50,7 +50,10 @@ export function isTextSpan(el: Element): boolean {
  * text an element of its own (src/test/looseText.test.tsx); Layers still shows one that's loose as a layer of its own.
  * Text with runs of text beside it ("**3** tasks left today") is one text, a Text.rich.
  */
-export const mixesText = (el: Element) => el instanceof HTMLElement && el.childElementCount > 0 && hasOwnText(el) && [...el.children].some((c) => !isTextSpan(c));
+/** An inline run with nothing in it (a `<b>` around a value that's empty): nothing on screen, nothing beside the text. */
+const isEmptyRun = (el: Element) => PHRASING.has(el.tagName) && !el.childElementCount && !el.textContent?.trim();
+
+export const mixesText = (el: Element) => el instanceof HTMLElement && el.childElementCount > 0 && hasOwnText(el) && [...el.children].some((c) => !isTextSpan(c) && !isEmptyRun(c));
 
 export function elementKind(el: Element): ElementKind {
   if (el instanceof SVGSVGElement) return 'graphic';

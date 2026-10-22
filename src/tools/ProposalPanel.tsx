@@ -10,7 +10,7 @@ import { componentKind, useGalleryNav, useGalleryRoute } from '../gallery/route'
 import { useNavRoot } from '../nav/context';
 import { composePages } from '../nav/manifest';
 import { BASE_PAGES, HOME } from '../nav/pages';
-import { chainFor, SIM_PARAMS, stackUrl } from '../nav/stack';
+import { chainFor, SIM_PARAMS, stackUrl, variantState } from '../nav/stack';
 import { recalledAuthor, rememberAuthor } from '../persist/author';
 import { useCanWrite, writeJson } from '../persist/devApi';
 import { authorLetters, defaultAuthorLetters, MAX_AUTHOR_LETTERS, nextProposalCode } from '../proposals/code';
@@ -220,7 +220,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
             const def = nav.pages[id];
             const variant = def.variants?.()[0];
             return (
-              <div key={id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => nav.open(id, variant?.params ?? {}, variant?.state)} title={t('Open')}>
+              <div key={id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => nav.open(id, variant?.params ?? {}, variant && variantState(def, variant))} title={t('Open')}>
                 <ChangeBadge change={nav.change(id)!} />
                 <span className={styles.name}>{def.name ?? (typeof def.title === 'string' ? def.title : id)}</span>
                 <span className={styles.muted}>{!BASE_PAGES[id] ? t('new page') : p.pages[id] ? (p.config[id] ? t('page + config') : t('page')) : t('config')}</span>

@@ -8,7 +8,7 @@ import { CHANGE, type ChangeKind } from '../design/changes';
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
-import { pageIcon, pageName, parsePath, ROLE_NAMES } from '../nav/stack';
+import { pageIcon, pageName, parsePath, ROLE_NAMES, variantState } from '../nav/stack';
 import { lastPrototypeUrl } from '../sim/modes';
 import type { PageStatus } from '../nav/types';
 import type { Layout } from '../sim/layout';
@@ -358,7 +358,7 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
               className={`${styles.thumb} ${id === current ? styles.current : ''}`}
               style={{ width: w, height: h, borderRadius: radius }}
               title={far ? name : t('Open in the prototype')}
-              onClick={() => moved.current < 4 && nav.open(id, params, state)}
+              onClick={() => moved.current < 4 && nav.open(id, params, variants[vi] && variantState(def, variants[vi]))}
             >
               {far ? (
                 <PageCard icon={pageIcon(def)} status={def.status} change={nav.change(id)} />

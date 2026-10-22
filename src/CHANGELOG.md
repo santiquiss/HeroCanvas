@@ -6,6 +6,24 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.40.1 — 2026-10-22
+
+From moving Andaremos Designer onto HeroCanvas:
+
+- **A variant by state replaces the page's state**: opening one clears the page's other state (a search's text
+  gone when its "Auctions" variant opens), and it's the one shown only while the URL holds exactly its state; its
+  thumbnail in Flow shows only that state.
+- **The app's fonts** (`appConfig.fonts`): stylesheets with its typeface (a Google Fonts `css2` URL), loaded with the
+  designer.
+- The tool's own tests run in English whatever the copy's language, and the brand's test reads the tour's icon, not
+  the team's logo: a copy in Spanish, or with its own logo, passes them.
+- An empty inline run (a `<b>` around an empty value) isn't loose text beside a text.
+- `npm test` runs a team's own script tests too (`app/**/*.test.mjs`: a connector's).
+
+**Contract**
+
+- `AppConfig.fonts` (new): nothing to adapt.
+
 ## 0.40.0 — 2026-10-22
 
 What an app does around its pages, declared instead of forked (from moving Andaremos Designer, a Compose app's
