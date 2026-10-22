@@ -3,7 +3,7 @@
 // focused field like a real one (letters, numbers and symbols layers, shift / caps lock, delete, space, return), and
 // never takes focus itself. A physical keyboard keeps working too.
 import { useEffect, useReducer, useRef, useState, type SyntheticEvent } from 'react';
-import { Icon } from '../components/Icon';
+import { hasSymbol, Icon } from '../components/Icon';
 import type { DeviceOS } from '../devices/devices';
 import styles from './SystemKeyboard.module.css';
 
@@ -58,7 +58,36 @@ const WIDTH: Record<DeviceOS, Record<string, number>> = {
   },
 };
 
-const ICON: Record<string, string> = { '⌫': 'backspace', '☺': 'mood', '🌐': 'language', '🎤': 'mic', '⌨': 'keyboard_hide' };
+/** Each glyph as Apple draws it (an SF Symbol) and as Material does (Gboard's, and iOS's when the team has no SF Symbols). */
+const GLYPH: Record<string, { sf: string; material: string }> = {
+  '⌫': { sf: 'delete.left', material: 'backspace' },
+  '☺': { sf: 'face.smiling', material: 'mood' },
+  '🌐': { sf: 'globe', material: 'language' },
+  '🎤': { sf: 'mic', material: 'mic' },
+  '⌨': { sf: 'keyboard.chevron.compact.down', material: 'keyboard_hide' },
+  shift: { sf: 'shift', material: 'shift' },
+  shiftOnce: { sf: 'shift.fill', material: 'shift' },
+  capsLock: { sf: 'capslock.fill', material: 'shift_lock' },
+  return: { sf: 'return', material: 'keyboard_return' },
+  search: { sf: 'magnifyingglass', material: 'search' },
+  done: { sf: 'checkmark', material: 'check' },
+  go: { sf: 'arrow.right', material: 'arrow_forward' },
+  send: { sf: 'arrow.up', material: 'arrow_upward' },
+  undo: { sf: 'arrow.uturn.backward', material: 'undo' },
+  redo: { sf: 'arrow.uturn.forward', material: 'redo' },
+  paste: { sf: 'clipboard', material: 'content_paste' },
+};
+
+/**
+ * A key's glyph: on iOS and iPadOS the SF Symbol, at the letters' weight, when the team made HeroCanvas's own
+ * (`npm run symbols`); else Material's, lighter than its default so it doesn't stand out bolder than the letters
+ * beside it. Android: Material's, as Gboard draws.
+ */
+function KeyGlyph({ os, g, size, fill }: { os: DeviceOS; g: keyof typeof GLYPH; size: number; fill?: boolean }) {
+  const { sf, material } = GLYPH[g];
+  if (os !== 'android' && hasSymbol(sf)) return <Icon name={`sf:${sf}`} size={size} />;
+  return <Icon name={material} size={size} fill={fill} weight={os === 'android' ? undefined : 300} />;
+}
 
 /** Number hints on Android's top letter row. */
 const HINTS = '1234567890';
@@ -219,14 +248,14 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
     const k = base(key);
     // iOS 26 glyphs are bigger than the others' (shift, delete and emoji ≈ 26pt).
     const glyph = os === 'android' ? 22 : os === 'ipad' ? 24 : 26;
-    if (k === '⇧') return <Icon name={shift === 'lock' ? 'shift_lock' : 'shift'} fill={shift !== 'off'} size={glyph} />;
+    if (k === '⇧') return <KeyGlyph os={os} g={shift === 'lock' ? 'capsLock' : shift === 'once' ? 'shiftOnce' : 'shift'} fill={shift !== 'off'} size={glyph} />;
     if (k === '⏎' && action) return ACTION_LABEL;
     if (k === '⏎') {
       // A glyph on every OS (iOS and iPadOS 26, Android).
-      const glyph = hint === 'search' ? 'search' : hint === 'done' ? 'check' : hint === 'go' ? 'arrow_forward' : hint === 'send' ? 'arrow_upward' : 'keyboard_return';
-      return <Icon name={glyph} size={os === 'android' ? 22 : 28} weight={os === 'android' ? undefined : 500} />;
+      const g = hint === 'search' || hint === 'done' || hint === 'go' || hint === 'send' ? hint : 'return';
+      return <KeyGlyph os={os} g={g} size={os === 'android' ? 22 : 28} />;
     }
-    if (ICON[k]) return <Icon name={ICON[k]} size={glyph} />;
+    if (GLYPH[k]) return <KeyGlyph os={os} g={k} size={glyph} />;
     if (k === '␣') return '';
     if (k.startsWith('→')) {
       const to = k.slice(1);
@@ -276,9 +305,9 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
         <div className={styles.suggest}>
           {os === 'ipad' && (
             <span className={styles.shortcuts}>
-              <Icon name="undo" size={24} />
-              <Icon name="redo" size={24} />
-              <Icon name="content_paste" size={24} />
+              <KeyGlyph os={os} g="undo" size={24} />
+              <KeyGlyph os={os} g="redo" size={24} />
+              <KeyGlyph os={os} g="paste" size={24} />
             </span>
           )}
           {SUGGESTIONS.map((s, i) => (
@@ -344,8 +373,8 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
       {os === 'ios' && !pad && (
         // Globe (emoji, with a typed return key) and dictation below the keys, in the home indicator's band.
         <div className={styles.below} style={{ height: land ? Math.max(bottomInset + 8, 40) : Math.max(bottomInset + 37, 71) }}>
-          <Icon name={action ? 'mood' : 'language'} size={27} />
-          <Icon name="mic" size={27} />
+          <KeyGlyph os={os} g={action ? '☺' : '🌐'} size={27} />
+          <KeyGlyph os={os} g="🎤" size={27} />
         </div>
       )}
       {os === 'android' && (

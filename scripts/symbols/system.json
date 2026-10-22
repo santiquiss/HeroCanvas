@@ -1,0 +1,9 @@
+{
+  "//": "HeroCanvas's own SF Symbols: the iOS and iPadOS keyboards' glyphs and the iOS kit's (src/sim/SystemKeyboard.tsx, src/ios). `npm run symbols` with no names makes them; without them, both draw Material's closest.",
+  "symbols": [
+    "shift", "shift.fill", "capslock.fill", "delete.left", "return", "face.smiling", "globe", "mic",
+    "keyboard.chevron.compact.down", "arrow.uturn.backward", "arrow.uturn.forward", "clipboard",
+    "checkmark", "arrow.right", "arrow.up", "magnifyingglass",
+    "chevron.backward", "chevron.forward", "chevron.up.chevron.down", "xmark.circle.fill"
+  ]
+}

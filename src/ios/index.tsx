@@ -209,7 +209,8 @@ export function SearchField({ text, prompt = 'Search', onChange, scopes }: Searc
     <div {...hc} onFocus={() => setActive(true)} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setActive(false)}>
       <label className={styles.search}>
         <Glyph sf="magnifyingglass" material="search" size={20} />
-        <input value={text} placeholder={prompt} onChange={(e) => onChange(e.target.value)} />
+        {/* type=search: the keyboard's return is a blue Search key, as iOS gives a search field. */}
+        <input type="search" enterKeyHint="search" value={text} placeholder={prompt} onChange={(e) => onChange(e.target.value)} />
         {text && (
           <button className={styles.searchClear} aria-label="Clear text" onMouseDown={(e) => e.preventDefault()} onClick={() => onChange('')}>
             <Glyph sf="xmark.circle.fill" material="cancel" size={18} />

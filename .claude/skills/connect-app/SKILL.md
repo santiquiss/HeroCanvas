@@ -63,7 +63,8 @@ dark, to make tokens of (step 3); screens reach the images through `import.meta.
 **Texts**: `npm run texts -- --from <its translations>` (`.strings`, `.xcstrings`, `strings.xml`, ARB, i18next JSON)
 writes one `app/i18n.<lang>.json` per language, key → text; `app/i18n.ts` reads them in the screen's language.
 
-**Icons**: an iOS or macOS app's SF Symbols, as the app has them: `npm run symbols -- <name>…` (every
+**Icons**: an iOS or macOS app's SF Symbols, as the app has them: `npm run symbols` first (HeroCanvas's own: the
+system keyboards' and the iOS kit's glyphs), then `npm run symbols -- <name>…` (every
 `systemName:` / `systemImage:` the screens use; on a Mac) and its own symbols, `npm run symbols -- --from
 <its .xcassets>`; then `<Icon name="sf:<name>" />`. Other apps: the closest Material Symbol by name.
 

@@ -1,5 +1,6 @@
 // `npm run symbols`: SF Symbols and an app's own symbols for the screens, where `<Icon name="sf:…">` finds them.
 //
+//   npm run symbols                                           HeroCanvas's own: the keyboards' and the iOS kit's
 //   npm run symbols -- box.truck heart.fill trophy:semibold   SF Symbols, rendered by this Mac (macOS only)
 //   npm run symbols -- --from <path/to/Assets.xcassets>       the app's own symbols (.symbolset), as SVG
 //
@@ -14,13 +15,17 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(root, 'public/symbols');
 const MANIFEST = join(root, 'app/symbols.json');
-const args = process.argv.slice(2);
-if (!args.length) {
-  console.log('Usage: npm run symbols -- <sf.symbol.name[:weight]>…   |   npm run symbols -- --from <Assets.xcassets or a .symbolset>');
-  process.exit(1);
+// No names: HeroCanvas's own symbols (scripts/symbols/system.json), the system keyboards' and the iOS kit's glyphs,
+// so a team never lists them. With names: those, and HeroCanvas's own the first time.
+const SYSTEM = JSON.parse(readFileSync(join(root, 'scripts/symbols/system.json'), 'utf8')).symbols;
+const given = process.argv.slice(2);
+if (given[0] === '--help') {
+  console.log('Usage: npm run symbols [-- <sf.symbol.name[:weight]>…]   |   npm run symbols -- --from <Assets.xcassets or a .symbolset>');
+  process.exit(0);
 }
 mkdirSync(OUT, { recursive: true });
 const manifest = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : {};
+const args = given[0] === '--from' ? given : [...new Set([...given, ...SYSTEM.filter((n) => !manifest[n] || !given.length)])];
 const added = [];
 
 /** A custom symbol template's Regular-M glyph as a standalone SVG: its paths, in a box around them. */

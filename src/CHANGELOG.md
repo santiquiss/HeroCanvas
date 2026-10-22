@@ -6,6 +6,20 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.37.1 — 2026-10-22
+
+- **The keyboards' glyphs as Apple draws them**: on iPhone and iPad, shift, delete, return, emoji, globe, dictation,
+  hide and the shortcuts are SF Symbols at the letters' weight when the team made HeroCanvas's own; without them,
+  Material's at a lighter weight (its font now loads 100–700), so none stands out bolder than the letters. Android
+  keeps Gboard's.
+- `npm run symbols` with no names makes HeroCanvas's own symbols (`scripts/symbols/system.json`: the keyboards' and
+  the iOS kit's); with names, those too the first time.
+- The iOS kit's search field asks for the keyboard's blue Search key.
+
+**Contract**
+
+- None.
+
 ## 0.37.0 — 2026-10-22
 
 The iOS kit, from mirroring Studio (AdaptiveAppShell's demo):
