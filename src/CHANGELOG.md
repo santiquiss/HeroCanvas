@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.47.3 — 2026-10-22
+
+- **The About page shows HeroCanvas's own icon in every copy** (`public/tour/icon.png`), not the copy's app icon
+  (`pwa/`, made from its brand logo): a team's copy showed its own app there.
+
 ## 0.47.2 — 2026-10-22
 
 - **A team's retired proposal codes are its own** (`proposals/retired.json`): the Proposal panel and
