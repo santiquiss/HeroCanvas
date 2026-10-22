@@ -4,7 +4,7 @@
 
 ### Superpowers for Designers
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.38.1-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.38.2-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 <img alt="Status: beta" src="https://img.shields.io/badge/status-beta-e0362f">
 <a href="https://herocanvas.io"><img alt="Website" src="https://img.shields.io/badge/website-herocanvas.io-0f1730"></a>
@@ -360,7 +360,7 @@ the tool's, on its page (the ⓘ at the bottom of the left rail) with the licens
 
 ## License
 
-Made by [Santiago Quiss](https://github.com/santiquiss) and [Agus Salas](https://github.com/salasagustina-ds), in
+Made by [Santiago Quiss](https://github.com/santiquiss) and [Agustina Salas](https://github.com/salasagustina-ds), in
 collaboration with the [MacrosFirst](https://macrosfirst.com) team.
 
 Open source under the [Apache License 2.0](LICENSE): use it, change it and share it, for yourself or your company,

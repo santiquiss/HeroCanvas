@@ -14,7 +14,7 @@ const LICENSE = 'https://www.apache.org/licenses/LICENSE-2.0';
 /** Who made it, with their GitHub profiles. */
 const AUTHORS = [
   { name: 'Santiago Quiss', url: 'https://github.com/santiquiss' },
-  { name: 'Agus Salas', url: 'https://github.com/salasagustina-ds' },
+  { name: 'Agustina Salas', url: 'https://github.com/salasagustina-ds' },
 ];
 const BODY = changelogBody(hcChangelog);
 
