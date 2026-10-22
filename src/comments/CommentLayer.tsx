@@ -62,7 +62,9 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
       e.stopPropagation();
       const at = anchorAt(on.el, t, e.clientX, e.clientY);
       const scope = screenScope(on.screen, global);
-      if (at) setDraft({ page: at.page, anchor: { ...at.anchor, device: on.screen.device, display: on.screen.display }, design: scope.design, variant: scope.variant, frame: on.el });
+      // On a bare canvas (the gallery) the pin isn't any device's.
+      const device = on.screen.bare ? {} : { device: on.screen.device, display: on.screen.display };
+      if (at) setDraft({ page: at.page, anchor: { ...at.anchor, ...device }, design: scope.design, variant: scope.variant, frame: on.el });
       setSelected(null);
     };
     window.addEventListener('click', onClick, true);
@@ -89,7 +91,7 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
     }
     // Each pin's frame and the element it follows, found once per change of the screens' DOM (`version`), not every
     // frame: a thread shows on the frames of its device that show its version.
-    const frames = screensIn(st).map((f) => ({ ...f, scope: screenScope(f.screen, global), shown: f.el.querySelector<HTMLElement>('[data-theme]') ?? f.el }));
+    const frames = screensIn(st).map((f) => ({ ...f, scope: screenScope(f.screen, global), shown: (!f.screen.bare && f.el.querySelector<HTMLElement>('[data-theme]')) || f.el }));
     const targets = frames.flatMap((f, i) => [
       ...shown
         .filter(({ root }) => root.design === f.scope.design && (!root.variant || !f.scope.variant || root.variant === f.scope.variant) && showsOn(root.anchor!, f.screen))
@@ -97,10 +99,10 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
       ...(draft && draft.frame === f.el ? [{ id: 'draft', key: 'draft', page: draft.page, anchor: draft.anchor, frame: f }] : []),
     ]);
     const els = targets.map((t) => {
-      const pageEl = pageLayer(t.frame.el, t.page);
+      const pageEl = pageLayer(t.frame.el, t.page, t.anchor.story);
       const at = pageEl && anchorElement(t.frame.el, pageEl, t.anchor);
-      // A sheet's component is over every page; a page's can be under one pushed over it.
-      return at ? { t, pageEl, above: t.anchor.overlay ? [] : pagesAbove(t.frame.el, pageEl), ...at } : null;
+      // A sheet's component is over every page; a page's can be under one pushed over it (not on a bare canvas's).
+      return at ? { t, pageEl, above: t.anchor.overlay || t.frame.screen.bare ? [] : pagesAbove(t.frame.el, pageEl), ...at } : null;
     });
     let last = '';
     const loop = () => {

@@ -16,6 +16,8 @@
   "Components": "Componentes",
   "Not replicated · {kind}": "No replicado · {kind}",
   "Missing in the simulator": "Falta en el simulador",
+  "Not in the app’s code yet: {code} proposes it and builds it here. Live gets it once the app has it.": "Todavía no está en el código de la app: {code} lo propone y lo construye aquí. En vivo lo tendrá cuando la app lo tenga.",
+  "{param}: {code} adds it to the widget": "{param}: {code} lo agrega al widget",
   "Not built here yet: it has no stories.": "Aún no está hecho aquí: no tiene ejemplos.",
   "Differs from code": "Distinto del código",
   "Differs from the app": "Distinto de la app",

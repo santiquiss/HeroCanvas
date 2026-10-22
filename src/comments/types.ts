@@ -17,13 +17,20 @@ export const kindOf = (id: string): (typeof KINDS)[number] => KINDS.find((k) => 
 /** Where Live's comments go (a proposal's go under its code, `PJ-12`). */
 export const LIVE = 'live';
 
+/** A component's page in the gallery, as a comment's `page` (the app's pages are their ids). */
+const COMPONENT_PAGE = 'component:';
+export const componentPage = (name: string) => COMPONENT_PAGE + name;
+/** The component a comment's page is, or null when it's one of the app's pages. */
+export const componentOfPage = (page: string): string | null => (page.startsWith(COMPONENT_PAGE) ? page.slice(COMPONENT_PAGE.length) : null);
+
 /**
  * Where a pin sits: on a component of a page (the nth of its name in the page, at a point of it), so it follows the
  * component when the screen scrolls or the layout changes; `x`/`y` place it on the page when the component isn't
  * found (the design changed since). Every fraction is 0–1 of the box. `device` / `display`: the device it was left on
  * (devices/devices.ts), where its pin shows; none (older comments) shows on every device. `overlay`: the component is on
  * a sheet, dialog or popover over the page (comments/anchor), and the pin shows only while it's open; `sheet`: that
- * sheet's id, when it has one, so opening the comment opens it (sim/sheetLinks).
+ * sheet's id, when it has one, so opening the comment opens it (sim/sheetLinks). `story`: on a component's page in the
+ * gallery, the example it was left on (its pin follows that one).
  */
 export interface CommentAnchor {
   component: string | null;
@@ -36,6 +43,7 @@ export interface CommentAnchor {
   display?: string | null;
   overlay?: boolean;
   sheet?: string;
+  story?: string;
 }
 
 export interface Comment {
@@ -46,7 +54,7 @@ export interface Comment {
   design: string;
   /** The proposal's version it was left on (`b`), or null (Live, or a proposal without versions). */
   variant: string | null;
-  /** The page id (app/pages.tsx). */
+  /** The page id (app/pages.tsx), or a component's in the gallery (componentPage). */
   page: string;
   /** The view it was left on (route + query), to open it again. */
   link: string;

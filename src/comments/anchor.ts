@@ -10,23 +10,38 @@ export const PAGE_ATTR = 'data-page-id';
 /**
  * A device frame on the canvas (one, in a set, side by side): which device and display it is, and the version it shows
  * when it isn't the toolbar's (a set's device can show its own: `live`, `PJ-12`, `PJ-12~b`). Comments are left on it
- * and their pins show on it.
+ * and their pins show on it. `bare`: a canvas that isn't a device (the gallery's examples, GALLERY_SCREEN): its pages
+ * sit side by side in it, with nothing over them, its pins show whatever the device, and they're clipped to the
+ * canvas itself (it scrolls).
  */
 export interface CanvasScreen {
   device: string;
   display: string;
   design?: string;
+  bare?: boolean;
 }
 
+/** The gallery's canvas: a component's examples, each a page of its own (story frames, anchored by `story`). */
+export const GALLERY_SCREEN: CanvasScreen = { device: '', display: '', bare: true };
+
+/** On a bare canvas, the example a page layer is (the gallery's story). */
+const STORY_ATTR = 'data-hc-page';
+
 export function screenAttrs(s: CanvasScreen): Record<string, string> {
-  return { 'data-comment-device': s.device, 'data-comment-display': s.display, ...(s.design ? { 'data-comment-design': s.design } : {}) };
+  return {
+    'data-comment-device': s.device,
+    'data-comment-display': s.display,
+    ...(s.design ? { 'data-comment-design': s.design } : {}),
+    ...(s.bare ? { 'data-comment-bare': '' } : {}),
+  };
 }
 
 /** The device frame an element is on, and the frame's element. */
 export function screenOf(el: Element): { el: HTMLElement; screen: CanvasScreen } | null {
   const f = el.closest<HTMLElement>('[data-comment-device]');
   if (!f) return null;
-  return { el: f, screen: { device: f.dataset.commentDevice!, display: f.dataset.commentDisplay ?? '', design: f.dataset.commentDesign } };
+  const bare = f.hasAttribute('data-comment-bare');
+  return { el: f, screen: { device: f.dataset.commentDevice!, display: f.dataset.commentDisplay ?? '', design: f.dataset.commentDesign, ...(bare ? { bare } : {}) } };
 }
 
 /** Every device frame inside a canvas, in order. */
@@ -79,6 +94,8 @@ function topPage(frame: Element): HTMLElement | null {
  */
 export function anchorAt(frame: Element, target: Element, x: number, y: number): { page: string; anchor: CommentAnchor } | null {
   const own = target.closest<HTMLElement>(`[${PAGE_ATTR}]`);
+  // A bare canvas's pages are side by side (the gallery's stories): off them (a title, the margin) is on none.
+  if (frame.hasAttribute('data-comment-bare')) return own && frame.contains(own) ? onExample(own, target, x, y) : null;
   const pageEl = own && frame.contains(own) ? own : topPage(frame);
   const page = pageEl?.getAttribute(PAGE_ATTR);
   if (!pageEl || !page) return null;
@@ -98,9 +115,22 @@ export function anchorAt(frame: Element, target: Element, x: number, y: number):
   return { page, anchor: { component: name, nth, ox: o.fx, oy: o.fy, x: fx, y: fy, ...(overlay ? { overlay: true } : {}), ...(sheet ? { sheet } : {}) } };
 }
 
-/** The page layer of a page on the screen (the topmost, if it's in the stack twice). */
-export function pageLayer(screen: Element, page: string): HTMLElement | null {
-  const all = screen.querySelectorAll<HTMLElement>(`[${PAGE_ATTR}="${CSS.escape(page)}"]`);
+/** A click on one of a bare canvas's pages: anchored in that example, which it names (`story`). */
+function onExample(pageEl: HTMLElement, target: Element, x: number, y: number): { page: string; anchor: CommentAnchor } {
+  const page = pageEl.getAttribute(PAGE_ATTR)!;
+  const story = pageEl.getAttribute(STORY_ATTR) ?? undefined;
+  const { fx, fy } = fractionIn(pageEl.getBoundingClientRect(), x, y);
+  const hit = target.closest('[data-hc]');
+  const name = hit && pageEl.contains(hit) ? nameOf(hit) : null;
+  const at = { x: fx, y: fy, ...(story ? { story } : {}) };
+  if (!hit || !name) return { page, anchor: { component: null, nth: 0, ox: 0, oy: 0, ...at } };
+  const o = fractionIn(hit.getBoundingClientRect(), x, y);
+  return { page, anchor: { component: name, nth: Math.max(0, instances(pageEl, name).indexOf(hit as HTMLElement)), ox: o.fx, oy: o.fy, ...at } };
+}
+
+/** The page layer of a page on the screen (the topmost, if it's in the stack twice); `story`: that example of it. */
+export function pageLayer(screen: Element, page: string, story?: string): HTMLElement | null {
+  const all = screen.querySelectorAll<HTMLElement>(`[${PAGE_ATTR}="${CSS.escape(page)}"]${story ? `[${STORY_ATTR}="${CSS.escape(story)}"]` : ''}`);
   return all[all.length - 1] ?? null;
 }
 

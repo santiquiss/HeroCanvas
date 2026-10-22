@@ -1,10 +1,11 @@
-// The Comments panel, as Figma's: a search, the filters (this screen or every page, kinds, resolved) and the threads of
-// what's on screen (Live or the proposal), newest first. A thread opens beside its pin on the canvas and here, where it
+// The Comments panel, as Figma's: a search, the filters (this screen, or component in the gallery, or every page,
+// resolved) and the threads of what's on screen (Live or the proposal), newest first. A thread opens beside its pin on the canvas and here, where it
 // unfolds with its replies; opening one left on another view takes the canvas there.
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Icon } from '../components/Icon';
 import { findDevice } from '../devices/devices';
+import { useGalleryRoute } from '../gallery/route';
 import { useNavRoot } from '../nav/context';
 import { pageName } from '../nav/stack';
 import { useMode } from '../sim/modes';
@@ -13,7 +14,7 @@ import { useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsCont
 import { Avatar, EditField, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
 import { commentsShared, refresh, useComments, useCommentsOf } from './store';
 import { commentLink, filterThreads, resolverName, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
-import type { Comment } from './types';
+import { componentOfPage, componentPage, type Comment } from './types';
 import { openSheetLink } from '../sim/sheetLinks';
 import panel from '../tools/Panel.module.css';
 import styles from './Comments.module.css';
@@ -27,16 +28,19 @@ export default function CommentsPanel() {
   const { selected, setSelected, commenting, setCommenting, showResolved: resolved, setShowResolved: setResolvedShown } = useCommentsUi();
   const nav = useNavRoot();
   const mode = useMode();
+  const gallery = useGalleryRoute().name;
   const navigate = useNavigate();
   const location = useLocation();
   const [scope, setScope] = useState<'page' | 'all'>('page');
   const [query, setQuery] = useState('');
-  // In Flow there's no page on screen: every page's.
-  const pageScope = mode === 'prototype' && scope === 'page';
+  // What's on the canvas: the screen's pages in the prototype, a component's page in the gallery; in Flow (and the
+  // gallery's overview) no one page: every page's.
+  const onScreen = new Set(mode === 'prototype' ? nav.stack.map((r) => r.id) : mode === 'components' && gallery ? [componentPage(gallery)] : []);
+  const hasScope = onScreen.size > 0;
+  const pageScope = hasScope && scope === 'page';
   const all = useMemo(() => threadsOf(comments), [comments]);
   const numbers = useMemo(() => threadNumbers(all), [all]);
-  const onScreen = new Set(nav.stack.map((r) => r.id));
-  const label = (t: Thread) => pageName(nav.pages, t.root.page);
+  const label = (t: Thread) => componentOfPage(t.root.page) ?? pageName(nav.pages, t.root.page);
   const threads = filterThreads(all, { resolved, variant }).filter((t) => (!pageScope || onScreen.has(t.root.page) || t.root.id === selected) && threadMatches(t, query, label(t)));
   const here = commentLink(location.pathname, location.search);
   const open = (t: Thread) => {
@@ -45,7 +49,7 @@ export default function CommentsPanel() {
     // The canvas shows the view it was left on, where its pin is, and the sheet it's on (over its page: not under
     // another one pushed over it).
     const sheetElsewhere = !!t.root.anchor?.sheet && location.pathname !== t.root.link.split('?')[0];
-    if (mode !== 'prototype' || !onScreen.has(t.root.page) || sheetElsewhere) navigate(t.root.link);
+    if (!onScreen.has(t.root.page) || sheetElsewhere) navigate(t.root.link);
     openItsSheet(t.root);
   };
 
@@ -55,11 +59,11 @@ export default function CommentsPanel() {
       {!commentsShared() && <SharingNote />}
       <div className={styles.filters}>
         <div className={styles.filterRow}>
-          {mode === 'prototype' ? (
+          {hasScope ? (
             <div className={styles.segmented} role="radiogroup" aria-label={t('Pages')}>
               {(['page', 'all'] as const).map((s) => (
                 <button key={s} role="radio" aria-checked={scope === s} className={scope === s ? styles.segOn : ''} onClick={() => setScope(s)}>
-                  {s === 'page' ? t('This screen') : t('All pages')}
+                  {s === 'page' ? (mode === 'components' ? t('This component') : t('This screen')) : t('All pages')}
                 </button>
               ))}
             </div>
@@ -95,7 +99,7 @@ export default function CommentsPanel() {
         <div className={styles.empty}>
           <Icon name="chat_bubble" size={20} />
           <span>{all.length ? t('Nothing with these filters.') : t('No comments yet.')}</span>
-          {mode === 'prototype' && !commenting && (
+          {hasScope && !commenting && (
             <button className={panel.btn} onClick={() => setCommenting(true)}>
               <Icon name="add_comment" size={14} />
               {t('Comment (C)')}
@@ -131,6 +135,7 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
           <span className={styles.number}>#{number}</span>
           <span className={styles.where}>
             {pageLabel}
+            {root.anchor?.story ? ` · ${root.anchor.story}` : ''}
             {root.variant ? ` · ${root.variant.toUpperCase()}` : ''}
             {root.anchor?.device ? ` · ${deviceLabel(root.anchor.device, root.anchor.display)}` : ''}
           </span>

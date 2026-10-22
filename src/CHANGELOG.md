@@ -6,6 +6,30 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.42.0 — 2026-10-22
+
+- **Comments on components**: in Components, with a component open, **Comment** (or `C`) leaves a pin on any of its
+  examples, as on a screen: the same box, kinds, threads and replies. The comment belongs to the component's page and
+  to the example under the click, not to a device, so its pin follows that example. The Comments panel shows in
+  Components too, with **This component** / **All pages**, and each thread says where it was left (`Button · Tinted`).
+- **A component Live doesn't have but an open proposal builds** is listed as built, not missing: in the gallery's
+  overview with NEW and "in PJ-2", in the Components list with the proposal's code; it opens in that proposal. Its
+  state is Local, the proposal a note.
+- **A proposal's parameters make a component differ only with that proposal on**: in Live the component matches its
+  widget, and Status links the open proposals that add parameters to it; Inspect still marks a screen that sets one.
+- **Compare hangs a menu from the right control on every screen**: a drop-down or popover opened on a phone finds the
+  same control on the tablet beside it by its name and order, not its place in the tree. On a scrolled page it sits
+  by its control (it was placed as if at the top).
+- **A scroll closes a drop-down or a popover** (a wheel, a trackpad or a finger dragging), besides a tap outside, as
+  the platforms' menus do; once closed, the page takes the scroll.
+- **An action sheet's actions may come in groups**: a divider between each in the drop-down on large screens, one list
+  in the sheet on phones.
+- `npm run shot -- … --press <key>` presses a key in a field (Enter submits a search).
+
+**Contract**
+
+- New: `useActionSheet()`'s `actions` takes groups (`ActionSheetAction[][]`) as well as a list. Nothing to adapt.
+
 ## 0.41.2 — 2026-10-22
 
 - Pull requests: the same checks run on each one (typecheck, lint, tests, build), and a fork's leaves the version

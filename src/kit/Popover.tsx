@@ -2,6 +2,7 @@
 // out of it on a spring and shrinking back. No barrier: a tap outside closes it. Pure: props in, callbacks out.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useComponent } from '../design/component';
+import { useDismissOutside } from './dismissOutside';
 import { spring, useEntered } from './motion';
 import styles from './Popover.module.css';
 
@@ -78,6 +79,7 @@ export function Popover({ anchor, bounds, open = true, onClose, width = 378, top
     return () => window.clearTimeout(t);
   }, [open]);
   const on = useEntered(open && mounted);
+  const outside = useDismissOutside(onClose, open);
   const shadowId = 'pop' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const card = useRef<HTMLDivElement>(null);
   const [h, setH] = useState(400);
@@ -125,14 +127,14 @@ export function Popover({ anchor, bounds, open = true, onClose, width = 378, top
     // The layer lets taps through (pointer-events none); the catcher has a hole over the anchor, so the button that
     // opened the popover (the +, turned ×) stays tappable and shows its press.
     <div className={styles.popoverRoot} style={{ pointerEvents: 'none' }}>
-      {/* No shim: a transparent layer just catches the tap outside. */}
+      {/* No shim: a transparent layer catches the tap outside, and a scroll of the page under it (kit/dismissOutside). */}
       <div
         className={styles.popoverCatch}
+        {...outside}
         style={{
-          pointerEvents: 'auto',
+          ...outside.style,
           clipPath: `path(evenodd, 'M0 0H${bounds.w}V${bounds.h}H0Z M${anchor.x} ${anchor.y}h${anchor.w}v${anchor.h}h${-anchor.w}Z')`,
         }}
-        onClick={onClose}
       />
       {/* Named on the card, not the layer over the screen: Inspect and the changes highlight mark the popover itself. */}
       <div

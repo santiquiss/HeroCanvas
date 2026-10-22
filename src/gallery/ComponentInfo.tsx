@@ -60,8 +60,8 @@ function Card({ id, title, icon, aside, children }: { id: string; title: string;
  */
 export function Status({ name }: { name: string }) {
   const lib = useLibrary();
-  const [, setProposal] = useProposalParam();
-  const state = lib && componentState(name, true, lib);
+  const [proposalId, setProposal] = useProposalParam();
+  const state = lib && componentState(name, true, lib, proposalId);
   return (
     <Card id="status" title={t('Status')} icon="flag">
       {state ? (

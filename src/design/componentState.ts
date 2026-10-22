@@ -1,11 +1,13 @@
 // A component against the code, as the gallery shows it (the dot beside it in Components, and Info's Status): green,
 // it matches the code's component library; amber, it differs (props the widget doesn't have, or a look unlike the code, declared
-// beside it: simulatorProps); blue, the app builds it itself; gray, drawn here only, or (lighter) missing in the
+// beside it: simulatorProps; or, with a proposal on, the parameters it adds to the widget); blue, the app builds it itself; gray, drawn here only, or (lighter) missing in the
 // simulator; or (lightest, apart) not replicated on purpose (design/unreplicated).
 import { NO_APP } from '../nav/noApp';
-import { proposalsAdding } from '../proposals';
+import { findProposal, PROPOSALS, proposalsAdding } from '../proposals';
+import type { Proposal } from '../proposals/types';
 import { APP_WIDGETS, WORK } from './handoff';
 import type { Library } from './library';
+import { PROPOSAL_STORIES } from './stories';
 import { acceptedDifferences, declaredDifferences, kindsOf, lookDifferences, type Acceptance } from './simulatorProps';
 import { UNREPLICATED, UNREPLICATED_KIND } from './unreplicated';
 import { plural, t } from '../i18n/ui';
@@ -22,7 +24,7 @@ export interface ComponentState {
   accepted: { key: string; text: string; acceptance: Acceptance }[];
   /** The app's own widget: what it is and the files it's drawn in. */
   where?: { widget: string; files: string[] };
-  /** The open proposals that add it to the component library (its code and title). */
+  /** The open proposals that add it to the component library, or parameters to its widget (its code and title). */
   proposals?: { code: string; title: string }[];
 }
 
@@ -30,11 +32,33 @@ export const MISSING_COLOR = '#d2d6dc';
 /** Not replicated on purpose: no work, so lighter than missing. */
 export const UNREPLICATED_COLOR = '#e8eaed';
 
-export function componentState(name: string, built: boolean, lib: Library): ComponentState {
+/** The open proposal (not archived or merged) that builds a component the app doesn't have, with its stories. */
+export function proposalBuilding(name: string): Proposal | null {
+  return PROPOSALS.find((p) => p.meta.status !== 'archived' && p.meta.status !== 'merged' && PROPOSAL_STORIES.get(p.id)?.some((s) => s.component === name)) ?? null;
+}
+
+/**
+ * `proposalId`, the active proposal: the parameters it adds to the widget (its `params`) are differences while it's on.
+ * In Live they aren't: the component is the widget, and only the screens that set one differ (Inspect, design/handoff).
+ */
+export function componentState(name: string, built: boolean, lib: Library, proposalId: string | null = null): ComponentState {
   const none = { reasons: [], accepted: [] };
   const skip = UNREPLICATED[name];
   if (!built && skip) return { color: UNREPLICATED_COLOR, label: t('Not replicated · {kind}', { kind: UNREPLICATED_KIND[skip.kind] }), summary: skip.reason, ...none };
-  if (!built) return { color: MISSING_COLOR, label: t('Missing in the simulator'), summary: t('Not built here yet: it has no stories.'), ...none };
+  if (!built) {
+    // Not in Live, but an open proposal builds it (new to the app and its library): Local, not missing; the proposal
+    // is a note.
+    const p = proposalBuilding(name);
+    if (p)
+      return {
+        color: WORK.build.color,
+        label: WORK.build.label,
+        summary: t('Not in the app’s code yet: {code} proposes it and builds it here. Live gets it once the app has it.', { code: p.id }),
+        ...none,
+        proposals: [{ code: p.id, title: p.meta.title }],
+      };
+    return { color: MISSING_COLOR, label: t('Missing in the simulator'), summary: t('Not built here yet: it has no stories.'), ...none };
+  }
   // A class of named constructors (Message) is its kinds: their differences, each under its widget's name.
   const kinds = lib.widget(name) ? [] : kindsOf(name).filter((k) => lib.widget(k));
   if (lib.widget(name) || kinds.length) {
@@ -42,17 +66,22 @@ export function componentState(name: string, built: boolean, lib: Library): Comp
       ...Object.entries(declaredDifferences(n)).map(([key, why]) => ({ key: prefix + key, text: `${prefix}${key}: ${why}` })),
       ...lookDifferences(n).map((l) => ({ key: prefix + l, text: prefix + l })),
     ];
-    const reasons = kinds.length ? kinds.flatMap((k) => of(k, `${k} · `)) : of(name, '');
+    const active = findProposal(proposalId);
+    const added = (active?.params[name] ?? []).map((k) => ({ key: k, text: t('{param}: {code} adds it to the widget', { param: k, code: active!.id }) }));
+    const reasons = kinds.length ? kinds.flatMap((k) => of(k, `${k} · `)) : [...of(name, ''), ...added];
     const accepted = kinds.length ? kinds.flatMap((k) => acceptedDifferences(k).map((a) => ({ ...a, key: `${k} · ${a.key}`, text: `${k} · ${a.text}` }))) : acceptedDifferences(name);
     const n = accepted.length;
+    // The open proposals that add parameters to it, on or not: Status links them.
+    const proposals = PROPOSALS.filter((p) => p.meta.status !== 'archived' && p.meta.status !== 'merged' && p.params[name]?.length).map((p) => ({ code: p.id, title: p.meta.title }));
     return reasons.length
-      ? { color: WORK.differs.color, label: t('Differs from code'), summary: '', reasons, accepted }
+      ? { color: WORK.differs.color, label: t('Differs from code'), summary: '', reasons, accepted, proposals }
       : {
           color: WORK.reuse.color,
           label: n ? plural(n, '{badge} · {n} difference accepted', '{badge} · {n} differences accepted', { badge: WORK.reuse.badge }) : WORK.reuse.badge,
           summary: '',
           reasons,
           accepted,
+          proposals,
         };
   }
   const app = APP_WIDGETS[name];

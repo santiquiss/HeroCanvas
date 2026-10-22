@@ -1,5 +1,5 @@
 // What an agent's shot does on the screens before the picture (`npm run shot`, scripts/shot.mjs): tap a text, type in
-// a field, scroll, wait. The same steps on every frame of the shot (light and dark), except what they share: the
+// a field, press a key in it, scroll, wait. The same steps on every frame of the shot (light and dark), except what they share: the
 // navigation and the overlays (sheets, dialogs) are one for all the frames, so a step whose effect already shows on
 // the others isn't repeated there.
 
@@ -10,6 +10,8 @@ export type ShotStep =
   | { fill: string; into?: string }
   /** Puts the focus in a field (the system keyboard shows): `into`, else the first. */
   | { focus: true; into?: string }
+  /** Presses a key in a field (`Enter` submits a search): `into`, else the focused one, else the first. */
+  | { press: string; into?: string }
   /** Scrolls the screen's scrolling areas (or the one `in` selects) to `y` points, or to their end. */
   | { scroll: number | 'end'; in?: string }
   /** Waits, in milliseconds. */
@@ -86,6 +88,12 @@ export function runStep(root: HTMLElement, step: ShotStep) {
     const el = field(root, step.into);
     if (!el) throw new Error(`No field${step.into ? ` "${step.into}"` : ''} on the screen`);
     el.focus();
+  } else if ('press' in step) {
+    const el = field(root, step.into);
+    if (!el) throw new Error(`No field${step.into ? ` "${step.into}"` : ''} on the screen`);
+    const key = { key: step.press, code: step.press, bubbles: true, cancelable: true };
+    el.dispatchEvent(new KeyboardEvent('keydown', key));
+    el.dispatchEvent(new KeyboardEvent('keyup', key));
   } else if ('scroll' in step) {
     for (const el of scrollers(root, step.in)) el.scrollTop = step.scroll === 'end' ? el.scrollHeight : step.scroll;
   }

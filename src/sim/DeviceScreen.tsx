@@ -13,7 +13,7 @@ const { SideNav, SideRail, TabBar, Overlays: AppOverlays } = NAVIGATION;
 const AppScreen = NAVIGATION.Screen ?? (({ children }: { children: ReactNode }) => <>{children}</>);
 import { Icon } from '../components/Icon';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { Dialog, Popover, Sheet, Snackbar, SNACKBAR_MS, sheetMaxWidth, type AnchorRect } from '../kit';
+import { Dialog, Popover, Sheet, Snackbar, SNACKBAR_MS, sheetMaxWidth } from '../kit';
 import { Toast } from '../components/Toast';
 import { useDesignRoot } from '../design/DesignContext';
 import { DetailPanelCtx, NavCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot, type Nav } from '../nav/context';
@@ -26,6 +26,7 @@ import { LocateFlash } from './locate';
 import { anchoredFloats, listDetailActive, phoneMotion, tallSheetTop, type Layout } from './layout';
 import { EASE, EXIT_MS, PAGE_MS, SWAP, TAB_IN_MS } from './motion';
 import { screenRegions } from './regions';
+import { boxInScreen, counterpartIn } from './anchor';
 import { DropDownLayer } from './DropDownLayer';
 import { useSim, type SheetSpec, type SnackbarSpec } from './SimContext';
 import { isTextField, KeyboardInsetCtx, useKeyboardInset } from './keyboard';
@@ -730,35 +731,6 @@ function VideoArea({ layout: L }: { layout: Layout }) {
     </div>
   );
 }
-
-/**
- * The element at the same place in `screen` as `el` in its own device screen: the tapped control's counterpart on the
- * other screens showing the same sheet (light and dark side by side, a device set to another version), so the sheet
- * hangs from it there too. Null where the screens differ there.
- */
-function counterpartIn(el: HTMLElement, screen: HTMLElement): HTMLElement | null {
-  const own = el.closest('[data-device-screen]');
-  if (!own) return null;
-  const path: number[] = [];
-  for (let n: Element = el; n !== own && n.parentElement; n = n.parentElement) path.unshift(Array.prototype.indexOf.call(n.parentElement.children, n));
-  let m: Element | undefined = screen;
-  for (const i of path) m = m?.children[i];
-  return m instanceof HTMLElement ? m : null;
-}
-
-/** An element's box within the device screen (offsets, so the canvas scale, zoom and frame rotation don't matter). */
-function boxInScreen(el: HTMLElement): AnchorRect | null {
-  const root = el.closest('[data-theme]');
-  let x = 0;
-  let y = 0;
-  for (let n: HTMLElement | null = el; n && n !== root; n = n.offsetParent as HTMLElement | null) {
-    x += n.offsetLeft;
-    y += n.offsetTop;
-    if (!n.offsetParent) return null;
-  }
-  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
-}
-
 
 /** The snackbar (useSim().showSnackbar): the kit's Snackbar over the screen's insets, kept while it animates out. */
 function SnackbarLayer({ layout: L }: { layout: Layout }) {

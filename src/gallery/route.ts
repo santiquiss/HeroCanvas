@@ -25,9 +25,11 @@ export function useGalleryNav() {
   const sim = useSimQuery();
   return {
     /** `story` / `args`: open on that story with those args (the Controls' overrides), e.g. from Inspect. */
-    openComponent: (name: string | null, at?: { story: string; args?: Args }) => {
+    openComponent: (name: string | null, at?: { story: string; args?: Args }, proposal?: string) => {
       rememberPrototype(location);
       const extra: Record<string, string> = at ? { story: at.story } : {};
+      // `proposal`: open it in that proposal (one Live doesn't have yet).
+      if (proposal) extra.proposal = proposal;
       if (at?.args && Object.keys(at.args).length) extra.args = JSON.stringify({ [at.story]: at.args });
       navigate(PREFIX + (name ? `/${encodeURIComponent(name)}` : '') + sim(extra));
     },

@@ -1,10 +1,11 @@
 // Where an anchored sheet hangs as a drop-down (`openSheet({ anchored: 'dropdown' })`), where anchored sheets float
 // (sim/layout anchoredFloats: 600pt wide or more): below its anchor, at its start, centered or at
 // its end, kept on screen, above the anchor when there isn't
-// room below. A tap outside closes it (no shim, as the app's: a transparent layer). It fades and drops in a little;
-// motion: transform and opacity.
+// room below. A tap outside closes it (no shim, as the app's: a transparent layer), and so does scrolling the page under
+// it (kit/dismissOutside). It fades and drops in a little; motion: transform and opacity.
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { AnchorRect } from '../kit';
+import { useDismissOutside } from '../kit/dismissOutside';
 import styles from './DropDownLayer.module.css';
 import { useOverlay } from './useOverlay';
 
@@ -34,6 +35,7 @@ export function DropDownLayer({
   const { mounted, on } = useOverlay(open, MS);
   const menu = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const outside = useDismissOutside(onClose, open);
   useLayoutEffect(() => {
     const el = menu.current;
     if (!el) return;
@@ -51,7 +53,7 @@ export function DropDownLayer({
   const top = up ? anchor.y - GAP - size.h : clamp(below, topInset + EDGE, bounds.h - EDGE - size.h);
   return (
     <div className={styles.root}>
-      <div className={styles.catch} onClick={onClose} />
+      <div className={styles.catch} {...outside} />
       <div
         ref={menu}
         className={`${styles.menu} ${on ? styles.on : ''}`}

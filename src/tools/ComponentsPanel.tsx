@@ -6,7 +6,7 @@ import { CATALOG } from '../design/catalog';
 import { componentIcon } from '../design/element';
 import { componentGroups, GROUP_TITLES, groupTitle, type GroupKey } from '../design/figma';
 import { useGalleryNav, useGalleryRoute, useStories } from '../gallery/route';
-import { COMPONENT_STATUSES, componentState, MISSING_COLOR, statusOf, type ComponentStatus } from '../design/componentState';
+import { COMPONENT_STATUSES, componentState, MISSING_COLOR, proposalBuilding, statusOf, type ComponentStatus } from '../design/componentState';
 import { useLibrary } from '../design/library';
 import styles from './Panel.module.css';
 import { SearchField } from './SearchField';
@@ -47,10 +47,11 @@ export function ComponentsPanel() {
   };
   const query = q.trim().toLowerCase();
 
-  const { stories: STORIES } = useStories();
+  const { stories: STORIES, proposalId } = useStories();
   const lib = useLibrary();
-  // Its dot: the component against the code (design/componentState); gray while the code's API loads.
-  const stateOf = (n: string) => (lib ? componentState(n, STORIES.has(n), lib) : { color: STORIES.has(n) ? '#9aa0a8' : MISSING_COLOR, label: '' });
+  // Its dot: the component against the code (design/componentState), with the active proposal's parameters; gray while
+  // the code's API loads.
+  const stateOf = (n: string) => (lib ? componentState(n, STORIES.has(n), lib, proposalId) : { color: STORIES.has(n) ? '#9aa0a8' : MISSING_COLOR, label: '' });
   const groups = componentGroups(CATALOG.keys(), STORIES.keys(), (n) => lib?.widget(n)?.tier ?? CATALOG.get(n)?.tier);
   const tiers = Object.keys(GROUP_TITLES) as GroupKey[];
   const matches = (n: string) => !query || n.toLowerCase().includes(query);
@@ -65,19 +66,22 @@ export function ComponentsPanel() {
   const row = (n: string, skipped = false) => {
     const has = STORIES.has(n);
     const state = stateOf(n);
+    // One Live doesn't have that an open proposal builds: listed as built, opened in its proposal.
+    const elsewhere = has ? null : proposalBuilding(n);
     return (
       <div
         key={n}
         className={`${styles.row} ${n === name ? styles.current : ''}`}
         style={{ paddingLeft: 12 }}
-        onClick={() => openComponent(n)}
+        onClick={() => openComponent(n, undefined, elsewhere?.id)}
         title={skipped && 'summary' in state ? state.summary : undefined}
       >
         {/* Its kind (Figma's tier, as its page's badge; else the catalog's), its name, at the end its state against the code. */}
-        <Icon name={componentIcon(n)} size={14} color={has ? 'var(--ui-text-muted)' : 'var(--ui-text-faint)'} />
-        <span className={styles.name} style={{ color: has || n === name ? undefined : 'var(--ui-text-subtle)' }}>
+        <Icon name={componentIcon(n)} size={14} color={has || elsewhere ? 'var(--ui-text-muted)' : 'var(--ui-text-faint)'} />
+        <span className={styles.name} style={{ color: has || elsewhere || n === name ? undefined : 'var(--ui-text-subtle)' }}>
           {n}
         </span>
+        {elsewhere && <span className={styles.muted}>{elsewhere.id}</span>}
         <span className={styles.dot} style={{ background: state.color, marginLeft: 'auto' }} title={state.label} />
       </div>
     );

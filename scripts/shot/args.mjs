@@ -33,8 +33,9 @@ Options
 Steps, in order, before the picture (on every screen)
   --click <text>       taps the element with that text (or "css:<selector>")
   --fill <text>        types into the focused field, or the first
-  --into <selector>    the field of the --fill or --focus before
+  --into <selector>    the field of the --fill, --focus or --press before
   --focus              focuses the first field (the keyboard shows)
+  --press <key>        presses a key in the focused field, or the first (Enter submits a search)
   --scroll <y|end>     scrolls the screen
   --wait <ms>          waits`;
 
@@ -103,9 +104,12 @@ export function parseArgs(argv) {
       case '--focus':
         shot.steps.push({ focus: true });
         break;
+      case '--press':
+        shot.steps.push({ press: value(i++, a) });
+        break;
       case '--into': {
         const last = shot.steps.at(-1);
-        if (!last || !('fill' in last || 'focus' in last)) throw new Error('--into goes after --fill or --focus');
+        if (!last || !('fill' in last || 'focus' in last || 'press' in last)) throw new Error('--into goes after --fill, --focus or --press');
         last.into = value(i++, a);
         break;
       }

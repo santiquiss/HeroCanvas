@@ -47,7 +47,7 @@ export const TOOLS: ToolDef[] = [
   { id: 'inspect', title: t('Inspect'), icon: 'ads_click', side: 'right', component: InspectPanel, whileInspecting: true },
   { id: 'page', title: t('Page'), icon: 'info', side: 'right', component: PageInspector, modes: ['prototype'] },
   { id: 'scenarios', title: t('Scenarios'), icon: 'science', side: 'right', component: ScenariosPanel, modes: ['prototype', 'flow'] },
-  // Its panel loads when the tab opens; the tab counts the open threads.
-  { id: 'comments', title: t('Comments'), icon: 'chat_bubble', side: 'right', component: CommentsTool, modes: ['prototype', 'flow'], badge: CommentsBadge },
+  // Its panel loads when the tab opens; the tab counts the open threads. In Components, on a component's examples.
+  { id: 'comments', title: t('Comments'), icon: 'chat_bubble', side: 'right', component: CommentsTool, modes: ['prototype', 'flow', 'components'], badge: CommentsBadge },
   { id: 'proposal', title: t('Proposal'), icon: 'call_split', side: 'right', component: ProposalPanel, modes: ['prototype', 'flow'], badge: ProposalChangeCounts },
 ];

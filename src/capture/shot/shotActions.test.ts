@@ -35,6 +35,13 @@ describe('runStep', () => {
     expect(onInput).toHaveBeenCalledOnce();
     expect(onClick).toHaveBeenCalledOnce();
   });
+  it('presses a key in the field', () => {
+    const root = screen('<input id="k">');
+    const onKey = vi.fn((e: KeyboardEvent) => e.key);
+    root.querySelector('input')!.addEventListener('keydown', onKey);
+    runStep(root, { press: 'Enter' });
+    expect(onKey).toHaveReturnedWith('Enter');
+  });
   it('says what it could not find', () => {
     const root = screen('<p>x</p>');
     expect(() => runStep(root, { click: 'Save' })).toThrow('Save');

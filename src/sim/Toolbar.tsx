@@ -11,6 +11,7 @@ import { ProposalMenu } from './ProposalMenu';
 import { VersionButton } from './Changelog';
 import { useCommentsUi } from '../comments';
 import { t } from '../i18n/ui';
+import { useGalleryRoute } from '../gallery/route';
 import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
@@ -36,6 +37,8 @@ export function Toolbar(props: ToolbarProps) {
   // Capture keeps the canvas to the device: no picking or commenting on it.
   const [search] = useSearchParams();
   const capture = props.mode === 'prototype' && search.get('capture') === '1';
+  // In Components, a component's examples take comments (not the overview).
+  const gallery = useGalleryRoute().name;
   useEffect(() => {
     if (!capture) return;
     setInspect(false);
@@ -66,8 +69,13 @@ export function Toolbar(props: ToolbarProps) {
           {t('Inspect')}
         </Chip>
       )}
-      {props.mode === 'prototype' && !capture && (
-        <Chip active={commenting} onClick={() => setCommenting(!commenting)} title={t('Comment: click on the screen to leave one (C)')} tour="comment">
+      {(props.mode === 'prototype' || (props.mode === 'components' && gallery)) && !capture && (
+        <Chip
+          active={commenting}
+          onClick={() => setCommenting(!commenting)}
+          title={props.mode === 'components' ? t('Comment: click on the component to leave one (C)') : t('Comment: click on the screen to leave one (C)')}
+          tour="comment"
+        >
           <Icon name="add_comment" size={18} />
           {t('Comment')}
         </Chip>

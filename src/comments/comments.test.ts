@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { anchorAt, anchorElement, fractionIn, pagesAbove, pointIn, showsOn } from './anchor';
+import { anchorAt, anchorElement, fractionIn, GALLERY_SCREEN, pageLayer, pagesAbove, pointIn, screenAttrs, screenOf, showsOn } from './anchor';
 import { screenScope } from './CommentsContext';
 import { localBackend } from './backend';
 import { myOwner, sha256Hex } from './owner';
 import { addComment, deleteComment, editComment, refresh, setBackendForTests, setResolved } from './store';
 import { commentLink, filterThreads, initials, openByPage, personColor, threadMatches, threadNumbers, threadsOf, timeAgo } from './threads';
-import type { Comment } from './types';
+import { componentOfPage, componentPage, type Comment } from './types';
 
 let n = 0;
 const comment = (over: Partial<Comment> = {}): Comment => ({
@@ -132,6 +132,25 @@ describe('anchor', () => {
     expect(anchorElement(f, f.querySelector<HTMLElement>('[data-page-id="projects"]')!, { ...a, overlay: true })).toBeNull();
     // On the page, a component that's gone leaves the pin at its point of the page.
     expect(anchorElement(f, page, a)).toEqual({ el: page, onComponent: false });
+  });
+  // The gallery: a component's examples side by side, each a page of the component's (gallery/Gallery).
+  it('puts a click in the gallery on its example, and none off them', () => {
+    const f = document.createElement('div');
+    for (const [k, v] of Object.entries(screenAttrs(GALLERY_SCREEN))) f.setAttribute(k, v);
+    const page = componentPage('Button');
+    f.innerHTML = `
+      <h1 id="title">Button</h1>
+      <div data-page-id="${page}" data-hc-page="Primary"><p id="primary"></p></div>
+      <div data-page-id="${page}" data-hc-page="Disabled"><p id="disabled"></p></div>`;
+    expect(screenOf(f)?.screen.bare).toBe(true);
+    const at = anchorAt(f, f.querySelector('#disabled')!, 0, 0);
+    expect(at?.page).toBe(page);
+    expect(at?.anchor.story).toBe('Disabled');
+    expect(pageLayer(f, page, 'Disabled')?.dataset.hcPage).toBe('Disabled');
+    // A title, the margin: on no example (not the last one, as off a device's pages).
+    expect(anchorAt(f, f.querySelector('#title')!, 0, 0)).toBeNull();
+    expect(componentOfPage(page)).toBe('Button');
+    expect(componentOfPage('foodSearch')).toBeNull();
   });
 });
 

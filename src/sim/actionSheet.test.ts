@@ -19,4 +19,9 @@ describe('an action sheet’s actions as a drop-down', () => {
     ]);
     expect(items).toEqual([{ text: 'Remove Apple', icon: 'delete', isDestructive: true, onTap: undefined }]);
   });
+
+  it('puts a divider between the actions’ groups, dropping a group left empty', () => {
+    const items = dropDownItemsOf([[{ label: 'Share Photo' }, { label: 'Share Order' }], [{ label: 'Hidden', enabled: false }], [{ label: 'Edit Order' }]]);
+    expect(items.map((i) => ('text' in i ? i.text : '—'))).toEqual(['Share Photo', 'Share Order', '—', 'Edit Order']);
+  });
 });

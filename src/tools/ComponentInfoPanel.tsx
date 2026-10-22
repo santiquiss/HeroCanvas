@@ -17,9 +17,9 @@ export function ComponentInfoPanel() {
 /** Info's tab: the open component's dot, its state against the code (the Components list has the same). */
 export function ComponentStateBadge() {
   const { name } = useGalleryRoute();
-  const { stories } = useStories();
+  const { stories, proposalId } = useStories();
   const lib = useLibrary();
   if (!name || !lib || !stories.has(name)) return null;
-  const state = componentState(name, true, lib);
+  const state = componentState(name, true, lib, proposalId);
   return <span className={styles.dot} style={{ background: state.color, marginLeft: 6 }} title={state.label} />;
 }

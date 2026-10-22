@@ -3,6 +3,8 @@
   position: absolute;
   inset: 0;
   z-index: 90;
+  /* The catcher takes the taps while open (kit/dismissOutside); the rest goes to the page. */
+  pointer-events: none;
 }
 .catch {
   position: absolute;
@@ -10,6 +12,7 @@
 }
 .menu {
   position: absolute;
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
   opacity: 0;

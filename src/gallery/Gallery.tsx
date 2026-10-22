@@ -1,13 +1,16 @@
 // Component gallery: every component isolated, all its stories side by side, in the current theme and at
-// widths taken from the current device. Inspect, Layers and Controls work on the stories.
+// widths taken from the current device. Inspect, Layers, Controls and Comments work on the stories.
 import { useAppTheme } from '../sim/appThemes';
 import { useLanguage } from '../sim/language';
 import { useMemo, useRef, useState } from 'react';
+import { CommentPins } from '../comments';
+import { GALLERY_SCREEN, screenAttrs } from '../comments/anchor';
+import { componentPage } from '../comments/types';
 import { Icon } from '../components/Icon';
 import { CATALOG, catalogUrl } from '../design/catalog';
 import { useDesignRoot } from '../design/DesignContext';
 import { unreplicated, UNREPLICATED_KIND } from '../design/unreplicated';
-import { componentGroups, componentTier, FIGMA, UNUSED_FIGMA, FIGMA_FILE, groupTitle, MAPPED_FIGMA, type GroupKey } from '../design/figma';
+import { codeName, componentGroups, componentTier, FIGMA, UNUSED_FIGMA, FIGMA_FILE, groupTitle, MAPPED_FIGMA, type GroupKey } from '../design/figma';
 import { type Args, type FrameWidth, type StoryModule } from '../design/stories';
 import { ChangeBadge } from '../flow/FlowView';
 import { useSim, useUrlParams, useUrlState } from '../sim/SimContext';
@@ -16,7 +19,7 @@ import { findProposal, proposalChanges, VARIANT_PARAM } from '../proposals';
 import { InspectOverlay } from '../tools/InspectOverlay';
 import { FigmaInfo } from './FigmaInfo';
 import { useLibrary } from '../design/library';
-import { componentState } from '../design/componentState';
+import { componentState, proposalBuilding } from '../design/componentState';
 import { componentKind, isBaseComponent, useGalleryNav, useGalleryRoute, useStories } from './route';
 import { UsageStats } from './UsageStats';
 import { useStoryArgs } from './useStoryArgs';
@@ -43,13 +46,15 @@ export function Gallery() {
           <TokensView group={tokens} />
         </div>
       ) : (
-        <div className={styles.scroll}>
+        // The canvas comments are left on (comments/anchor): each example a page of the component's.
+        <div className={styles.scroll} {...screenAttrs(GALLERY_SCREEN)}>
           <div ref={setRoot} data-theme={theme} data-app-theme={appTheme?.id} lang={language} {...captureProps} className={styles.root} style={{ cursor: inspect ? 'crosshair' : undefined }}>
             {name ? mod ? <ComponentPage key={name} mod={mod} /> : <Missing name={name} /> : <Overview />}
           </div>
         </div>
       )}
       <InspectOverlay stage={wrap} />
+      {tokens == null && <CommentPins stage={wrap} />}
     </div>
   );
 }
@@ -114,7 +119,7 @@ function ComponentPage({ mod }: { mod: StoryModule<Args> }) {
                   </span>
                 )}
               </div>
-              <div className={styles.frame} data-hc-page={s.name} style={{ width }}>
+              <div className={styles.frame} data-hc-page={s.name} data-page-id={componentPage(mod.component)} style={{ width }}>
                 <ErrorBoundary label={t('Story “{name}”', { name: s.name })} resetKey={JSON.stringify(args)}>
                   <StoryRender render={() => mod.render(args, ctx)} />
                 </ErrorBoundary>
@@ -137,7 +142,8 @@ function Overview() {
   const groups = componentGroups(CATALOG.keys(), [...STORIES.keys()].filter((n) => !proposalNames.has(n) || isBaseComponent(n)), (n) => lib?.widget(n)?.tier ?? CATALOG.get(n)?.tier);
   // The Figma components the code uses (not the code map's `unused`: a Tooltip the code never draws).
   const figmaNames = [...FIGMA.keys()].filter((n) => !UNUSED_FIGMA.has(n));
-  const built = figmaNames.filter((n) => STORIES.has(n)).length;
+  // Built under the code's name too (renamed in the code map).
+  const built = figmaNames.filter((n) => STORIES.has(n) || STORIES.has(codeName(n))).length;
   // The components built here (with stories), for the usage stats.
   const builtNames = useMemo(() => [...STORIES.keys()], [STORIES]);
   return (
@@ -179,15 +185,20 @@ function Overview() {
             <div className={styles.tier}>{groupTitle(g, groups)}</div>
             <div className={styles.cards}>
               {[...groups[g]]
-                .sort((a, b) => Number(STORIES.has(b)) - Number(STORIES.has(a)) || a.localeCompare(b))
+                .sort((a, b) => Number(STORIES.has(b) || !!proposalBuilding(b)) - Number(STORIES.has(a) || !!proposalBuilding(a)) || a.localeCompare(b))
                 .map((n) => {
                   const mod = STORIES.get(n);
                   const fig = FIGMA.get(n);
+                  // Not in Live, built by an open proposal: new there (opens in it).
+                  const elsewhere = mod ? null : proposalBuilding(n);
                   return (
-                    <button key={n} className={`${styles.card} ${mod ? '' : styles.cardOff}`} onClick={() => openComponent(n)}>
-                      <span className={styles.cardName}>{n}</span>
+                    <button key={n} className={`${styles.card} ${mod || elsewhere ? '' : styles.cardOff}`} onClick={() => openComponent(n, undefined, elsewhere?.id)}>
+                      <span className={styles.cardName} style={elsewhere ? { display: 'flex', alignItems: 'center', gap: 6 } : undefined}>
+                        {n}
+                        {elsewhere && <ChangeBadge change="new" />}
+                      </span>
                       <span className={styles.dim}>
-                        {mod ? plural(mod.stories.length, '{n} story', '{n} stories') : g === 'unreplicated' ? t('not replicated') : t('not built')}
+                        {mod ? plural(mod.stories.length, '{n} story', '{n} stories') : elsewhere ? t('in {code}', { code: elsewhere.id }) : g === 'unreplicated' ? t('not replicated') : t('not built')}
                         {fig?.variants ? ` · ${plural(fig.variants.length, '{n} Figma variant', '{n} Figma variants')}` : ''}
                       </span>
                     </button>
@@ -264,8 +275,9 @@ function formatValue(v: unknown): string {
 /** Where a component stands against the code, as a badge: its state's label, in its color. */
 function StateBadge({ name }: { name: string }) {
   const lib = useLibrary();
+  const { proposalId } = useStories();
   if (!lib) return null;
-  const state = componentState(name, true, lib);
+  const state = componentState(name, true, lib, proposalId);
   return (
     <span className={styles.badge} style={{ color: state.color, background: 'transparent', boxShadow: `inset 0 0 0 1px ${state.color}` }} title={state.summary || state.label}>
       {state.label}
