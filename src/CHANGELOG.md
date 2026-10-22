@@ -6,6 +6,21 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.38.0 — 2026-10-22
+
+Tokens and themes beyond light and dark:
+
+- **The theme picker lists every theme**: with the app's own themes (`appConfig.themes`), the canvas's Light / Dark
+  becomes a dropdown of them, each with its page color and accent; one that follows the device is there twice
+  (Light and Dark). An app with no themes keeps Light / Dark.
+- **Tokens has a column per theme**: Light and Dark, or each of the app's (Classic, Graphite, Stone…), its values
+  read from `[data-app-theme='<id>']` over its scheme's. A color's swatch sits beside its value in each column.
+- Tokens inside a value (a shadow in the theme's shadow color) are resolved per theme, so Elevation shows each one.
+
+**Contract**
+
+- None. (Inside the tool: a token's `value` and `alias` are keyed by theme mode, `THEME_MODES`; `base` is the first's.)
+
 ## 0.37.1 — 2026-10-22
 
 - **The keyboards' glyphs as Apple draws them**: on iPhone and iPad, shift, delete, return, emoji, globe, dictation,

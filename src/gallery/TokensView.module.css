@@ -197,6 +197,43 @@
   white-space: nowrap;
 }
 
+/* A color in a theme's column: its swatch, then its value and the primitive it points to. */
+.colorCell {
+  overflow: hidden;
+}
+.colorCell > .swatch {
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+.colorCell,
+.colorCell > .valueText {
+  white-space: nowrap;
+}
+td.colorCell {
+  vertical-align: middle;
+}
+.colorCell > * {
+  vertical-align: middle;
+}
+.colorCell > .valueText {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: calc(100% - 38px);
+  margin-inline-start: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.valueText > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.swatch {
+  display: inline-block;
+}
+
 /* Values: the value, and the primitive it points to under it. */
 .valueCell {
   overflow: hidden;

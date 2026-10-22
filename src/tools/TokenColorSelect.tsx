@@ -31,7 +31,7 @@ const flat = (c: string) => c.toLowerCase().replace(/\s/g, '');
 const BY_VALUE = (() => {
   const out = new Map<string, string>();
   const groups = [...TOKEN_GROUPS.filter((g) => g.id !== 'palette'), ...TOKEN_GROUPS.filter((g) => g.id === 'palette')];
-  for (const g of groups) for (const t of g.tokens) if (t.kind === 'color' && !out.has(flat(t.value.light))) out.set(flat(t.value.light), `var(--${t.name})`);
+  for (const g of groups) for (const t of g.tokens) if (t.kind === 'color' && !out.has(flat(t.base))) out.set(flat(t.base), `var(--${t.name})`);
   return out;
 })();
 

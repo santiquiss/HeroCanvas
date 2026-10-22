@@ -137,7 +137,7 @@ export function builtFrom(el: HTMLElement): { name: string; ids: string[] }[] {
 
 // The design file's spacing and radius scale, in px: 8-based ("2x" = 16), named as its variables are.
 /** The app's own scale, from its tokens (`--app-space-*`, `--app-radius-*`): each one's name and its size in px. */
-const scale = (group: string): [string, number][] => (findTokenGroup(group)?.tokens ?? []).map((t) => [t.name, parseFloat(t.value.light)] as [string, number]).filter(([, n]) => Number.isFinite(n));
+const scale = (group: string): [string, number][] => (findTokenGroup(group)?.tokens ?? []).map((t) => [t.name, parseFloat(t.base)] as [string, number]).filter(([, n]) => Number.isFinite(n));
 const SPACING = scale('spacing');
 const RADIUS = scale('radius');
 

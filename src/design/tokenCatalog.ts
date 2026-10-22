@@ -1,17 +1,21 @@
 // The connected app's design tokens, for the Tokens view and Inspect: each `--app-*` variable the screens are drawn
-// with (src/kit/tokens.css, and the app's own theme, app/theme.css, which overrides it), its value in light and
-// dark, and the token it points to. Grouped by what they are: colors, space, corners, type, effects.
+// with (src/kit/tokens.css, and the app's own theme, app/theme.css, which overrides it), its value in each of the
+// screens' themes (THEME_MODES: light and dark, or the app's own), and the token it points to. Grouped by what they are: colors, space, corners, type, effects.
 //
 // `figma` and `code`: the token's name in the design file and in the app's code, when a connector gives them
 // (none yet: the token's own name, and null).
 import { APP_THEME_CSS } from './appTheme';
 import kitCss from '../kit/tokens.css?raw';
 import { CODE_TEXT_STYLES, type CodeTextStyle } from './textStyles';
+import { THEME_MODES, type ThemeMode } from './themeModes';
+
+export { THEME_MODES, type ThemeMode };
 
 const appCss = APP_THEME_CSS;
 
 export type TokenKind = 'color' | 'number' | 'text';
-export type Mode = 'light' | 'dark';
+/** A theme mode's id (THEME_MODES). */
+export type Mode = string;
 
 export interface Token {
   /** The CSS variable, without `--`: `app-primary`. */
@@ -21,6 +25,8 @@ export interface Token {
   kind: TokenKind;
   /** Resolved (aliases followed), per mode. */
   value: Record<Mode, string>;
+  /** Its value in the first mode (the default theme): what a single value shows. */
+  base: string;
   /** The variable it points to, per mode, when it's an alias. */
   alias: Record<Mode, string | null>;
   /** How the app's code reads it, when a connector gives it; null otherwise. */
@@ -74,7 +80,13 @@ function block(selector: RegExp): Map<string, string> {
 }
 
 const BOTH = block(/^\[data-theme\]$/);
-const MODES: Record<Mode, Map<string, string>> = { light: block(/^\[data-theme='light'\]$/), dark: block(/^\[data-theme='dark'\]$/) };
+const SCHEMES = { light: block(/^\[data-theme='light'\]$/), dark: block(/^\[data-theme='dark'\]$/) };
+// A mode: its scheme's block, then its app theme's (`[data-app-theme='<id>']`), which wins, as on the screens.
+const MODES: Record<Mode, Map<string, string>> = Object.fromEntries(
+  THEME_MODES.map((m) => [m.id, new Map([...SCHEMES[m.scheme], ...(m.appTheme ? block(new RegExp(`^\\[data-app-theme='${m.appTheme}'\\]$`)) : [])])]),
+);
+const FIRST = THEME_MODES[0].id;
+const perMode = <T,>(f: (m: Mode) => T): Record<Mode, T> => Object.fromEntries(THEME_MODES.map((m) => [m.id, f(m.id)]));
 
 const raw = (name: string, mode: Mode) => MODES[mode].get(name) ?? BOTH.get(name);
 const target = (v: string | undefined) => v?.match(/^var\(--([\w-]+)\)$/)?.[1] ?? null;
@@ -82,26 +94,29 @@ const target = (v: string | undefined) => v?.match(/^var\(--([\w-]+)\)$/)?.[1] ?
 function resolve(name: string, mode: Mode, depth = 0): string {
   const v = raw(name, mode) ?? '';
   const t = target(v);
-  return t && depth < 10 ? resolve(t, mode, depth + 1) : v;
+  if (t) return depth < 10 ? resolve(t, mode, depth + 1) : v;
+  // A token inside a value (a shadow in the theme's shadow color): its value in this mode.
+  return depth < 10 ? v.replace(/var\(--(app-[\w-]+)\)/g, (all, inner: string) => resolve(inner, mode, depth + 1) || all) : v;
 }
 
-const NAMES = [...new Set([...BOTH.keys(), ...MODES.light.keys(), ...MODES.dark.keys()])];
+const NAMES = [...new Set([...BOTH.keys(), ...Object.values(MODES).flatMap((m) => [...m.keys()])])];
 
 function token(name: string): Token {
-  const light = resolve(name, 'light');
+  const base = resolve(name, FIRST);
   return {
     name,
     figma: name,
-    kind: /^(rgb|#|hsl)/.test(light) ? 'color' : /^-?[\d.]+(px)?$/.test(light) ? 'number' : 'text',
-    value: { light, dark: resolve(name, 'dark') },
-    alias: { light: target(raw(name, 'light')), dark: target(raw(name, 'dark')) },
+    kind: /^(rgb|#|hsl)/.test(base) ? 'color' : /^-?[\d.]+(px)?$/.test(base) ? 'number' : 'text',
+    value: perMode((m) => resolve(name, m)),
+    base,
+    alias: perMode((m) => target(raw(name, m))),
     code: null,
   };
 }
 
 const used = new Set<string>();
 const take = (pred: (n: string) => boolean) => NAMES.filter((n) => !used.has(n) && pred(n)).map((n) => (used.add(n), n));
-const px = (t: Token) => parseFloat(t.value.light);
+const px = (t: Token) => parseFloat(t.base);
 
 function build(): TokenGroup[] {
   const groups: TokenGroup[] = [];
@@ -120,7 +135,7 @@ function build(): TokenGroup[] {
     section: 'Effects',
     note: 'Shadows',
     tokens: [],
-    elevations: elevation.map((n) => ({ name: n, figma: n, shadows: { light: resolve(n, 'light'), dark: resolve(n, 'dark') }, code: null })),
+    elevations: elevation.map((n) => ({ name: n, figma: n, shadows: perMode((m) => resolve(n, m)), code: null })),
     sub: () => '',
   });
   const rest = take(() => true);
@@ -141,17 +156,20 @@ export const CODE_TOKENS_COMMIT: string | null = null;
 export interface TokenPlace {
   group: string;
   name: string;
-  /** Its value (light), to show beside the name. */
+  /** Its value (the first mode's), to show beside the name. */
   value: string | null;
   figma: string;
   code: string | null;
 }
 
+/** A mode's look in two colors: its page and its accent (the theme picker's swatch). */
+export const modeSwatch = (m: Mode): [string, string] => [resolve('app-page', m), resolve('app-primary', m)];
+
 const alnum = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 const PLACES = (() => {
   const out = new Map<string, TokenPlace>();
   for (const g of TOKEN_GROUPS) {
-    for (const t of g.tokens) out.set(alnum(t.name), { group: g.id, name: t.name, value: t.value.light, figma: t.figma, code: t.code });
+    for (const t of g.tokens) out.set(alnum(t.name), { group: g.id, name: t.name, value: t.base, figma: t.figma, code: t.code });
     for (const e of g.elevations ?? []) out.set(alnum(e.name), { group: g.id, name: e.name, value: null, figma: e.figma, code: e.code });
   }
   return out;

@@ -1,16 +1,18 @@
 // Components › Tokens › a group: its tokens as tables — what each looks like, its three names (the Figma variable,
 // the CSS variable, how the app's code reads it), each copyable, and its value with the primitive it points to. A
-// table has Light and Dark columns only when its tokens change with the theme. A token the code doesn't have is
+// table has a column per theme (Light and Dark, or the app's own: THEME_MODES) only when its tokens change with the
+// theme; a color shows its swatch in each. A token the code doesn't have is
 // marked: that's a change to ask for.
 import { NO_APP } from '../nav/noApp';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
-import { CODE_TOKENS_COMMIT, findTokenGroup, groupSize, TOKEN_GROUPS, type ElevationToken, type Mode, type TextStyleToken, type Token, type TokenGroup, TOKENS_CODE_LINKED } from '../design/tokenCatalog';
+import { CODE_TOKENS_COMMIT, findTokenGroup, groupSize, THEME_MODES, TOKEN_GROUPS, type ElevationToken, type TextStyleToken, type ThemeMode, type Token, type TokenGroup, TOKENS_CODE_LINKED } from '../design/tokenCatalog';
 import type { CodeTextStyle } from '../design/textStyles';
 import styles from './TokensView.module.css';
 
-const MODES: Mode[] = ['light', 'dark'];
+/** The first theme alone, for a table whose tokens don't change with the theme. */
+const ONE: ThemeMode[] = [THEME_MODES[0]];
 
 export function TokensView({ group: id }: { group: string }) {
   const group = findTokenGroup(id) ?? TOKEN_GROUPS[0];
@@ -121,36 +123,35 @@ function Table({ title, head, widths = [], children }: { title?: string; head: s
 }
 
 function TokenTable({ title, tokens, group, marked }: { title: string; tokens: Token[]; group: TokenGroup; marked: string | null }) {
-  // Light and Dark columns only when a token here changes with the theme.
-  const themed = tokens.some((t) => t.value.light !== t.value.dark || t.alias.light !== t.alias.dark);
-  const modes = themed ? MODES : (['light'] as Mode[]);
+  // A column per theme only when a token here changes with it.
+  const themed = tokens.some((t) => THEME_MODES.some((m) => t.value[m.id] !== t.base || t.alias[m.id] !== t.alias[THEME_MODES[0].id]));
+  const modes = themed ? THEME_MODES : ONE;
   const system = isSystem(group);
+  // Colors show their swatch in each theme's column; other tokens their look in a column of its own, first.
   const color = tokens[0]?.kind === 'color';
-  const head = ['', 'Token', ...(system ? ['Code'] : []), ...(themed ? ['Light', 'Dark'] : ['Value'])];
-  const widths = ['96px', system ? '42%' : '50%', system ? '24%' : undefined];
+  const values = themed ? modes.map((m) => m.label) : ['Value'];
+  const head = [...(color ? [] : ['']), 'Token', ...(system ? ['Code'] : []), ...values];
+  const widths = color ? [modes.length > 2 ? '26%' : '34%', system ? '16%' : undefined] : ['96px', system ? '42%' : '50%', system ? '24%' : undefined];
   return (
     <Table title={title} head={head} widths={widths}>
       {tokens.map((t) => (
         <tr key={t.name} className={t.name === marked ? styles.marked : ''} data-token={t.name}>
-          <td className={styles.preview}>
-            {color ? (
-              <span className={styles.swatches}>
-                {modes.map((m) => (
-                  <span key={m} className={styles.swatch} style={{ background: t.value[m] }} title={`${m === 'light' ? 'Light' : 'Dark'}: ${t.value[m]}`} />
-                ))}
-              </span>
-            ) : (
+          {!color && (
+            <td className={styles.preview}>
               <Visual t={t} group={group} />
-            )}
-          </td>
+            </td>
+          )}
           <td>
             <Name figma={t.figma} css={`var(--${t.name})`} />
           </td>
           {system && <CodeCell code={t.code} />}
           {modes.map((m) => (
-            <td key={m} className={styles.valueCell}>
-              <span className={styles.mono}>{show(t.value[m], t.kind)}</span>
-              {t.alias[m] && <span className={styles.alias}>{t.alias[m]!.replace(/-/g, '/')}</span>}
+            <td key={m.id} className={color ? styles.colorCell : styles.valueCell}>
+              {color && <span className={styles.swatch} style={{ background: t.value[m.id] }} title={`${m.label}: ${t.value[m.id]}`} />}
+              <span className={styles.valueText}>
+                <span className={styles.mono}>{show(t.value[m.id], t.kind)}</span>
+                {t.alias[m.id] && <span className={styles.alias}>{t.alias[m.id]!.replace(/-/g, '/')}</span>}
+              </span>
             </td>
           ))}
         </tr>
@@ -171,7 +172,7 @@ function Name({ figma, css }: { figma: string; css?: string }) {
 
 /** What a length looks like: a bar, a radius on a box's corner, a stroke. */
 function Visual({ t, group }: { t: Token; group: TokenGroup }) {
-  const n = Number(t.value.light);
+  const n = Number(t.base);
   if (group.id === 'spacing') return <span className={styles.bar} style={{ width: Math.max(1, Math.min(n, 64)) }} />;
   if (group.id === 'radius') return <span className={styles.radius} style={{ borderTopLeftRadius: Math.min(n, 28) }} />;
   if (group.id === 'borders') return <span className={styles.stroke} style={{ height: n }} />;
@@ -210,8 +211,8 @@ function TextStyleTable({ list, marked }: { list: TextStyleToken[]; marked: stri
   const px = (t?: Token) => (t ? `calc(${css(t)} * 1px)` : undefined);
   const cell = (t?: Token) => (
     <td className={styles.valueCell}>
-      {t && <span className={styles.mono}>{t.value.light.replace(/"/g, '')}</span>}
-      {t?.alias.light && <span className={styles.alias}>{t.alias.light.replace(/-/g, '/')}</span>}
+      {t && <span className={styles.mono}>{t.base.replace(/"/g, '')}</span>}
+      {t?.alias[THEME_MODES[0].id] && <span className={styles.alias}>{t.alias[THEME_MODES[0].id]!.replace(/-/g, '/')}</span>}
     </td>
   );
   return (
@@ -238,15 +239,16 @@ function TextStyleTable({ list, marked }: { list: TextStyleToken[]; marked: stri
 }
 
 function ElevationTable({ levels, marked }: { levels: ElevationToken[]; marked: string | null }) {
-  const themed = levels.some((e) => e.shadows.light !== e.shadows.dark);
-  const modes = themed ? MODES : (['light'] as Mode[]);
+  const first = THEME_MODES[0].id;
+  const themed = levels.some((e) => THEME_MODES.some((m) => e.shadows[m.id] !== e.shadows[first]));
+  const modes = themed ? THEME_MODES : ONE;
   return (
-    <Table head={[...(themed ? ['Light', 'Dark'] : ['']), 'Level', 'Code', 'Shadow']} widths={[...modes.map(() => '80px'), '18%', '34%']}>
+    <Table head={[...(themed ? modes.map((m) => m.label) : ['']), 'Level', 'Code', 'Shadow']} widths={[...modes.map(() => '80px'), '18%', '34%']}>
       {levels.map((e) => (
         <tr key={e.name} className={e.name === marked ? styles.marked : ''} data-token={e.name}>
           {modes.map((m) => (
-            <td key={m} className={styles.preview}>
-              <span className={`${styles.shadowBox} ${m === 'dark' ? styles.shadowDark : ''}`} style={{ boxShadow: e.shadows[m] }} />
+            <td key={m.id} className={styles.preview}>
+              <span className={`${styles.shadowBox} ${m.scheme === 'dark' ? styles.shadowDark : ''}`} style={{ boxShadow: e.shadows[m.id] }} />
             </td>
           ))}
           <td>
@@ -255,7 +257,7 @@ function ElevationTable({ levels, marked }: { levels: ElevationToken[]; marked: 
           <CodeCell code={e.code} />
           <td className={styles.valueCell}>
             {/* One shadow per line (the commas inside rgba() aren't separators). */}
-            {e.shadows.light.split(/,\s*(?![^(]*\))/).map((s, i) => (
+            {e.shadows[first].split(/,\s*(?![^(]*\))/).map((s, i) => (
               <span key={i} className={styles.mono}>
                 {s}
               </span>
@@ -269,7 +271,7 @@ function ElevationTable({ levels, marked }: { levels: ElevationToken[]; marked: 
 
 /** Figma's weights are names ("Regular", "Bold"); CSS wants numbers. */
 const WEIGHTS: Record<string, number> = { thin: 100, light: 300, regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800, black: 900 };
-const weight = (t?: Token) => (t ? (WEIGHTS[t.value.light.replace(/["'\s-]/g, '').toLowerCase()] ?? 400) : undefined);
+const weight = (t?: Token) => (t ? (WEIGHTS[t.base.replace(/["'\s-]/g, '').toLowerCase()] ?? 400) : undefined);
 
 /** The Code column shows the member (`accentBrand`); the group's path is in the note, and Copy copies it all. */
 const member = (code: string) => code.slice(code.lastIndexOf('.') + 1);
