@@ -6,8 +6,10 @@
 
 <a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.38.1-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
+<img alt="Status: beta" src="https://img.shields.io/badge/status-beta-e0362f">
+<a href="https://herocanvas.io"><img alt="Website" src="https://img.shields.io/badge/website-herocanvas.io-0f1730"></a>
 
-**Design your app's screens in code, with an AI agent, on a canvas of real devices.**
+**Design your app’s screens with an AI agent, on a canvas of real devices.**
 
 HeroCanvas shows your app's screens on every device at once — phones, foldables, iPads, in light and dark, in every
 language — with the navigation, sheets, keyboard and accessibility text sizes behaving as they will in the app. The
@@ -22,12 +24,18 @@ honest; you look at the canvas, try the scenarios, and say what to change.
 <p align="center"><img src="docs/images/canvas.jpg" width="100%" alt="HeroCanvas with the same screen on an iPhone, a Pixel Fold and an iPad side by side, its pages on the left and Scenarios on the right"><br>
 <sub>One screen on an iPhone, a foldable and an iPad at once, with the app's pages and the scenarios to try it in.</sub></p>
 
-> **See it with a real app**: the [`example/food-truck`](https://github.com/santiquiss/HeroCanvas/tree/example/food-truck)
-> branch is a copy with Apple's Food Truck (SwiftUI) connected, every screen mirrored.
+**[Try it live](https://herocanvas.io/examples/studio/)**: the real HeroCanvas in your browser, with a SwiftUI app mirrored (tabs on
+the iPhone, a sidebar and an inspector on the iPad, three themes) and [a proposal](https://herocanvas.io/examples/studio/#/projects?devices=ip17,ipad11&proposal=PS-1)
+to compare. More on the [website](https://herocanvas.io).
 
-> Early days. Until you connect your app, HeroCanvas shows its own **tour**, a small app that walks through every part
-> of it. Connecting your own app works today through the agent (any stack: React, React Native, Flutter, SwiftUI, Compose); dedicated connectors
-> per stack are next — see [Developer experience](docs/developer-experience.md).
+<p align="center"><img src="docs/images/demo.webp" width="100%" alt="HeroCanvas in use: moving through a mirrored app's tabs, switching between its three themes, then an iPhone and an iPad side by side with the iPad's inspector open"></p>
+
+> [!WARNING]
+> **HeroCanvas is in beta.** It works today, and it's changing fast. Expect rough edges, and changes to how your copy
+> plugs in, until 1.0. Update on purpose, and read the [changelog](src/CHANGELOG.md) first: each release says what to
+> adapt. Until you connect your app, HeroCanvas shows its own **tour**; connecting your app works through the agent,
+> for any stack (React, React Native, Flutter, SwiftUI, Compose). Dedicated connectors per stack are next: see
+> [Developer experience](docs/developer-experience.md).
 
 ## Why not just Figma?
 
@@ -62,6 +70,8 @@ before there's code, and your agent can read a frame you link to turn it into co
 | Handoff in your code's own terms | ◐ | ◐ | — | — | ✓ |
 | Changed by asking an AI agent | ◐ | — | ✓ | ◐ | ✓ |
 | Comments for the whole team on the screens | ✓ | — | ◐ | — | ✓ |
+| Images and videos of the screens, the device in 3D | ◐ | — | — | ◐ | ✓ |
+| Tried on a real phone, installed as an app | ◐ | ◐ | ◐ | ✓ | ✓ |
 
 <sub>✓ yes · ◐ partly, or with extra setup · — no. Storybook shows components one by one; AI app builders make a new app
 in their own stack, not yours; native previews show one view of one platform at a time.</sub>
@@ -70,16 +80,17 @@ in their own stack, not yours; native previews show one view of one platform at 
 
 <p align="center"><img src="docs/images/how-it-works.jpg" width="100%" alt="How it works: your app's code (any stack, untouched) is read by the agent, which writes the app's mirror (pages, components, tokens, texts, data), shown on the canvas (devices, flows, proposals, Inspect and more)"></p>
 
-1. **The mirror** (`app/`) is your app as it is today: one page per screen at its route, your components with
-   your names and props, your tokens as `--app-*` variables, your texts in every language, mock data per persona.
-2. **The tool** reads only that mirror. It knows nothing about your app beyond it, so it works the same for any app.
+1. **The mirror** (`app/`) is your app as it is today: one page per screen, your components with their names and
+   props, your tokens as `--app-*` variables, your texts in every language, and sample data for each persona.
+2. **The tool** (`src/`) reads only the mirror and knows nothing else about your app, so it works the same for any app,
+   and its updates never touch your work.
 3. **Proposals** (`proposals/`) are changes to the mirror, kept apart: new pages, replaced components, versions A
    and B to compare, and a `handoff.md` for whoever builds it.
 
 ## The story
 
 HeroCanvas was born inside **[MacrosFirst](https://macrosfirst.com)**, a macro tracker and meal planner used every day
-on iPhone and Android ([App Store](https://apps.apple.com/us/app/macrosfirst/id1253012487) ·
+by people all over the world, on iPhone and Android ([App Store](https://apps.apple.com/us/app/macrosfirst/id1253012487) ·
 [Google Play](https://play.google.com/store/apps/details?id=com.ha.prepsmart)).
 
 We set out to design MacrosFirst for **foldables**: phones that open into a tablet, with two screens, hinges and
@@ -90,15 +101,15 @@ the building.
 
 It kept growing. Every phone, tablet and foldable; light and dark; every language; personas and text sizes;
 proposals to compare; Inspect, comments and handoffs in the code's own terms. It became the way we design MacrosFirst,
-and something we couldn't imagine working without. So we took everything specific to MacrosFirst out of it, made it
-work for any app and any stack, and decided to share it with the world.
+and something we couldn't imagine working without. Then we took out everything specific to MacrosFirst, made it work
+for any app and any stack, and shared it with the world.
 
 If HeroCanvas helps you, give [MacrosFirst](https://macrosfirst.com) a try: it's where all of this started.
 
 ## Get started
 
 You need [Node.js](https://nodejs.org) 20 or newer, git, and an AI coding agent —
-[Claude Code](https://claude.com/claude-code) is what HeroCanvas is tested with.
+HeroCanvas is tested with [Claude Code](https://claude.com/claude-code).
 
 ### 1. Get your copy
 
@@ -153,17 +164,18 @@ Talk to the agent about what you see on the canvas:
 > The empty state of Today looks wrong next to the app: compare and fix it.
 > Propose a new onboarding with two versions: one with a video, one with three steps.
 > On the iPad the list should open beside the detail. Make it a proposal.
-> Write the handoff for PJ-2 and take screenshots of it on a phone and an iPad.
+> Write the handoff for the new onboarding, with screenshots on a phone and an iPad.
 > Create two personas: an admin on the paid plan and someone who just signed up.
 ```
 
 Share any view by its link (**Share**: the device, page, scenario and proposal are in the URL), leave **comments** on
 the canvas, and export images or videos with **Capture**.
 
-### 6. Share it with your team
+### 6. Stay in sync with your team
 
-Deploy your copy to get a public link (Vercel, Netlify, your own servers): your team opens the canvas in a browser,
-leaves comments and reviews proposals, with nothing to install. See [Deploy](#deploy-a-link-for-your-team).
+Deploy your copy once to any static host (Vercel, Netlify, Cloudflare Pages, GitHub Pages, your own servers). Every push
+updates the link: designers, developers and reviewers open the same canvas, leave comments and review proposals, with
+nothing to install. See [Deploy](#deploy-a-link-for-your-team).
 
 ## Working with the agent
 
@@ -184,18 +196,27 @@ Other agents can read the same files: they're plain Markdown.
 
 - **Canvas**: one device or many (a set, All devices), turned, zoomed, with the status bar, Dynamic Island or notch,
   home indicator and system keyboard of each.
-- **Simulator**: your pages by their manifest (tabs, pushed pages, covers, what comes before the tabs), list–detail on
-  wide screens, and one rule for sheets: an action sheet on a phone is a menu hanging from its button on an iPad, a
-  task is a dialog.
+- **Real navigation**: your pages by their manifest (tabs, pushed screens, modals, what comes before the tabs),
+  list–detail on wide screens, tabs that become a sidebar on tablets, and one rule for sheets: an action sheet on a
+  phone becomes a menu on an iPad, as in the app; a task is a dialog.
 - **Launch**: the app's launch screen and its way into the first screen (screen, enter, hold, exit: the same four
   phases as iOS and Android), played on a cold start; Pages' Launch screen (or Scenarios' Replay) plays it again.
-- **Pages, Flow, Scenarios**: every page and its variants; flows laid out step by step; personas, the language, the
-  system's text size and Bold Text, and each page's own controls — all in the URL, so a scenario is a link.
+- **Pages, Flow, Scenarios**: every page and its variants; flows laid out step by step; personas, the language (right
+  to left too), iOS and Android text sizes and Bold Text, and each page's own controls — all in the URL, so a
+  scenario is a link to share.
+- **Themes and tokens**: light and dark, or your app's own themes (Classic, Graphite, Stone…), picked from the canvas;
+  the Tokens view lists every token with a column per theme.
+- **The iOS kit** (`herocanvas/ios`): SwiftUI's own views (NavigationStack, List sections and rows, Picker, Menu,
+  Toggle, searchable…) on your app's tokens, so a SwiftUI app's mirror doesn't rebuild the platform. The system
+  keyboards of each device come built in.
 - **Proposals**: changes kept apart, with versions to compare side by side and a handoff for whoever builds them.
 - **Inspect, Layers, Components**: the component under the cursor with its props and tokens, the tree of components,
   and a gallery of every component and its states.
-- **Comments** on the canvas (in the browser, or shared through a Supabase table: `src/comments/supabase.sql`), and
-  **Capture**: images and videos of the screens in 3D, with light and motion.
+- **Comments**: notes for the whole team, right on the screens (kept in the browser, or shared through a Supabase
+  table: `src/comments/supabase.sql`).
+- **Capture**: any screen as an image or a video, the device turned in 3D with light and motion.
+- **On a real phone**: open your deployed copy on a phone and install it from the browser (a PWA): your app's screens
+  at their real size, in your hand.
 - **Icons as your app draws them**: Material Symbols, or your app's SF Symbols and its own `.symbolset`s, made on a
   Mac with `npm run symbols` (`<Icon name="sf:box.truck" />`). HeroCanvas ships no SF Symbols: Apple's license lets
   you use them to design apps for its platforms, from your Mac's own copy.
@@ -204,11 +225,14 @@ Other agents can read the same files: they're plain Markdown.
 - **Screenshots from the terminal**: `npm run shot -- "/today"` (light and dark, in device frames; `--device`,
   `--land`, `--compare` with a proposal; it finds this project's dev server on its own) — what the agent uses to look at its own work.
 
-<p align="center"><img src="docs/images/inspect.jpg" width="100%" alt="Inspect on a list row: highlighted on the device with its measurements, its place in Layers, and its props, layout and tokens in the right panel"><br>
+<p align="center"><img src="docs/images/inspect.webp" width="100%" alt="Inspect in use: picking a title, a status badge and a tab icon on the device, each measured, found in Layers, with its layout and tokens"><br>
 <sub><b>Inspect</b>: the component under the cursor, measured on the device, with its props, layout and tokens; Layers shows where it sits.</sub></p>
 
-<p align="center"><img src="docs/images/capture.webp" width="340" alt="An iPhone turned in 3D with a soft shadow, exported from Capture"><br>
-<sub><b>Capture</b>: any screen as an image or a video, the device turned in 3D, ready for a deck or a store page.</sub></p>
+<p align="center"><img src="docs/images/scenarios.webp" width="100%" alt="Scenarios in use on an iPhone and an iPad: the theme switched from Classic to Graphite and Stone, the text size raised to the largest accessibility size, then Bold Text turned on"><br>
+<sub><b>Scenarios</b>: every theme, text size and Bold Text, on every device at once; where a layout breaks shows.</sub></p>
+
+<p align="center"><img src="docs/images/capture.webp" width="100%" alt="Capture in use: the iPhone turned to different angles, then its color changed, ready to export"><br>
+<sub><b>Capture</b>: any screen as an image or a video, the device turned in 3D with light and motion, ready for a deck or a store page.</sub></p>
 
 ## Project layout
 
@@ -310,6 +334,19 @@ Good to know:
 - **Shared comments** need a database: until you connect one, each browser keeps its own. Ask your agent to set up
   Supabase with `src/comments/supabase.sql` and `src/comments/supabase.json`.
 
+## Contribute
+
+HeroCanvas is in beta and built in the open: feature requests, bugs and contributions all go through GitHub.
+
+- **Request a feature**: open an issue with the [Idea template](https://github.com/santiquiss/HeroCanvas/issues/new?template=feature.yml): what you want to
+  design and why. For a bigger change, we agree on its shape there before anyone builds it.
+- **Report a bug**: open an issue with the [Bug template](https://github.com/santiquiss/HeroCanvas/issues/new?template=bug.yml): what you did, what you
+  expected, and the link HeroCanvas shows for that screen.
+- **Tell us where your app didn't connect**: a stack or a pattern the agent misreads is the most valuable report we
+  get. A small public repository that shows it is even better.
+- **Send a pull request**: fork it and make one change. [AGENTS.md](AGENTS.md) guides you or your agent;
+  [CONTRIBUTING.md](CONTRIBUTING.md) has the checklist.
+
 ## Develop HeroCanvas itself
 
 `npm run typecheck`, `npm run lint`, `npm test`, `npx vite build` before a change is done; versions and the changelog
@@ -326,6 +363,6 @@ the tool's, on its page (the ⓘ at the bottom of the left rail) with the licens
 Made by [Santiago Quiss](https://github.com/santiquiss) and [Agus Salas](https://github.com/salasagustina-ds), in
 collaboration with the [MacrosFirst](https://macrosfirst.com) team.
 
-Open source under the [Apache License 2.0](LICENSE): use it, change it and share it freely, for yourself or your
-company, commercial uses included. Any copy or project built from it keeps the license and the [`NOTICE`](NOTICE) file,
+Open source under the [Apache License 2.0](LICENSE): use it, change it and share it, for yourself or your company,
+commercially too. Any copy or project built from it keeps the license and the [`NOTICE`](NOTICE) file,
 which names its creators. Your own code (`app/`, `proposals/`) is yours.
