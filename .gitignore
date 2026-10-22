@@ -30,3 +30,6 @@ dist-ssr
 
 # npm run shot
 shots/
+
+# MacrosFirst's own material (its logo, the transparent video the site's clip is made from): large, and not HeroCanvas's.
+brand/macrosfirst/
