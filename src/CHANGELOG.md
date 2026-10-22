@@ -6,6 +6,16 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.44.2 — 2026-10-22
+
+- **An app's own test setup**: `npm test` runs `app/test/setup.ts` after the tool's, when the app has one: stand-ins
+  for what its dependencies need and a DOM doesn't have (a WebAssembly runtime, an SVG animation player).
+- The appearance test reads its own settings, not whatever the app's setup loaded first.
+
+**Contract**
+
+- New (optional): `app/test/setup.ts`.
+
 ## 0.44.1 — 2026-10-22
 
 - `PreviewScreen` from `herocanvas` loads when it first shows: exported at once, it loaded the app's pages with the

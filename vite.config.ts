@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import pkg from './package.json' with { type: 'json' }
@@ -41,7 +42,9 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     include: ['{src,app,proposals}/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs', 'app/**/*.test.mjs'],
-    setupFiles: ['src/test/setup.ts'],
+    // The tool's, then the app's own when it has one (app/test/setup.ts: stand-ins for what its dependencies need and
+    // a DOM doesn't have, as a WebAssembly runtime).
+    setupFiles: ['src/test/setup.ts', ...(existsSync('app/test/setup.ts') ? ['app/test/setup.ts'] : [])],
     // No module cache between runs: it keeps an import.meta.glob's old list (proposals/, stories, pages), so a
     // proposal or a story added since fails as missing until the cache is cleared.
     fsModuleCache: false,

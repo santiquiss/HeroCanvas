@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@app/config', () => ({ appConfig: { name: 'App', home: 'home', appearance: { system: 'Auto', light: 'Light', dark: 'Dark' } } }));
 
+// Loaded again under the mock: the setup may have loaded it with the app's own settings.
+vi.resetModules();
 const { appearanceIn, schemeIn } = await import('./appThemes');
 const params = (q: string) => (k: string) => new URLSearchParams(q).get(k);
 
