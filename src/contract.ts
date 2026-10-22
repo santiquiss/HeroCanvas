@@ -30,6 +30,11 @@ export interface AppConfig {
   languages?: { id: string; name: string }[];
   /** Who the app is tried as (Scenarios panel; `?persona=`), the default first. None: no picker. */
   personas?: Persona[];
+  /**
+   * The app's own themes, beyond light and dark (palettes its user picks in its settings), the default first
+   * (Scenarios › Theme; `?apptheme=`; the app picks one with useAppTheme). None: just light and dark.
+   */
+  themes?: AppTheme[];
   /** The tab an empty or unknown URL opens. */
   home: string;
   /** What the app shows while it starts (LaunchConfig). None: it opens straight on its first screen. */
@@ -41,6 +46,17 @@ export interface AppConfig {
    * None: every device.
    */
   devices?: DeviceTargets;
+}
+
+/**
+ * One of the app's own themes: its tokens in app/theme.css under `[data-app-theme='<id>']` (after the light and dark
+ * blocks). `scheme`: the light or dark it forces, as SwiftUI's `preferredColorScheme` (a dark palette); none: it
+ * follows the device's.
+ */
+export interface AppTheme {
+  id: string;
+  name: string;
+  scheme?: 'light' | 'dark';
 }
 
 /**

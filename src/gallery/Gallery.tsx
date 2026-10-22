@@ -1,5 +1,6 @@
 // Component gallery: every component isolated, all its stories side by side, in the current theme and at
 // widths taken from the current device. Inspect, Layers and Controls work on the stories.
+import { useAppTheme } from '../sim/appThemes';
 import { useLanguage } from '../sim/language';
 import { useMemo, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
@@ -26,6 +27,7 @@ import { TokensView } from './TokensView';
 export function Gallery() {
   const { name, tokens } = useGalleryRoute();
   const { theme } = useSim();
+  const [appTheme] = useAppTheme();
   const language = useLanguage();
   const { setRoot, captureProps, inspect } = useDesignRoot();
   const wrap = useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ export function Gallery() {
         </div>
       ) : (
         <div className={styles.scroll}>
-          <div ref={setRoot} data-theme={theme} lang={language} {...captureProps} className={styles.root} style={{ cursor: inspect ? 'crosshair' : undefined }}>
+          <div ref={setRoot} data-theme={theme} data-app-theme={appTheme?.id} lang={language} {...captureProps} className={styles.root} style={{ cursor: inspect ? 'crosshair' : undefined }}>
             {name ? mod ? <ComponentPage key={name} mod={mod} /> : <Missing name={name} /> : <Overview />}
           </div>
         </div>

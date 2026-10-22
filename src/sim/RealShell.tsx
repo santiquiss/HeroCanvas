@@ -2,6 +2,7 @@
 // designer around it, and no drawn system (the device shows its own status, home indicator and keyboard). The layout
 // is the same one every device of the canvas gets, from a display made of what this one reports (sim/realDevice).
 // On by itself on a phone or when installed on the home screen; `?real=1` / `?real=0` say so either way.
+import { schemeIn } from './appThemes';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { DesignProvider } from '../design/DesignContext';
@@ -52,7 +53,7 @@ export function RealShell() {
   const view = useRealViewport();
   usePageAsApp();
   const platform = useMemo(() => platformOf(navigator.userAgent, navigator.maxTouchPoints), []);
-  const theme = search.get('theme') === 'dark' ? 'dark' : 'light';
+  const theme = schemeIn((k) => search.get(k));
   const video = search.get('video') === '1';
   const detailOpen = detailOpenFor(pages, stack);
   const top = stack[stack.length - 1];

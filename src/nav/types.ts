@@ -67,9 +67,11 @@ export interface PageDef {
   variants?: () => { label: string; params: Params }[];
   /**
    * Nav bar / rail entry (tabs only). `icon`: a Material Symbol, or one of the app's own glyphs, as its tab bar
-   * takes one. `search`: a search pill floats over it.
+   * takes one. `search`: a search pill floats over it. `section`: the sidebar's section it's listed under (the rail
+   * draws them). `sidebarOnly`: only in the rail (a tablet's sidebar), not in a phone's tab bar, as SwiftUI's
+   * `.sidebarAdaptable` tabs hidden when compact: a screen without the rail opens on the home tab instead.
    */
-  tab?: { label: string; short: string; icon: string; search?: boolean };
+  tab?: { label: string; short: string; icon: string; search?: boolean; section?: string; sidebarOnly?: boolean };
   status?: PageStatus;
   /** Where this page navigates to, drawn as arrows in the Flow view. A page nobody links to gets an arrow from its parent. */
   links?: PageLink[];

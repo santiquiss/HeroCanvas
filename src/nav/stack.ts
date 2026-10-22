@@ -16,7 +16,7 @@ export type Manifest = Record<string, PageDef>;
  * PostHog flags read by more than one page (a user's flag doesn't change from one screen to the next: `lsv2`,
  * screens/Scan/flag).
  */
-export const SIM_PARAMS = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'capture', ...SHOT_PARAMS] as const;
+export const SIM_PARAMS = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'capture', ...SHOT_PARAMS] as const;
 
 /**
  * Whether the split's right part is in use (the layout's `detailOpen`): a push page over the tab.

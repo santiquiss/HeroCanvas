@@ -10,6 +10,7 @@
 //
 // `window.__shot` is what the script drives: `ready()` once the screens have settled, `act(steps)` (shotActions.ts),
 // `finish()` before the picture, `rect()` the area to cut.
+import { APP_THEME_PARAM, findAppTheme } from '../../sim/appThemes';
 import { designLayout, railFoldedIn, VARIANT_PARAM } from '../../design/overridableRegistry';
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
@@ -84,7 +85,9 @@ export function ShotShell() {
         ]
       : [{ key: 'after', label: null, nav }];
   // Before and after compare one theme (light unless asked); a plain shot shows both.
-  const themes = shotThemes(search.get(SHOT_THEMES_PARAM), compare ? ['light'] : ['light', 'dark']);
+  // An app theme that forces light or dark (appConfig.themes) shows in it alone.
+  const forced = findAppTheme(search.get(APP_THEME_PARAM))?.scheme;
+  const themes = forced ? [forced] : shotThemes(search.get(SHOT_THEMES_PARAM), compare ? ['light'] : ['light', 'dark']);
   const padding = shotPoints(search.get(SHOT_PADDING_PARAM), SHOT_PADDING);
   const gap = shotPoints(search.get(SHOT_GAP_PARAM), SHOT_GAP);
   const stage = useRef<HTMLDivElement>(null);

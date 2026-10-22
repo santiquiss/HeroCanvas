@@ -13,7 +13,8 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Dialog, Popover, Sheet, Snackbar, SNACKBAR_MS, sheetMaxWidth, type AnchorRect } from '../kit';
 import { Toast } from '../components/Toast';
 import { useDesignRoot } from '../design/DesignContext';
-import { DetailPanelCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot } from '../nav/context';
+import { DetailPanelCtx, NavCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot, type Nav } from '../nav/context';
+import { useAppTheme } from './appThemes';
 import { sideColumnFor, splitFor, useScreenConfig, type ScreenConfig } from '../nav/screenConfig';
 import type { PageDef, PageRef, SplitConfig } from '../nav/types';
 import { ChangesOverlay } from './ChangesOverlay';
@@ -198,13 +199,32 @@ function Layer({
 }
 
 /**
+ * A tab that's only in the sidebar (`tab.sidebarOnly`) on a screen without the rail (a phone): the home tab instead,
+ * as an adaptive app falls back when it turns compact. Every other screen keeps the shared stack.
+ */
+function useCompactNav(nav: Nav, rail: boolean): Nav {
+  const off = !rail && nav.def(nav.stack[0].id).tab?.sidebarOnly;
+  return useMemo(() => (off ? { ...nav, stack: [{ id: HOME, params: {} }] } : nav), [nav, off]);
+}
+
+/**
  * `preview`: not inspectable, and without overlays (Flow thumbnails). `overlays` shows sheets, dialogs and toasts on a
  * preview anyway: the other screens of a device set or All devices, which share them.
  */
-export function DeviceScreen({ preview = false, overlays = !preview }: { preview?: boolean; overlays?: boolean }) {
+export function DeviceScreen(props: { preview?: boolean; overlays?: boolean }) {
+  const nav = useCompactNav(useNavRoot(), useSim().layout.showRail);
+  return (
+    <NavCtx.Provider value={nav}>
+      <Screen {...props} />
+    </NavCtx.Provider>
+  );
+}
+
+function Screen({ preview = false, overlays = !preview }: { preview?: boolean; overlays?: boolean }) {
   const { layout: L, theme, toastText, dialog } = useSim();
   const language = useLanguage();
   const nav = useNavRoot();
+  const [appTheme] = useAppTheme();
   const { stack } = nav;
   const { setRoot, captureProps, inspect } = useDesignRoot();
   const [screen, setScreen] = useState<HTMLDivElement | null>(null);
@@ -327,6 +347,8 @@ export function DeviceScreen({ preview = false, overlays = !preview }: { preview
       <div
         ref={setScreen}
         data-theme={theme}
+        // The app's own theme (appConfig.themes): its tokens' block in app/theme.css.
+        data-app-theme={appTheme?.id}
         // The device's language (Scenarios › Language): the browser hyphenates and picks quotes by it.
         lang={language}
         // Right to left (Arabic, Hebrew…), the screen mirrors: rows, bars and the status bar flip, as iOS and Android do.

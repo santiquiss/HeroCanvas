@@ -103,6 +103,11 @@ their defaults): colors per theme (`[data-theme='light']`, `[data-theme='dark']`
 contract doesn't: add it as `--app-<name>` too; screens may read it. HeroCanvas applies the file to the screens itself:
 don't import it.
 
+**Themes of its own** (palettes its settings offer beyond light and dark): list them in `appConfig.themes` (the
+default first; `scheme: 'dark'` for one made dark, as SwiftUI's `preferredColorScheme`), each one's tokens in a
+`[data-app-theme='<id>']` block after the light and dark ones. The app's own picker reads and sets it with
+`useAppTheme()`; the designer picks it in Scenarios › Theme.
+
 An app on the platform's own look (SwiftUI's or UIKit's defaults, Material's) takes the platform's values:
 `src/tour/theme.css` has iOS's system colors, text styles and grouped backgrounds to start from; change its accent
 (the asset catalog's AccentColor) and what the app sets of its own.
@@ -116,6 +121,11 @@ look. If the app has no tabs, the components render nothing and every page is a 
 **A SwiftUI (or UIKit) app** builds its screens from the platform's views: take them from `herocanvas/ios`
 (`NavigationStack`, `Section`, `NavigationLink`, `LabeledContent`, `Label`, `Picker`, `SearchField`, `TextField`,
 `Toggle`, `Gauge`), named as SwiftUI names them; write only the app's own components.
+
+**An adaptive app** (tabs on phones, a sidebar on tablets: SwiftUI's `TabView` with `.sidebarAdaptable`, or a
+`horizontalSizeClass` switch between a `TabView` and a `NavigationSplitView`): its sections are tabs; the TabBar draws
+them as a bar, the SideRail as the sidebar (its width as `appConfig.layout.railWidth`), grouped by `tab.section`. A
+section only the sidebar lists (hidden when compact) is `tab.sidebarOnly`: a phone opens on the home tab instead.
 
 **A sidebar app** (SwiftUI's `NavigationSplitView`, UIKit's `UISplitViewController`, Material's list-detail or a
 navigation drawer that stays open on tablets) has no tabs: its sidebar is one root page (`level: 'tab'`, the app's

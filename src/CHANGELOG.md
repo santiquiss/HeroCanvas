@@ -6,6 +6,24 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.36.0 — 2026-10-22
+
+From connecting AdaptiveAppShell (a SwiftUI shell: tabs on iPhone, a sidebar on iPad, three themes of its own):
+
+- **An app's own themes** (`appConfig.themes`): palettes beyond light and dark, as an app whose settings offer
+  several. Picked in Scenarios › Theme (`?apptheme=`) or by the app's own settings (`useAppTheme()`); their tokens in
+  `app/theme.css` under `[data-app-theme='<id>']`. One made for light or dark (`scheme`, SwiftUI's
+  `preferredColorScheme`) sets the screens' scheme and holds the Light / Dark switch on it; a screenshot shows it in
+  that scheme alone.
+- **Tabs only in the sidebar** (`tab.sidebarOnly`), and the sidebar's sections (`tab.section`): an adaptive app's
+  sections that its iPad sidebar lists and its iPhone tab bar doesn't. A screen without the rail (a phone) opens on
+  the home tab instead, as the app does when it turns compact.
+- `connect-app`: an adaptive app (tabs on phones, a sidebar on tablets) and an app's own themes.
+
+**Contract**
+
+- `AppConfig.themes`, `AppTheme`, `useAppTheme`, `tab.section` and `tab.sidebarOnly` (new): nothing to adapt.
+
 ## 0.35.0 — 2026-10-21
 
 - **An iOS kit**, `herocanvas/ios`: SwiftUI's own views as iOS draws them, for mirroring a SwiftUI or UIKit app

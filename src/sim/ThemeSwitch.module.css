@@ -34,3 +34,8 @@
   z-index: 10;
   backdrop-filter: blur(12px);
 }
+/* Held by an app theme that's light or dark: the other side can't be picked. */
+.seg button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

@@ -16,6 +16,7 @@ import { LAUNCH } from '../nav/pages';
 import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
 import { PersonaPicker, usePersonaParam } from './PersonaPicker';
+import { APP_THEME_PARAM, APP_THEMES, useAppTheme } from '../sim/appThemes';
 
 interface Option {
   value: string;
@@ -40,6 +41,8 @@ export function ScenariosPanel() {
         </div>
         <PersonaPicker persona={persona} onPick={pick} />
       </div>
+
+      {APP_THEMES.length > 0 && <ThemeSection />}
 
       <LanguageSection />
 
@@ -130,6 +133,19 @@ function LaunchSection() {
           Replay
         </button>
       </div>
+    </div>
+  );
+}
+
+/** The app's own themes (appConfig.themes): the one the screens show, as its user picks it in the app's settings. */
+function ThemeSection() {
+  const [theme, pick] = useAppTheme();
+  return (
+    <div className={styles.section}>
+      <Title label="Theme" hint="app" params={[APP_THEME_PARAM]} />
+      <Row label="Theme" note="The app’s own themes, as its settings offer them. One made for light or dark sets the screens’ scheme.">
+        <Select label="Theme" value={theme!.id} onChange={pick} options={APP_THEMES.map((t) => ({ value: t.id, label: t.scheme ? `${t.name} · ${t.scheme}` : t.name }))} />
+      </Row>
     </div>
   );
 }

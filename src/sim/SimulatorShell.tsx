@@ -1,4 +1,5 @@
 // Top toolbar + scaled device frame. Simulator state (device, display, land, theme) lives in the URL.
+import { schemeIn } from './appThemes';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
 import { deviceGroup, findDevice, findDisplay } from '../devices/devices';
@@ -111,7 +112,7 @@ function DesignerShell() {
   const device = findDevice(search.get('device'));
   const display = findDisplay(device, search.get('display'));
   const land = search.get('land') === '1';
-  const theme = search.get('theme') === 'dark' ? 'dark' : 'light';
+  const theme = schemeIn((k) => search.get(k));
   // The video layout (16:9 video on top, the app below), on every display that offers it.
   const video = search.get('video') === '1';
 

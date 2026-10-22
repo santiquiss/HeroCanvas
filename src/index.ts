@@ -3,7 +3,7 @@
 // here holds still between releases (a change is in CHANGELOG.md); anything not here is the tool's own business.
 
 // What the app gives the tool (app/index.ts).
-export type { AppConfig, AppNavigation, DeviceTargets, LaunchConfig, Persona, ScreenLayout } from './contract';
+export type { AppConfig, AppNavigation, AppTheme, DeviceTargets, LaunchConfig, Persona, ScreenLayout } from './contract';
 export type { FlowDef, PageDef, PageProps } from './nav/types';
 
 // Instrumenting components and their stories.
@@ -18,6 +18,7 @@ export { hasSymbol, Icon } from './components/Icon';
 // The simulator, as a screen sees it: its layout and state, the language, the navigation.
 export { useHeaderInset, usePadL, usePadR, useSharedState, useSim, useUrlState } from './sim/SimContext';
 export { useLanguage } from './sim/language';
+export { useAppTheme } from './sim/appThemes';
 export { useActionSheet } from './sim/actionSheet';
 export { useNav, useNavRoot, useSplit } from './nav/context';
 export { useFlow } from './nav/flow';
