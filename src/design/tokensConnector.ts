@@ -24,8 +24,23 @@ export interface TokensConnector {
     /** Whether the code's text styles (TokensConnector.textStyles) show in this group. */
     codeTextStyles?: boolean;
   }[];
-  /** The text styles the code writes texts with: Inspect names a text by its style (design/textStyles). */
-  textStyles?: { name: string; code: string; widget?: string; figma?: string; size: number; line: number; weight: number }[];
+  /**
+   * The text styles the code writes texts with, each a font shorthand (`font: var(--<name>)`): Inspect names a text by
+   * its style (design/textStyles), and the system's text size and Bold Text scale them (theme/systemTextVars). `parts`:
+   * the variables a style also has for its size, line height and weight, scaled with it.
+   */
+  textStyles?: {
+    name: string;
+    code: string;
+    widget?: string;
+    figma?: string;
+    size: number;
+    line: number;
+    weight: number;
+    parts?: { size?: string; line?: string; weight?: string };
+  }[];
+  /** The type scale's own variables, which the system's text size (`sizes`, px) and Bold Text (`weights`) change too. */
+  typeScale?: { sizes?: string[]; weights?: string[] };
 }
 
 export const TOKENS_CONNECTOR: TokensConnector | null =

@@ -1,5 +1,7 @@
 // The app viewport: theme root, base tab, push layers (or the split panel), covers, overlays and system chrome.
 // Every entry of the navigation stack is its own layer, so navigation can go any number of levels deep.
+// The app's theme, applied to the screens (its tokens and aliases over the kit's): loaded with what draws them.
+import '../design/appTheme';
 import { SIDE_PANEL_PAGE, useSidePanel } from '../nav/sidePanel';
 import { appConfig } from '@app/config';
 import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';

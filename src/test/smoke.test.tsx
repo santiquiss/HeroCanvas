@@ -14,6 +14,14 @@ import { undeclaredProps } from './undeclaredProps';
 import { renderAt } from './render';
 
 /** The errors rendering `url`, and its loose texts. */
+describe('the app’s theme', () => {
+  it('reaches the screens', async () => {
+    await renderAt(`/${HOME}`, () => {});
+    // Its stylesheet is in the page (its text is empty here: the tests read the tour's theme as no CSS).
+    expect(document.getElementById('hc-app-theme')).not.toBeNull();
+  });
+});
+
 async function problemsAt(url: string, changed: Set<string> = new Set()): Promise<string[]> {
   const loose: string[] = [];
   const errors = await renderAt(url, (root) => {

@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.47.1 — 2026-10-22
+
+- **The app's theme reaches the screens again**: since 0.47.0 nothing loaded it, so its aliases and its own tokens
+  were missing on the screens (a link drawn in the kit's text color). The smoke test checks it's there.
+- **The system's text size and Bold Text change an app's own text styles**: the ones its tokens connector lists (any
+  name, `font: var(--<name>)`), their parts (a style's own size, line height and weight variables) and its type scale's
+  sizes and weights, besides `--app-font-*`.
+
+**Contract**
+
+- New (optional) in the tokens connector: a text style's `parts` (`{ size, line, weight }`: its variables) and
+  `typeScale` (`{ sizes, weights }`). Nothing to adapt.
+
 ## 0.47.0 — 2026-10-22
 
 - **An app's own tokens, as it organizes them**: with a tokens connector (`app/connectors/tokens.json`, written by
