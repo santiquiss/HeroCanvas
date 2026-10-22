@@ -1,0 +1,31 @@
+/* The iPhone Duo column's toolbar: under the corner status, centered in the column. It fades as pages come and go. */
+.column {
+  position: absolute;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  transition: opacity 220ms ease, visibility 0s;
+}
+.off {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 220ms ease, visibility 0s linear 220ms;
+}
+/* The kit's bar (an app without a ColumnBar of its own): its controls 40 round, 8 apart. */
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--app-radius-full);
+  background: var(--app-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}

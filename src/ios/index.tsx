@@ -11,6 +11,8 @@ import { hasSymbol, Icon } from '../components/Icon';
 import { DropDownMenu, type MenuEntry } from '../kit';
 import { useComponent } from '../design/component';
 import { useNav, useSplit } from '../nav/context';
+import type { ToolbarAction } from '../contract';
+import { useColumnBar } from '../sim/columnBar';
 import { usePadB, usePadL, usePadR, useSim } from '../sim/SimContext';
 import type { DropDownAlign } from '../sim/DropDownLayer';
 import styles from './ios.module.css';
@@ -32,6 +34,11 @@ export interface NavigationStackProps {
   listStyle?: 'insetGrouped' | 'plain';
   /** `.toolbar`'s trailing items. */
   toolbar?: ReactNode;
+  /**
+   * `.toolbar`'s trailing buttons that are only a symbol (`Button("Add", systemImage: "plus")`), before `toolbar`: on
+   * the iPhone Duo they move to the right column with the back button, as many as fit (useColumnBar).
+   */
+  toolbarItems?: ToolbarAction[];
   /** `.searchable`: its field under the title; `scopes` (`.searchScopes`) under it while it's active. */
   searchable?: SearchFieldProps;
   children: ReactNode;
@@ -42,7 +49,7 @@ export interface NavigationStackProps {
  * which turns to glass once content is under it; back on a pushed screen (none beside a split's sidebar), the
  * toolbar at its end.
  */
-export function NavigationStack({ title, titleDisplayMode = 'automatic', listStyle = 'insetGrouped', toolbar, searchable, children }: NavigationStackProps) {
+export function NavigationStack({ title, titleDisplayMode = 'automatic', listStyle = 'insetGrouped', toolbar, toolbarItems = [], searchable, children }: NavigationStackProps) {
   const hc = useComponent('NavigationStack', { title, titleDisplayMode, listStyle });
   const { layout } = useSim();
   const nav = useNav();
@@ -52,6 +59,8 @@ export function NavigationStack({ title, titleDisplayMode = 'automatic', listSty
   const padB = usePadB();
   const besideSidebar = split?.role === 'detail' && nav.index === split.masterIndex + 1;
   const back = nav.index > 0 && !besideSidebar;
+  // On the iPhone Duo the back and the symbol buttons that fit go to the right column.
+  const inColumn = useColumnBar(title, { back: back ? { onPress: nav.back } : undefined, actions: toolbarItems });
   const large = titleDisplayMode !== 'inline';
   const [edge, setEdge] = useState({ under: false, collapsed: !large });
   const onScroll = (e: UIEvent<HTMLDivElement>) => {
@@ -65,14 +74,21 @@ export function NavigationStack({ title, titleDisplayMode = 'automatic', listSty
         <div className={`${styles.bar} ${edge.under ? styles.barUnder : ''}`} style={{ margin: `0 ${-padR}px 0 ${-padL}px`, padding: `${layout.headerY - 22}px ${padR}px 6px ${padL}px` }}>
           <span className={styles.barGlass} aria-hidden />
           <span className={styles.barSide}>
-            {back && (
+            {back && !inColumn.back && (
               <button className={styles.barButton} aria-label="Back" onClick={nav.back}>
                 <Glyph sf="chevron.backward" material="arrow_back_ios_new" size={22} className={styles.flip} />
               </button>
             )}
           </span>
           <span className={`${styles.barTitle} ${edge.collapsed ? styles.barTitleShown : ''}`}>{title}</span>
-          <span className={`${styles.barSide} ${styles.barEnd}`}>{toolbar}</span>
+          <span className={`${styles.barSide} ${styles.barEnd}`}>
+            {toolbarItems.slice(inColumn.actions).map((a) => (
+              <button key={`${a.icon}:${a.label}`} className={styles.barButton} aria-label={a.label} title={a.label} onClick={a.onPress}>
+                <Icon name={a.icon} size={22} color="var(--app-primary)" />
+              </button>
+            ))}
+            {toolbar}
+          </span>
         </div>
         {large && <h1 className={styles.largeTitle}>{title}</h1>}
         {searchable && <SearchField {...searchable} />}

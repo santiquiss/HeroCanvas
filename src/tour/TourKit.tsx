@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as R
 import { Icon } from '../components/Icon';
 import { useComponent } from '../design/component';
 import { useNav } from '../nav/context';
+import { useColumnBar } from '../sim/columnBar';
 import { SEARCH_BAR_H } from '../sim/layout';
 import { usePadL, usePadR, useSim } from '../sim/SimContext';
 import styles from './TourKit.module.css';
@@ -73,13 +74,15 @@ export function LargeTitle({ title, titleRef }: { title: string; titleRef?: Ref<
 
 /**
  * A screen's bar: its title small and centered (`titleShown`: a tab's root shows it only once its large title has
- * scrolled away); on a pushed screen, back as a glass circle at the left (iOS 26).
+ * scrolled away); on a pushed screen, back as a glass circle at the left (iOS 26), or on the iPhone Duo in its right
+ * column (useColumnBar).
  */
 export function NavigationBar({ title, onBack, titleShown = true }: { title: string; onBack?: () => void; titleShown?: boolean }) {
   const hc = useComponent('NavigationBar', { title, onBack, titleShown });
+  const inColumn = useColumnBar(title, { back: onBack ? { onPress: onBack } : undefined });
   return (
     <header {...hc} className={styles.navBar}>
-      {onBack ? (
+      {onBack && !inColumn.back ? (
         <button className={`${styles.glass} ${styles.back}`} aria-label="Back" onClick={onBack}>
           <Icon name="arrow_back_ios_new" size={20} />
         </button>

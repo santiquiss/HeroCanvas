@@ -3,7 +3,7 @@
 // here holds still between releases (a change is in CHANGELOG.md); anything not here is the tool's own business.
 
 // What the app gives the tool (app/index.ts).
-export type { AppConfig, AppControl, AppNavigation, AppTheme, DeviceTargets, LaunchConfig, Persona, ScreenLayout } from './contract';
+export type { AppConfig, AppControl, AppNavigation, ColumnBarProps, ToolbarAction, AppTheme, DeviceTargets, LaunchConfig, Persona, ScreenLayout } from './contract';
 export type { FlowDef, PageControl, PageDef, PageProps, PageVariant, Params, StateParams } from './nav/types';
 
 // Instrumenting components and their stories.
@@ -23,6 +23,7 @@ export { useAppControl, usePersona } from './sim/persona';
 export { useLanguage } from './sim/language';
 export { useAppearance, useAppTheme, type Appearance } from './sim/appThemes';
 export { useActionSheet } from './sim/actionSheet';
+export { useColumnBar, type InColumn } from './sim/columnBar';
 export { useNav, useNavRoot, useSplit } from './nav/context';
 export { useFlow } from './nav/flow';
 export { useLaunchPhase, type LaunchPhase } from './sim/launchPhase';

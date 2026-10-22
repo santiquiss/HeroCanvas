@@ -6,6 +6,26 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.43.0 — 2026-10-22
+
+- **On the iPhone Duo the page's toolbar is in the right column**, as Apple's "Designing for iPhone Duo" has it
+  (vertical controls): where the bars are vertical (the outer display, the inner one in landscape), the back or close
+  of the page on top goes under the corner status, followed by its actions that are only a symbol. The title, the
+  actions with a label and a screen's own content stay in its bar. Only a page at the screen's right edge, beside the
+  column, puts its controls there (a list beside its detail keeps its own); only what fits above the column's
+  navigation goes; it fades as pages come and go. The iOS kit's `NavigationStack` and the tour do it on their own.
+
+**Contract**
+
+- New: `useColumnBar(title, { back, actions })` from `herocanvas`: a page's bar hands its back (or close) and its
+  symbol-only actions (`ToolbarAction`) to the column, and leaves out of its row what it returns as moved.
+- New: `AppNavigation.ColumnBar` (optional, `ColumnBarProps`): the app's vertical bar, drawn as its own bar draws its
+  controls; without one, the kit's round buttons.
+- New: the iOS kit's `NavigationStack` takes `toolbarItems` (`ToolbarAction[]`), its symbol-only buttons, which move to
+  the column with the back.
+- To adapt: an app with its own app bar calls `useColumnBar` in it (an app on the iOS kit's `NavigationStack` passes
+  its symbol buttons as `toolbarItems`). Without it, nothing changes: the bar keeps its controls.
+
 ## 0.42.0 — 2026-10-22
 
 - **Comments on components**: in Components, with a component open, **Comment** (or `C`) leaves a pin on any of its

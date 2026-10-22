@@ -8,7 +8,7 @@ import { findProposal } from '../proposals';
 import { HOME, LAUNCH, NAVIGATION } from '../nav/pages';
 import { useLaunch } from './launch';
 import { LaunchPhaseCtx } from './launchPhase';
-const { SideNav, SideRail, TabBar, Overlays: AppOverlays } = NAVIGATION;
+const { SideNav, SideRail, TabBar, Overlays: AppOverlays, ColumnBar: AppColumnBar } = NAVIGATION;
 /** The app's own wrapper around each screen (AppNavigation.Screen), or none. */
 const AppScreen = NAVIGATION.Screen ?? (({ children }: { children: ReactNode }) => <>{children}</>);
 import { Icon } from '../components/Icon';
@@ -27,6 +27,7 @@ import { anchoredFloats, listDetailActive, phoneMotion, tallSheetTop, type Layou
 import { EASE, EXIT_MS, PAGE_MS, SWAP, TAB_IN_MS } from './motion';
 import { screenRegions } from './regions';
 import { boxInScreen, counterpartIn } from './anchor';
+import { ColumnBar, ColumnBarCtx, createColumnBar, PageOpenCtx, SIDE_NAV_ATTR } from './columnBar';
 import { DropDownLayer } from './DropDownLayer';
 import { useSim, type SheetSpec, type SnackbarSpec } from './SimContext';
 import { isTextField, KeyboardInsetCtx, useKeyboardInset } from './keyboard';
@@ -49,7 +50,7 @@ const SHADOW = '-8px 0 24px rgba(0,0,0,0.12)';
  * The screen's layers, bottom to top: the split panel, pushed pages (beside the tablet rail), the rail (the app's nav: over the pages beside it, so its shadow falls on them), covers (full pages over everything, the rail too),
  * the snackbar (over the pages, under the sheets' and dialogs' routes, as a scaffold has it), dialogs, Inspect.
  */
-const Z = { panel: 20, push: 40, rail: 70, cover: 71, snackbar: 85, dialog: 91, inspect: 97 };
+const Z = { panel: 20, push: 40, rail: 70, cover: 71, column: 84, snackbar: 85, dialog: 91, inspect: 97 };
 
 interface Entry {
   ref: PageRef;
@@ -199,7 +200,7 @@ function Layer({
         ...(fade && { opacity: open && entered ? 1 : 0 }),
       }}
     >
-      {children}
+      <PageOpenCtx.Provider value={open}>{children}</PageOpenCtx.Provider>
     </div>
   );
 }
@@ -239,6 +240,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   const launch = useLaunch(LAUNCH, screen, theme, stack.length === 1 && stack[0].id === HOME);
   const a11y = useAccessibility();
   const textVars = useMemo(() => systemTextVars(textSystemOf(L.os), a11y.textSize, a11y.boldText), [L.os, a11y.textSize, a11y.boldText]);
+  // The iPhone Duo column's toolbar: the top page's back or close and actions (columnBar.tsx).
+  const [columnBar] = useState(createColumnBar);
   // Where the sheets a page keeps itself go (screenLayer.tsx).
   const [sheetLayer, setSheetLayer] = useState<HTMLDivElement | null>(null);
   // The system keyboard: up while a text field in this screen has focus (the last field stays while it slides away).
@@ -579,8 +582,14 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         </div>
 
         {!boot && L.bottomNav && <TabBar />}
-        {!boot && L.sideNav && sideColumn === 'nav' && <SideNav />}
+        {!boot && L.sideNav && sideColumn === 'nav' && (
+          <div {...{ [SIDE_NAV_ATTR]: '' }} style={{ display: 'contents' }}>
+            <SideNav />
+          </div>
+        )}
         {!boot && L.showRail && <SideRail />}
+        {/* Over the pages and a cover's background under the column, under the snackbar and the sheets. */}
+        {L.sideNav && <ColumnBar store={columnBar} zIndex={Z.column} Bar={AppColumnBar} />}
 
         {overlays && AppOverlays && <AppOverlays />}
         {overlays && <SnackbarLayer layout={L} />}
@@ -642,7 +651,9 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   return (
     <div style={L.videoH ? { width: L.vw, height: L.videoH + L.vh, borderRadius: L.fullRadius, overflow: 'clip', background: '#000' } : { display: 'contents' }}>
       {L.videoH > 0 && <VideoArea layout={L} />}
-      <ScreenLayerCtx.Provider value={overlays ? sheetLayer : null}>{app}</ScreenLayerCtx.Provider>
+      <ScreenLayerCtx.Provider value={overlays ? sheetLayer : null}>
+        <ColumnBarCtx.Provider value={columnBar}>{app}</ColumnBarCtx.Provider>
+      </ScreenLayerCtx.Provider>
     </div>
   );
 }

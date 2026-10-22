@@ -141,3 +141,24 @@
     transition: none;
   }
 }
+/* The iPhone Duo column's toolbar (sim/columnBar): the bar's glass circles, 40 round, 8 apart. */
+.columnBar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.columnButton {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--app-radius-full);
+  color: var(--app-icon);
+  cursor: pointer;
+}
+.columnButton:active {
+  transform: scale(0.94);
+}

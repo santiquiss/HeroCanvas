@@ -2,7 +2,7 @@
 // bottom on phones, a rail with labels on tablets, a column on the iPhone Duo. The simulator places them; this draws them.
 import type { CSSProperties } from 'react';
 import { Icon } from '../components/Icon';
-import type { AppNavigation } from '../contract';
+import type { AppNavigation, ColumnBarProps } from '../contract';
 import { useComponent } from '../design/component';
 import { useNavRoot } from '../nav/context';
 import { useSim } from '../sim/SimContext';
@@ -99,4 +99,22 @@ function SideNav() {
   );
 }
 
-export const TOUR_NAVIGATION: AppNavigation = { TabBar, SideRail, SideNav };
+/** The iPhone Duo column's toolbar: the bar's glass circles, one under the other. */
+function ColumnBar({ back, actions }: ColumnBarProps) {
+  return (
+    <div className={styles.columnBar}>
+      {back && (
+        <button className={`${styles.glass} ${styles.columnButton}`} aria-label={back.icon === 'close' ? 'Close' : 'Back'} onClick={back.onPress}>
+          <Icon name={back.icon === 'close' ? 'close' : 'arrow_back_ios_new'} size={20} />
+        </button>
+      )}
+      {actions.map((a) => (
+        <button key={`${a.icon}:${a.label}`} className={`${styles.glass} ${styles.columnButton}`} aria-label={a.label} title={a.label} onClick={a.onPress}>
+          <Icon name={a.icon} size={20} />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export const TOUR_NAVIGATION: AppNavigation = { TabBar, SideRail, SideNav, ColumnBar };

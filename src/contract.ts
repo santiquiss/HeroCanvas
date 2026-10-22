@@ -48,6 +48,26 @@ export interface AppNavigation {
    * a gate that asks to sign in). Positioned by the app, under z-index 85 (the snackbar), above the pages (up to 79).
    */
   Overlays?: ComponentType;
+  /**
+   * The iPhone Duo column's toolbar (optional): the page on top's back or close and its symbol-only actions, drawn
+   * vertically under the corner status, as the app's own bar draws its controls. Pages hand them over with
+   * useColumnBar. None: the kit's round buttons.
+   */
+  ColumnBar?: ComponentType<ColumnBarProps>;
+}
+
+/** An action of a page's toolbar that is only a symbol: its icon (Icon's name) and what a screen reader says. */
+export interface ToolbarAction {
+  icon: string;
+  label: string;
+  onPress?: () => void;
+}
+
+/** What the iPhone Duo column's toolbar draws (AppNavigation.ColumnBar): the controls that fit, back first. */
+export interface ColumnBarProps {
+  title: string;
+  back?: { icon: 'back' | 'close'; onPress: () => void };
+  actions: ToolbarAction[];
 }
 
 /** The app's settings: plain data, free of imports of its screens (the simulator reads it early). */
