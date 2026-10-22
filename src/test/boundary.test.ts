@@ -21,3 +21,40 @@ describe('the team’s code imports the tool only as herocanvas', () => {
     expect(reaching).toEqual([]);
   });
 });
+
+// The API loads before the app: what it exports at once may read the app's settings (app/config), never its pages,
+// which import the API (a cycle the app would meet half loaded). What needs the pages loads when it's used.
+const TOOL = import.meta.glob<string>(['/src/**/*.{ts,tsx}', '!/src/**/*.test.{ts,tsx}'], { eager: true, query: '?raw', import: 'default' });
+
+/** The modules `file` loads at once (not `import type`, not a dynamic `import()`), as paths from the root. */
+function loadsAtOnce(file: string): string[] {
+  const out: string[] = [];
+  for (const m of TOOL[file].matchAll(/^(?:import|export)(?!\s+type\b)[^'"\n]*?(?:from\s+)?'([^']+)'/gm)) {
+    const spec = m[1].split('?')[0];
+    if (spec.startsWith('@app')) out.push(spec);
+    else if (spec.startsWith('.')) {
+      const base = resolve(file, spec);
+      const hit = ['', '.ts', '.tsx', '/index.ts', '/index.tsx'].map((e) => base + e).find((p) => p in TOOL);
+      if (hit) out.push(hit);
+    }
+  }
+  return out;
+}
+
+describe('the public API loads without the app’s pages', () => {
+  it('reaches app/config at most', () => {
+    const seen = new Set<string>();
+    const pages: string[] = [];
+    const walk = (f: string, path: string[]) => {
+      if (seen.has(f)) return;
+      seen.add(f);
+      if (f.startsWith('@app')) {
+        if (f !== '@app/config') pages.push([...path, f].join(' > '));
+        return;
+      }
+      for (const d of loadsAtOnce(f)) walk(d, [...path, f]);
+    };
+    walk('/src/index.ts', []);
+    expect(pages).toEqual([]);
+  });
+});

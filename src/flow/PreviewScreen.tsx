@@ -14,6 +14,8 @@ import { liveSearch, SimProvider, UrlOverride, useSim } from '../sim/SimContext'
 
 const noop = () => {};
 
+export type PreviewScreenProps = Parameters<typeof PreviewScreen>[0];
+
 export function PreviewScreen({
   page,
   query,

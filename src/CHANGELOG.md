@@ -6,6 +6,16 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.44.1 — 2026-10-22
+
+- `PreviewScreen` from `herocanvas` loads when it first shows: exported at once, it loaded the app's pages with the
+  API, and an app importing the API met it half loaded (`overridable is not a function`). A test keeps what the API
+  loads at once off the app's pages.
+
+**Contract**
+
+- None.
+
 ## 0.44.0 — 2026-10-22
 
 - **The simulator's services, for a richer app**: the system's camera and photo picker, a sheet a page keeps itself
