@@ -78,6 +78,13 @@ Which devices the app is made for, so the designer offers only those (`DeviceTar
 tablet-only `<supports-screens>` narrows it); React Native and Flutter by the platform folders they ship (`ios/`,
 `android/`); a web app, every device. Say what you set, and leave it out when the code doesn't narrow it.
 
+### Its own sheets and dialogs (`navigation.kit`)
+
+When the app's library has its own bottom sheet, action sheet, drop-down, dialog, popover or snackbar, give them to
+`navigation.kit` (app/index.ts), each with the kit's props (src/kit), adapting a prop where the library names it
+otherwise: what the screens open then shows as the app draws it. Leave out what the app takes from the platform: the
+kit draws it on the `--app-*` tokens.
+
 ### A side panel (`appConfig.sidePanel`)
 
 An assistant or a chat that opens beside the screens rather than over them (a tablet's panel on the right, the tab

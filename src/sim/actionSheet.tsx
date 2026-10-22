@@ -2,7 +2,8 @@
 // (sim/sheetPresentation) the same actions hanging from that control as a drop-down menu, its destructive ones after a
 // divider. A long menu may split its actions into groups (`actions` as a list of lists): a divider between each in the
 // drop-down, one list in the sheet. One call for both, so no screen writes its menu twice.
-import { ActionSheet, DropDownMenu, MENU_DIVIDER, type ActionSheetAction, type MenuEntry } from '../kit';
+import { MENU_DIVIDER, type ActionSheetAction, type MenuEntry } from '../kit';
+import { KIT } from '../kit/appKit';
 import { useSim, type SheetSpec } from './SimContext';
 
 export interface ActionSheetOptions extends Pick<SheetSpec, 'id' | 'anchor' | 'dropdownAlign' | 'onClose'> {
@@ -32,7 +33,7 @@ export function useActionSheet() {
     openSheet({
       ...spec,
       kind: 'actions',
-      render: (frame) => <ActionSheet {...frame} width="medium" actions={groupsOf(actions).flat()} destructiveActions={destructiveActions} headerLabel={headerLabel} />,
-      content: (close) => <DropDownMenu onClose={close} items={dropDownItemsOf(actions, destructiveActions)} />,
+      render: (frame) => <KIT.ActionSheet {...frame} width="medium" actions={groupsOf(actions).flat()} destructiveActions={destructiveActions} headerLabel={headerLabel} />,
+      content: (close) => <KIT.DropDownMenu onClose={close} items={dropDownItemsOf(actions, destructiveActions)} />,
     });
 }

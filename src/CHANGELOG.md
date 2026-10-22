@@ -6,6 +6,18 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.46.0 — 2026-10-22
+
+- **An app's own components for what the simulator presents** (`AppNavigation.kit`): its bottom sheet, action sheet
+  and drop-down menu, dialog, popover and snackbar, with the kit's props. What the screens open (`openSheet`,
+  `useActionSheet`, `openDialog`, `showSnackbar`) then shows as the app's library draws it, and Inspect and Layers name
+  it as the app's code does; any left out is the kit's, on the app's `--app-*` tokens.
+
+**Contract**
+
+- New: `AppNavigation.kit` (`Partial<AppKit>`: `Sheet`, `ActionSheet`, `DropDownMenu`, `Dialog`, `Popover`,
+  `Snackbar`, each taking the kit's props) and the `AppKit` type from `herocanvas`. Nothing to adapt.
+
 ## 0.45.0 — 2026-10-22
 
 - **An app's side panel** (`appConfig.sidePanel`): a page that opens beside the screens rather than over them, an

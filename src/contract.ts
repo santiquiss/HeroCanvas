@@ -2,6 +2,7 @@
 // navigation chrome, its languages and the people it's tried as. Everything else (screens, components, data, tokens)
 // is the app's own business.
 import type { ComponentType, ReactNode } from 'react';
+import type { AppKit } from './kit/appKit';
 
 export interface Persona {
   id: string;
@@ -54,6 +55,13 @@ export interface AppNavigation {
    * useColumnBar. None: the kit's round buttons.
    */
   ColumnBar?: ComponentType<ColumnBarProps>;
+  /**
+   * The app's own components for what the simulator presents (optional, any of them): its bottom sheet, its action
+   * sheet and drop-down menu, its dialog, popover and snackbar, with the kit's props (src/kit). What the screens open
+   * then shows as the app draws it, named as its code names it in Inspect and Layers. Left out: the kit's, on the
+   * app's `--app-*` tokens.
+   */
+  kit?: Partial<AppKit>;
 }
 
 /** An action of a page's toolbar that is only a symbol: its icon (Icon's name) and what a screen reader says. */

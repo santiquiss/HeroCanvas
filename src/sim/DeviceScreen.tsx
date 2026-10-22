@@ -14,7 +14,8 @@ const { SideNav, SideRail, TabBar, Overlays: AppOverlays, ColumnBar: AppColumnBa
 const AppScreen = NAVIGATION.Screen ?? (({ children }: { children: ReactNode }) => <>{children}</>);
 import { Icon } from '../components/Icon';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { Dialog, Popover, Sheet, Snackbar, SNACKBAR_MS, sheetMaxWidth } from '../kit';
+import { SNACKBAR_MS, sheetMaxWidth, type DialogProps, type PopoverProps, type SheetProps, type SnackbarProps } from '../kit';
+import { KIT } from '../kit/appKit';
 import { Toast } from '../components/Toast';
 import { useDesignRoot } from '../design/DesignContext';
 import { DetailPanelCtx, NavCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot, type Nav } from '../nav/context';
@@ -127,6 +128,12 @@ function SplitView({ entry }: { entry: Entry }) {
 function EntryView({ entry }: { entry: Entry }) {
   return entry.split ? <SplitView entry={entry} /> : <PageView entry={entry} />;
 }
+
+// What the simulator presents with, the app's where it gives them (kit/appKit): looked up when they draw.
+const KitSheet = (p: SheetProps) => <KIT.Sheet {...p} />;
+const KitDialog = (p: DialogProps) => <KIT.Dialog {...p} />;
+const KitPopover = (p: PopoverProps) => <KIT.Popover {...p} />;
+const KitSnackbar = (p: SnackbarProps) => <KIT.Snackbar {...p} />;
 
 function PageView({ entry }: { entry: Entry }) {
   const nav = useNavRoot();
@@ -637,7 +644,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         {overlays && <SheetLayer layout={L} screen={screen} />}
         {overlays && dialog && (
           <div style={{ position: 'absolute', inset: 0, zIndex: Z.dialog }}>
-            <Dialog {...dialog} />
+            <KitDialog {...dialog} />
           </div>
         )}
         {overlays && <Toast text={toastText} bottom={L.toastBottom} />}
@@ -801,7 +808,7 @@ function SnackbarLayer({ layout: L }: { layout: Layout }) {
   if (!s) return null;
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: Z.snackbar, pointerEvents: 'none' }}>
-      <Snackbar text={s.text} level={s.level} action={s.action} open={!!snackbar} bottomInset={L.botIn} endInset={L.sideNav ? L.sideW : 0} />
+      <KitSnackbar text={s.text} level={s.level} action={s.action} open={!!snackbar} bottomInset={L.botIn} endInset={L.sideNav ? L.sideW : 0} />
     </div>
   );
 }
@@ -852,16 +859,16 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
     );
   if (anchor && as === 'popover')
     return (
-      <Popover anchor={anchor} bounds={{ w: L.vw, h: L.vh }} open={open} onClose={closeSheet} topInset={topInset} side={s.popoverSide}>
+      <KitPopover anchor={anchor} bounds={{ w: L.vw, h: L.vh }} open={open} onClose={closeSheet} topInset={topInset} side={s.popoverSide}>
         {body()}
-      </Popover>
+      </KitPopover>
     );
   if (as === 'dialog')
     return (
       // The keyboard's height: the dialog stays above it (a field in it keeps the keyboard up).
-      <Sheet layout="dialog" width={s.width} surface={s.surface} open={open} onClose={closeSheet} bottomInset={kb} topInset={topInset}>
+      <KitSheet layout="dialog" width={s.width} surface={s.surface} open={open} onClose={closeSheet} bottomInset={kb} topInset={topInset}>
         {body()}
-      </Sheet>
+      </KitSheet>
     );
   if (s.render)
     return (
@@ -887,7 +894,7 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
     ...(besideStatus ? { paddingRight: L.sideW, ['--sheet-pad-r' as string]: '0px' } : {}),
   };
   return (
-    <Sheet
+    <KitSheet
       layout={s.layout}
       width={s.width}
       showPadding={s.showPadding}
@@ -899,7 +906,7 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
       topInset={topInset}
     >
       {body()}
-    </Sheet>
+    </KitSheet>
   );
 }
 
