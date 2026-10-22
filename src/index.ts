@@ -21,7 +21,7 @@ export { useBackHandler } from './sim/back';
 export { useKeyboardInset } from './sim/keyboard';
 export { useAppControl, usePersona } from './sim/persona';
 export { useLanguage } from './sim/language';
-export { useAppTheme } from './sim/appThemes';
+export { useAppearance, useAppTheme, type Appearance } from './sim/appThemes';
 export { useActionSheet } from './sim/actionSheet';
 export { useNav, useNavRoot, useSplit } from './nav/context';
 export { useFlow } from './nav/flow';

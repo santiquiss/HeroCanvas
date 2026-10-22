@@ -65,6 +65,13 @@ export interface AppConfig {
    * (Scenarios › Theme; `?apptheme=`; the app picks one with useAppTheme). None: just light and dark.
    */
   themes?: AppTheme[];
+  /**
+   * The app's appearance setting (follow the system, or always light or dark), its three options as the app names
+   * them. The designer's Light / Dark is the system's; the app's choice, when light or dark, overrides it on the
+   * screens (Scenarios › Appearance; `?appearance=`; the app reads and sets it with useAppearance). Not a theme: no
+   * palette of its own. None: the screens follow the designer's switch.
+   */
+  appearance?: { system: string; light: string; dark: string };
   /** The tab an empty or unknown URL opens. */
   home: string;
   /**

@@ -17,7 +17,8 @@ import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
 import { PersonaPicker, usePersonaParam } from './PersonaPicker';
 import { APP_CONTROLS, findPersona, PERSONA_PARAM, personaValue } from '../sim/persona';
-import { APP_THEME_PARAM, APP_THEMES, useAppTheme } from '../sim/appThemes';
+import { APPEARANCE_PARAM, APP_THEME_PARAM, APP_THEMES, useAppearance, useAppTheme, type Appearance } from '../sim/appThemes';
+import { appConfig } from '@app/config';
 import { t } from '../i18n/ui';
 
 /** A theme's forced scheme, as its option says it. */
@@ -52,6 +53,7 @@ export function ScenariosPanel() {
       {APP_CONTROLS.length > 0 && <AppSection />}
 
       {APP_THEMES.length > 0 && <ThemeSection />}
+      {APPEARANCE && <AppearanceSection />}
 
       <LanguageSection />
 
@@ -184,6 +186,22 @@ function ThemeSection() {
       <Title label={t('Theme')} hint={t('app')} params={[APP_THEME_PARAM]} />
       <Row label={t('Theme')} note={t('The app’s own themes, as its settings offer them. One made for light or dark sets the screens’ scheme.')}>
         <Select label={t('Theme')} value={theme!.id} onChange={pick} options={APP_THEMES.map((th) => ({ value: th.id, label: th.scheme ? `${th.name} · ${SCHEME_WORD[th.scheme]}` : th.name }))} />
+      </Row>
+    </div>
+  );
+}
+
+const APPEARANCE = appConfig.appearance;
+
+/** The app's appearance setting (appConfig.appearance): follow the system, or always light or dark, as its user picks it. */
+function AppearanceSection() {
+  const [appearance, pick] = useAppearance();
+  const options = (['system', 'light', 'dark'] as const).map((a) => ({ value: a, label: APPEARANCE![a] }));
+  return (
+    <div className={styles.section}>
+      <Title label={t('Appearance')} hint={t('app')} params={[APPEARANCE_PARAM]} />
+      <Row label={t('Appearance')} note={t('As the app’s settings offer it. Light or dark overrides the system’s, the theme switch above the devices.')}>
+        <Select label={t('Appearance')} value={appearance} onChange={(v) => pick(v as Appearance)} options={options} />
       </Row>
     </div>
   );

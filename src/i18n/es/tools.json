@@ -298,5 +298,7 @@
   "Scenarios": "Escenarios",
   "Comments": "Comentarios",
   "Proposal": "Propuesta",
-  "{option} · {persona}": "{option} · {persona}"
+  "{option} · {persona}": "{option} · {persona}",
+  "Appearance": "Apariencia",
+  "As the app’s settings offer it. Light or dark overrides the system’s, the theme switch above the devices.": "Como la ofrecen los ajustes de la app. Claro u oscuro reemplaza al del sistema, el selector de tema sobre los dispositivos."
 }

@@ -109,6 +109,10 @@ default first; `scheme: 'dark'` for one made dark, as SwiftUI's `preferredColorS
 `[data-app-theme='<id>']` block after the light and dark ones. The app's own picker reads and sets it with
 `useAppTheme()`; the designer picks it in Scenarios › Theme.
 
+**An appearance setting** (follow the system, or always light or dark; no palette of its own) isn't a theme: declare
+it as `appConfig.appearance` with its three options as the app names them (`{ system: 'Automático', light: 'Claro',
+dark: 'Oscuro' }`); the app's picker reads and sets it with `useAppearance()`.
+
 An app on the platform's own look (SwiftUI's or UIKit's defaults, Material's) takes the platform's values:
 `src/tour/theme.css` has iOS's system colors, text styles and grouped backgrounds to start from; change its accent
 (the asset catalog's AccentColor) and what the app sets of its own.

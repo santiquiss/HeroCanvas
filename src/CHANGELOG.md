@@ -6,6 +6,21 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.41.0 — 2026-10-22
+
+- An app's appearance setting (follow the system, or always light or dark) is declared as itself:
+  `appConfig.appearance`, its three options as the app names them. The designer's Light / Dark stays the system's
+  (two options, not each app theme times light and dark); the app's choice, when light or dark, overrides it on the
+  screens, in Scenarios › Appearance and from the app's own settings (`useAppearance()`). Picking Light or Dark in the
+  designer sets the app back to following the system.
+
+**Contract**
+
+- New: `AppConfig.appearance` (`{ system, light, dark }`, the app's labels), `useAppearance()` and `Appearance` from
+  `herocanvas`, the `?appearance=` param. An app that declared its appearance setting as `themes` (an "Auto" theme
+  with no scheme beside a light and a dark one, none with tokens of its own) moves it to `appearance` and reads it
+  with `useAppearance()` instead of `useAppTheme()`.
+
 ## 0.40.3 — 2026-10-22
 
 - A carousel dragged with the touch pointer rests on the card it's heading to (its own snap position, one card per
