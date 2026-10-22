@@ -8,8 +8,9 @@ import type { SheetLayout } from '../kit';
  * - `actions`: only rows that each do one thing and close (ActionSheet's actions, a list to pick one from).
  * - `content`: anything else that acts at once, with no Save or Cancel (the + menu, a range).
  * - `task`: something to fill in and confirm (Save, Copy, Done), type into, or go through in steps.
+ * - `menu`: a menu that hangs from its control on every screen, phones too (iOS's `Menu`, Android's dropdown menu).
  */
-export type SheetKind = 'actions' | 'content' | 'task';
+export type SheetKind = 'actions' | 'content' | 'task' | 'menu';
 
 /** How it shows. A `content(close, as)` sheet is told which, to draw itself for it. */
 export type SheetPresentation = 'sheet' | 'dropdown' | 'popover' | 'dialog';
@@ -37,6 +38,7 @@ export interface SheetRuleInput {
 const RISES_FROM_BOTTOM: SheetLayout[] = ['bottomContent', 'bottomExpanded'];
 
 export function sheetPresentation(s: SheetRuleInput): SheetPresentation {
+  if (s.kind === 'menu') return s.hasAnchor ? 'dropdown' : 'sheet';
   if (!s.floats || !s.kind || (s.layout && !RISES_FROM_BOTTOM.includes(s.layout))) return 'sheet';
   if (s.kind === 'task') return 'dialog';
   if (s.kind === 'actions') return s.hasAnchor ? 'dropdown' : 'sheet';

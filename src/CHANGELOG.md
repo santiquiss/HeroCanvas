@@ -6,6 +6,23 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.37.0 — 2026-10-22
+
+The iOS kit, from mirroring Studio (AdaptiveAppShell's demo):
+
+- **`Menu`**, in `herocanvas/ios`: a button whose items pop up from it, on an iPhone as on an iPad, as SwiftUI's
+  `Menu` does (a Picker in it: its items with `isSelected`).
+- A sheet of the new kind `menu` hangs from its control on every screen, phones too; the other kinds float only on
+  large screens, as before.
+- `SearchField` (and `NavigationStack`'s `searchable`) as iOS 26 draws it: a 44-point capsule, its clear button with
+  text, and `scopes` (`.searchScopes`) as a segmented Picker under it while it's active.
+- A Form's `TextField`s are divided like its other rows.
+
+**Contract**
+
+- `Menu`, `SearchFieldProps` and the `menu` sheet kind (new): nothing to adapt. `SearchField` is taller (iOS 26's):
+  a screen that sized around the old one may want a look.
+
 ## 0.36.0 — 2026-10-22
 
 From connecting AdaptiveAppShell (a SwiftUI shell: tabs on iPhone, a sidebar on iPad, three themes of its own):

@@ -119,7 +119,7 @@ like the tour's (`src/tour/TourNav.tsx`, an example to start from). Same tabs, i
 look. If the app has no tabs, the components render nothing and every page is a push or a cover.
 
 **A SwiftUI (or UIKit) app** builds its screens from the platform's views: take them from `herocanvas/ios`
-(`NavigationStack`, `Section`, `NavigationLink`, `LabeledContent`, `Label`, `Picker`, `SearchField`, `TextField`,
+(`NavigationStack`, `Section`, `NavigationLink`, `LabeledContent`, `Label`, `Picker`, `Menu`, `SearchField`, `TextField`,
 `Toggle`, `Gauge`), named as SwiftUI names them; write only the app's own components.
 
 **An adaptive app** (tabs on phones, a sidebar on tablets: SwiftUI's `TabView` with `.sidebarAdaptable`, or a

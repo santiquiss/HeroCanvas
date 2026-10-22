@@ -22,6 +22,12 @@ describe('a sheet takes the shape of what it holds on large screens', () => {
     expect(sheetPresentation(large({ kind: 'actions', hasAnchor: false }))).toBe('sheet');
   });
 
+  it('hangs a menu from its control on every screen, phones too', () => {
+    expect(sheetPresentation(phone({ kind: 'menu' }))).toBe('dropdown');
+    expect(sheetPresentation(large({ kind: 'menu' }))).toBe('dropdown');
+    expect(sheetPresentation(phone({ kind: 'menu', hasAnchor: false }))).toBe('sheet');
+  });
+
   it('keeps sheets on phones', () => {
     for (const kind of ['actions', 'content', 'task'] as const) expect(sheetPresentation(phone({ kind }))).toBe('sheet');
   });

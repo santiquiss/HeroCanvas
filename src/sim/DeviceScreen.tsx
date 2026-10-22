@@ -755,8 +755,9 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
     s.anchor && screen && !screen.contains(s.anchor)
       ? ((s.id ? screen.querySelector<HTMLElement>(`[data-sheet-anchor="${s.id}"]`) : null) ?? counterpartIn(s.anchor, screen))
       : s.anchor;
+  // A menu hangs from its control on every screen; anything else only where anchored menus float.
   const floats = anchoredFloats(L, s.fromNav);
-  const anchor = anchorEl && floats ? boxInScreen(anchorEl) : null;
+  const anchor = anchorEl && (floats || s.kind === 'menu') ? boxInScreen(anchorEl) : null;
   // What has no `content` to show elsewhere stays the sheet it renders.
   const as = s.content ? sheetPresentation({ kind: s.kind, layout: s.layout, hasAnchor: !!anchor, floats }) : 'sheet';
   const body = () => (typeof s.content === 'function' ? s.content(closeSheet, as) : s.content);

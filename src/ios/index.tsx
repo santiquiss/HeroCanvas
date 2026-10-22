@@ -1,15 +1,18 @@
 // HeroCanvas's iOS kit (`herocanvas/ios`): SwiftUI's own views, as an app that uses them draws them on iOS, for
 // mirroring a SwiftUI (or UIKit) app without rebuilding the platform's parts every time: a screen in a
 // NavigationStack (its large title collapsing into a glass bar), List's inset grouped Sections and their rows
-// (NavigationLink, LabeledContent, Label), Picker (segmented and menu), searchable's field, TextField, Toggle, Gauge.
+// (NavigationLink, LabeledContent, Label), Picker (segmented and menu), Menu, searchable's field, TextField, Toggle,
+// Gauge.
 // Named as SwiftUI names them, so Inspect and Layers say what a developer writes; drawn on the app's tokens
 // (`--app-*`); their glyphs SF Symbols when the team made them (`npm run symbols`), Material's otherwise.
 // The app's own components stay the app's (app/components), named as its code names them.
-import { useState, type ReactNode, type UIEvent } from 'react';
+import { useState, type MouseEvent, type ReactNode, type UIEvent } from 'react';
 import { hasSymbol, Icon } from '../components/Icon';
+import { DropDownMenu, type MenuEntry } from '../kit';
 import { useComponent } from '../design/component';
 import { useNav, useSplit } from '../nav/context';
 import { usePadL, usePadR, useSim } from '../sim/SimContext';
+import type { DropDownAlign } from '../sim/DropDownLayer';
 import styles from './ios.module.css';
 
 /** A system glyph: its SF Symbol when the team made it, else the closest Material Symbol. */
@@ -29,8 +32,8 @@ export interface NavigationStackProps {
   listStyle?: 'insetGrouped' | 'plain';
   /** `.toolbar`'s trailing items. */
   toolbar?: ReactNode;
-  /** `.searchable`: its field under the title. */
-  searchable?: { text: string; prompt?: string; onChange: (text: string) => void };
+  /** `.searchable`: its field under the title; `scopes` (`.searchScopes`) under it while it's active. */
+  searchable?: SearchFieldProps;
   children: ReactNode;
 }
 
@@ -171,14 +174,50 @@ export function Picker<T extends string>({ label, selection, options, onChange, 
   );
 }
 
-/** `.searchable`'s field: a magnifier and its prompt, on the tertiary fill. */
-export function SearchField({ text, prompt = 'Search', onChange }: { text: string; prompt?: string; onChange: (text: string) => void }) {
-  const hc = useComponent('SearchField', { prompt });
+/**
+ * Menu: a button (its `label`) whose items pop up from it, on an iPhone as on an iPad. A Picker inside a Menu is its
+ * items with `isSelected` (a ✓ on the picked one).
+ */
+export function Menu({ title, label, items, align = 'end', className }: { title: string; label: ReactNode; items: MenuEntry[]; align?: DropDownAlign; className?: string }) {
+  const hc = useComponent('Menu', { title });
+  const { openSheet } = useSim();
+  const open = (e: MouseEvent<HTMLButtonElement>) =>
+    openSheet({ kind: 'menu', anchor: e.currentTarget, dropdownAlign: align, content: (close) => <DropDownMenu items={items} onClose={close} /> });
   return (
-    <label {...hc} className={styles.search}>
-      <Glyph sf="magnifyingglass" material="search" size={17} />
-      <input value={text} placeholder={prompt} onChange={(e) => onChange(e.target.value)} />
-    </label>
+    <button {...hc} className={className} aria-label={title} aria-haspopup="menu" onClick={open}>
+      {label}
+    </button>
+  );
+}
+
+export interface SearchFieldProps {
+  text: string;
+  prompt?: string;
+  onChange: (text: string) => void;
+  /** `.searchScopes`: a segmented Picker under the field while it's active (focused), as iOS shows them. */
+  scopes?: { selection: string; options: { value: string; label: string }[]; onChange: (value: string) => void };
+}
+
+/**
+ * `.searchable`'s field, as iOS 26 draws it: a capsule with a magnifier, the prompt and, with text, its clear button;
+ * its scopes under it while it's active.
+ */
+export function SearchField({ text, prompt = 'Search', onChange, scopes }: SearchFieldProps) {
+  const hc = useComponent('SearchField', { prompt, scopes: scopes?.options.length });
+  const [active, setActive] = useState(false);
+  return (
+    <div {...hc} onFocus={() => setActive(true)} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setActive(false)}>
+      <label className={styles.search}>
+        <Glyph sf="magnifyingglass" material="search" size={20} />
+        <input value={text} placeholder={prompt} onChange={(e) => onChange(e.target.value)} />
+        {text && (
+          <button className={styles.searchClear} aria-label="Clear text" onMouseDown={(e) => e.preventDefault()} onClick={() => onChange('')}>
+            <Glyph sf="xmark.circle.fill" material="cancel" size={18} />
+          </button>
+        )}
+      </label>
+      {scopes && active && <Picker label="Scope" pickerStyle="segmented" selection={scopes.selection} options={scopes.options} onChange={scopes.onChange} />}
+    </div>
   );
 }
 
