@@ -1,18 +1,19 @@
-// The connected app's design tokens, for the Tokens view and Inspect: each `--app-*` variable the screens are drawn
-// with (src/kit/tokens.css, and the app's own theme, app/theme.css, which overrides it), its value in each of the
-// screens' themes (THEME_MODES: light and dark, or the app's own), and the token it points to. Grouped by what they are: colors, space, corners, type, effects.
+// The connected app's design tokens, for the Tokens view and Inspect, as the app organizes them: its value in each of
+// the screens' themes (THEME_MODES: light and dark, or the app's own), read from its token stylesheets (design/appTokens),
+// and the token it points to.
 //
-// `figma` and `code`: the token's name in the design file and in the app's code, when a connector gives them
-// (none yet: the token's own name, and null).
-import { APP_THEME_CSS } from './appTheme';
-import kitCss from '../kit/tokens.css?raw';
+// With a tokens connector (app/connectors/tokens.json, TokensConnector: the app's own groups, each token's name in the
+// design file and in the code, its text styles and elevations), the catalog is the app's. Without one, the `--app-*`
+// variables the kit and the screens draw with, grouped by what they are: colors, space, corners, type, effects.
+import { TOKEN_BLOCKS } from './appTokens';
+import { TOKENS_CONNECTOR, type TokensConnector } from './tokensConnector';
+
+export type { TokensConnector };
 import { CODE_TEXT_STYLES, type CodeTextStyle } from './textStyles';
 import { THEME_MODES, type ThemeMode } from './themeModes';
 import { t } from '../i18n/ui';
 
 export { THEME_MODES, type ThemeMode };
-
-const appCss = APP_THEME_CSS;
 
 export type TokenKind = 'color' | 'number' | 'text';
 /** A theme mode's id (THEME_MODES). */
@@ -68,23 +69,10 @@ export interface TokenGroup {
 
 // ---------------------------------------------------------------- reading the stylesheets
 
-/** Every `--app-*` declaration in the blocks whose selector matches, the app's after the kit's (so it wins). */
-function block(selector: RegExp): Map<string, string> {
-  const out = new Map<string, string>();
-  for (const css of [kitCss, appCss])
-    // Comments out first: one before a block would be read as part of its selector.
-    for (const m of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^}]*)\}/g)) {
-      if (!selector.test(m[1].trim())) continue;
-      for (const d of m[2].matchAll(/--(app-[\w-]+)\s*:\s*([^;]+);/g)) out.set(d[1], d[2].trim());
-    }
-  return out;
-}
-
-const BOTH = block(/^\[data-theme\]$/);
-const SCHEMES = { light: block(/^\[data-theme='light'\]$/), dark: block(/^\[data-theme='dark'\]$/) };
+const BOTH = TOKEN_BLOCKS.all;
 // A mode: its scheme's block, then its app theme's (`[data-app-theme='<id>']`), which wins, as on the screens.
 const MODES: Record<Mode, Map<string, string>> = Object.fromEntries(
-  THEME_MODES.map((m) => [m.id, new Map([...SCHEMES[m.scheme], ...(m.appTheme ? block(new RegExp(`^\\[data-app-theme='${m.appTheme}'\\]$`)) : [])])]),
+  THEME_MODES.map((m) => [m.id, new Map([...TOKEN_BLOCKS[m.scheme], ...(m.appTheme ? (TOKEN_BLOCKS.appThemes.get(m.appTheme) ?? []) : [])])]),
 );
 const FIRST = THEME_MODES[0].id;
 const perMode = <T,>(f: (m: Mode) => T): Record<Mode, T> => Object.fromEntries(THEME_MODES.map((m) => [m.id, f(m.id)]));
@@ -97,22 +85,52 @@ function resolve(name: string, mode: Mode, depth = 0): string {
   const t = target(v);
   if (t) return depth < 10 ? resolve(t, mode, depth + 1) : v;
   // A token inside a value (a shadow in the theme's shadow color): its value in this mode.
-  return depth < 10 ? v.replace(/var\(--(app-[\w-]+)\)/g, (all, inner: string) => resolve(inner, mode, depth + 1) || all) : v;
+  return depth < 10 ? v.replace(/var\(--([\w-]+)\)/g, (all, inner: string) => resolve(inner, mode, depth + 1) || all) : v;
 }
 
-const NAMES = [...new Set([...BOTH.keys(), ...Object.values(MODES).flatMap((m) => [...m.keys()])])];
+// Without a connector, the `--app-*` variables (the kit's and the app's).
+const NAMES = [...new Set([...BOTH.keys(), ...Object.values(MODES).flatMap((m) => [...m.keys()])])].filter((n) => n.startsWith('app-'));
 
-function token(name: string): Token {
+function token(name: string, own: { figma?: string; code?: string | null; kind?: TokenKind } = {}): Token {
   const base = resolve(name, FIRST);
   return {
     name,
-    figma: name,
-    kind: /^(rgb|#|hsl)/.test(base) ? 'color' : /^-?[\d.]+(px)?$/.test(base) ? 'number' : 'text',
+    figma: own.figma ?? name,
+    kind: own.kind ?? (/^(rgb|#|hsl)/.test(base) ? 'color' : /^-?[\d.]+(px)?$/.test(base) ? 'number' : 'text'),
     value: perMode((m) => resolve(name, m)),
     base,
     alias: perMode((m) => target(raw(name, m))),
-    code: null,
+    code: own.code ?? null,
   };
+}
+
+/** A shadow from its parts' variables, in a mode. */
+const shadowIn = (parts: Partial<Record<'x' | 'y' | 'blur' | 'spread' | 'color', string>>[], m: Mode) =>
+  parts.map((p) => `${resolve(p.x ?? '', m) || 0}px ${resolve(p.y ?? '', m) || 0}px ${resolve(p.blur ?? '', m) || 0}px ${resolve(p.spread ?? '', m) || 0}px ${resolve(p.color ?? '', m) || 'transparent'}`).join(', ');
+
+/** The app's own catalog, from its connector. */
+export function fromConnector(c: TokensConnector): TokenGroup[] {
+  return c.groups.map((g) => {
+    const subs = new Map((g.tokens ?? []).map((tk) => [tk.name, tk.sub ?? '']));
+    return {
+      id: g.id,
+      title: g.title,
+      section: g.section,
+      note: g.note ?? '',
+      tokens: (g.tokens ?? []).map((tk) => token(tk.name, tk)),
+      textStyles: g.textStyles?.map((st) => ({
+        name: st.name,
+        figma: st.figma ?? st.name,
+        code: st.code ?? null,
+        props: Object.fromEntries(Object.entries(st.props).map(([k, v]) => [k, token(v!)])),
+      })),
+      codeTextStyles: g.codeTextStyles ? CODE_TEXT_STYLES : undefined,
+      elevations: g.elevations?.map((e) => ({ name: e.name, figma: e.figma ?? e.name, code: e.code ?? null, shadows: perMode((m) => shadowIn(e.shadows, m)) })),
+      sub: (tk: Token) => subs.get(tk.name) ?? '',
+      codeOnly: g.codeOnly,
+      codeAccess: g.codeAccess,
+    };
+  });
 }
 
 const used = new Set<string>();
@@ -121,15 +139,15 @@ const px = (t: Token) => parseFloat(t.base);
 
 function build(): TokenGroup[] {
   const groups: TokenGroup[] = [];
-  const space = take((n) => n.startsWith('app-space-')).map(token);
-  const radius = take((n) => n.startsWith('app-radius-')).map(token);
+  const space = take((n) => n.startsWith('app-space-')).map((n) => token(n));
+  const radius = take((n) => n.startsWith('app-radius-')).map((n) => token(n));
   const fonts = take((n) => n.startsWith('app-font-'));
   const elevation = take((n) => n === 'app-elevation' || n.startsWith('app-elevation-'));
-  const colors = take((n) => token(n).kind === 'color' || n === 'app-scrim').map(token);
+  const colors = take((n) => token(n).kind === 'color' || n === 'app-scrim').map((n) => token(n));
   groups.push({ id: 'colors', title: t('Colors'), section: 'Colors', note: t('Pages, surfaces, text, icons, actions and states'), tokens: colors, sub: () => '' });
   groups.push({ id: 'spacing', title: t('Space'), section: 'Dimensions', note: t('Gaps and padding, on a 4-point scale'), tokens: space.sort((a, b) => px(a) - px(b)), sub: () => '' });
   groups.push({ id: 'radius', title: t('Corner radius'), section: 'Dimensions', note: t('Corners'), tokens: radius.sort((a, b) => px(a) - px(b)), sub: () => '' });
-  groups.push({ id: 'text-styles', title: t('Text styles'), section: 'Type', note: t('Titles, headings, body, labels and captions'), tokens: fonts.map(token), codeTextStyles: CODE_TEXT_STYLES, sub: () => '' });
+  groups.push({ id: 'text-styles', title: t('Text styles'), section: 'Type', note: t('Titles, headings, body, labels and captions'), tokens: fonts.map((n) => token(n)), codeTextStyles: CODE_TEXT_STYLES, sub: () => '' });
   groups.push({
     id: 'elevation',
     title: t('Elevation'),
@@ -140,18 +158,18 @@ function build(): TokenGroup[] {
     sub: () => '',
   });
   const rest = take(() => true);
-  if (rest.length) groups.push({ id: 'other', title: t('Other'), section: 'Other', note: t('The app’s other variables'), tokens: rest.map(token), sub: (t) => t.name.split('-')[1] ?? '' });
+  if (rest.length) groups.push({ id: 'other', title: t('Other'), section: 'Other', note: t('The app’s other variables'), tokens: rest.map((n) => token(n)), sub: (t) => t.name.split('-')[1] ?? '' });
   return groups;
 }
 
-export const TOKEN_GROUPS: TokenGroup[] = build();
+export const TOKEN_GROUPS: TokenGroup[] = TOKENS_CONNECTOR ? fromConnector(TOKENS_CONNECTOR) : build();
 /** Whether a code connector says how the code names the tokens: until one does, no token is "not in the code". */
 export const TOKENS_CODE_LINKED = TOKEN_GROUPS.some((g) => !!g.codeAccess || g.tokens.some((t) => t.code !== null));
 export const findTokenGroup = (id: string | null | undefined) => TOKEN_GROUPS.find((g) => g.id === id) ?? null;
 /** How many entries a group shows (tokens, text styles or elevations). */
-export const groupSize = (g: TokenGroup) => g.tokens.length + (g.textStyles?.length ?? 0) + (g.elevations?.length ?? 0);
+export const groupSize = (g: TokenGroup) => g.tokens.length + (g.codeTextStyles?.length ?? 0) + (g.textStyles?.length ?? 0) + (g.elevations?.length ?? 0);
 /** The code version the tokens' code names were read from (a connector's). */
-export const CODE_TOKENS_COMMIT: string | null = null;
+export const CODE_TOKENS_COMMIT: string | null = TOKENS_CONNECTOR?.version ?? null;
 
 /** A token's place in the catalog: its group and the name its row is marked by (the Tokens view's `token`). */
 export interface TokenPlace {
@@ -170,8 +188,13 @@ const alnum = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 const PLACES = (() => {
   const out = new Map<string, TokenPlace>();
   for (const g of TOKEN_GROUPS) {
-    for (const t of g.tokens) out.set(alnum(t.name), { group: g.id, name: t.name, value: t.base, figma: t.figma, code: t.code });
-    for (const e of g.elevations ?? []) out.set(alnum(e.name), { group: g.id, name: e.name, value: null, figma: e.figma, code: e.code });
+    // By any of its names (the CSS variable, the design file's, the code's); a group's earlier claim stands, so a name
+    // in Other doesn't shadow one of the system's.
+    const add = (keys: (string | null)[], place: TokenPlace) => keys.forEach((k) => k && !out.has(alnum(k)) && out.set(alnum(k), place));
+    for (const t of g.tokens) add([t.name, t.figma, t.code], { group: g.id, name: t.name, value: t.base, figma: t.figma, code: t.code });
+    for (const s of g.codeTextStyles ?? []) add([s.name, s.figma, s.code], { group: g.id, name: s.name, value: `${s.weight} ${s.size}/${s.line}`, figma: s.figma, code: s.code });
+    for (const s of g.textStyles ?? []) add([s.name, s.figma], { group: g.id, name: s.name, value: null, figma: s.figma, code: s.code });
+    for (const e of g.elevations ?? []) add([e.name, e.figma, e.code], { group: g.id, name: e.name, value: null, figma: e.figma, code: e.code });
   }
   return out;
 })();

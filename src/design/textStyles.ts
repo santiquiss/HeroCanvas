@@ -1,10 +1,9 @@
-// The connected app's text styles: its `--app-font-*` tokens (font shorthands), for Inspect and the Tokens view. A
-// text takes one as `font: var(--app-font-body)`; Inspect names a text by the style it's written with.
-import { APP_THEME_CSS } from './appTheme';
-import kitCss from '../kit/tokens.css?raw';
+// The connected app's text styles, for Inspect and the Tokens view: the ones its tokens connector lists (how its code
+// names each and the widget that writes a text with it), or else its `--app-font-*` tokens (font shorthands). A text
+// takes one as `font: var(--<name>)`; Inspect names a text by the style it's written with.
+import { TOKEN_CSS } from './appTokens';
 import { declaredValue } from './declared';
-
-const appCss = APP_THEME_CSS;
+import { TOKENS_CONNECTOR } from './tokensConnector';
 
 export interface CodeTextStyle {
   /** The CSS variable, without `--` (`app-font-body`). */
@@ -20,7 +19,7 @@ export interface CodeTextStyle {
   weight: number;
 }
 
-const VARS = new Map([...(kitCss + '\n' + appCss).matchAll(/--(app-font-[\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()] as const));
+const VARS = new Map([...TOKEN_CSS.join('\n').matchAll(/--(app-font-[\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()] as const));
 
 /** `600 20px/26px Inter, …` → weight, size, line height. */
 function parse(font: string): { weight: number; size: number; line: number } | null {
@@ -30,10 +29,14 @@ function parse(font: string): { weight: number; size: number; line: number } | n
 
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 
-export const CODE_TEXT_STYLES: CodeTextStyle[] = [...VARS.entries()].flatMap(([name, value]) => {
-  const p = parse(value);
-  return p ? [{ name, code: name, widget: name, figma: cap(name.replace(/^app-font-/, '')), ...p }] : [];
-});
+export const CODE_TEXT_STYLES: CodeTextStyle[] = TOKENS_CONNECTOR?.textStyles
+  ? TOKENS_CONNECTOR.textStyles.map((s) => ({ ...s, widget: s.widget ?? s.code, figma: s.figma ?? s.name }))
+  : [...VARS.entries()].flatMap(([name, value]) => {
+      const p = parse(value);
+      return p ? [{ name, code: name, widget: name, figma: cap(name.replace(/^app-font-/, '')), ...p }] : [];
+    });
+
+const BY_NAME = new Map(CODE_TEXT_STYLES.map((s) => [s.name, s]));
 
 /** The text styles a computed text is: its size, line height and weight (some styles share all three). */
 export function textStylesOf(cs: CSSStyleDeclaration): CodeTextStyle[] {
@@ -63,8 +66,8 @@ function lookUp(el: Element): { style: CodeTextStyle | null; declared: boolean; 
     const font = declaredValue(at, 'font');
     const size = declaredValue(at, 'font-size');
     if (!font && !size) continue;
-    const name = font?.match(/var\(--(app-font-[\w-]+)\)/)?.[1];
-    const style = (name && CODE_TEXT_STYLES.find((s) => s.name === name)) || null;
+    const name = font?.match(/var\(--([\w-]+)\)/)?.[1];
+    const style = (name && BY_NAME.get(name)) || null;
     const w = Number(getComputedStyle(el).fontWeight);
     return { style, declared: true, weight: style && w !== style.weight ? w : null };
   }

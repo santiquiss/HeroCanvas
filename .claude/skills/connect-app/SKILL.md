@@ -130,6 +130,16 @@ An app on the platform's own look (SwiftUI's or UIKit's defaults, Material's) ta
 `src/tour/theme.css` has iOS's system colors, text styles and grouped backgrounds to start from; change its accent
 (the asset catalog's AccentColor) and what the app sets of its own.
 
+### Its own token catalog (`app/connectors/tokens.json`)
+
+The `--app-*` variables are what the kit draws with; the app's own tokens keep the names its code and its design file
+give them (its own stylesheets, in `app/theme.css` or `app/theme/`, any selectors: `:root`, `[data-theme='dark']`,
+`:root[data-theme="dark"]`). For the Tokens view and Inspect to show them as the app organizes them, write a script of
+the app's (in `app/connectors/`) that reads its theme code and writes `tokens.json` (`TokensConnector`,
+src/design/tokensConnector.ts): its groups, each token's CSS variable, its name in the design file and in the code, its
+text styles (Inspect names a text by the one it's written with) and elevations. Without it, the Tokens view shows the
+`--app-*` variables.
+
 ## 4. Navigation (`app/nav/`)
 
 The app's tab bar (phones), and rail and side column (large screens) if it has them, as `AppNavigation` components,

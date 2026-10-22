@@ -1,7 +1,7 @@
 // Where an element's color comes from, for Inspect: the rule that sets it (`background: var(--sf)`), followed through
-// the theme's aliases (theme.css: `--sf: var(--app-surface)`) to the app's token. Read from the stylesheets, not
-// matched by value: two tokens can share a color, and the one the code names is the one to hand off.
-import themeCss from '../theme/theme.css?raw';
+// the app's aliases (its token stylesheets: `--sf: var(--app-surface)`) to a token of its catalog. Read from the
+// stylesheets, not matched by value: two tokens can share a color, and the one the code names is the one to hand off.
+import { TOKEN_BLOCKS } from './appTokens';
 import { declaredValue } from './declared';
 import { findToken, type TokenPlace } from './tokenCatalog';
 
@@ -18,13 +18,13 @@ export type ColorSource =
   /** Nothing in the stylesheets sets it (a default, a value set from script). */
   | { kind: 'unknown' };
 
-/** Each alias's value as theme.css writes it, per theme. */
+/** Each variable's value as the app's token stylesheets write it, per theme (`--name` keys). */
 const ALIAS: Record<'light' | 'dark', Map<string, string>> = (() => {
-  const read = (block: string) => new Map([...block.matchAll(/^\s*(--[\w-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2].trim()]));
-  const both = read(themeCss.split("[data-theme='light']")[0]);
-  const [light, rest = ''] = themeCss.split("[data-theme='dark']");
-  const dark = read(rest.split(':root')[0]);
-  return { light: new Map([...both, ...read(light.split("[data-theme='light']")[1] ?? '')]), dark: new Map([...both, ...dark]) };
+  const dashed = (m: Map<string, string>) => [...m].map(([k, v]) => [`--${k}`, v] as const);
+  return {
+    light: new Map([...dashed(TOKEN_BLOCKS.all), ...dashed(TOKEN_BLOCKS.light)]),
+    dark: new Map([...dashed(TOKEN_BLOCKS.all), ...dashed(TOKEN_BLOCKS.dark)]),
+  };
 })();
 
 const firstVar = (v: string) => v.match(/var\(\s*(--[\w-]+)/)?.[1] ?? null;
@@ -70,7 +70,8 @@ function resolve(value: string | null, theme: 'light' | 'dark'): ColorSource {
   let alpha = tokenAlpha(value);
   // Through the aliases (an alias can name another) to a token, or to the value an alias has instead.
   let via: string | null = null;
-  for (let i = 0; i < 4 && ALIAS[theme].has(name); i++) {
+  // A token of the catalog stops it: its own value isn't an alias.
+  for (let i = 0; i < 6 && !findToken(name) && ALIAS[theme].has(name); i++) {
     via ??= name;
     const next = ALIAS[theme].get(name)!;
     const inner = firstVar(next);

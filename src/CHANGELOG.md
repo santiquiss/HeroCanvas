@@ -6,6 +6,23 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.47.0 — 2026-10-22
+
+- **An app's own tokens, as it organizes them**: with a tokens connector (`app/connectors/tokens.json`, written by
+  the app's script from its code and its design file), the Tokens view shows the app's groups, each token with its CSS
+  variable, its name in the design file and in the code, how the code reaches the group and the names the code has that
+  no token matches; its text styles and elevations. Inspect names a text by the app's text style it's written with and
+  a color by the app's token, through the app's own aliases. Without one, as before: the `--app-*` variables.
+- **The app's token stylesheets are read as the app writes them**: `app/theme.css` and anything in `app/theme/` (a
+  design file's export, a size scale), whatever the selectors' spelling (`:root`, `[data-theme='dark']`,
+  `:root[data-theme="dark"]`, `[data-app-theme='<id>']`). Inspect's colors no longer read the designer's own theme.
+
+**Contract**
+
+- New (optional): `app/connectors/tokens.json` (`TokensConnector`: `version`, `groups` with `tokens`, `textStyles`,
+  `elevations`, `codeAccess`, `codeOnly`; the code's `textStyles`) and `app/theme/*.css`, read as token stylesheets.
+  Nothing to adapt.
+
 ## 0.46.0 — 2026-10-22
 
 - **An app's own components for what the simulator presents** (`AppNavigation.kit`): its bottom sheet, action sheet
