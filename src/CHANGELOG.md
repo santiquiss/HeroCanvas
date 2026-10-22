@@ -6,6 +6,27 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.44.0 — 2026-10-22
+
+- **The simulator's services, for a richer app**: the system's camera and photo picker, a sheet a page keeps itself
+  (`OnScreen`) and its link (`useSheetLink`), shared-element motion (`useMorph`), an overlay's mount and exit
+  (`useOverlay`), the keyboard's helpers, the layout's and the motion's measures, a developer's hidden spot, a page drawn
+  on a device of its own (`PreviewScreen` with `computeLayout`), and an element of the app's own named for Inspect and
+  Layers (`<Component name props>`, beside `useComponent`).
+- **The iPhone Duo's column compacts its navigation** when the page's toolbar doesn't fit above it (smaller tabs,
+  closer: Apple's "minimize the tab bar"), only if that makes room for more of it.
+
+**Contract**
+
+- New from `herocanvas`: `Component`, `ComponentProps`, `PageRef`, `Nav`, `liveSearch`, `useUrlNumber`, `holdKeyboard`,
+  `inputBar`, `KEYBOARD_GAP`, `dropDownItemsOf`, `useInPanel`, `useColumnNav`, `usePageOpen`, `useColumnCompact`,
+  `SIDE_NAV_ATTR`, `NAV_SAVING_ATTR`, `NAV_COMPACT_ATTR`, `SystemCamera`, `SystemPhotoPicker`, `OnScreen`,
+  `useSheetLink`, `useMorph`, `useOverlay`, `DEVELOPER_HIDDEN`, `DropDownAlign`, `EASE`, `KEYBOARD_MOTION`,
+  `KEYBOARD_MS`, `PAGE_MS`, `computeLayout`, `Layout`, `CONTENT_MAX_W`, `SEARCH_BAR_H`, `TAB_BAR_ROOM`, `tallSheetTop`,
+  `tasksKeepNav`, `findDevice`, `findDisplay`, `Display`, `PreviewScreen`, `RAIL_PARAM`. Nothing to adapt.
+- An app's `SideNav` that can compact puts `SIDE_NAV_ATTR`, `NAV_SAVING_ATTR` (the pixels it saves) and, while
+  `useColumnCompact()` says so, `NAV_COMPACT_ATTR` on its root. Optional.
+
 ## 0.43.0 — 2026-10-22
 
 - **On the iPhone Duo the page's toolbar is in the right column**, as Apple's "Designing for iPhone Duo" has it

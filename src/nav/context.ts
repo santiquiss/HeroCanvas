@@ -59,6 +59,8 @@ export const RightEdgeCtx = createContext(true);
 
 /** Pages in the tablet split's right panel (beside the base page): their left padding is half the column gap. */
 export const DetailPanelCtx = createContext(false);
+/** Whether this page is in the tablet split's panel, beside another (not a screen of its own). */
+export const useInPanel = () => useContext(DetailPanelCtx);
 
 export function useSplit(): SplitScope | null {
   return useContext(SplitCtx);

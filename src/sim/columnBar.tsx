@@ -4,7 +4,9 @@
 // content in its row; the column draws them with the app's ColumnBar (AppNavigation), or the kit's. Only as many as fit
 // above the column's navigation go; the rest stay in the page's bar. Only a page at the screen's right edge, beside the
 // column, can have it ("Locate controls near the content they affect"): a pane on the left (a list beside its detail)
-// keeps its controls in its own bar. Of those, the page mounted last that is still open has it.
+// keeps its controls in its own bar. Of those, the page mounted last that is still open has it. Where the toolbar doesn't
+// fit, the column's navigation compacts first if it can (smaller tabs, closer: Apple's "minimize the tab bar"): it
+// says how much it saves (NAV_SAVING_ATTR) and reads useColumnCompact.
 import { createContext, useContext, useLayoutEffect, useRef, useState, useSyncExternalStore, type ComponentType } from 'react';
 import { Icon } from '../components/Icon';
 import type { ColumnBarProps, ToolbarAction } from '../contract';
@@ -24,19 +26,21 @@ interface State {
   top: Entry | null;
   /** How many controls fit between the status and the column's navigation. */
   room: number;
+  /** The navigation compacts to leave the toolbar room. */
+  compact: boolean;
 }
 
 export interface ColumnBarStore {
   subscribe: (listener: () => void) => () => void;
   state: () => State;
   set: (entry: Entry) => () => void;
-  setRoom: (room: number) => void;
+  setRoom: (room: number, compact: boolean) => void;
 }
 
 export function createColumnBar(): ColumnBarStore {
   const entries = new Map<number, Entry>();
   const listeners = new Set<() => void>();
-  let state: State = { top: null, room: Infinity };
+  let state: State = { top: null, room: Infinity, compact: false };
   const changed = (next: Partial<State>) => {
     state = { ...state, ...next };
     listeners.forEach((l) => l());
@@ -60,8 +64,8 @@ export function createColumnBar(): ColumnBarStore {
         changed({ top: topEntry() });
       };
     },
-    setRoom: (room) => {
-      if (room !== state.room) changed({ room });
+    setRoom: (room, compact) => {
+      if (room !== state.room || compact !== state.compact) changed({ room, compact });
     },
   };
 }
@@ -70,8 +74,15 @@ export function createColumnBar(): ColumnBarStore {
 export const ColumnBarCtx = createContext<ColumnBarStore | null>(null);
 /** Whether the page it's in is open: one leaving (sliding out) gives the column to the page under it at once. */
 export const PageOpenCtx = createContext(true);
+/** Whether the column shows the app's navigation (DeviceScreen): a page's own bar then leaves its main action to it. */
+export const ColumnNavCtx = createContext(false);
 
-const NONE: State = { top: null, room: 0 };
+/** Whether the page it's in is open (false while it slides out). */
+export const usePageOpen = () => useContext(PageOpenCtx);
+/** Whether the iPhone Duo column shows the app's navigation (SideNav) beside this page. */
+export const useColumnNav = () => useContext(ColumnNavCtx);
+
+const NONE: State = { top: null, room: 0, compact: false };
 const noState = () => NONE;
 const noSubscribe = () => () => {};
 let mounted = 0;
@@ -127,6 +138,15 @@ const GAP = 8;
 const NAV_GAP = 16;
 /** On the wrapper of the column's navigation (DeviceScreen), to measure the room above it. */
 export const SIDE_NAV_ATTR = 'data-side-nav';
+/** On the navigation's root: how much shorter it is compact (px), and whether it is (the app's SideNav sets them). */
+export const NAV_SAVING_ATTR = 'data-compact-saving';
+export const NAV_COMPACT_ATTR = 'data-compact';
+
+/** Whether the column's navigation compacts to leave the toolbar room (the app's SideNav reads it). */
+export function useColumnCompact(): boolean {
+  const store = useContext(ColumnBarCtx);
+  return useSyncExternalStore(store?.subscribe ?? noSubscribe, store?.state ?? noState).compact;
+}
 
 /** The column's vertical bar (DeviceScreen, on displays with a column): it fades out with the last page that had it. */
 export function ColumnBar({ store, zIndex, Bar = KitColumnBar }: { store: ColumnBarStore; zIndex: number; Bar?: ComponentType<ColumnBarProps> }) {
@@ -134,12 +154,21 @@ export function ColumnBar({ store, zIndex, Bar = KitColumnBar }: { store: Column
   const { top, room } = useSyncExternalStore(store.subscribe, store.state);
   const ref = useRef<HTMLDivElement>(null);
   const barTop = columnBarTop(L);
-  // The room above the navigation, after each commit (it comes and goes with the page on top). Offsets, not client
-  // rects: the canvas scales the screen.
+  // The room above the navigation, after each commit (it comes and goes with the page on top), at its full size; if
+  // the toolbar doesn't fit, compact (the gap to it closes to the controls' own). Offsets, not client rects: the
+  // canvas scales the screen.
   useLayoutEffect(() => {
     const nav = ref.current?.parentElement?.querySelector(`[${SIDE_NAV_ATTR}]`)?.firstElementChild as HTMLElement | null | undefined;
-    if (!nav) return store.setRoom(Infinity);
-    store.setRoom(Math.max(0, Math.floor((nav.offsetTop - NAV_GAP - barTop + GAP) / (CONTROL + GAP))));
+    if (!nav) return store.setRoom(Infinity, false);
+    const saving = Number(nav.getAttribute(NAV_SAVING_ATTR) ?? 0);
+    const fullTop = nav.offsetTop - (nav.hasAttribute(NAV_COMPACT_ATTR) ? saving : 0);
+    const fits = (navTop: number, gap: number) => Math.max(0, Math.floor((navTop - gap - barTop + GAP) / (CONTROL + GAP)));
+    const wanted = top ? (top.back ? 1 : 0) + top.actions.length : 0;
+    const full = fits(fullTop, NAV_GAP);
+    const tight = fits(fullTop + saving, GAP);
+    // Only if it makes room for more of the toolbar.
+    const compact = wanted > full && tight > full;
+    store.setRoom(compact ? tight : full, compact);
   });
   // The one it last showed, kept while it fades out.
   const [shown, setShown] = useState(top);

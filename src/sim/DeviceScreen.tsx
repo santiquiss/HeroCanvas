@@ -27,7 +27,7 @@ import { anchoredFloats, listDetailActive, phoneMotion, tallSheetTop, type Layou
 import { EASE, EXIT_MS, PAGE_MS, SWAP, TAB_IN_MS } from './motion';
 import { screenRegions } from './regions';
 import { boxInScreen, counterpartIn } from './anchor';
-import { ColumnBar, ColumnBarCtx, createColumnBar, PageOpenCtx, SIDE_NAV_ATTR } from './columnBar';
+import { ColumnBar, ColumnBarCtx, ColumnNavCtx, createColumnBar, PageOpenCtx, SIDE_NAV_ATTR } from './columnBar';
 import { DropDownLayer } from './DropDownLayer';
 import { useSim, type SheetSpec, type SnackbarSpec } from './SimContext';
 import { isTextField, KeyboardInsetCtx, useKeyboardInset } from './keyboard';
@@ -652,7 +652,10 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
     <div style={L.videoH ? { width: L.vw, height: L.videoH + L.vh, borderRadius: L.fullRadius, overflow: 'clip', background: '#000' } : { display: 'contents' }}>
       {L.videoH > 0 && <VideoArea layout={L} />}
       <ScreenLayerCtx.Provider value={overlays ? sheetLayer : null}>
-        <ColumnBarCtx.Provider value={columnBar}>{app}</ColumnBarCtx.Provider>
+        <ColumnBarCtx.Provider value={columnBar}>
+          {/* The same condition the column's navigation (SideNav) is drawn with. */}
+          <ColumnNavCtx.Provider value={!boot && L.sideNav && sideColumn === 'nav'}>{app}</ColumnNavCtx.Provider>
+        </ColumnBarCtx.Provider>
       </ScreenLayerCtx.Provider>
     </div>
   );
