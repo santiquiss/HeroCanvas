@@ -6,4 +6,4 @@
 
 - [ ] `npm run typecheck`, `npm run lint`, `npm test`, `npx vite build`
 - [ ] Looked at it on a phone and a tablet, light and dark
-- [ ] Version bumped and `src/CHANGELOG.md` entry (a **Contract** item if teams must adapt)
+- [ ] Version left as it is: it's bumped and tagged on merge. Say here if teams must adapt anything (the **Contract**)

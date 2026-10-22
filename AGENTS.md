@@ -92,4 +92,5 @@ Versioning: two versions, two changelogs.
 - **HeroCanvas's** (`src/version.json`, `src/CHANGELOG.md`): only when developing HeroCanvas itself. Every commit to
   the tool bumps it (0.Y.0 features, 0.Y.Z fixes), adds an entry (a **Contract** item for what a team must adapt),
   updates the README's badge, and is tagged `vX.Y.Z`: the tags are what `npm run update` installs. Shown on its
-  page (`#/about`), from the ⓘ at the bottom of the left rail.
+  page (`#/about`), from the ⓘ at the bottom of the left rail. A pull request from a fork leaves both alone: they're
+  bumped and tagged when it's merged into `main` (one squashed commit), so two open at once don't clash.

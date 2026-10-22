@@ -25,11 +25,13 @@ Before you open a pull request:
 
 - `npm run typecheck`, `npm run lint`, `npm test` and `npx vite build` pass.
 - You looked at it: `npm run shot -- "/<page>"`, or the dev server, on a phone and a tablet, light and dark.
-- The tool's version is bumped and `src/CHANGELOG.md` has an entry (AGENTS.md, Versioning). A change to what a
-  team's code relies on goes under **Contract**, saying what to adapt.
+- The version stays as it is: it's bumped, written in `src/CHANGELOG.md` and tagged when the pull request is
+  merged, so two open at once don't clash. If it changes what a team's code relies on, say what to adapt in the
+  description: it goes in the changelog's **Contract**.
 - A new file or folder of the tool's is listed in `scripts/update/tool-files.json`, so updates bring it.
 
-Keep pull requests to one change each, with a line on why in the description.
+Keep pull requests to one change each, with a line on why in the description. The same checks run on every pull
+request (`.github/workflows/checks.yml`), and it's merged once they pass.
 
 ## License
 

@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.41.2 — 2026-10-22
+
+- Pull requests: the same checks run on each one (typecheck, lint, tests, build), and a fork's leaves the version
+  alone: it's bumped and tagged when merged into `main`.
+
+**Contract**
+
+- None.
+
 ## 0.41.1 — 2026-10-22
 
 - The changelog speaks of HeroCanvas only: no team's copy by name.
