@@ -1,4 +1,5 @@
 // Top toolbar + scaled device frame. Simulator state (device, display, land, theme) lives in the URL.
+import { systemBack } from './back';
 import { schemeIn } from './appThemes';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
@@ -118,6 +119,17 @@ function DesignerShell() {
   const video = search.get('video') === '1';
 
   const [frameEl, setFrameEl] = useState<HTMLDivElement | null>(null);
+  // The system back (sim/back): Alt+←, or Esc while the focus is inside a device's screen (typing in it).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const inScreen = (e.target as Element | null)?.closest?.('[data-device-screen]');
+      if ((e.altKey && e.key === 'ArrowLeft') || (e.key === 'Escape' && inScreen)) {
+        if (systemBack()) e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   // Capture mode (src/capture): its 3D turn and each device's color are the canvas's, not the URL's.
   const [tilt, setTilt] = useState<Tilt>(FLAT);
   const [colors, setColors] = useState<Record<string, string>>({});

@@ -60,7 +60,7 @@ export function FlowView({ makeLayout }: { makeLayout: (detailOpen: boolean, pag
   const last = useMemo(() => parsePath(PAGES, (lastPrototypeUrl() ?? '').split('?')[0]), [PAGES]);
   const [variant, setVariant] = useState<Record<string, number>>(() => {
     if (!last) return {};
-    const i = PAGES[last.id].variants?.().findIndex((v) => Object.entries(v.params).every(([k, x]) => last.params[k] === x)) ?? -1;
+    const i = PAGES[last.id].variants?.().findIndex((v) => Object.entries(v.params ?? {}).every(([k, x]) => last.params[k] === x)) ?? -1;
     return i > 0 ? { [last.id]: i } : {};
   });
   const [dragging, setDragging] = useState(false);
@@ -320,6 +320,7 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
         const variants = def.variants?.() ?? [];
         const vi = Math.min(variant[id] ?? 0, Math.max(0, variants.length - 1));
         const params = variants[vi]?.params ?? {};
+        const state = variants[vi]?.state;
         const name = pageName(PAGES, id);
         const head = far ? (
           // Far out: just the name (and its open comments), at a constant size on screen.
@@ -357,13 +358,13 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
               className={`${styles.thumb} ${id === current ? styles.current : ''}`}
               style={{ width: w, height: h, borderRadius: radius }}
               title={far ? name : t('Open in the prototype')}
-              onClick={() => moved.current < 4 && nav.open(id, params)}
+              onClick={() => moved.current < 4 && nav.open(id, params, state)}
             >
               {far ? (
                 <PageCard icon={pageIcon(def)} status={def.status} change={nav.change(id)} />
               ) : (
                 <div className={styles.thumbInner} style={{ width: layout.vw, height: layout.vh, transform: `scale(${S})` }}>
-                  <LazyPreview>{() => <PreviewScreen page={{ id, params }} makeLayout={makeLayout} still />}</LazyPreview>
+                  <LazyPreview>{() => <PreviewScreen page={{ id, params }} state={state} makeLayout={makeLayout} still />}</LazyPreview>
                 </div>
               )}
             </div>

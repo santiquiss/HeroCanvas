@@ -1,5 +1,6 @@
 // The app viewport: theme root, base tab, push layers (or the split panel), covers, overlays and system chrome.
 // Every entry of the navigation stack is its own layer, so navigation can go any number of levels deep.
+import { appConfig } from '@app/config';
 import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { DesignOverride } from '../design/overridable';
 import { composePages } from '../nav/manifest';
@@ -7,7 +8,9 @@ import { findProposal } from '../proposals';
 import { HOME, LAUNCH, NAVIGATION } from '../nav/pages';
 import { useLaunch } from './launch';
 import { LaunchPhaseCtx } from './launchPhase';
-const { SideNav, SideRail, TabBar } = NAVIGATION;
+const { SideNav, SideRail, TabBar, Overlays: AppOverlays } = NAVIGATION;
+/** The app's own wrapper around each screen (AppNavigation.Screen), or none. */
+const AppScreen = NAVIGATION.Screen ?? (({ children }: { children: ReactNode }) => <>{children}</>);
 import { Icon } from '../components/Icon';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Dialog, Popover, Sheet, Snackbar, SNACKBAR_MS, sheetMaxWidth, type AnchorRect } from '../kit';
@@ -15,6 +18,7 @@ import { Toast } from '../components/Toast';
 import { useDesignRoot } from '../design/DesignContext';
 import { DetailPanelCtx, NavCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot, type Nav } from '../nav/context';
 import { useAppTheme } from './appThemes';
+import { BackDispatcherCtx, createBackDispatcher, registerBackTarget } from './back';
 import { sideColumnFor, splitFor, useScreenConfig, type ScreenConfig } from '../nav/screenConfig';
 import type { PageDef, PageRef, SplitConfig } from '../nav/types';
 import { ChangesOverlay } from './ChangesOverlay';
@@ -222,7 +226,7 @@ export function DeviceScreen(props: { preview?: boolean; overlays?: boolean }) {
 }
 
 function Screen({ preview = false, overlays = !preview }: { preview?: boolean; overlays?: boolean }) {
-  const { layout: L, theme, toastText, dialog } = useSim();
+  const { layout: L, theme, toastText, dialog, sheet, closeSheet, closeDialog } = useSim();
   const language = useLanguage();
   const nav = useNavRoot();
   const [appTheme] = useAppTheme();
@@ -322,7 +326,11 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   const sideColumn = sideColumnFor(top.id, nav.def(top.id), cfg);
   const pushL = usePresence(pushes, entryKey, EXIT_MS);
   const coverL = usePresence(covers, entryKey, EXIT_MS);
-  const anyOpen = pushes.length > 0 || covers.length > 0;
+  // What slides over the base page moves it aside; a page that fades in place or rises from the bottom doesn't.
+  const anyOpen = pushes.some((p) => nav.def(p.ref.id).transition !== 'fade') || covers.some((c) => !nav.def(c.ref.id).transition);
+  // Pushes that keep the bar at the bottom (manifest `keepNav`): the first ones, from the base up.
+  const firstOwn = pushes.findIndex((p) => !nav.def(p.ref.id).keepNav);
+  const keepNav = firstOwn < 0 ? pushes.length : firstOwn;
 
   /** The split panel's section being replaced: one first page leaving while another comes in. */
   const swapping = pushL.some((p) => p.item.index === 1 && !p.present) && pushL.some((p) => p.item.index === 1 && p.present);
@@ -343,7 +351,39 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
     transition: `${T}, width ${PAGE_MS}ms ${EASE}, left ${PAGE_MS}ms ${EASE}`,
   };
 
+  // The system back (sim/back): the screen's handlers (useBackHandler) take it first; with none, the device puts the
+  // keyboard away, then closes a dialog or a sheet, then goes back a page (at the root there's nothing to do).
+  const fallback = useRef<() => boolean>(() => false);
+  fallback.current = () => {
+    if (dialog) {
+      closeDialog();
+      return true;
+    }
+    if (sheet) {
+      closeSheet();
+      return true;
+    }
+    if (stack.length <= 1) return false;
+    nav.pop();
+    return true;
+  };
+  const dispatcher = useMemo(() => createBackDispatcher(() => fallback.current()), []);
+  const back = useRef<() => boolean>(() => false);
+  back.current = () => {
+    if (kbOpen && kbField) {
+      kbField.blur();
+      setKbOpen(false);
+      return true;
+    }
+    return dispatcher.back();
+  };
+  useEffect(() => {
+    if (!overlays) return;
+    return registerBackTarget(() => back.current(), !preview);
+  }, [overlays, preview]);
+
   const app = (
+    <BackDispatcherCtx.Provider value={dispatcher}>
     <KeyboardInsetCtx.Provider value={L.real ? realKb : kbOpen ? kbH : 0}>
       <div
         ref={setScreen}
@@ -377,6 +417,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         }}
       >
         <LaunchPhaseCtx.Provider value={launch.phase}>
+        <AppScreen>
         {/* The device in hand shows its own status, camera, home indicator and keyboard. */}
         {!L.real && <StatusBar layout={L} />}
 
@@ -400,12 +441,13 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
             <div data-hc-page={boot ? undefined : nav.title(stack[0])} data-page-id={boot ? undefined : stack[0].id} style={base}>
               {/* The base reaches the right edge unless the tablet split panel is open beside it. */}
               <RightEdgeCtx.Provider value={!L.dashOpen}>
-                {/* Each section fades up as it comes in (keyed by the tab). */}
+                {/* Another section comes in at once, as iOS and Android switch tabs; an app that fades them
+                    (appConfig.layout.tabTransition) gets a short fade up (keyed by the tab). */}
                 <div
                   key={stack[0].id}
                   style={{
                     height: '100%',
-                    animation: `hcTabIn ${TAB_IN_MS}ms ${EASE}`,
+                    animation: appConfig.layout?.tabTransition === 'fade' ? `hcTabIn ${TAB_IN_MS}ms ${EASE}` : undefined,
                   }}
                 >
                   {boot ? null : baseSplit?.split ? <EntryView entry={baseSplit} /> : <PageView entry={baseEntry} />}
@@ -459,25 +501,31 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                 })}
               </div>
             ) : (
-              pushL.map((p, k) => (
+              pushL.map((p, k) => {
+                const def = nav.def(p.item.ref.id);
+                const fades = def.transition === 'fade';
+                // Under the app's bar (TabBar, z-index 26) while every push below it keeps the bar too.
+                const underBar = !!def.keepNav && p.item.index - 1 < keepNav;
+                return (
                 <Layer
                   key={p.key}
                   page={nav.title(p.item.ref)}
                   pageId={p.item.ref.id}
                   open={p.present}
                   animateIn={p.animateIn}
+                  fade={fades}
                   covered={covered(pushL, k)}
                   openT={phoneMotion(L) && covered(pushL, k) ? 'translateX(-25%)' : 'translateX(0)'}
-                  closedT={offRight(R.pushes.left)}
+                  closedT={fades ? 'translateX(0)' : offRight(R.pushes.left)}
                   style={{
                     position: 'absolute',
                     top: 0,
                     bottom: 0,
                     left: R.pushes.left,
                     width: R.pushes.width,
-                    zIndex: Z.push + k,
+                    zIndex: underBar ? 20 + k : Z.push + k,
                     background: 'var(--pg)',
-                    boxShadow: p.present && !L.railW ? SHADOW : 'none',
+                    boxShadow: p.present && !L.railW && !fades ? SHADOW : 'none',
                     // Beside the iPhone Duo right column the shadow stays on the left: it would tint the column.
                     clipPath: L.sideNav ? 'inset(0 0 0 -40px)' : undefined,
                     ...glideStyle,
@@ -485,11 +533,15 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                 >
                   <EntryView entry={p.item} />
                 </Layer>
-              ))
+                );
+              })
             )}
 
             {coverL.map((p, k) => {
               const bg = nav.def(p.item.ref.id).background;
+              // `transition: 'up'`: it rises from the bottom of the screen and goes back down.
+              const up = nav.def(p.item.ref.id).transition === 'up';
+              const fades = nav.def(p.item.ref.id).transition === 'fade';
               return (
                 <Layer
                   key={p.key}
@@ -498,8 +550,9 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                   open={p.present}
                   animateIn={p.animateIn}
                   covered={covered(coverL, k)}
-                  openT={covered(coverL, k) ? 'translateX(-25%)' : 'translateX(0)'}
-                  closedT={offRight(R.covers.left)}
+                  fade={fades}
+                  openT={covered(coverL, k) && !up ? 'translateX(-25%)' : 'translate(0, 0)'}
+                  closedT={up ? 'translate(0, 100%)' : fades ? 'translate(0, 0)' : offRight(R.covers.left)}
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -528,6 +581,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         {!boot && L.sideNav && sideColumn === 'nav' && <SideNav />}
         {!boot && L.showRail && <SideRail />}
 
+        {overlays && AppOverlays && <AppOverlays />}
         {overlays && <SnackbarLayer layout={L} />}
         {overlays && <div ref={setSheetLayer} style={{ display: 'contents' }} />}
         {overlays && <SheetLayer layout={L} screen={screen} />}
@@ -576,9 +630,11 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         {launch.overlay}
         {!L.real && <LandscapeCamera layout={L} />}
         {!L.real && <HomeIndicator layout={L} />}
+        </AppScreen>
         </LaunchPhaseCtx.Provider>
       </div>
     </KeyboardInsetCtx.Provider>
+    </BackDispatcherCtx.Provider>
   );
   // The video layout (where the display offers it): a 16:9 video across the top, the app in the rest below. The
   // wrapper is always there (a box only with the video), so turning the video on or off doesn't remount the app.

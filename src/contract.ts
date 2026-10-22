@@ -1,7 +1,7 @@
 // What a connected app gives HeroCanvas. The tool reads the app only through this (app/index.ts): its pages, its
 // navigation chrome, its languages and the people it's tried as. Everything else (screens, components, data, tokens)
 // is the app's own business.
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 export interface Persona {
   id: string;
@@ -10,6 +10,24 @@ export interface Persona {
   description?: string;
   /** Its photo, under public/ (`npm run persona:avatar` makes `personas/<id>.png`); none: their initials. */
   avatar?: string;
+  /**
+   * Its values for the app's controls (`AppConfig.controls`, by param): who they are, in the terms the screens read
+   * (signed in, verified, on a paid plan). One left out takes the control's first option.
+   */
+  values?: Record<string, string>;
+}
+
+/**
+ * One of the app's own conditions, for every page (Scenarios › App; `?<param>=`): something about the account or the
+ * app that changes the screens, a feature flag, a backend state. Each persona has its value (`Persona.values`); the
+ * panel can change it for a moment, and a link keeps it. The screens read it with `useAppControl(param)`.
+ */
+export interface AppControl {
+  param: string;
+  label: string;
+  note?: string;
+  /** The first is the default (a persona with no value of its own). */
+  options: { value: string; label: string }[];
 }
 
 /**
@@ -20,6 +38,16 @@ export interface AppNavigation {
   TabBar: ComponentType;
   SideRail: ComponentType;
   SideNav: ComponentType;
+  /**
+   * Around each device's screen, once (optional): where the app provides what all its pages share (its own overlay
+   * host, its theme or session context), as its root does.
+   */
+  Screen?: ComponentType<{ children: ReactNode }>;
+  /**
+   * Over the pages, once per device (optional): what the app shows above any page (its own sheets' and dialogs' host,
+   * a gate that asks to sign in). Positioned by the app, under z-index 85 (the snackbar), above the pages (up to 79).
+   */
+  Overlays?: ComponentType;
 }
 
 /** The app's settings: plain data, free of imports of its screens (the simulator reads it early). */
@@ -30,6 +58,8 @@ export interface AppConfig {
   languages?: { id: string; name: string }[];
   /** Who the app is tried as (Scenarios panel; `?persona=`), the default first. None: no picker. */
   personas?: Persona[];
+  /** The app's own conditions for every page (AppControl), each persona with its values. */
+  controls?: AppControl[];
   /**
    * The app's own themes, beyond light and dark (palettes its user picks in its settings), the default first
    * (Scenarios › Theme; `?apptheme=`; the app picks one with useAppTheme). None: just light and dark.
@@ -85,6 +115,27 @@ export interface ScreenLayout {
   railFoldedWidth?: number;
   /** The rail shows the user (a sidebar's account): the screens drop their own way to them (a header's avatar). */
   userInRail?: boolean;
+  /**
+   * The app has only a phone layout (an Android app without a tablet one, an iPhone-only app run on an iPad): tablets
+   * and open foldables draw it too, its bar at the bottom and one column, stretched to the screen's width.
+   */
+  compactOnly?: boolean;
+  /**
+   * The height of the app's bar at the bottom (its TabBar, floating or not), in points, over the bottom inset: what a
+   * tab's content keeps room for (usePadB), and where the snackbar and toasts sit. None: the tour's bar and search pill.
+   */
+  tabBarHeight?: number;
+  /**
+   * Tabs keep their state, as a tab bar's do on iOS and Android: going to another tab and back finds the pages it had
+   * open and their state (a filter, a scroll's step, a search) as it was left. Picking the tab on screen goes back to
+   * its root.
+   */
+  keepTabs?: boolean;
+  /**
+   * How a section (a tab) comes in when it's picked: at once (default), as iOS and Android switch tabs; or `fade`, a
+   * short fade up, for an app that animates it.
+   */
+  tabTransition?: 'none' | 'fade';
   /** The room between the rail and the left column when a page shows two (list and detail; 16 by default), and
    * between the right one and the screen's edge. */
   splitGap?: number;

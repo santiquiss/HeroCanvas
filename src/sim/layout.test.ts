@@ -45,3 +45,28 @@ describe('an anchored menu floats or rises as a sheet', () => {
     expect(floats('zf8', 'outer')).toBe(false);
   });
 });
+
+describe('an app with only a phone layout (compactOnly)', () => {
+  const tablet = findDisplay(findAnyDevice('ipad13'), 'main');
+  const at = (compactOnly: boolean) => computeLayout({ display: tablet, land: false, supported: true, detailOpen: true, compactOnly });
+
+  it('draws it on a tablet: the bar at the bottom, no rail, one column', () => {
+    const l = at(true);
+    expect(l.bottomNav).toBe(true);
+    expect(l.showRail).toBe(false);
+    expect(l.isTablet).toBe(false);
+    expect(l.dashOpen).toBe(false);
+  });
+
+  it('leaves a tablet layout alone otherwise', () => {
+    expect(at(false).isTablet).toBe(true);
+  });
+});
+
+describe('the app’s bar height (tabBarHeight)', () => {
+  const phone = findDisplay(findAnyDevice('ip17'), 'main');
+  it('keeps room for the bar over the bottom inset, not the tour’s pill', () => {
+    const l = computeLayout({ display: phone, land: false, supported: true, detailOpen: false, tabBarHeight: 80 });
+    expect(l.padB).toBe(l.botIn + 80 + 24);
+  });
+});

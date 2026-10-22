@@ -16,6 +16,7 @@ import { LAUNCH } from '../nav/pages';
 import { LAUNCH_PARAM, LAUNCH_PLAYBACK, replayLaunch } from '../sim/launch';
 import styles from './Panel.module.css';
 import { PersonaPicker, usePersonaParam } from './PersonaPicker';
+import { APP_CONTROLS, findPersona, PERSONA_PARAM, personaValue } from '../sim/persona';
 import { APP_THEME_PARAM, APP_THEMES, useAppTheme } from '../sim/appThemes';
 import { t } from '../i18n/ui';
 
@@ -47,6 +48,8 @@ export function ScenariosPanel() {
         </div>
         <PersonaPicker persona={persona} onPick={pick} />
       </div>
+
+      {APP_CONTROLS.length > 0 && <AppSection />}
 
       {APP_THEMES.length > 0 && <ThemeSection />}
 
@@ -141,6 +144,34 @@ function LaunchSection() {
           {t('Replay')}
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The app's controls (appConfig.controls), for every page: each at the persona's value unless changed here, marked
+ * when it is (picking the persona's own value back undoes it).
+ */
+function AppSection() {
+  const [search] = useSearchParams();
+  const patch = useUrlPatch();
+  const persona = findPersona(search.get(PERSONA_PARAM));
+  return (
+    <div className={styles.section}>
+      <Title label={t('App')} hint={t('every page')} params={APP_CONTROLS.map((c) => c.param)} />
+      {APP_CONTROLS.map((c) => {
+        const own = personaValue(c, persona);
+        const value = search.get(c.param) ?? own;
+        const set = (v: string) => patch({ [c.param]: v === own ? null : v });
+        const on = c.options.length === 2 ? c.options.find((o) => /^on$/i.test(o.label))?.value : undefined;
+        const off = c.options.find((o) => o.value !== on)?.value ?? c.options[0].value;
+        const options = c.options.map((o) => ({ value: o.value, label: o.value === own && persona ? t('{option} · {persona}', { option: o.label, persona: persona.name }) : o.label }));
+        return (
+          <Row key={c.param} label={c.label} overridden={value !== own} note={c.note}>
+            {on ? <Switch label={c.label} checked={value === on} onChange={(v) => set(v ? on : off)} /> : <Select label={c.label} value={value} onChange={set} options={options} />}
+          </Row>
+        );
+      })}
     </div>
   );
 }

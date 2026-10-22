@@ -9,7 +9,7 @@ import { stepOf, stepState } from '../nav/flow';
 import { ChangeBadge } from '../flow/FlowView';
 import type { Manifest } from '../nav/stack';
 import { pageIcon, pageName, ROLE_ICONS, ROLE_NAMES, sameRef } from '../nav/stack';
-import type { FlowStep, PageDef, PageRef, PageStatus } from '../nav/types';
+import type { FlowStep, PageDef, PageRef, PageStatus, Params } from '../nav/types';
 import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
@@ -112,7 +112,7 @@ function PageNode({ id, depth, query }: { id: string; depth: number; query: stri
       {expanded && steps.map((st, i) => <StepRows key={st.id} id={id} step={st} n={i + 1} depth={depth + 1} query={query} />)}
       {expanded &&
         shownVariants.map((v) => (
-          <Row key={JSON.stringify(v.params)} depth={depth + 1} def={def} label={v.label} refOf={{ id, params: v.params }} caret={null} variant onClick={() => nav.open(id, v.params)} />
+          <Row key={v.label} depth={depth + 1} def={def} label={v.label} refOf={{ id, params: v.params ?? {} }} state={v.state} caret={null} variant onClick={() => nav.open(id, v.params ?? {}, v.state)} />
         ))}
       {expanded &&
         modes.map((m) => (
@@ -147,6 +147,8 @@ interface RowProps {
   label: string;
   /** Concrete page this row opens (null for a page with variants: the row only expands). */
   refOf: PageRef | null;
+  /** A variant's state params: current only while the URL holds them. */
+  state?: Params;
   caret?: string | null;
   onCaret?: () => void;
   onClick: () => void;
@@ -154,11 +156,13 @@ interface RowProps {
   count?: number;
 }
 
-function Row({ depth, def, label, refOf, caret, onCaret, onClick, variant, count }: RowProps) {
+function Row({ depth, def, label, refOf, state, caret, onCaret, onClick, variant, count }: RowProps) {
   const nav = useNavRoot();
   const top = nav.stack[nav.stack.length - 1];
-  // A flow's current row is its step's, below it.
-  const isCurrent = !!refOf && sameRef(refOf, top) && !def.flow;
+  const [search] = useSearchParams();
+  // A flow's current row is its step's, below it; a variant by state is the one shown only while the URL holds its state.
+  const holds = !state || Object.entries(state).every(([k, v]) => search.get(k) === v);
+  const isCurrent = !!refOf && sameRef(refOf, top) && !def.flow && holds;
   const inStack = !!refOf && nav.stack.some((r) => sameRef(r, refOf));
   const cls = [styles.row, isCurrent ? styles.current : inStack ? styles.inStack : ''].join(' ');
   return (

@@ -6,11 +6,11 @@ import { useMemo } from 'react';
 import { NavCtx, useNavRoot, type Nav } from '../nav/context';
 import { HOME } from '../nav/pages';
 import { chainFor, detailOpenFor, pageTitle, stackUrl } from '../nav/stack';
-import type { PageRef } from '../nav/types';
+import type { PageRef, Params } from '../nav/types';
 import { DeviceScreen } from '../sim/DeviceScreen';
 import type { Layout } from '../sim/layout';
 import { StillCtx } from '../kit/motion';
-import { SimProvider, UrlOverride, useSim } from '../sim/SimContext';
+import { liveSearch, SimProvider, UrlOverride, useSim } from '../sim/SimContext';
 
 const noop = () => {};
 
@@ -20,6 +20,7 @@ export function PreviewScreen({
   makeLayout,
   overlays = false,
   still = false,
+  state,
 }: {
   page: PageRef;
   query?: URLSearchParams;
@@ -27,6 +28,8 @@ export function PreviewScreen({
   overlays?: boolean;
   /** A still copy: no animation (CSS or JS), every element at its end state (Flow, the where-used rail). */
   still?: boolean;
+  /** State params the page shows (a variant by state), over `query`. */
+  state?: Params;
 }) {
   const { theme } = useSim();
   // Same manifest and proposal as the app, with a static stack for this page.
@@ -65,7 +68,13 @@ export function PreviewScreen({
       </SimProvider>
     </NavCtx.Provider>
   );
-  const shown = query ? <UrlOverride value={query}>{screen}</UrlOverride> : screen;
+  const fixed = useMemo(() => {
+    if (!state) return query;
+    const q = new URLSearchParams(query ?? liveSearch());
+    for (const [k, v] of Object.entries(state)) q.set(k, v);
+    return q;
+  }, [query, state]);
+  const shown = fixed ? <UrlOverride value={fixed}>{screen}</UrlOverride> : screen;
   return still ? (
     <StillCtx.Provider value>
       <div data-still style={{ display: 'contents' }}>

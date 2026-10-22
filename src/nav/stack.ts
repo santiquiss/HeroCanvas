@@ -5,6 +5,7 @@
 //   #/projects/work                              → [projects, project]
 //   #/tasks/t1?stack=/projects,/projects/work    → [projects, project, task]
 //   #/tasks/t1                                   → [today, task] (its `parentOf`)
+import { appConfig } from '@app/config';
 import { SHOT_PARAMS } from '../capture/shot/params';
 import type { Level, PageDef, PageRef, Params, StateParams } from './types';
 import { t } from '../i18n/ui';
@@ -17,7 +18,8 @@ export type Manifest = Record<string, PageDef>;
  * PostHog flags read by more than one page (a user's flag doesn't change from one screen to the next: `lsv2`,
  * screens/Scan/flag).
  */
-export const SIM_PARAMS = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'capture', ...SHOT_PARAMS] as const;
+/** The URL params that survive navigation: the designer's own, and the app's controls (appConfig.controls). */
+export const SIM_PARAMS: readonly string[] = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'capture', ...SHOT_PARAMS, ...(appConfig.controls ?? []).map((c) => c.param)];
 
 /**
  * Whether the split's right part is in use (the layout's `detailOpen`): a push page over the tab.

@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useKeyboardInset } from './keyboard';
 import { useLocation, useSearchParams } from 'react-router';
 import { SNACKBAR_DURATION, type AlertLevel, type AlertProps, type DialogProps, type SheetLayout, type SheetWidth } from '../kit';
-import { DetailPanelCtx, PageScope, RightEdgeCtx, SplitCtx } from '../nav/context';
+import { DetailPanelCtx, PageScope, RightEdgeCtx, SplitCtx, useNav } from '../nav/context';
 import type { DropDownAlign } from './DropDownLayer';
 import type { Layout } from './layout';
 import { tappedControl, type SheetKind, type SheetPresentation } from './sheetPresentation';
@@ -366,6 +367,26 @@ export function usePadL(): number {
   const split = useContext(SplitCtx);
   const inPanel = useContext(DetailPanelCtx);
   return split?.role === 'detail' || inPanel ? layout.columnGap / 2 : layout.padX;
+}
+
+/**
+ * The screen's insets, in points: what the system takes at each edge (the status bar, the home indicator or the
+ * navigation bar, a phone's camera turned sideways) and the keyboard while it's up, as an app reads its window insets.
+ */
+export function useScreenInsets(): { top: number; bottom: number; left: number; right: number; keyboard: number } {
+  const { layout } = useSim();
+  const keyboard = useKeyboardInset();
+  return { top: layout.sbH, bottom: layout.botIn, left: layout.safeL, right: 0, keyboard };
+}
+
+/**
+ * The room a page keeps at its bottom: on a tab's root, or a page that keeps the app's bar (manifest `keepNav`), what
+ * the bar at the bottom takes (layout.padB); on a page pushed over the bar, only the home indicator's (padBPush).
+ */
+export function usePadB(): number {
+  const { layout } = useSim();
+  const nav = useNav();
+  return nav.index === 0 || nav.def(nav.ref.id)?.keepNav ? layout.padB : layout.padBPush;
 }
 
 /**

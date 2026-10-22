@@ -2,8 +2,8 @@
 // Scenarios panel and kept in the URL (`?persona=`, none: the first). The simulator only carries it; the app reads
 // it (usePersona, or the param) and shows that person's data.
 import { appConfig } from '@app/config';
-import type { Persona } from '../contract';
-import { useUrlParams } from './SimContext';
+import type { AppControl, Persona } from '../contract';
+import { useUrlParams, useUrlPatch } from './SimContext';
 
 export const PERSONA_PARAM = 'persona';
 
@@ -19,3 +19,24 @@ export function usePersona(): Persona | undefined {
 
 /** A persona's avatar URL, or null (no photo: the initial). */
 export const avatarUrl = (p: Persona) => (p.avatar ? `${import.meta.env.BASE_URL}${p.avatar}` : null);
+
+/** The app's controls (AppConfig.controls), for every page. */
+export const APP_CONTROLS: AppControl[] = appConfig.controls ?? [];
+
+/** A control's value for `persona`: its own, else the control's first option. */
+export const personaValue = (control: AppControl, persona: Persona | undefined): string =>
+  persona?.values?.[control.param] ?? control.options[0]?.value ?? '';
+
+/**
+ * One of the app's controls in the screen this renders in: the value set in Scenarios (the URL), else the persona's,
+ * else the first option; and setting it (null: back to the persona's).
+ */
+export function useAppControl(param: string): [string, (value: string | null) => void] {
+  const get = useUrlParams();
+  const patch = useUrlPatch();
+  const persona = findPersona(get(PERSONA_PARAM));
+  const control = APP_CONTROLS.find((c) => c.param === param);
+  const own = control ? personaValue(control, persona) : '';
+  const set = (value: string | null) => patch({ [param]: value == null || value === own ? null : value });
+  return [get(param) ?? own, set];
+}

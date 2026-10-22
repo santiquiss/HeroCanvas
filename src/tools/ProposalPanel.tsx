@@ -220,7 +220,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
             const def = nav.pages[id];
             const variant = def.variants?.()[0];
             return (
-              <div key={id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => nav.open(id, variant?.params)} title={t('Open')}>
+              <div key={id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => nav.open(id, variant?.params ?? {}, variant?.state)} title={t('Open')}>
                 <ChangeBadge change={nav.change(id)!} />
                 <span className={styles.name}>{def.name ?? (typeof def.title === 'string' ? def.title : id)}</span>
                 <span className={styles.muted}>{!BASE_PAGES[id] ? t('new page') : p.pages[id] ? (p.config[id] ? t('page + config') : t('page')) : t('config')}</span>

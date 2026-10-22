@@ -63,8 +63,11 @@ export interface PageDef {
    * one (`:id`) and has no variants still opens on a sample one. Without it the path has an empty segment.
    */
   defaults?: Params;
-  /** Concrete instances listed in the Pages panel (for pages with path params). */
-  variants?: () => { label: string; params: Params }[];
+  /**
+   * Concrete instances listed in the Pages panel: by path params (a listing's id), or by state (`state`: the page's
+   * state params it opens with, its error, its empty case), or both.
+   */
+  variants?: () => PageVariant[];
   /**
    * Nav bar / rail entry (tabs only). `icon`: a Material Symbol, or one of the app's own glyphs, as its tab bar
    * takes one. `search`: a search pill floats over it. `section`: the sidebar's section it's listed under (the rail
@@ -77,6 +80,16 @@ export interface PageDef {
   links?: PageLink[];
   /** Master–detail on wide screens (iPad Settings style). Overridable per link from the Page panel. */
   split?: SplitConfig;
+  /**
+   * How it comes in, over the default (a push slides from the side, a cover too): `fade`, in place (a search field
+   * opening its search); `up`, from the bottom (a full-screen sheet, a settings page shown modally).
+   */
+  transition?: 'fade' | 'up';
+  /**
+   * A pushed page that keeps the app's bar at the bottom (TabBar) over it, as one shown inside a tab's own stack:
+   * it slides in under the bar, and its content keeps room for it (usePadB).
+   */
+  keepNav?: boolean;
   /** iPhone Duo right column for this page. */
   sideColumn?: SideColumn;
   /**
@@ -108,6 +121,14 @@ export interface PageDef {
    * which the page reads as usual (added to its state for you). Who's using the app goes for every page (the app's personas).
    */
   controls?: PageControl[];
+}
+
+/** A page's variant: a name, the path params it opens with, and the state params it sets. */
+export interface PageVariant {
+  label: string;
+  params?: Params;
+  /** State params it opens with (and holds while it's the one shown): a variant by state, not by route. */
+  state?: Params;
 }
 
 export interface PageControl {

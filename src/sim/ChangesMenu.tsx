@@ -98,7 +98,7 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                       pg.kind === 'removed'
                         ? undefined
                         : () => {
-                            nav.open(pg.id, def?.variants?.()[0]?.params);
+                            nav.open(pg.id, def?.variants?.()[0]?.params ?? {}, def?.variants?.()[0]?.state);
                             setOpen(false);
                           }
                     }

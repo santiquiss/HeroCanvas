@@ -6,7 +6,7 @@ import { buildPath, parsePath } from './stack';
 const pages = composePages(null);
 const refs = Object.entries(pages).flatMap(([id, def]) => {
   const variants = def.variants?.() ?? [];
-  return variants.length ? variants.map((v) => ({ id, params: v.params })) : [{ id, params: { ...def.defaults } }];
+  return variants.length ? variants.map((v) => ({ id, params: v.params ?? { ...def.defaults } })) : [{ id, params: { ...def.defaults } }];
 });
 
 describe('page URLs', () => {

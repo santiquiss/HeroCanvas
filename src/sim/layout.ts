@@ -19,6 +19,10 @@ export interface LayoutInput {
   splitGap?: number;
   /** The design's rail shows the user (a proposal's sidebar, its account at the foot). */
   userInRail?: boolean;
+  /** The app has only a phone layout (ScreenLayout.compactOnly): wide screens draw it too. */
+  compactOnly?: boolean;
+  /** The height of the app's bar at the bottom (ScreenLayout.tabBarHeight); none: the tour's. */
+  tabBarHeight?: number;
 }
 
 /** The tablet rail's width in Live (NavigationRail: its column of 48 and the room around it). */
@@ -221,7 +225,7 @@ export const ISLAND_W = 124;
 /** The notch's width (iPhone 16e): 162×34 hanging from the top edge. */
 export const NOTCH_W = 162;
 
-export function computeLayout({ display: full, land: wantLand, supported, detailOpen, video = false, railWidth = RAIL_W, splitGap, userInRail = false }: LayoutInput): Layout {
+export function computeLayout({ display: full, land: wantLand, supported, detailOpen, video = false, railWidth = RAIL_W, splitGap, userInRail = false, compactOnly = false, tabBarHeight }: LayoutInput): Layout {
   const land = wantLand && supported;
   const rotLocked = wantLand && !supported;
   // Video layout: a 16:9 area across the top of the screen; the app lays out in the rest, as a display of its own
@@ -230,9 +234,10 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
   const dev: Display = videoH ? { ...full, h: full.h - videoH, cornerStatus: false } : full;
   const vw = land ? dev.h : dev.w;
   const vh = land ? dev.w : dev.h;
-  const isTablet = vw >= 600 && !dev.compact;
+  // An app with only a phone layout (compactOnly) draws it on a tablet too: the bar at the bottom, one column.
+  const isTablet = vw >= 600 && !dev.compact && !compactOnly;
   const isPhone = !isTablet;
-  const nav: NavPlacement = (land ? dev.nav?.landscape : dev.nav?.portrait) ?? (vw >= 600 ? 'rail' : 'bottom');
+  const nav: NavPlacement = compactOnly && vw >= 600 ? 'bottom' : ((land ? dev.nav?.landscape : dev.nav?.portrait) ?? (vw >= 600 ? 'rail' : 'bottom'));
   const bottomNav = nav === 'bottom';
   const sideNav = nav === 'column';
   // A phone turned sideways (camera on the left, no status bar), unless its controls go to the column.
@@ -275,7 +280,8 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
   // The search pill's bottom; beside a nav column it lines up with the column's buttons, not with the safe area.
   const tabPadB = sideNav ? 24 : Math.max(24, botIn);
   // Clears the bottom chrome of the tab pages (a home, a list): the search pill, plus the tab bar on phones.
-  const chromeTop = tabPadB + SEARCH_BAR_H + (bottomNav ? TAB_BAR_ROOM : 0);
+  // An app that gives its bar's height (tabBarHeight): the bar over the bottom inset; else the tour's search pill and bar.
+  const chromeTop = tabBarHeight != null ? botIn + (bottomNav ? tabBarHeight : 0) : tabPadB + SEARCH_BAR_H + (bottomNav ? TAB_BAR_ROOM : 0);
   const padB = chromeTop + 24;
   const padBPush = botIn + 24;
   // Two columns beside the rail: the left one a design's own distance from it (a proposal's splitGap), and the right

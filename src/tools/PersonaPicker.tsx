@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useSearchParams } from 'react-router';
 import type { Persona } from '../contract';
 import { Icon } from '../components/Icon';
-import { DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/persona';
+import { APP_CONTROLS, DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/persona';
 import { useUrlPatch } from '../sim/SimContext';
 import surface from '../theme/surface.module.css';
 import styles from './Panel.module.css';
@@ -20,7 +20,8 @@ export const ANONYMOUS: Persona = { id: 'anonymous', name: t('Anonymous user'), 
 export function usePersonaParam(): [Persona, (id: Persona['id']) => void] {
   const [search] = useSearchParams();
   const patch = useUrlPatch();
-  const pick = (id: string) => patch({ [PERSONA_PARAM]: id === DEFAULT_PERSONA ? null : id });
+  // Another persona brings their own values for the app's controls: what was changed for the last one goes.
+  const pick = (id: string) => patch({ [PERSONA_PARAM]: id === DEFAULT_PERSONA ? null : id, ...Object.fromEntries(APP_CONTROLS.map((c) => [c.param, null])) });
   return [findPersona(search.get(PERSONA_PARAM)) ?? ANONYMOUS, pick];
 }
 

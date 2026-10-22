@@ -34,10 +34,10 @@ function urlOf(pages: Manifest, ref: PageRef, extra = ''): string {
 }
 
 /** Every page of a manifest, in each of its variants. */
-function placesOf(pages: Manifest): { name: string; ref: PageRef }[] {
+function placesOf(pages: Manifest): { name: string; ref: PageRef; state?: Record<string, string> }[] {
   return Object.entries(pages).flatMap(([id, def]) => {
     const variants = def.variants?.() ?? [];
-    return variants.length ? variants.map((v) => ({ name: `${id} · ${v.label}`, ref: { id, params: v.params } })) : [{ name: id, ref: { id, params: {} } }];
+    return variants.length ? variants.map((v) => ({ name: `${id} · ${v.label}`, ref: { id, params: v.params ?? {} }, state: v.state })) : [{ name: id, ref: { id, params: {} } }];
   });
 }
 
@@ -46,7 +46,7 @@ const live = composePages(null);
 // None without an app connected (an empty `each` is no test, which vitest fails).
 if (placesOf(live).length)
   describe('Live pages render', () => {
-    it.each(placesOf(live).map((p) => [p.name, urlOf(live, p.ref)]))('%s', async (_, url) => {
+    it.each(placesOf(live).map((p) => [p.name, urlOf(live, p.ref, new URLSearchParams(p.state).toString())]))('%s', async (_, url) => {
       expect(await problemsAt(url)).toEqual([]);
     });
   });
@@ -58,7 +58,7 @@ for (const proposal of PROPOSALS) {
   if (!own.length) continue;
   describe(`Proposal ${proposal.id} renders`, () => {
     const changed = new Set([...Object.keys(proposal.components), ...Object.values(proposal.variants ?? {}).flatMap((v) => Object.keys(v.components ?? {}))]);
-    it.each(own.map((p) => [p.name, urlOf(pages, p.ref, `proposal=${proposal.id}`)]))('%s', async (_, url) => {
+    it.each(own.map((p) => [p.name, urlOf(pages, p.ref, new URLSearchParams({ ...p.state, proposal: proposal.id }).toString())]))('%s', async (_, url) => {
       expect(await problemsAt(url, changed)).toEqual([]);
     });
   });

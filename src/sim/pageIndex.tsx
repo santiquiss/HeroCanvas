@@ -29,6 +29,8 @@ import { SHEET_ATTR, SheetLinkScopeCtx, sheetLinkScope } from './sheetLinks';
 /** A page in one of its variants (its label: "Inbox"), where a component is. */
 export interface PagePlace extends PageRef {
   label?: string;
+  /** A variant by state: the state params it shows. */
+  state?: Record<string, string>;
   /** How many instances of the component it has there. */
   count?: number;
   /** Of those, how many are inside another component, by that component's name (the rest are on the page itself). */
@@ -176,7 +178,7 @@ function Scan({ design }: { design: string }) {
     () =>
       Object.entries(nav.pages).flatMap(([id, def]) => {
         const variants = def.variants?.() ?? [];
-        return variants.length ? variants.map((v) => ({ id, params: v.params, label: v.label })) : [{ id, params: {} }];
+        return variants.length ? variants.map((v) => ({ id, params: v.params ?? {}, label: v.label, state: v.state })) : [{ id, params: {} }];
       }),
     [nav.pages],
   );
@@ -260,7 +262,7 @@ function Scan({ design }: { design: string }) {
             <ErrorBoundary label={`Scan ${ref.id}`}>
               {/* With its overlays, for its sheets to open in; they register in the page's own scope. */}
               <SheetLinkScopeCtx.Provider value={scopes[i]}>
-                <PreviewScreen page={ref} query={query} makeLayout={makeLayout} overlays />
+                <PreviewScreen page={ref} query={query} state={ref.state} makeLayout={makeLayout} overlays />
               </SheetLinkScopeCtx.Provider>
             </ErrorBoundary>
           </div>

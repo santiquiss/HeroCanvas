@@ -6,6 +6,39 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.40.0 — 2026-10-22
+
+What an app does around its pages, declared instead of forked (from moving Andaremos Designer, a Compose app's
+mirror, onto HeroCanvas):
+
+- **Tabs switch at once**, as on iOS and Android, with no animation; `appConfig.layout.tabTransition: 'fade'` keeps
+  the old fade for an app that animates its tabs.
+- **The system back**: `useBackHandler(enabled, onBack)`, as Android's `BackHandler`: the screen takes the back
+  while it's enabled; with none, the device puts the keyboard away, then closes a dialog or a sheet, then goes back a
+  page. Sent with Alt+←, Esc while typing in a screen, or the back button in an Android device's header.
+- **Variants by state**: a page's variant can set state params (`variants: () => [{ label, state }]`): its error, its
+  empty case, a step. The Pages panel opens it, Flow and the page scan show it, the smoke test renders it.
+- **Transitions**: a page fades in place (`transition: 'fade'`) or rises from the bottom (`'up'`); a push can keep
+  the app's bar over it (`keepNav`), and `usePadB()` gives its content the room.
+- **The app's controls**: `appConfig.controls`, conditions for every page (signed in, verified, a feature flag),
+  each persona with its `values`; Scenarios › App changes them for a moment, marked, and a link keeps them; picking a
+  persona brings its values back. Screens read them with `useAppControl(param)`.
+- **The app's own layer**: `navigation.Screen` wraps each device's screen (the app's providers), `navigation.Overlays`
+  sits over its pages; `useScreenInsets()` gives the system's insets and the keyboard.
+- **Layout**: `compactOnly` (a phone-only app draws its phone layout on tablets and open foldables),
+  `tabBarHeight` (the app's bar), `keepTabs` (tabs keep their pages and state when another is picked; the one on
+  screen goes back to its root).
+- Public: `useUrlParams`, `useUrlPatch`, `useKeyboardInset`, `usePersona`, `useScreenInsets`, `usePadB`, and the
+  types `PageVariant`, `PageControl`, `Params`, `StateParams`, `AppControl`.
+- The device in hand (real mode) takes the app's layout and the proposal's, as the canvas does.
+
+**Contract**
+
+- A page variant's `params` is optional now (`{ label, params?, state? }`): code reading `variant.params` takes
+  `variant.params ?? {}`.
+- Tabs no longer fade in: an app whose design fades them sets `appConfig.layout.tabTransition: 'fade'`.
+- Everything else is new and optional: nothing to adapt.
+
 ## 0.39.0 — 2026-10-22
 
 - **HeroCanvas in Spanish**: its whole interface (the panels, the toolbar and menus, Capture, Flow, the gallery and

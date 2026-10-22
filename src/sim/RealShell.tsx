@@ -6,6 +6,7 @@ import { schemeIn } from './appThemes';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { DesignProvider } from '../design/DesignContext';
+import { designLayout, VARIANT_PARAM } from '../design/overridableRegistry';
 import { useNavRoot } from '../nav/context';
 import { landscapeFor, supportsLandscape, useScreenConfig } from '../nav/screenConfig';
 import { detailOpenFor } from '../nav/stack';
@@ -56,6 +57,8 @@ export function RealShell() {
   const platform = useMemo(() => platformOf(navigator.userAgent, navigator.maxTouchPoints), []);
   const theme = schemeIn((k) => search.get(k));
   const video = search.get('video') === '1';
+  const proposal = search.get('proposal');
+  const variant = search.get(VARIANT_PARAM);
   const detailOpen = detailOpenFor(pages, stack);
   const top = stack[stack.length - 1];
 
@@ -69,8 +72,9 @@ export function RealShell() {
   const layout = useMemo(() => {
     // A page with no landscape stays in portrait on a turned device: its safe area turns with the device.
     const shown = land && !supported && display.safe ? { ...display, safe: turnedSafe(display.safe, angle) } : display;
-    return computeLayout({ display: shown, land, supported, detailOpen, video });
-  }, [display, land, supported, detailOpen, video, angle]);
+    // The app's layout (its rail, its bar, phone only), and the proposal's over it, as on the canvas.
+    return computeLayout({ display: shown, land, supported, detailOpen, video, ...designLayout(proposal, variant) });
+  }, [display, land, supported, detailOpen, video, angle, proposal, variant]);
 
   const [frame, setFrame] = useState<HTMLDivElement | null>(null);
   // The browser's own surface (the status bar's background when installed, the page behind the app) takes the

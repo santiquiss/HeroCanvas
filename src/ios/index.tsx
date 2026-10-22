@@ -11,7 +11,7 @@ import { hasSymbol, Icon } from '../components/Icon';
 import { DropDownMenu, type MenuEntry } from '../kit';
 import { useComponent } from '../design/component';
 import { useNav, useSplit } from '../nav/context';
-import { usePadL, usePadR, useSim } from '../sim/SimContext';
+import { usePadB, usePadL, usePadR, useSim } from '../sim/SimContext';
 import type { DropDownAlign } from '../sim/DropDownLayer';
 import styles from './ios.module.css';
 
@@ -49,6 +49,7 @@ export function NavigationStack({ title, titleDisplayMode = 'automatic', listSty
   const split = useSplit();
   const padL = usePadL();
   const padR = usePadR();
+  const padB = usePadB();
   const besideSidebar = split?.role === 'detail' && nav.index === split.masterIndex + 1;
   const back = nav.index > 0 && !besideSidebar;
   const large = titleDisplayMode !== 'inline';
@@ -60,7 +61,7 @@ export function NavigationStack({ title, titleDisplayMode = 'automatic', listSty
   };
   return (
     <div {...hc} className={`${styles.screen} ${listStyle === 'plain' ? styles.plain : ''}`}>
-      <div className={styles.scroll} style={{ paddingLeft: padL, paddingRight: padR, paddingBottom: nav.index === 0 ? layout.padB : layout.padBPush }} onScroll={onScroll}>
+      <div className={styles.scroll} style={{ paddingLeft: padL, paddingRight: padR, paddingBottom: padB }} onScroll={onScroll}>
         <div className={`${styles.bar} ${edge.under ? styles.barUnder : ''}`} style={{ margin: `0 ${-padR}px 0 ${-padL}px`, padding: `${layout.headerY - 22}px ${padR}px 6px ${padL}px` }}>
           <span className={styles.barGlass} aria-hidden />
           <span className={styles.barSide}>

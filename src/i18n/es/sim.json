@@ -159,5 +159,7 @@
   "and": "y",
   "Open source under the {license}: free to use, change and share, commercial uses included. Any copy or project built from it keeps its NOTICE, which names its creators.": "Código abierto bajo la {license}: libre para usar, modificar y compartir, incluidos los usos comerciales. Toda copia o proyecto hecho a partir de él conserva su NOTICE, que nombra a sus creadores.",
   "Theme: {theme}": "Tema: {theme}",
-  "Back to the start": "Volver al inicio"
+  "Back to the start": "Volver al inicio",
+  "System back (Alt+←)": "Atrás del sistema (Alt+←)",
+  "System back": "Atrás del sistema"
 }

@@ -136,6 +136,22 @@ slides over it; on a wide screen the sidebar stays and the section shows beside 
 reads `useSplit()` to highlight the section that's open. Such an app has no rail: `appConfig.layout = { railWidth: 0 }`,
 so nothing is kept for one at the left of a tablet.
 
+### What the app's own simulator layer needs
+
+What an app does around its pages has a place, each declared, never a fork of the tool:
+
+- **Back**: a screen that takes the system back (a step in a flow, an open panel) uses `useBackHandler(enabled, onBack)`
+  (Android's `BackHandler`); with none, the device goes back a page.
+- **Its own host and contexts**: `navigation.Screen` wraps each device's screen (the app's providers), and
+  `navigation.Overlays` sits over its pages (its own sheets' host, a gate that asks to sign in); `useScreenInsets()`
+  gives the system's insets and the keyboard.
+- **Who the user is**: `appConfig.controls` (signed in, verified, a feature flag), each persona with its `values`;
+  screens read them with `useAppControl(param)`.
+- **Its bar and layout**: `appConfig.layout.tabBarHeight` (its bar's height), `keepTabs` (tabs keep their state),
+  `compactOnly` (a phone-only app on tablets too), `tabTransition: 'fade'` (only if it fades its tabs).
+- **Pages**: `transition: 'fade' | 'up'`, `keepNav` (a push under the bar), variants by state (`variants: () =>
+  [{ label, state }]`).
+
 ## 5. Pages (`app/pages.tsx`)
 
 One page per screen of the app, at its route, from its router (not from guessing): `level` (`tab`, `push`, `cover`,

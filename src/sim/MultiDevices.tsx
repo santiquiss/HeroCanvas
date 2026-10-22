@@ -6,6 +6,7 @@
 // nothing selected the one under the pointer) is the inspectable one.
 // Each can show its own version instead of the toolbar's (Live, another proposal, a proposal's version): side by side,
 // that compares them; the components those versions replace change, navigation stays shared.
+import { systemBack } from './back';
 import { designLayout } from '../design/overridableRegistry';
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { Icon } from '../components/Icon';
@@ -185,8 +186,8 @@ export function AddDeviceButton({ onPick, side }: { onPick: (id: string) => void
 
 
 /** What a header can show after its device's name, in order; the first of `DROP` go into its ⋯ menu first. */
-type HeadPart = 'displays' | 'video' | 'rotate' | 'design' | 'language';
-const DROP: HeadPart[] = ['language', 'design', 'video', 'rotate', 'displays'];
+type HeadPart = 'back' | 'displays' | 'video' | 'rotate' | 'design' | 'language';
+const DROP: HeadPart[] = ['language', 'design', 'video', 'back', 'rotate', 'displays'];
 /** The name keeps at least this much (or all of it, if shorter) before a control moves into the menu. */
 const NAME_MIN = 84;
 
@@ -229,7 +230,10 @@ export function DeviceHeader({
 }) {
   const dev = findDevice(id);
   const hasVideo = !!(findDisplay(dev, displayKey).videoSplit && !land && onVideo);
+  // Android's system back (sim/back): its devices have one; iOS goes back from the screen itself.
+  const hasBack = findDisplay(dev, displayKey).os === 'android';
   const parts: HeadPart[] = [
+    ...(hasBack ? (['back'] as const) : []),
     ...(dev.displays.length > 1 ? (['displays'] as const) : []),
     ...(hasVideo ? (['video'] as const) : []),
     'rotate' as const,
@@ -285,6 +289,12 @@ export function DeviceHeader({
 
   const chip = (p: HeadPart) => {
     switch (p) {
+      case 'back':
+        return (
+          <button key={p} className={styles.devChip} title={t('System back (Alt+←)')} aria-label={t('System back')} onClick={() => systemBack()}>
+            <Icon name="arrow_back" size={16} />
+          </button>
+        );
       case 'displays':
         return dev.displays.map((x) => (
           <button key={x.key} className={`${styles.devChip} ${x.key === displayKey ? styles.devChipOn : ''}`} onClick={() => onDisplay(x.key)}>
@@ -312,6 +322,13 @@ export function DeviceHeader({
   const row = (p: HeadPart) => {
     const check = (on: boolean) => <Icon name="check" size={16} className={on ? styles.devMenuCheck : styles.devMenuNoCheck} />;
     switch (p) {
+      case 'back':
+        return (
+          <button key={p} className={styles.devMenuRow} onClick={closing(() => systemBack())}>
+            <Icon name="arrow_back" size={16} className={styles.devMenuCheck} />
+            <span className={styles.devMenuLabel}>{t('System back')}</span>
+          </button>
+        );
       case 'displays':
         return dev.displays.map((x) => (
           <button key={x.key} className={styles.devMenuRow} onClick={closing(() => onDisplay(x.key))}>
