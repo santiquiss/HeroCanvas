@@ -7,6 +7,8 @@
 <a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.41.2-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 <img alt="Status: beta" src="https://img.shields.io/badge/status-beta-e0362f">
+<a href="https://github.com/santiquiss/HeroCanvas/actions/workflows/checks.yml"><img alt="Checks" src="https://github.com/santiquiss/HeroCanvas/actions/workflows/checks.yml/badge.svg"></a>
+<a href="https://github.com/santiquiss/HeroCanvas/discussions"><img alt="Discussions" src="https://img.shields.io/badge/discussions-ask%20here-3b6fd8"></a>
 <a href="https://herocanvas.io"><img alt="Website" src="https://img.shields.io/badge/website-herocanvas.io-0f1730"></a>
 
 **Design your app’s screens with an AI agent, on a canvas of real devices.**
