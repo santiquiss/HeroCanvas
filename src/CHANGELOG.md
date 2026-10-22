@@ -6,6 +6,15 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.40.2 — 2026-10-22
+
+- A button drawn inline in a sentence (a link that acts: "Read the [terms]") is one of its text's runs, not loose
+  text beside it.
+
+**Contract**
+
+- None.
+
 ## 0.40.1 — 2026-10-22
 
 From moving Andaremos Designer onto HeroCanvas:

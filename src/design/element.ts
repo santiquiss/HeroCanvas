@@ -31,7 +31,9 @@ export function hasOwnText(el: Element): boolean {
 const painted = (c: string) => !!c && c !== 'transparent' && c !== 'rgba(0, 0, 0, 0)';
 
 // A link in a text is one of its runs (a TextSpan with a tap).
-const PHRASING = new Set(['SPAN', 'B', 'STRONG', 'EM', 'I', 'SMALL', 'SUB', 'SUP', 'MARK', 'A']);
+// A button drawn inline in a sentence is one of its runs: a link that acts (Compose's LinkAnnotation, a `<button>` in
+// the web's text).
+const PHRASING = new Set(['SPAN', 'B', 'STRONG', 'EM', 'I', 'SMALL', 'SUB', 'SUP', 'MARK', 'A', 'BUTTON']);
 const isIconFont = (cs: CSSStyleDeclaration) => cs.fontFamily.includes('Material Symbols');
 
 /**
