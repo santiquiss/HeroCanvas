@@ -9,6 +9,7 @@ import { Icon } from '../components/Icon';
 import { ACCESSIBILITY_PARAMS, accessibilityIn, DEFAULT_TEXT_SIZE, TEXT_SIZES, textSizeFor, textSystemOf } from '../sim/systemText';
 import { findDevice, findDisplay } from '../devices/devices';
 import { useNavRoot } from '../nav/context';
+import { pageInFront } from '../nav/sidePanel';
 import type { PageControl } from '../nav/types';
 import { useUrlPatch } from '../sim/SimContext';
 import { BASE_LANGUAGE, LANG_PARAM, LANGUAGES, languageIn } from '../sim/language';
@@ -32,8 +33,11 @@ interface Option {
 export function ScenariosPanel() {
   const nav = useNavRoot();
   const [persona, pick] = usePersonaParam();
-  // Top page first: the one on screen, then the ones under it (a cover's page still shapes it).
-  const pages = [...nav.stack].reverse().filter((r, i, all) => nav.def(r.id).controls?.length && all.findIndex((x) => x.id === r.id) === i);
+  const [search] = useSearchParams();
+  // Top page first: the one on screen (the side panel, when it's on), then the ones under it (a cover's page still
+  // shapes it).
+  const front = pageInFront(nav.stack, search);
+  const pages = [front, ...[...nav.stack].reverse()].filter((r, i, all) => nav.def(r.id).controls?.length && all.findIndex((x) => x.id === r.id) === i);
   // The sentence around the manifest's key, which stays code.
   const noControls = t('No page controls yet. Add {code} to its manifest entry: each sets one of its state params.').split('{code}');
 
@@ -75,7 +79,7 @@ export function ScenariosPanel() {
 
       {!pages.length && (
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>{nav.title(nav.stack[nav.stack.length - 1])}</div>
+          <div className={styles.sectionTitle}>{nav.title(front)}</div>
           <span className={styles.muted} style={{ lineHeight: '16px' }}>
             {noControls[0]}
             <code>controls</code>

@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.48.3 — 2026-10-23
+
+- **Scenarios shows the side panel's controls**: with the panel open, its page's controls come first, as the page in
+  front (0.48.2 did it for Pages and the Page inspector). They were missing: Scenarios read only the stack.
+
 ## 0.48.2 — 2026-10-23
 
 - **The side panel is the page in front**: with it open (`appConfig.sidePanel`, a state over the tabs), Pages
