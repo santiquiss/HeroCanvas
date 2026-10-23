@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.50.1 — 2026-10-23
+
+- **The landscape rules' tests run on any app's devices**: a foldable an app leaves out of its catalog skips its cases
+  (they failed on an app without the Galaxy Z Fold).
+
 ## 0.50.0 — 2026-10-23
 
 - **Proposals have three statuses**: Draft, In review, Dev handoff (`handed-off`, with its `ticket`). Approved was the
