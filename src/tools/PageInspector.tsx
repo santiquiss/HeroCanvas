@@ -6,6 +6,7 @@ import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
 import { flowTransitions, isVariant, stepOf, stepState } from '../nav/flow';
 import { HOLD_PARAM, ROLE_NAMES, stateKeys } from '../nav/stack';
+import { pageInFront, SIDE_PANEL_PAGE, sidePanelOnIn } from '../nav/sidePanel';
 import { isFullScreen } from '../nav/types';
 import { DEVICES, displayId, findDevice, findDisplay, type Device, type Display } from '../devices/devices';
 import { landscapeFor, sideColumnFor, splitFor, supportsLandscape, useScreenConfigLayers } from '../nav/screenConfig';
@@ -22,7 +23,9 @@ export function PageInspector() {
   const [search] = useSearchParams();
   const { effective: cfg } = useScreenConfigLayers();
   const [copied, setCopied] = useState(false);
-  const top = nav.stack[nav.stack.length - 1];
+  // The side panel, when it's on, is the page in front: the one inspected.
+  const panel = SIDE_PANEL_PAGE && sidePanelOnIn(search) ? SIDE_PANEL_PAGE : null;
+  const top = pageInFront(nav.stack, search);
   const def = nav.def(top.id);
   const params = Object.entries(top.params);
   const state = stateKeys(def).map((k) => [k, search.get(k)] as const);
@@ -87,12 +90,12 @@ export function PageInspector() {
         <div className={styles.sectionTitle}>
           {t('Open pages')}
           <span className={styles.muted} style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 400 }}>
-            {nav.stack.length === 1 ? t('this one') : t('{count}, bottom to top', { count: nav.stack.length })}
+            {nav.stack.length + (panel ? 1 : 0) === 1 ? t('this one') : t('{count}, bottom to top', { count: nav.stack.length + (panel ? 1 : 0) })}
           </span>
         </div>
         <div className={styles.crumbs}>
           {nav.stack.map((r, i) => {
-            const isTop = i === nav.stack.length - 1;
+            const isTop = !panel && i === nav.stack.length - 1;
             return (
               <button
                 key={i}
@@ -107,6 +110,14 @@ export function PageInspector() {
               </button>
             );
           })}
+          {/* The side panel, over the stack (or beside it). */}
+          {panel && (
+            <button className={styles.crumb} style={{ paddingLeft: 6 + nav.stack.length * 12, fontWeight: 600 }} title={t('This page')}>
+              <Icon name="right_panel_open" size={14} />
+              <span className={styles.name}>{nav.title({ id: panel, params: {} })}</span>
+              <span className={styles.badge}>{ROLE_NAMES[nav.def(panel).level]}</span>
+            </button>
+          )}
         </div>
       </div>
 

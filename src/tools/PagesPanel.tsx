@@ -14,6 +14,7 @@ import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
 import { HOME, LAUNCH } from '../nav/pages';
+import { pageInFront } from '../nav/sidePanel';
 import { pageGroups } from '../nav/pageGroups';
 import { replayLaunch } from '../sim/launch';
 import { t } from '../i18n/ui';
@@ -153,8 +154,9 @@ interface RowProps {
 
 function Row({ depth, def, label, refOf, state, caret, onCaret, onClick, variant, count }: RowProps) {
   const nav = useNavRoot();
-  const top = nav.stack[nav.stack.length - 1];
   const [search] = useSearchParams();
+  // The side panel, when it's on, is the page in front (the tab under it stays marked as in the stack).
+  const top = pageInFront(nav.stack, search);
   // A flow's current row is its step's, below it; a variant by state is the one shown only while the URL holds its state.
   const holds = isVariantState(def, (k) => search.get(k), { state });
   const isCurrent = !!refOf && sameRef(refOf, top) && !def.flow && holds;

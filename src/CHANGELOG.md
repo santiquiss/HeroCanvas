@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.48.2 — 2026-10-23
+
+- **The side panel is the page in front**: with it open (`appConfig.sidePanel`, a state over the tabs), Pages
+  highlights its page and the Page inspector shows it (its status, note, params), listed in Open pages over the stack.
+  They showed the tab under it, as if the panel weren't a page of its own.
+
 ## 0.48.1 — 2026-10-23
 
 - **Beside the iPhone Duo's column, a control's shadow shows whole** (#1): where a page has no side padding, against the
