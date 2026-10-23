@@ -486,7 +486,9 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
             opacity: launch.phase === 'screen' ? 0 : undefined,
           }}
         >
-          <RightEdgeCtx.Provider value>
+          {/* With the side panel open the app's area ends beside it: none of its layers (the pushes and covers too, not
+              only the base) reaches the right edge, so none takes the iPhone Duo's column from the panel's page. */}
+          <RightEdgeCtx.Provider value={!regions.panel}>
             {/* Under a boot page there's no base: it's empty (and not a page for the layers or the scanner). */}
             <div
               data-hc-page={boot ? undefined : panelInBase ? nav.title(panelEntry.ref) : nav.title(stack[0])}
