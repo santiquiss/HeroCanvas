@@ -40,7 +40,7 @@ and token names), keyboard keys, and units as they are.
 | Text size / Bold Text | Tamaño de texto / Texto en negrita |
 | Language | Idioma |
 | Launch / Launch screen | Inicio / Pantalla de inicio |
-| Tab / Push / Cover / Boot (page roles) | Pestaña / Apilada / Modal / Arranque |
+| Tab / Push / Cover / Boot (page roles) | Tab / Push / Cover / Boot: the platforms' terms, kept in English (badges and tooltips) |
 | Sheet / Dialog / Popover / Menu | Hoja / Diálogo / Ventana emergente / Menú |
 | Reset | Restablecer |
 | Copy | Copiar |

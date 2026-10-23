@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.47.4 — 2026-10-23
+
+- **Page roles stay in English in every language**: the badges in Flow, Pages and the Page inspector say `tab`,
+  `push`, `cover` and `boot` (the platforms' terms, as developers say them), and their tooltips start with the same
+  word. In Spanish they read "apilada", "modal", "arranque".
+
 ## 0.47.3 — 2026-10-22
 
 - **The About page shows HeroCanvas's own icon in every copy** (`public/tour/icon.png`), not the copy's app icon

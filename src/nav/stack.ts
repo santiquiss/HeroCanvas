@@ -187,8 +187,9 @@ export const ROLE_ICONS: Record<Level, { icon: string; label: string }> = {
   boot: { icon: 'smartphone', label: t('Before the app: welcome, sign-in, onboarding') },
 };
 
-/** A page's role as its badge names it (Flow, Pages), in the interface's language: lowercase, as the badge styles it. */
-export const ROLE_NAMES: Record<Level, string> = { tab: t('tab'), push: t('push'), cover: t('cover'), boot: t('boot') };
+/** A page's role as its badge names it (Flow, Pages): the platforms' own terms, in English in every language (as
+ *  a developer says them), lowercase as the badge styles it. */
+export const ROLE_NAMES: Record<Level, string> = { tab: 'tab', push: 'push', cover: 'cover', boot: 'boot' };
 
 export function pageIcon(def: PageDef | undefined): string {
   return ROLE_ICONS[def?.level ?? 'push'].icon;
