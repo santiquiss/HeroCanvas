@@ -38,6 +38,14 @@ describe('the navigation over the pages (navOverPages)', () => {
     expect(R.base.left + R.base.width).toBe(L.vw);
     expect(R.covers).toEqual({ left: 0, width: L.vw });
   });
+  it('puts the split’s right panels under the Duo’s column too (the side panel, list–detail’s)', () => {
+    const L = computeLayout({ display: findDisplay(findAnyDevice('ipduo'), 'inner'), land: true, supported: true, detailOpen: true, navOverPages: true });
+    expect(L.split && L.sideW > 0).toBe(true);
+    const side = screenRegions(L, true).panel!;
+    expect(side.left + side.width).toBe(L.vw);
+    const R = screenRegions(L);
+    expect(R.pushes.left + R.pushes.width).toBe(L.vw);
+  });
   it('leaves them beside it without', () => {
     const L = computeLayout({ display: findDisplay(findAnyDevice('ipadmini'), null), land: false, supported: true, detailOpen: false });
     expect(screenRegions(L).base.left).toBe(L.railW);

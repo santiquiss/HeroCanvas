@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.49.2 — 2026-10-23
+
+- **Under a floating nav, the split's right panels reach under the Duo's column too**: the side panel and
+  list–detail's panel, with the iPhone Duo's inner display turned. They stopped at the column, which then showed the
+  screen behind it (and changed color later than the pages between light and dark).
+
 ## 0.49.1 — 2026-10-23
 
 - **Under a floating nav, the base page's padding clears it too** (`layout.basePadL`, `basePadR`): with

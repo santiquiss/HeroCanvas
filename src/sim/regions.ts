@@ -34,12 +34,14 @@ export function screenRegions(L: Layout, panelOn = false): Regions {
   const base = { left: L.railW - underL, width: L.baseW + underL + (L.dashOpen ? 0 : underR) };
   if (L.split && panelOn) {
     const app = { left: 0, width: L.railW + L.baseW };
-    return { app, base, pushes: { ...base, inPanel: false }, covers: app, panel: { left: L.detailLeft, width: L.detailW } };
+    // The base beside the panel stops at it; the panel, at the right edge, reaches under the column.
+    const beside = { left: base.left, width: L.railW + L.baseW - base.left };
+    return { app, base: beside, pushes: { ...beside, inPanel: false }, covers: app, panel: { left: L.detailLeft, width: L.detailW + underR } };
   }
   return {
     app: { left: 0, width: L.vw },
     base,
-    pushes: L.split ? { left: L.detailLeft, width: L.detailW, inPanel: true } : { left: L.railW - underL, width: L.mainW + underL + underR, inPanel: false },
+    pushes: L.split ? { left: L.detailLeft, width: L.detailW + underR, inPanel: true } : { left: L.railW - underL, width: L.mainW + underL + underR, inPanel: false },
     covers: { left: 0, width: L.vw - L.sideW + underR },
     panel: null,
   };
