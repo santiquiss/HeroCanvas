@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iPhone Duo 3D</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0d0f14; color: #e8eaf0; font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+      canvas { display: block; position: fixed; inset: 0; }
+      .live { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+      .bar { z-index: 2; position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 12px; align-items: center;
+        background: rgba(30, 33, 42, 0.85); padding: 10px 16px; border-radius: 14px; backdrop-filter: blur(12px); }
+      button { font: inherit; background: #3b6fd8; color: white; border: 0; border-radius: 8px; padding: 6px 14px; cursor: pointer; }
+      input { width: 220px; }
+      .credit { z-index: 2; position: fixed; right: 12px; top: 10px; opacity: 0.5; font-size: 12px; }
+      .credit a { color: inherit; }
+    </style>
+  </head>
+  <body>
+    <div class="bar">
+      <button id="toggle">Close</button>
+      <input id="angle" type="range" min="0" max="180" value="180" />
+      <span id="deg">180°</span>
+    </div>
+    <div class="credit">Model: <a href="https://sketchfab.com/3d-models/iphone-duo-3d-model-by-pikkme-studio-d2ca6bff92c141d1b1c5759b19d533e0">iPhone Duo</a> by PikkmeStudios, CC BY 4.0</div>
+    <script type="module" src="./duo3d.ts"></script>
+  </body>
+</html>
