@@ -297,6 +297,10 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
   // against the iPhone Duo right column it has none.
   const basePadR = dashOpen ? columnGap / 2 : sideNav ? 0 : padX;
   const contentW = baseW - basePadL - basePadR;
+  // Under the nav (navOverPages) the base page reaches under the rail and the Duo's column (sim/regions): its padding
+  // takes their width too, so its content stays where it was (contentW, above, is the same).
+  const baseUnderL = navOverPages ? railW : 0;
+  const baseUnderR = navOverPages && !dashOpen ? sideW : 0;
   const cols = contentW >= 720 ? 4 : contentW >= 529 ? 3 : 2;
   // Above the nav: the column's buttons (48) on the iPhone Duo, the bottom chrome on phones.
   const toastBottom = sideNav ? columnNavBottom + 48 + 16 : bottomNav ? chromeTop + 16 : botIn + 24;
@@ -345,9 +349,9 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
     padBPush,
     padX,
     columnGap,
-    basePadL,
+    basePadL: basePadL + baseUnderL,
     edgePadR,
-    basePadR,
+    basePadR: basePadR + baseUnderR,
     contentW,
     cols,
     showRail,

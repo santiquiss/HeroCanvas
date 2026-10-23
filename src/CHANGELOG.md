@@ -6,6 +6,17 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.49.1 — 2026-10-23
+
+- **Under a floating nav, the base page's padding clears it too** (`layout.basePadL`, `basePadR`): with
+  `navOverPages`, they add the rail's and the Duo column's width, as `usePadL` and `usePadR` do, so a screen padded by
+  the layout keeps its content where it was.
+
+**Contract**
+
+- With `navOverPages`, `Layout.basePadL` and `basePadR` include the nav's width (the base page's box starts under the
+  rail). A screen that adds `L.railW` to them itself drops it.
+
 ## 0.49.0 — 2026-10-23
 
 - **The navigation can float over the pages** (`appConfig.layout.navOverPages`): a tablet's rail and the iPhone Duo's
