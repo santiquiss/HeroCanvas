@@ -23,6 +23,8 @@ export interface LayoutInput {
   compactOnly?: boolean;
   /** The height of the app's bar at the bottom (ScreenLayout.tabBarHeight); none: the tour's. */
   tabBarHeight?: number;
+  /** The navigation floats over the pages (ScreenLayout.navOverPages). */
+  navOverPages?: boolean;
 }
 
 /** The tablet rail's width in Live (NavigationRail: its column of 48 and the room around it). */
@@ -73,6 +75,8 @@ export interface Layout {
   safeL: number;
   /** Left nav rail width (tablets). */
   railW: number;
+  /** The rail and the Duo's column float over the pages, which reach under them (ScreenLayout.navOverPages). */
+  navOverPages: boolean;
   /** The rail shows the user (a sidebar's account): a screen's own way to them (a home page's avatar) leaves. */
   userInRail: boolean;
   mainW: number;
@@ -225,7 +229,7 @@ export const ISLAND_W = 124;
 /** The notch's width (iPhone 16e): 162×34 hanging from the top edge. */
 export const NOTCH_W = 162;
 
-export function computeLayout({ display: full, land: wantLand, supported, detailOpen, video = false, railWidth = RAIL_W, splitGap, userInRail = false, compactOnly = false, tabBarHeight }: LayoutInput): Layout {
+export function computeLayout({ display: full, land: wantLand, supported, detailOpen, video = false, railWidth = RAIL_W, splitGap, userInRail = false, compactOnly = false, tabBarHeight, navOverPages = false }: LayoutInput): Layout {
   const land = wantLand && supported;
   const rotLocked = wantLand && !supported;
   // Video layout: a 16:9 area across the top of the screen; the app lays out in the rest, as a display of its own
@@ -326,6 +330,7 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
     botIn,
     safeL,
     railW,
+    navOverPages,
     userInRail: showRail && userInRail,
     mainW,
     split,

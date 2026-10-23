@@ -6,6 +6,19 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.49.0 — 2026-10-23
+
+- **The navigation can float over the pages** (`appConfig.layout.navOverPages`): a tablet's rail and the iPhone Duo's
+  column with no background of their own, the pages reaching under them and their content clear of them (`usePadL`
+  and `usePadR` add the rail's and the column's width). What spills past them (a card's shadow, a row scrolled
+  sideways, the input's shadow) shows behind the nav instead of being cut at its edge. Covers stay over the rail and
+  go under the column. Without it, as before.
+
+**Contract**
+
+- New (optional): `ScreenLayout.navOverPages`, and `Layout.navOverPages`. Nothing to adapt; a screen that places
+  things by `L.railW` or `L.sideW` itself (rather than `usePadL`, `usePadR`) checks it.
+
 ## 0.48.3 — 2026-10-23
 
 - **Scenarios shows the side panel's controls**: with the panel open, its page's controls come first, as the page in

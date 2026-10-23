@@ -57,6 +57,12 @@ export const SplitCtx = createContext<SplitScope | null>(null);
 /** Whether the current layer reaches the screen's right edge (where the reserved corner is). */
 export const RightEdgeCtx = createContext(true);
 
+/**
+ * A page that reaches under the rail (layout.navOverPages: the base and pushed pages, not a cover over the rail): its
+ * content keeps clear of it (usePadL).
+ */
+export const UnderRailCtx = createContext(false);
+
 /** Pages in the tablet split's right panel (beside the base page): their left padding is half the column gap. */
 export const DetailPanelCtx = createContext(false);
 /** Whether this page is in the tablet split's panel, beside another (not a screen of its own). */

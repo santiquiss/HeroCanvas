@@ -20,7 +20,7 @@ import { SNACKBAR_MS, sheetMaxWidth, type DialogProps, type PopoverProps, type S
 import { KIT } from '../kit/appKit';
 import { Toast } from '../components/Toast';
 import { useDesignRoot } from '../design/DesignContext';
-import { DetailPanelCtx, NavCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot, type Nav } from '../nav/context';
+import { DetailPanelCtx, NavCtx, PageScope, RightEdgeCtx, SplitCtx, useNavRoot, type Nav, UnderRailCtx } from '../nav/context';
 import { useAppTheme } from './appThemes';
 import { BackDispatcherCtx, createBackDispatcher, registerBackTarget } from './back';
 import { sideColumnFor, splitFor, useScreenConfig, type ScreenConfig } from '../nav/screenConfig';
@@ -335,6 +335,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   }, [glide]);
   const glideStyle = (glide === null ? {} : { '--glide-from': `${glide}px`, animation: `hcGlide ${PAGE_MS}ms ${EASE}` }) as CSSProperties;
   const appW = R.app.width;
+  // The base and pushed pages reach under the rail (navOverPages): their content keeps clear of it.
+  const underRail = L.navOverPages && L.railW > 0;
   /** Off the app area's right edge, the room it draws past it and its shadow, from a layer's left. */
   const offRight = (left: number) => `translateX(${appW - left + SHADOW_ROOM + 8}px)`;
   const baseEntry = useMemo(() => ({ ref: stack[0], index: 0 }), [stack]);
@@ -486,7 +488,10 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                     animation: appConfig.layout?.tabTransition === 'fade' ? `hcTabIn ${TAB_IN_MS}ms ${EASE}` : undefined,
                   }}
                 >
-                  {boot ? null : panelInBase ? <PageView entry={panelEntry} /> : baseSplit?.split ? <EntryView entry={baseSplit} /> : <PageView entry={baseEntry} />}
+                  {/* Under the rail (navOverPages), its content clear of it (usePadL). */}
+                  <UnderRailCtx.Provider value={underRail}>
+                    {boot ? null : panelInBase ? <PageView entry={panelEntry} /> : baseSplit?.split ? <EntryView entry={baseSplit} /> : <PageView entry={baseEntry} />}
+                  </UnderRailCtx.Provider>
                 </div>
               </RightEdgeCtx.Provider>
             </div>
@@ -568,7 +573,9 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                     ...glideStyle,
                   }}
                 >
-                  <EntryView entry={p.item} />
+                  <UnderRailCtx.Provider value={underRail}>
+                    <EntryView entry={p.item} />
+                  </UnderRailCtx.Provider>
                 </Layer>
                 );
               })

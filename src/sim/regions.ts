@@ -8,6 +8,9 @@
 //   covers   full pages over everything in the app's area (the iPhone Duo right column stays out of them).
 //   panel    the app's side panel (appConfig.sidePanel) where the screen splits, fixed on the right; the app keeps
 //            the left part, rail included.
+//
+// With the navigation over the pages (layout.navOverPages), base and pushes reach under the rail, and they and the
+// covers under the iPhone Duo's column; their content stays clear of them (usePadL, usePadR).
 import type { Layout } from './layout';
 
 export interface Box {
@@ -25,7 +28,10 @@ export interface Regions {
 }
 
 export function screenRegions(L: Layout, panelOn = false): Regions {
-  const base = { left: L.railW, width: L.baseW };
+  // Under the nav: the rail's width at the left (base, pushes), the column's at the right (all but the split's).
+  const underL = L.navOverPages ? L.railW : 0;
+  const underR = L.navOverPages ? L.sideW : 0;
+  const base = { left: L.railW - underL, width: L.baseW + underL + (L.dashOpen ? 0 : underR) };
   if (L.split && panelOn) {
     const app = { left: 0, width: L.railW + L.baseW };
     return { app, base, pushes: { ...base, inPanel: false }, covers: app, panel: { left: L.detailLeft, width: L.detailW } };
@@ -33,8 +39,8 @@ export function screenRegions(L: Layout, panelOn = false): Regions {
   return {
     app: { left: 0, width: L.vw },
     base,
-    pushes: L.split ? { left: L.detailLeft, width: L.detailW, inPanel: true } : { left: L.railW, width: L.mainW, inPanel: false },
-    covers: { left: 0, width: L.vw - L.sideW },
+    pushes: L.split ? { left: L.detailLeft, width: L.detailW, inPanel: true } : { left: L.railW - underL, width: L.mainW + underL + underR, inPanel: false },
+    covers: { left: 0, width: L.vw - L.sideW + underR },
     panel: null,
   };
 }

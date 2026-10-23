@@ -187,6 +187,12 @@ export interface ScreenLayout {
   /** The room between the rail and the left column when a page shows two (list and detail; 16 by default), and
    * between the right one and the screen's edge. */
   splitGap?: number;
+  /**
+   * The navigation floats over the pages (a tablet's rail, the iPhone Duo's column): no background of its own, the
+   * pages reaching under it, their content clear of it (usePadL, usePadR), so what spills past it (a card's shadow, a
+   * row scrolled sideways) shows behind the nav. None: the pages stop at its edge.
+   */
+  navOverPages?: boolean;
 }
 
 /**

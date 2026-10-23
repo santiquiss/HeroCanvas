@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useKeyboardInset } from './keyboard';
 import { useLocation, useSearchParams } from 'react-router';
 import { SNACKBAR_DURATION, type AlertLevel, type AlertProps, type DialogProps, type SheetLayout, type SheetWidth } from '../kit';
-import { DetailPanelCtx, PageScope, RightEdgeCtx, SplitCtx, useNav } from '../nav/context';
+import { DetailPanelCtx, PageScope, RightEdgeCtx, SplitCtx, UnderRailCtx, useNav } from '../nav/context';
 import type { DropDownAlign } from './DropDownLayer';
 import type { Layout } from './layout';
 import { tappedControl, type SheetKind, type SheetPresentation } from './sheetPresentation';
@@ -352,7 +352,8 @@ export function usePadR(): number {
   const atRight = useContext(RightEdgeCtx);
   const split = useContext(SplitCtx);
   const inPanel = useContext(DetailPanelCtx);
-  if (layout.sideNav && atRight) return 0;
+  // Beside the iPhone Duo's column, at its edge; under it (navOverPages), clear of it.
+  if (layout.sideNav && atRight) return layout.navOverPages ? layout.sideW : 0;
   if (split?.role === 'master' || (!atRight && !inPanel && layout.dashOpen)) return layout.columnGap / 2;
   // At the screen's right edge: the layout's edge padding (padX, or a design's matching its left gap in two columns).
   return layout.edgePadR;
@@ -366,7 +367,10 @@ export function usePadL(): number {
   const { layout } = useSim();
   const split = useContext(SplitCtx);
   const inPanel = useContext(DetailPanelCtx);
-  return split?.role === 'detail' || inPanel ? layout.columnGap / 2 : layout.padX;
+  const underRail = useContext(UnderRailCtx);
+  if (split?.role === 'detail' || inPanel) return layout.columnGap / 2;
+  // Under the rail (navOverPages), clear of it.
+  return layout.padX + (underRail ? layout.railW : 0);
 }
 
 /**
