@@ -494,7 +494,7 @@
   color: inherit;
 }
 
-/* Pages: a group of roots (Before the app, App) when there are boot pages. */
+/* Pages: a section of roots (Before the app, the app's own groups, App). */
 .treeGroup {
   margin: 10px 8px 2px;
   color: var(--ui-text-subtle);

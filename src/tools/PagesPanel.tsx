@@ -1,4 +1,4 @@
-// Pages tree built from the manifest: boot pages and tabs at the root (two groups when there are boot pages), children by `parent`, variants for pages with params, steps
+// Pages tree built from the manifest: its sections (pageGroups: boot pages, the app's own, App), children by `parent`, variants for pages with params, steps
 // for flows. A step's states (something picked on it) aren't pages: they're in the page inspector and in Flow. Click opens the page with its default chain underneath (a step: held, to look at);
 // rows in the current stack are highlighted.
 import { Fragment, useEffect, useRef, useState } from 'react';
@@ -14,6 +14,7 @@ import styles from './Panel.module.css';
 import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
 import { HOME, LAUNCH } from '../nav/pages';
+import { pageGroups } from '../nav/pageGroups';
 import { replayLaunch } from '../sim/launch';
 import { t } from '../i18n/ui';
 
@@ -24,8 +25,6 @@ export const STATUS_WORD: Record<PageStatus, string> = { done: t('done'), pendin
 const childrenOf = (pages: Manifest, id: string) => Object.keys(pages).filter((k) => pages[k].parent === id && pages[k].level !== 'tab' && !pages[k].modeOf);
 /** Other modes of a page's screen (`modeOf`): listed with it, as its states. */
 const modesOf = (pages: Manifest, id: string) => Object.keys(pages).filter((k) => pages[k].modeOf === id);
-/** Pages with no parent besides tabs and boot pages (a settings page opened from the avatar): roots after the tabs. */
-const loose = (pages: Manifest) => Object.keys(pages).filter((k) => !pages[k].parent && !pages[k].modeOf && pages[k].level !== 'tab' && pages[k].level !== 'boot');
 
 /** The open rows, by page id: as you left them when you come back to the tab, and Collapse / Expand all after a reload. */
 const TREE = treeOpen<string>('pages');
@@ -33,18 +32,14 @@ const TREE = treeOpen<string>('pages');
 export function PagesPanel() {
   const [q, setQ] = useState('');
   const query = q.trim().toLowerCase();
-  const { tabs, boots, pages } = useNavRoot();
+  const { pages } = useNavRoot();
   TREE.useVersion();
   // Collapsed, the button expands all; otherwise it collapses all (and again, closing what was opened since).
   const collapsed = TREE.mode() === 'collapsed';
-  const app = [...tabs, ...loose(pages)];
-  // Boot pages (a welcome flow) start before the app: their own group, above the tabs (and under the launch).
-  const groups = boots.length || LAUNCH
-    ? [
-        ...(boots.length ? [{ label: t('Before the app'), roots: boots }] : []),
-        { label: t('App'), roots: app },
-      ]
-    : [{ label: null, roots: app }];
+  // Titled when there's more than one section, or the launch row above them.
+  const sections = pageGroups(pages);
+  const titled = sections.length > 1 || !!LAUNCH;
+  const groups = sections.map((g) => ({ key: g.key, label: !titled ? null : g.key === 'boot' ? t('Before the app') : g.key === 'app' ? t('App') : g.key, roots: g.roots }));
   return (
     <>
       {/* A search shows every match's branch open, whatever is collapsed: nothing to collapse then. */}
@@ -52,7 +47,7 @@ export function PagesPanel() {
       <div style={{ paddingBottom: 12 }}>
         {LAUNCH && t('Launch screen').toLowerCase().includes(query) && <LaunchRow />}
         {groups.map((g) => (
-          <Fragment key={g.label ?? 'app'}>
+          <Fragment key={g.key}>
             {/* A group's title only while something in it matches the search. */}
             {g.label && g.roots.some((id) => matches(pages, id, query)) && <div className={styles.treeGroup}>{g.label}</div>}
             {g.roots.map((id) => (

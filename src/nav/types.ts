@@ -45,6 +45,12 @@ export interface PageDef {
    */
   parent?: string;
   /**
+   * A root page's section in Pages, in the app's words (`'Cuenta'`: sign-in and onboarding). Sections follow the
+   * manifest's order: one whose first page comes before the first tab shows above App. None: App's. Tabs, boot pages
+   * and pages with a `parent` ignore it.
+   */
+  group?: string;
+  /**
    * A page that opens from more than one section (a task's detail from Today or from its
    * project): the page under it, from its params, for deep links. `parent` stays where the Pages tree lists it.
    */
