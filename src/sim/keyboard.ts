@@ -54,3 +54,22 @@ export function holdKeyboard() {
   el.focus({ preventScroll: true });
   window.setTimeout(() => el.remove(), 1000);
 }
+
+// ---------------------------------------------------------------- Whose field takes the focus
+
+/** The screen the last tap was on (a canvas shows several, each with the same sheet open). */
+let tappedScreen: Element | null = null;
+if (typeof document !== 'undefined')
+  document.addEventListener('pointerdown', (e) => (tappedScreen = e.target instanceof Element ? e.target.closest('[data-device-screen]') : null), true);
+
+/**
+ * Whether a field that focuses itself as it shows (autofocus) should take the focus: only on the screen the person is
+ * using (the last one tapped). The same sheet opens on every screen of the canvas; each would take the focus in turn
+ * and the keyboard come up on the last one mounted. With no tap yet (a link, the page index), the first screen does.
+ */
+export function ownsFocus(el: Element): boolean {
+  const screen = el.closest('[data-device-screen]');
+  if (!screen) return true;
+  if (tappedScreen && tappedScreen.isConnected) return tappedScreen === screen;
+  return document.querySelector('[data-device-screen]') === screen;
+}

@@ -8,9 +8,7 @@ import { Icon } from '../components/Icon';
 import { CATALOG } from '../design/catalog';
 import { useDesign } from '../design/DesignContext';
 import { componentIcon, elementKind, groupLayout, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, textOf, type Corners } from '../design/element';
-import { APP_WIDGETS } from '../design/handoff';
 import { COMPONENT_STATUSES, componentState, statusOf } from '../design/componentState';
-import { NO_APP } from '../nav/noApp';
 import { useLibrary } from '../design/library';
 import { componentHint, componentInstance } from '../design/component';
 import styles from './Panel.module.css';
@@ -18,8 +16,6 @@ import { SearchAction, SearchField } from './SearchField';
 import { treeOpen } from './treeOpen';
 import { t } from '../i18n/ui';
 
-/** Layers' legend: the states a component on screen can be in (the app's own widgets' only when it has some). */
-const LEGEND = COMPONENT_STATUSES.filter((s) => (NO_APP ? s.key === 'build' : s.key === 'matches' || s.key === 'differs' || s.key === 'build' || (s.key === 'app' && Object.keys(APP_WIDGETS).length > 0)));
 
 /** The word beside a component's row when it doesn't match the code. */
 const ROW_WORD: Partial<Record<string, string>> = { differs: t('differs'), app: t('in app'), build: t('local'), missing: t('missing'), unreplicated: t('not replicated') };
@@ -151,15 +147,6 @@ export function LayersPanel() {
         action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? t('Expand all') : t('Collapse all')} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />}
       />
       <div style={{ padding: '6px 0 12px' }}>
-        {/* The components' states, as the gallery has them: against the code. With no app, all are Local. */}
-        <div className={styles.layersLegend}>
-          {LEGEND.map((s) => (
-            <span key={s.key}>
-              <span className={styles.dot} style={{ background: s.color }} />
-              {s.label}
-            </span>
-          ))}
-        </div>
         {found
           ? found.map((f) => <LayerRow key={f.node.key} node={f.node} depth={0} path={path} found={f.kids} />)
           : tree.map((n) => <LayerRow key={n.key} node={n} depth={0} path={path} />)}

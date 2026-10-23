@@ -921,20 +921,6 @@
   pointer-events: none;
 }
 
-/* Layers: what the two component colors mean. */
-.layersLegend {
-  display: flex;
-  gap: 12px;
-  padding: 2px 12px 8px;
-  color: var(--ui-text-muted);
-  font-size: 11px;
-}
-.layersLegend > span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
 /* Props: a color from the theme's tokens, as a swatch and its name (TokenColorSelect). */
 .tokenSelect {
   position: relative;

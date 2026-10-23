@@ -4,7 +4,7 @@ import { systemBack } from './back';
 import { schemeIn } from './appThemes';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
-import { deviceGroup, findDevice, findDisplay } from '../devices/devices';
+import { deviceGroup, findDevice, findDisplay, keepsLandscape, landAfterSwitch } from '../devices/devices';
 import { DesignProvider, useDesign, useDesignRoot } from '../design/DesignContext';
 import { SelectionInUrl } from '../design/SelectionInUrl';
 import { Gallery } from '../gallery/Gallery';
@@ -86,6 +86,9 @@ const COMPARE_ALL = 'all';
  * The designer, just the app at the real size of the device it's opened on (sim/RealShell), or an agent's shot (the
  * screen in light and dark, nothing else: capture/shot).
  */
+/** Switching to a device's display: landscape stays only where it's at home (keepsLandscape), else back upright. */
+const landOn = (deviceId: string, displayKey: string | null): { land?: null } => (keepsLandscape(deviceId, displayKey) ? {} : { land: null });
+
 export function SimulatorShell() {
   const [search] = useSearchParams();
   const real = useRealMode();
@@ -429,8 +432,8 @@ function DesignerShell() {
                         land={land}
                         video={video}
                         onVideo={toggleVideo}
-                        onDevice={(id) => setParam({ device: id, display: null })}
-                        onDisplay={(key) => setParam({ display: key })}
+                        onDevice={(id) => setParam({ device: id, display: null, ...landOn(id, null) })}
+                        onDisplay={(key) => setParam({ display: key, land: landAfterSwitch(device.id, display.key, key, land) ? '1' : null })}
                         onRotate={() => setParam({ land: land ? null : '1' })}
                       />
                       <InspectOverlay stage={spacerRef} />
@@ -486,8 +489,8 @@ function DesignerShell() {
                 land={land}
                 video={video}
                 onVideo={toggleVideo}
-                onDevice={(id) => setParam({ device: id, display: null, devices: null })}
-                onDisplay={(key) => setParam({ display: key })}
+                onDevice={(id) => setParam({ device: id, display: null, devices: null, ...landOn(id, null) })}
+                onDisplay={(key) => setParam({ display: key, land: landAfterSwitch(device.id, display.key, key, land) ? '1' : null })}
                 onArrange={(a) => setParam({ arrange: a === 'row' ? 'row' : null })}
                 onSort={(s) => setParam({ sort: s === 'type' ? null : s })}
                 onRotate={() => setParam({ land: land ? null : '1' })}
@@ -508,8 +511,8 @@ function DesignerShell() {
                 display={display}
                 land={land}
                 dark={theme === 'dark'}
-                onDevice={(id) => setParam({ device: id, display: null, devices: null })}
-                onDisplay={(key) => setParam({ display: key })}
+                onDevice={(id) => setParam({ device: id, display: null, devices: null, ...landOn(id, null) })}
+                onDisplay={(key) => setParam({ display: key, land: landAfterSwitch(device.id, display.key, key, land) ? '1' : null })}
                 onRotate={() => setParam({ land: land ? null : '1' })}
                 onTheme={() => setParam({ theme: theme === 'dark' ? null : 'dark' })}
                 tilt={shownTilt}

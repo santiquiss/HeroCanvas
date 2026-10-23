@@ -6,6 +6,7 @@ import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
 import { stepOf, stepState } from '../nav/flow';
+import { newSteps } from '../nav/manifest';
 import { ChangeBadge } from '../flow/FlowView';
 import type { Manifest } from '../nav/stack';
 import { isVariantState, pageIcon, pageName, ROLE_ICONS, ROLE_NAMES, sameRef, variantState } from '../nav/stack';
@@ -133,6 +134,8 @@ function StepRows({ id, step, n, depth, query }: { id: string; step: FlowStep; n
       <span className={styles.stepNum}>{n}</span>
       <Icon name={step.kind === 'loading' ? 'hourglass_empty' : 'crop_portrait'} size={16} />
       <span className={styles.name}>{step.label}</span>
+      {/* A step the proposal adds to the flow: a new screen, as a new page is. */}
+      {newSteps(id, nav.proposal).includes(step.id) && <ChangeBadge change="new" />}
     </div>
   );
 }

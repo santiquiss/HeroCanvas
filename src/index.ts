@@ -19,7 +19,7 @@ export { hasSymbol, Icon } from './components/Icon';
 // The simulator, as a screen sees it: its layout and state, the language, the navigation.
 export { liveSearch, useHeaderInset, usePadB, usePadL, usePadR, useScreenInsets, useSharedState, useSim, useUrlNumber, useUrlParams, useUrlPatch, useUrlState } from './sim/SimContext';
 export { useBackHandler } from './sim/back';
-export { holdKeyboard, inputBar, KEYBOARD_GAP, useKeyboardInset } from './sim/keyboard';
+export { holdKeyboard, inputBar, KEYBOARD_GAP, ownsFocus, useKeyboardInset } from './sim/keyboard';
 export { useAppControl, usePersona } from './sim/persona';
 export { useLanguage } from './sim/language';
 export { useAppearance, useAppTheme, type Appearance } from './sim/appThemes';
@@ -37,6 +37,8 @@ export { SystemCamera } from './sim/SystemCamera';
 export { SystemPhotoPicker } from './sim/SystemPhotoPicker';
 export { OnScreen } from './sim/screenLayer';
 export { useSheetLink } from './sim/sheetLinks';
+// A sheet's content guarding its close, as Flutter's PopScope (an unsaved edit asks before the shim or a swipe drops it).
+export { usePopScope, type PopScope } from './sim/popScope';
 export { useMorph } from './sim/morph';
 export { useOverlay } from './sim/useOverlay';
 export { DEVELOPER_HIDDEN } from './sim/developerHidden';

@@ -22,7 +22,9 @@ export function frameStyle(layout: Layout, scale: number, tilt = ''): CSSPropert
     padding: `${layout.bezY}px ${layout.bezX}px`,
     borderRadius: layout.frameRadius,
     transform: `translate(-50%,-50%) scale(${scale}) ${tilt} rotate(${layout.rotLocked ? 90 : 0}deg)`,
-  };
+    // One device pixel in the frame's points: the screen's edge (DeviceScreen) covers it.
+    '--hc-edge': `${1 / (scale * (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1))}px`,
+  } as CSSProperties;
 }
 
 /**
@@ -31,15 +33,34 @@ export function frameStyle(layout: Layout, scale: number, tilt = ''): CSSPropert
  */
 export function FrameHardware({ layout }: { layout: Layout }) {
   const cap = notchCap(layout);
-  if (!layout.ends) return cap && <div className={styles.hardware} aria-hidden>{cap}</div>;
+  const edge = screenEdge(layout);
+  if (!layout.ends) return (cap || edge) && <div className={styles.hardware} aria-hidden>{edge}{cap}</div>;
   const turned = layout.land;
   return (
     <div className={styles.hardware} data-turned={turned || undefined} style={{ '--end': `${turned ? layout.bezX : layout.bezY}px` } as CSSProperties} aria-hidden>
+      {edge}
       <span className={styles.earpiece} />
       <span className={styles.frontCamera} />
       {layout.homeButton && <span className={styles.homeButton} />}
       {cap}
     </div>
+  );
+}
+
+/**
+ * The screen's edge: a ring of the bezel one device pixel to each side of it (`--hc-edge`, frameStyle). At a fractional
+ * zoom the edge falls inside a pixel, and a scroller's clip is rounded out to whole pixels: what it scrolls under an
+ * opaque bar (a sticky header) showed as a line of text on the bezel, and the page's color as a hairline.
+ */
+function screenEdge(layout: Layout) {
+  if (layout.bare) return null;
+  // Each corner one pixel rounder, as the ring sits one pixel outside the screen.
+  const radius = layout.fullRadius.replace(/(\d+(?:\.\d+)?)px/g, 'calc($1px + var(--hc-edge))');
+  return (
+    <span
+      className={styles.screenEdge}
+      style={{ inset: `calc(${layout.bezY}px - var(--hc-edge)) calc(${layout.bezX}px - var(--hc-edge))`, borderRadius: radius }}
+    />
   );
 }
 

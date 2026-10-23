@@ -163,6 +163,15 @@
   background: linear-gradient(145deg, #15181c, #0b0c0e);
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
+/* DeviceFrame screenEdge: two device pixels of the bezel across the screen's edge (a gradient in light, so a masked
+   border, not a shadow); above the screen's layers. */
+.screenEdge {
+  position: absolute;
+  z-index: 97;
+  border: calc(2 * var(--hc-edge, 0px)) solid transparent;
+  background: var(--hc-device) border-box;
+  mask: linear-gradient(#000 0 0) border-box exclude, linear-gradient(#000 0 0) padding-box;
+}
 /* Over the screen's edge where the notch meets the bezel (DeviceFrame notchCap); above the notch (96). */
 .notchCap {
   position: absolute;
@@ -372,6 +381,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* An icon and its word (a foldable's Open, Close). */
+  gap: 4px;
   padding: 0 8px;
   border: none;
   border-radius: 7px;

@@ -5,7 +5,8 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { Icon } from '../components/Icon';
 import { PROPOSALS } from '../proposals';
-import { STATUSES, type Proposal } from '../proposals/types';
+import { ARCHIVED, STATUSES, type Proposal } from '../proposals/types';
+import { LIVE_TICKETS } from '../proposals/tickets';
 import { StatusDot, useProposalParam } from '../tools/ProposalPanel';
 import surface from '../theme/surface.module.css';
 import { plural, t, UI_LANGUAGE } from '../i18n/ui';
@@ -14,7 +15,9 @@ import styles from './ProposalMenu.module.css';
 /** Live's icon: the app as it is on the phone today. */
 const LIVE_ICON = 'smartphone';
 
-const statusOf = (p: Proposal) => STATUSES.find((s) => s.id === p.meta.status) ?? STATUSES[0];
+/** A Live ticket is with the developers: Dev handoff's look. */
+const HANDOFF = STATUSES.find((s) => s.id === 'handed-off')!;
+const statusOf = (p: Proposal) => (p.meta.archived ? { id: 'archived', ...ARCHIVED } : (STATUSES.find((s) => s.id === p.meta.status) ?? STATUSES[0]));
 
 /** `2026-10-19` → `Oct 19` (this year) or `Oct 19, 2025`. */
 function shortDate(iso: string): string {
@@ -33,9 +36,9 @@ export function ProposalMenu() {
   const list = useRef<HTMLDivElement>(null);
   const id = useId();
 
-  const archived = PROPOSALS.filter((p) => p.meta.status === 'archived');
+  const archived = PROPOSALS.filter((p) => p.meta.archived);
   // Newest first; the one picked stays listed even when archived.
-  const shown = [...PROPOSALS].reverse().filter((p) => showArchived || p.meta.status !== 'archived' || p.id === active?.id);
+  const shown = [...PROPOSALS].reverse().filter((p) => showArchived || !p.meta.archived || p.id === active?.id);
 
   // Listeners only while open; the picked row (else Live) takes focus so the arrows start there.
   useEffect(() => {
@@ -82,7 +85,7 @@ export function ProposalMenu() {
         aria-controls={id}
         onClick={() => setOpen((o) => !o)}
       >
-        {active ? <StatusDot status={active.meta.status} /> : <Icon name={LIVE_ICON} size={16} />}
+        {active ? <StatusDot status={active.meta.status} archived={active.meta.archived} /> : <Icon name={LIVE_ICON} size={16} />}
         {active && <span className={styles.code}>{active.id}</span>}
         <span className={styles.triggerTitle}>{active?.meta.title ?? t('Live')}</span>
         <Icon name="expand_more" size={18} />
@@ -140,7 +143,7 @@ export function ProposalMenu() {
                 </span>
                 <span className={styles.statusCol}>
                   <span className={styles.status} style={{ color: s.id === 'handed-off' ? s.color : undefined }}>
-                    <StatusDot status={p.meta.status} />
+                    <StatusDot status={p.meta.status} archived={p.meta.archived} />
                     <span>{s.label}</span>
                   </span>
                   {p.meta.ticket && <span className={styles.ticket}>{p.meta.ticket}</span>}
@@ -150,6 +153,49 @@ export function ProposalMenu() {
               </button>
             );
           })}
+          {/* Live's own tickets (proposals/tickets.json), after the proposals: small changes to the app as it is, with no
+              proposal; a row opens the ticket. */}
+          {LIVE_TICKETS.length > 0 && (
+            <>
+              <div className={`${styles.cols} ${styles.colHead}`} aria-hidden>
+                <span />
+                <span />
+                <span>{t('Live tickets · {count}', { count: LIVE_TICKETS.length })}</span>
+                <span />
+                <span />
+                <span />
+              </div>
+              {LIVE_TICKETS.map((tk) => (
+                <button
+                  key={tk.ticket}
+                  role="option"
+                  aria-selected={false}
+                  className={`${styles.row} ${styles.cols}`}
+                  title={tk.url ? t('Open {ticket}', { ticket: tk.ticket }) : tk.ticket}
+                  onClick={() => tk.url && window.open(tk.url, '_blank', 'noopener')}
+                >
+                  <span className={styles.check} />
+                  {/* A ticket, not a proposal's code: its id goes under its status, as a proposal's ticket does. */}
+                  <span className={styles.codeCol}>
+                    <Icon name="confirmation_number" size={18} color="var(--ui-text-2)" />
+                  </span>
+                  <span className={styles.what}>
+                    <span className={styles.title}>{tk.title}</span>
+                    {tk.summary && <span className={styles.summary}>{tk.summary}</span>}
+                  </span>
+                  <span className={styles.statusCol}>
+                    <span className={styles.status} style={{ color: HANDOFF.color }}>
+                      <StatusDot status="handed-off" />
+                      <span>{HANDOFF.label}</span>
+                    </span>
+                    <span className={styles.ticket}>{tk.ticket}</span>
+                  </span>
+                  <span className={styles.muted}>{tk.author ?? '—'}</span>
+                  <span className={styles.muted}>{shortDate(tk.created)}</span>
+                </button>
+              ))}
+            </>
+          )}
           {archived.length > 0 && (
             <button className={styles.footer} onClick={() => setShowArchived((a) => !a)}>
               <Icon name={showArchived ? 'visibility_off' : 'inventory_2'} size={14} />

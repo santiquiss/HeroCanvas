@@ -50,5 +50,6 @@ and token names), keyboard keys, and units as they are.
 | Custom | Personalizado |
 | Zoom / Fit | Zoom / Ajustar |
 | Settings | Ajustes |
-| Status (of a proposal): Draft, In review, Approved, Ticket created, Merged into base, Archived | Borrador, En revisión, Aprobada, Ticket creado, Incorporada, Archivada |
+| Status (of a proposal): Draft, In review, Dev handoff; Archived (a flag) | Borrador, En revisión, Para desarrollo; Archivada |
+| Live tickets (tickets for small changes to Live, with no proposal) | Tickets de Live |
 | Empty state ("No … yet") | "Aún no hay …" / "Todavía no hay …" |

@@ -68,7 +68,7 @@ export function workFor(name: string, proposalId: string | null, lib: Library, p
 export function proposedParams(name: string): Record<string, string> {
   const out: Record<string, string> = {};
   for (const p of PROPOSALS) {
-    if (p.meta.status === 'archived' || p.meta.status === 'merged') continue;
+    if (p.meta.archived) continue;
     for (const k of p.params[name] ?? []) out[k] ??= p.id;
   }
   return out;

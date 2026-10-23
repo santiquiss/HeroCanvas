@@ -3,7 +3,7 @@
 // color live in the shell, shared with the canvas.
 import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
-import { DEVICES, type Device, type DeviceType, type Display } from '../devices/devices';
+import { DEVICES, foldOf, type Device, type DeviceType, type Display } from '../devices/devices';
 import type { Layout } from '../sim/layout';
 import panel from '../tools/Panel.module.css';
 import styles from './CapturePanel.module.css';
@@ -392,7 +392,12 @@ export function CapturePanel(p: CapturePanelProps) {
           )}
           {p.device.displays.length > 1 && (
             <div className={styles.pair}>
-              <Seg value={p.display.key} options={p.device.displays.map((x) => [x.key, x.label])} onChange={p.onDisplay} disabled={deviceLocked} />
+              {foldOf(p.device) ? (
+                // A foldable: closed or open, its two displays.
+                <Seg value={p.display.key} options={[[foldOf(p.device)!.closed.key, t('Closed')], [foldOf(p.device)!.open.key, t('Open')]]} onChange={p.onDisplay} disabled={deviceLocked} />
+              ) : (
+                <Seg value={p.display.key} options={p.device.displays.map((x) => [x.key, x.label])} onChange={p.onDisplay} disabled={deviceLocked} />
+              )}
             </div>
           )}
           <div className={styles.pair}>

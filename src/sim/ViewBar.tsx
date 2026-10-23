@@ -4,7 +4,7 @@
 // right. Each mode shows what applies to it. Whether a page supports landscape is page
 // config: Page panel → Orientation.
 import { Icon } from '../components/Icon';
-import { DEVICE_GROUPS, DEVICES, deviceGroup, type Device, type DeviceType, type Display } from '../devices/devices';
+import { DEVICE_GROUPS, DEVICES, deviceGroup, foldOf, type Device, type DeviceType, type Display } from '../devices/devices';
 import type { Mode } from './modes';
 import { t } from '../i18n/ui';
 import styles from './Toolbar.module.css';
@@ -130,10 +130,15 @@ export function ViewBar(p: ViewBarProps) {
         </label>
       ) : (
         p.device.displays.length > 1 &&
-        p.device.displays.map((x) => (
-          <Chip key={x.key} active={x.key === p.display.key} onClick={() => p.onDisplay(x.key)}>
-            {x.label}
-          </Chip>
+        (foldOf(p.device) ? (
+          // A foldable: one button that opens or closes it.
+          <FoldChip device={p.device} display={p.display.key} onDisplay={p.onDisplay} />
+        ) : (
+          p.device.displays.map((x) => (
+            <Chip key={x.key} active={x.key === p.display.key} onClick={() => p.onDisplay(x.key)}>
+              {x.label}
+            </Chip>
+          ))
         ))
       )}
       {p.mode !== 'components' && (
@@ -220,5 +225,17 @@ export function ZoomBar({ zoom, fitScale, onZoom }: { zoom: Zoom; fitScale: numb
         <Icon name="fit_screen" size={18} />
       </button>
     </div>
+  );
+}
+
+/** A foldable's open / close: one chip, saying what it does (Open closed, Close open), its display in the tooltip. */
+function FoldChip({ device, display, onDisplay }: { device: Device; display: string; onDisplay: (key: string) => void }) {
+  const fold = foldOf(device)!;
+  const open = display === fold.open.key;
+  return (
+    <Chip active={false} onClick={() => onDisplay(open ? fold.closed.key : fold.open.key)} title={open ? t('Close: the {display}', { display: fold.closed.label }) : t('Open: the {display}', { display: fold.open.label })}>
+      <Icon name="devices_fold" size={18} />
+      {open ? t('Close') : t('Open')}
+    </Chip>
   );
 }

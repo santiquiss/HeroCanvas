@@ -44,6 +44,11 @@ export interface Display {
   /** Layout supports landscape by default. */
   rot?: boolean;
   /**
+   * A foldable's inner display that, opened from the outer one held upright, shows turned: opened like a book its hinge
+   * is upright only in landscape (iPhone Duo). None: opened, it's upright (a Galaxy Z Fold, a Pixel Fold).
+   */
+  opensLand?: boolean;
+  /**
    * Navigation per orientation, overriding the width default. `column`: vertical controls in a right column
    * (`columnW` wide) with the status at its top (iPhone Duo). Foldable inner displays keep `bottom` in portrait.
    */
@@ -214,6 +219,8 @@ export const ALL_DEVICES: Device[] = [
       }),
       D('inner', t('Inner {size}', { size: '7.6″' }), 669, 951, 'ipad', 55, 10, {
         rot: true,
+        // Opened like a book from the outer display (466 wide), it's twice as wide: landscape.
+        opensLand: true,
         nav: { portrait: 'bottom', landscape: 'column' },
         padX: 24,
         cornerStatus: true,
@@ -292,4 +299,36 @@ export function findDevice(id: string | null): Device {
 
 export function findDisplay(device: Device, key: string | null): Display {
   return device.displays.find((x) => x.key === key) ?? device.displays[0];
+}
+
+/**
+ * A foldable's two states: the display it shows closed (outer, cover) and open (the larger: inner). Null for a device
+ * that doesn't fold, or folds into more than two.
+ */
+export function foldOf(device: Device): { closed: Display; open: Display } | null {
+  if (device.type !== 'foldable' || device.displays.length !== 2) return null;
+  const [a, b] = device.displays;
+  return a.w * a.h >= b.w * b.h ? { open: a, closed: b } : { open: b, closed: a };
+}
+
+/**
+ * Whether landscape carries over when switching to a device's display: only to one that's turned as a rule (`rot`: a
+ * tablet, a foldable's inner display), so a tablet in landscape stays so on another; a phone or the iPhone Duo's outer
+ * display comes back upright.
+ */
+export function keepsLandscape(deviceId: string, displayKey: string | null): boolean {
+  return !!findDisplay(findDevice(deviceId), displayKey).rot;
+}
+
+/**
+ * Landscape after switching a device's display, from `from` (in landscape or not) to `to`. A foldable opened from its
+ * outer display held upright shows the inner one as a book opens (`opensLand`: the iPhone Duo's turned); otherwise as
+ * any switch (keepsLandscape).
+ */
+export function landAfterSwitch(deviceId: string, from: string | null, to: string, land: boolean): boolean {
+  const device = findDevice(deviceId);
+  const was = findDisplay(device, from);
+  const next = findDisplay(device, to);
+  if (device.type === 'foldable' && !land && !was.rot && next.rot) return !!next.opensLand;
+  return land && !!next.rot;
 }

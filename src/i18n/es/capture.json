@@ -223,5 +223,6 @@
   "This browser can't record the device's screen (it needs Chrome)": "Este navegador no puede grabar la pantalla del dispositivo (se necesita Chrome)",
   "Chrome didn't send frames of the device": "Chrome no envió fotogramas del dispositivo",
   "Nothing was recorded": "No se grabó nada",
-  "Lighting": "Luz"
+  "Lighting": "Luz",
+  "Closed": "Cerrado"
 }

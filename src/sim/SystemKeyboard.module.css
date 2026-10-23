@@ -325,6 +325,23 @@
   background: transparent;
   box-shadow: none;
 }
+/* iOS 26's number pad on an iPhone (measured on an iPhone 18 Pro screenshot): 24 above its rows, 7.5 at the sides,
+   keys 47.5 tall, 6 apart across and 6.5 down; in light, light keys on a darker gray than the letters' keyboard. */
+.ios .pad {
+  gap: 6.5px 6px;
+  padding: 24px 7.5px 0;
+}
+.ios .padKey {
+  height: 47.5px;
+}
+.ios.padPanel {
+  --kb-bg: #9fa2a6;
+  --kb-key: #e8e9ea;
+}
+:global([data-theme='dark']) .ios.padPanel {
+  --kb-bg: #2c2c2e;
+  --kb-key: #6c6c70;
+}
 /* Landscape: shorter keys (iOS 26's landscape pad), so the field and its button stay in view. */
 .land .pad {
   gap: 5px 6px;

@@ -43,5 +43,6 @@ whoever implements it from this.
 ## 4. Show it
 
 `npm run shot -- "/<route>?proposal=<code>" --compare`: the app as it is beside the proposal. Phones and tablets,
-light and dark. Show the person, iterate, and move the status on (`review`, `approved`, then `handed-off` with its
-ticket) when they say so.
+light and dark. Show the person, iterate, and move the status on when they say so: `draft`, `review` (someone has to
+look at it), `handed-off` (shown as Dev handoff: its ticket for the developers, `ticket`). Dropped: `"archived": true`.
+Built in the app: merged into Live and its folder deleted.

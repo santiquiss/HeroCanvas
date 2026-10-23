@@ -6,6 +6,38 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.50.0 — 2026-10-23
+
+- **Proposals have three statuses**: Draft, In review, Dev handoff (`handed-off`, with its `ticket`). Approved was the
+  step before the handoff; Merged meant the folder should go; Archived is now a flag (`"archived": true`), beside the
+  status. Old values still read (approved → review, merged → handed-off, archived → the flag).
+- **Live tickets** (`proposals/tickets.json`): small changes to the app as it is, each its own ticket with no proposal
+  behind it, listed at the bottom of the design picker (a row opens the ticket).
+- **A proposal's new flow steps are marked new**: a step in the proposal's page flow that the base page's flow doesn't
+  have is new in Pages and its own item in What changes (opening the page at it).
+- **Sheets guard their close** (`usePopScope`, as Flutter's PopScope): a tap on the shim, a swipe down or Escape asks
+  the content first (an unsaved edit asking before it's dropped).
+- **A field that focuses itself only does on the screen in use** (`ownsFocus`): the same sheet open on every device of a
+  set no longer brings the keyboard up on the last one mounted.
+- **Typing, a tap on a button keeps the field's focus** (as iOS): the keyboard stays until the button acts, so a sheet
+  riding on it doesn't drop before the release lands.
+- **iOS lists bounce** at their ends (iPhone and iPad; the wheel, the trackpad and the fingertip; `overscroll-behavior:
+  none` opts out). **iOS 26's number pad** as an iPhone draws it.
+- **Foldables open and close** with one button (Open / Close; Capture: Closed / Open), the iPhone Duo opening in
+  landscape; landscape carries over only to displays that rotate.
+- **The screen's edge at a fractional zoom**: a ring of the bezel over it, so what scrolls under a sticky header no
+  longer shows as a line. **Full-screen sheets clear the iPhone Duo's column** (its width as their right padding),
+  and a sheet's padding is set side by side, so a side given in `sheetStyle` stays when the keyboard changes another.
+- Layers drops its legend; shots launch Chrome with a mock keychain (no password prompt on macOS).
+
+**Contract**
+
+- `ProposalStatus` is `'draft' | 'review' | 'handed-off'`; `ProposalMeta.archived` is new. A `proposal.json` with
+  `approved`, `merged` or `archived` still reads; rewrite it when convenient.
+- New exports: `usePopScope` (and `PopScope`), `ownsFocus`. A component that focuses itself (autofocus) checks
+  `ownsFocus(el)` first.
+- New (optional): `proposals/tickets.json`.
+
 ## 0.49.2 — 2026-10-23
 
 - **Under a floating nav, the split's right panels reach under the Duo's column too**: the side panel and

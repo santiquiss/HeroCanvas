@@ -106,9 +106,7 @@
   "Done": "Listo",
   "Draft": "Borrador",
   "In review": "En revisión",
-  "Approved": "Aprobada",
-  "Ticket created": "Ticket creado",
-  "Merged into base": "Incorporada",
+  "Dev handoff": "Para desarrollo",
   "Archived": "Archivada",
   "every version": "todas las versiones",
   "this version": "esta versión",
@@ -128,5 +126,6 @@
   "All devices": "Todos los dispositivos",
   "Phones": "Teléfonos",
   "Foldables": "Plegables",
-  "Tablets": "Tabletas"
+  "Tablets": "Tabletas",
+  "A new step": "Un paso nuevo"
 }

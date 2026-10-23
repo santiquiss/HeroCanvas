@@ -11,6 +11,7 @@ import { componentKind, useGalleryNav } from '../gallery/route';
 import { useNavRoot } from '../nav/context';
 import { BASE_PAGES } from '../nav/pages';
 import { pageIcon, pageName, variantState } from '../nav/stack';
+import { stepState } from '../nav/flow';
 import { CHANGES_ALL, CHANGES_PARAM, PROPOSALS, proposalChanges, SCOPE_LABEL, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import type { PageDef } from '../nav/types';
 import { useMode, useSetMode } from './modes';
@@ -87,10 +88,10 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                 const def = (nav.pages[pg.id] ?? BASE_PAGES[pg.id]) as PageDef | undefined;
                 return (
                   <Item
-                    key={pg.id}
+                    key={pg.step ? `${pg.id}:${pg.step.id}` : pg.id}
                     icon={pageIcon(def)}
                     kind={pg.kind}
-                    name={pageName({ ...BASE_PAGES, ...nav.pages }, pg.id)}
+                    name={pg.step ? `${pageName({ ...BASE_PAGES, ...nav.pages }, pg.id)} › ${pg.step.label}` : pageName({ ...BASE_PAGES, ...nav.pages }, pg.id)}
                     // A removed page is only in Live: nothing to open.
                     details={pg.kind === 'removed' ? [...pg.details, t('Only in Live')] : pg.details}
                     title={t('Open it on the device')}
@@ -98,7 +99,9 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                       pg.kind === 'removed'
                         ? undefined
                         : () => {
-                            nav.open(pg.id, def?.variants?.()[0]?.params ?? {}, def && def.variants?.()[0] ? variantState(def, def.variants()[0]) : undefined);
+                            const step = pg.step && def?.flow?.steps.find((st) => st.id === pg.step!.id);
+                            if (step && def) nav.open(pg.id, {}, stepState(def, step));
+                            else nav.open(pg.id, def?.variants?.()[0]?.params ?? {}, def && def.variants?.()[0] ? variantState(def, def.variants()[0]) : undefined);
                             setOpen(false);
                           }
                     }

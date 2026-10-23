@@ -16,23 +16,42 @@ import type { PageDef } from '../nav/types';
 import type { ScreenConfig } from '../nav/screenConfig';
 import { t } from '../i18n/ui';
 
-export type ProposalStatus = 'draft' | 'review' | 'approved' | 'handed-off' | 'merged' | 'archived';
+/**
+ * Where a proposal is: being designed, waiting for someone to review it, or with its ticket for the developers. Built
+ * in the app, it's merged into Live and its folder goes; dropped, it's `archived` (a flag, not a status).
+ */
+export type ProposalStatus = 'draft' | 'review' | 'handed-off';
 
 export const STATUSES: { id: ProposalStatus; label: string; color: string }[] = [
   { id: 'draft', label: t('Draft'), color: '#9aa0a8' },
+  // Someone has to look at it (a design review, often with a ticket of its own).
   { id: 'review', label: t('In review'), color: '#f59e0b' },
-  { id: 'approved', label: t('Approved'), color: '#16a34a' },
   // Its ticket for whoever builds it is created (`ticket`): ready to build.
-  { id: 'handed-off', label: t('Ticket created'), color: '#0d99ff' },
-  { id: 'merged', label: t('Merged into base'), color: '#7c5cff' },
-  { id: 'archived', label: t('Archived'), color: '#c4c8ce' },
+  { id: 'handed-off', label: t('Dev handoff'), color: '#0d99ff' },
 ];
+
+/** How an archived proposal shows where a status would. */
+export const ARCHIVED = { label: t('Archived'), color: '#c4c8ce' };
+
+/**
+ * A proposal.json as written before 0.50 (six statuses) in today's terms: approved is still in review, merged is past
+ * the handoff (its folder should go), archived is the flag.
+ */
+export function normalizeMeta(raw: ProposalMeta): ProposalMeta {
+  const status = raw.status as string;
+  if (status === 'approved') return { ...raw, status: 'review' };
+  if (status === 'merged') return { ...raw, status: 'handed-off' };
+  if (status === 'archived') return { ...raw, status: 'draft', archived: true };
+  return STATUSES.some((s) => s.id === status) ? raw : { ...raw, status: 'draft' };
+}
 
 export interface ProposalMeta {
   /** Its permanent reference (`PJ-12`, proposals/code.ts): what links carry. Never changes; the title and the folder may. */
   code: string;
   title: string;
   status: ProposalStatus;
+  /** Dropped or superseded: out of the pickers and the panel's list, still opens from a link (`?proposal=PJ-5`). */
+  archived?: boolean;
   author?: string;
   /** ISO date. */
   created: string;

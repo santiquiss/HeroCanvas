@@ -19,14 +19,15 @@ import { hasProposalNotes, loadProposalNotes } from '../proposals/sources';
 import { activeVariant, CHANGES_PARAM, findProposal, listedProposals, PROPOSALS, proposalChanges, proposalPath, SCOPE_LABEL, slugify, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import { modeOf } from '../sim/modes';
 import { useUrlState } from '../sim/SimContext';
-import { STATUSES, ticketUrl, type Proposal, type ProposalMeta, type ProposalStatus } from '../proposals/types';
+import { ARCHIVED, STATUSES, ticketUrl, type Proposal, type ProposalMeta, type ProposalStatus } from '../proposals/types';
 import styles from './Panel.module.css';
 import { t } from '../i18n/ui';
 
 const field: React.CSSProperties = { width: '100%', padding: '4px 6px', border: '1px solid #dfe2e6', borderRadius: 6, font: 'inherit', fontSize: 12 };
 
-export function StatusDot({ status }: { status: ProposalStatus }) {
-  const s = STATUSES.find((x) => x.id === status) ?? STATUSES[0];
+/** A status as its dot, or an archived proposal's (its status doesn't matter while it's out of the lists). */
+export function StatusDot({ status, archived = false }: { status: ProposalStatus; archived?: boolean }) {
+  const s = archived ? ARCHIVED : (STATUSES.find((x) => x.id === status) ?? STATUSES[0]);
   return <span className={styles.dot} style={{ background: s.color }} title={s.label} />;
 }
 
@@ -113,7 +114,7 @@ function BaseView() {
         {listed.length ? (
           listed.map((p) => (
             <div key={p.id} className={styles.row} style={{ paddingLeft: 4 }} onClick={() => setProposal(p.id)}>
-              <StatusDot status={p.meta.status} />
+              <StatusDot status={p.meta.status} archived={p.meta.archived} />
               <span className={`${styles.mono} ${styles.muted}`}>{p.id}</span>
               <span className={styles.name}>{p.meta.title}</span>
               <span className={styles.muted}>{p.meta.created}</span>
@@ -173,7 +174,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
     <>
       <div className={styles.section}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-          <StatusDot status={meta.status} />
+          <StatusDot status={meta.status} archived={meta.archived} />
           <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: '20px' }}>{p.meta.title}</span>
           <button className={styles.btn} onClick={() => setProposal(null)} title={t("Back to what's live")}>
             {t('Live')}
@@ -185,7 +186,10 @@ function ActiveProposal({ p }: { p: Proposal }) {
           </span>
           <span className={styles.mono}>{p.id}</span>
           <span className={styles.k}>{t('Status')}</span>
-          <span>{(STATUSES.find((x) => x.id === meta.status) ?? STATUSES[0]).label}</span>
+          <span>
+            {(STATUSES.find((x) => x.id === meta.status) ?? STATUSES[0]).label}
+            {meta.archived && ` · ${ARCHIVED.label}`}
+          </span>
           {meta.ticket && (
             <>
               <span className={styles.k}>{t('Ticket')}</span>

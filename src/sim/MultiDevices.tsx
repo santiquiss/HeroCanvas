@@ -10,7 +10,7 @@ import { systemBack } from './back';
 import { designLayout } from '../design/overridableRegistry';
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { Icon } from '../components/Icon';
-import { DEVICES, findDevice, findDisplay, type DeviceType } from '../devices/devices';
+import { DEVICES, findDevice, findDisplay, type DeviceType, foldOf, keepsLandscape, landAfterSwitch } from '../devices/devices';
 import { supportsLandscape } from '../nav/screenConfig';
 import type { Landscape } from '../nav/types';
 import { InspectOverlay } from '../tools/InspectOverlay';
@@ -295,12 +295,24 @@ export function DeviceHeader({
             <Icon name="arrow_back" size={16} />
           </button>
         );
-      case 'displays':
+      case 'displays': {
+        // A foldable: one button that opens or closes it (its closed and open displays); else one per display.
+        const fold = foldOf(dev);
+        if (fold) {
+          const open = displayKey === fold.open.key;
+          return (
+            <button key={p} className={styles.devChip} title={open ? t('Close: the {display}', { display: fold.closed.label }) : t('Open: the {display}', { display: fold.open.label })} onClick={() => onDisplay(open ? fold.closed.key : fold.open.key)}>
+              <Icon name="devices_fold" size={16} />
+              {open ? t('Close') : t('Open')}
+            </button>
+          );
+        }
         return dev.displays.map((x) => (
           <button key={x.key} className={`${styles.devChip} ${x.key === displayKey ? styles.devChipOn : ''}`} onClick={() => onDisplay(x.key)}>
             {x.label.split(' ')[0]}
           </button>
         ));
+      }
       case 'video':
         return (
           <button key={p} className={`${styles.devChip} ${video ? styles.devChipOn : ''}`} title={t('Video layout: 16:9 on top, the app below')} onClick={onVideo}>
@@ -329,13 +341,24 @@ export function DeviceHeader({
             <span className={styles.devMenuLabel}>{t('System back')}</span>
           </button>
         );
-      case 'displays':
+      case 'displays': {
+        const fold = foldOf(dev);
+        if (fold) {
+          const open = displayKey === fold.open.key;
+          return (
+            <button key={p} className={styles.devMenuRow} onClick={closing(() => onDisplay(open ? fold.closed.key : fold.open.key))}>
+              <Icon name="devices_fold" size={16} className={styles.devMenuCheck} />
+              <span className={styles.devMenuLabel}>{open ? t('Close') : t('Open')}</span>
+            </button>
+          );
+        }
         return dev.displays.map((x) => (
           <button key={x.key} className={styles.devMenuRow} onClick={closing(() => onDisplay(x.key))}>
             {check(x.key === displayKey)}
             <span className={styles.devMenuLabel}>{x.label}</span>
           </button>
         ));
+      }
       case 'video':
         return (
           <button key={p} className={styles.devMenuRow} onClick={closing(() => onVideo?.())}>
@@ -572,8 +595,8 @@ export function MultiDevices({
                     land={it.land}
                     video={video}
                     onVideo={onVideo}
-                    onDevice={(id) => update(i, { device: id, display: findDevice(id).displays[0].key })}
-                    onDisplay={(key) => update(i, { display: key })}
+                    onDevice={(id) => update(i, { device: id, display: findDevice(id).displays[0].key, land: it.land && keepsLandscape(id, null) })}
+                    onDisplay={(key) => update(i, { display: key, land: landAfterSwitch(it.device, it.display, key, it.land) })}
                     onRotate={() => update(i, { land: !it.land })}
                     grip={{ onPointerDown: (e) => dragStart(i, e), onPointerMove: dragMove, onPointerUp: dragEnd, onPointerCancel: dragEnd }}
                     design={{ value: it.design, onPick: (design) => update(i, { design }) }}

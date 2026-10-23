@@ -35,12 +35,15 @@ export function findChrome() {
   return found;
 }
 
-/** Starts a headless Chrome and connects to it. `close()` ends it and removes its profile. */
+/**
+ * Starts a headless Chrome and connects to it. `close()` ends it and removes its profile. A mock keychain: a new
+ * profile would otherwise ask macOS's keychain for its cookie key (a password prompt for the person).
+ */
 export async function launch() {
   const profile = await mkdtemp(join(tmpdir(), 'hc-shot-'));
   const proc = spawn(
     findChrome(),
-    ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--force-color-profile=srgb', '--mute-audio', 'about:blank'],
+    ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--use-mock-keychain', '--password-store=basic', '--hide-scrollbars', '--force-color-profile=srgb', '--mute-audio', 'about:blank'],
     { stdio: ['ignore', 'ignore', 'pipe'] },
   );
   const wsUrl = await new Promise((resolve, reject) => {

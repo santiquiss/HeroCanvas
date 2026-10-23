@@ -14,7 +14,7 @@ describe('every proposal', () => {
     expect(new Set(codes).size).toBe(codes.length);
   });
   it('is listed by the pickers unless archived, or when it is the one picked', () => {
-    const archived = PROPOSALS.filter((p) => p.meta.status === 'archived');
+    const archived = PROPOSALS.filter((p) => p.meta.archived);
     expect(listedProposals()).toEqual(PROPOSALS.filter((p) => !archived.includes(p)));
     for (const p of archived) expect(listedProposals(p.id)).toContain(p);
   });

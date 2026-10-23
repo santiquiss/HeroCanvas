@@ -189,7 +189,11 @@ export function Sheet({ layout = 'bottomContent', showPadding = true, open = tru
         {...handlers}
         className={`${styles.sheet} ${surface === 'page' ? styles.sheetPage : ''} ${on ? styles.sheetOn : ''}`}
         style={{
-          padding: `${pad + (reachesTop ? topInset : 0)}px ${pad}px ${pad + (reachesBottom ? bottomInset : 0)}px`,
+          // Each side on its own (no shorthand): a side `sheetStyle` sets stays when another changes (the keyboard's inset).
+          paddingTop: pad + (reachesTop ? topInset : 0),
+          paddingRight: pad,
+          paddingBottom: pad + (reachesBottom ? bottomInset : 0),
+          paddingLeft: pad,
           // Its bottom padding, for content that scrolls a part of itself down to the sheet's edge.
           ['--sheet-pad-b' as string]: `${pad + (reachesBottom ? bottomInset : 0)}px`,
           // Its side padding, for content that scrolls or slides sideways out to the sheet's edges (a calendar's

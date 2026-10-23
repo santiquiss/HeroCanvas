@@ -3,7 +3,7 @@
 import { PROPOSAL_LOOKUP } from '../design/overridableRegistry';
 import type { ScreenConfig } from '../nav/screenConfig';
 import { parseProposalCode } from './code';
-import type { Proposal, ProposalCode, ProposalMeta } from './types';
+import { normalizeMeta, type Proposal, type ProposalCode, type ProposalMeta } from './types';
 import { t } from '../i18n/ui';
 
 const metas = import.meta.glob('/proposals/*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>;
@@ -16,8 +16,9 @@ const storiesIn = (folder: string) => storyFiles.filter((f) => f.split('/')[2] =
 const slugOf = (path: string) => path.split('/')[2];
 
 export const PROPOSALS: Proposal[] = Object.entries(metas)
-  .map(([path, meta]) => {
+  .map(([path, raw]) => {
     const folder = slugOf(path);
+    const meta = normalizeMeta(raw);
     const code = codes[`/proposals/${folder}/pages.tsx`];
     return {
       // Without a code (a proposal.json written by hand: `npm test` fails on it) the folder stands in.
@@ -43,7 +44,7 @@ export const PROPOSALS: Proposal[] = Object.entries(metas)
  * The proposals the pickers list: all but the archived, which stay in the repository and open from a link
  * (`?proposal=PJ-5`). `keep`: the one picked now, listed even when archived, so a picker can show what's on.
  */
-export const listedProposals = (keep?: string | null): Proposal[] => PROPOSALS.filter((p) => p.meta.status !== 'archived' || p.id === keep);
+export const listedProposals = (keep?: string | null): Proposal[] => PROPOSALS.filter((p) => !p.meta.archived || p.id === keep);
 
 export const proposalLabel = (p: Proposal): string => `${p.id} · ${p.meta.title}`;
 
@@ -81,6 +82,8 @@ export const highlightOnly = (value: string | null): string | null => (value && 
 export interface PageChangeItem {
   id: string;
   kind: 'new' | 'changed' | 'removed';
+  /** A new step of the page's flow (the page itself changed): its id and label. */
+  step?: { id: string; label: string };
   /** What changed, in a few words each: "Content changed", "Settings changed: links, title", "Layout rules changed: split". */
   details: string[];
 }
@@ -144,13 +147,23 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
     if (!base) return { id, kind: 'new', details: [] };
     return { id, kind: 'changed', details: pageDetails(p, id, base) };
   });
+  // A flow's new steps: new screens, each its own item (after its page).
+  for (const id of ids) {
+    const def = p.pages[id];
+    const base = basePages[id] as { flow?: { steps: { id: string }[] } } | undefined;
+    if (!def?.flow || !base) continue;
+    const had = new Set((base.flow?.steps ?? []).map((st) => st.id));
+    const at = pages.findIndex((pg) => pg.id === id) + 1;
+    const added = def.flow.steps.filter((st) => !had.has(st.id));
+    pages.splice(at, 0, ...added.map((st) => ({ id, kind: 'new' as const, step: { id: st.id, label: st.label }, details: [t('A new step')] })));
+  }
   return { components, pages };
 }
 
 /** A proposal by its code — or by its folder's name, which is what links carried before proposals had codes. */
 /** The open proposals (not archived or merged) that add a component to the code's library (e.g. a PageIndicator). */
 export function proposalsAdding(name: string): Proposal[] {
-  return PROPOSALS.filter((p) => p.meta.status !== 'archived' && p.meta.status !== 'merged' && proposalChanges(p, null, {}).components.some((c) => c.name === name && c.scope === 'added'));
+  return PROPOSALS.filter((p) => !p.meta.archived && proposalChanges(p, null, {}).components.some((c) => c.name === name && c.scope === 'added'));
 }
 
 export function findProposal(id: string | null | undefined): Proposal | null {

@@ -162,5 +162,9 @@
   "Theme: {theme}": "Tema: {theme}",
   "Back to the start": "Volver al inicio",
   "System back (Alt+←)": "Atrás del sistema (Alt+←)",
-  "System back": "Atrás del sistema"
+  "System back": "Atrás del sistema",
+  "Open: the {display}": "Abrir: {display}",
+  "Close: the {display}": "Cerrar: {display}",
+  "Live tickets · {count}": "Tickets de Live · {count}",
+  "Open {ticket}": "Abrir {ticket}"
 }

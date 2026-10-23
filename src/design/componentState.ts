@@ -34,7 +34,7 @@ export const UNREPLICATED_COLOR = '#e8eaed';
 
 /** The open proposal (not archived or merged) that builds a component the app doesn't have, with its stories. */
 export function proposalBuilding(name: string): Proposal | null {
-  return PROPOSALS.find((p) => p.meta.status !== 'archived' && p.meta.status !== 'merged' && PROPOSAL_STORIES.get(p.id)?.some((s) => s.component === name)) ?? null;
+  return PROPOSALS.find((p) => !p.meta.archived && PROPOSAL_STORIES.get(p.id)?.some((s) => s.component === name)) ?? null;
 }
 
 /**
@@ -72,7 +72,7 @@ export function componentState(name: string, built: boolean, lib: Library, propo
     const accepted = kinds.length ? kinds.flatMap((k) => acceptedDifferences(k).map((a) => ({ ...a, key: `${k} · ${a.key}`, text: `${k} · ${a.text}` }))) : acceptedDifferences(name);
     const n = accepted.length;
     // The open proposals that add parameters to it, on or not: Status links them.
-    const proposals = PROPOSALS.filter((p) => p.meta.status !== 'archived' && p.meta.status !== 'merged' && p.params[name]?.length).map((p) => ({ code: p.id, title: p.meta.title }));
+    const proposals = PROPOSALS.filter((p) => !p.meta.archived && p.params[name]?.length).map((p) => ({ code: p.id, title: p.meta.title }));
     return reasons.length
       ? { color: WORK.differs.color, label: t('Differs from code'), summary: '', reasons, accepted, proposals }
       : {

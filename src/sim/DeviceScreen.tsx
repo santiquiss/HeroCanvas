@@ -44,6 +44,8 @@ import { systemTextVars } from '../theme/systemTextVars';
 import { useRealKeyboard } from './useRealViewport';
 import { usePresence } from './usePresence';
 import { ScreenLayerCtx } from './screenLayer';
+import { PopScopeCtx, type PopScope } from './popScope';
+import { bounceWheel } from './bounce';
 import { SHEET_ATTR } from './sheetLinks';
 import { sheetPresentation } from './sheetPresentation';
 import { t } from '../i18n/ui';
@@ -270,6 +272,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   const [kbH, setKbH] = useState(0);
   // On the device in hand the keyboard is the system's: its height is what it hides of the window.
   const realKb = useRealKeyboard(L.real && !preview);
+  // The wheel and the trackpad at a list's end: its bounce (on iPhone and iPad screens, bounce.ts decides).
+  useEffect(() => (screen ? bounceWheel(screen) : undefined), [screen]);
   useEffect(() => {
     if (!screen) return;
     const onIn = (e: FocusEvent) => {
@@ -285,12 +289,22 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         if (!(a && screen.contains(a) && isTextField(a))) setKbOpen(false);
       });
     };
+    // A tap on a button while typing keeps the field's focus, as on iOS: the keyboard stays up until the button acts
+    // (a Save that closes the sheet). Otherwise the browser takes the focus on the press, the keyboard slides away, the
+    // sheet riding on it drops, and the release lands off the button: no click.
+    const onPress = (e: PointerEvent) => {
+      const a = document.activeElement;
+      if (!(a && screen.contains(a) && isTextField(a)) || isTextField(e.target)) return;
+      if (e.target instanceof Element && e.target.closest('button, [role="button"]')) e.preventDefault();
+    };
     screen.addEventListener('focusin', onIn);
     screen.addEventListener('focusout', onOut);
+    screen.addEventListener('pointerdown', onPress, true);
     return () => {
       window.clearTimeout(t);
       screen.removeEventListener('focusin', onIn);
       screen.removeEventListener('focusout', onOut);
+      screen.removeEventListener('pointerdown', onPress, true);
     };
   }, [screen]);
   // The inspectable root. An effect, not a ref: when the active screen of a set changes, every cleanup runs before the
@@ -428,6 +442,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         // Right to left (Arabic, Hebrew…), the screen mirrors: rows, bars and the status bar flip, as iOS and Android do.
         dir={isRtl(language) ? 'rtl' : 'ltr'}
         data-device-screen
+        // Lists on iPhone and iPad bounce at their ends (sim/bounce); Android's stop.
+        data-bounce={L.os !== 'android' && !L.real ? '' : undefined}
         {...(preview ? {} : captureProps)}
         style={{
           // The system's text size and Bold Text (Scenarios › Accessibility), as the type tokens they change (none at
@@ -856,6 +872,17 @@ function SheetLayer({ layout: L, screen }: { layout: Layout; screen: HTMLElement
 }
 
 function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout: Layout; screen: HTMLElement | null; s: SheetSpec; open: boolean; onClose: () => void }) {
+  // What asks to close it from outside its content (the shim, a swipe, Escape) goes through its PopScope, if it has one.
+  const guard = useRef<PopScope | null>(null);
+  const dismiss = () => (guard.current && !guard.current.canPop ? guard.current.onPopBlocked?.() : closeSheet());
+  return (
+    <PopScopeCtx.Provider value={guard}>
+      <SheetFrameOf layout={L} screen={screen} s={s} open={open} closeSheet={closeSheet} dismiss={dismiss} />
+    </PopScopeCtx.Provider>
+  );
+}
+
+function SheetFrameOf({ layout: L, screen, s, open, closeSheet, dismiss }: { layout: Layout; screen: HTMLElement | null; s: SheetSpec; open: boolean; closeSheet: () => void; dismiss: () => void }) {
   // Content clears the status bar, or the reserved corner where there's no status strip (iPhone Duo inner portrait).
   const topInset = L.sbH || (L.reserved ? L.reserved.top + L.reserved.height : 0);
   // A bottom sheet's content stays above the keyboard while a field in it has it up (the platform's bottom view inset, which
@@ -875,20 +902,20 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
   const body = () => (typeof s.content === 'function' ? s.content(closeSheet, as) : s.content);
   if (anchor && as === 'dropdown')
     return (
-      <DropDownLayer anchor={anchor} bounds={{ w: L.vw, h: L.vh }} open={open} onClose={closeSheet} topInset={topInset} align={s.dropdownAlign}>
+      <DropDownLayer anchor={anchor} bounds={{ w: L.vw, h: L.vh }} open={open} onClose={dismiss} topInset={topInset} align={s.dropdownAlign}>
         {body()}
       </DropDownLayer>
     );
   if (anchor && as === 'popover')
     return (
-      <KitPopover anchor={anchor} bounds={{ w: L.vw, h: L.vh }} open={open} onClose={closeSheet} topInset={topInset} side={s.popoverSide}>
+      <KitPopover anchor={anchor} bounds={{ w: L.vw, h: L.vh }} open={open} onClose={dismiss} topInset={topInset} side={s.popoverSide}>
         {body()}
       </KitPopover>
     );
   if (as === 'dialog')
     return (
       // The keyboard's height: the dialog stays above it (a field in it keeps the keyboard up).
-      <KitSheet layout="dialog" width={s.width} surface={s.surface} open={open} onClose={closeSheet} bottomInset={kb} topInset={topInset}>
+      <KitSheet layout="dialog" width={s.width} surface={s.surface} open={open} onClose={dismiss} bottomInset={kb} topInset={topInset}>
         {body()}
       </KitSheet>
     );
@@ -897,7 +924,7 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
       <>
         {s.render({
           open,
-          onClose: closeSheet,
+          onClose: dismiss,
           bottomInset: L.botIn,
           topInset,
         })}
@@ -909,11 +936,16 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
   const underStatus = L.cornerStatus === 'vertical' && (s.layout ?? 'bottomContent') === 'bottomContent' && (L.vw + sheetW) / 2 > L.vw - L.sideW;
   // A top sheet that wide (a day picker) still spans the screen, under the column; its content stops at
   // the column, so nothing of it sits under the time and the signal.
-  const besideStatus = L.cornerStatus === 'vertical' && s.layout === 'topContent' && (L.vw + sheetW) / 2 > L.vw - L.sideW;
+  const reachesColumn = L.cornerStatus === 'vertical' && (L.vw + sheetW) / 2 > L.vw - L.sideW;
+  const besideStatus = reachesColumn && s.layout === 'topContent';
+  // A sheet that takes the screen (Bottom Expanded) keeps its content clear of the column as of a safe area: the
+  // column's width in place of its own right padding (the iPhone Duo reports the strip as the window's right inset).
+  const clearOfColumn = reachesColumn && s.layout === 'bottomExpanded';
   const sheetStyle: CSSProperties = {
     ...(underStatus ? { maxHeight: L.vh - tallSheetTop(L) } : {}),
     // …and what slides or scrolls sideways in it is cut there too, not at the sheet's edge.
     ...(besideStatus ? { paddingRight: L.sideW, ['--sheet-pad-r' as string]: '0px' } : {}),
+    ...(clearOfColumn ? { paddingRight: L.sideW } : {}),
   };
   return (
     <KitSheet
@@ -923,7 +955,7 @@ function SheetBody({ layout: L, screen, s, open, onClose: closeSheet }: { layout
       surface={s.surface}
       sheetStyle={sheetStyle}
       open={open}
-      onClose={closeSheet}
+      onClose={dismiss}
       bottomInset={bottomInset}
       topInset={topInset}
     >

@@ -287,7 +287,7 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
   return (
     <div
       ref={ref}
-      className={`${styles.kb} ${styles[os]} ${land ? styles.land : ''} ${open ? styles.open : ''}`}
+      className={`${styles.kb} ${styles[os]} ${land ? styles.land : ''} ${pad ? styles.padPanel : ''} ${open ? styles.open : ''}`}
       style={{ paddingBottom: os === 'ios' ? 0 : bottomInset, ...ipadVars }}
       onPointerDown={keep}
       onMouseDown={keep}
@@ -369,7 +369,8 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
       </div>
       )}
 
-      {os === 'ios' && pad && <div style={{ height: Math.max(bottomInset, 16) }} />}
+      {/* iOS 26's pad: ~40 under its last row before the home indicator's band. */}
+      {os === 'ios' && pad && <div style={{ height: land ? Math.max(bottomInset, 16) : Math.max(bottomInset + 40, 56) }} />}
       {os === 'ios' && !pad && (
         // Globe (emoji, with a typed return key) and dictation below the keys, in the home indicator's band.
         <div className={styles.below} style={{ height: land ? Math.max(bottomInset + 8, 40) : Math.max(bottomInset + 37, 71) }}>

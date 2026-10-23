@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './SimulatorShell.module.css';
 import { snapPoints, snapTarget } from './snap';
+import { canMove, kick, pull, pulled, release, scrollerFor, type Axis } from './bounce';
 
 /** Movement (screen px) before a press becomes a drag. */
 const SLOP = 6;
@@ -16,20 +17,6 @@ const TIP = 38;
 /** Velocity decay per 16ms frame of momentum scrolling. */
 const FRICTION = 0.95;
 
-type Axis = 'x' | 'y';
-
-function canScroll(el: HTMLElement, axis: Axis): boolean {
-  const s = getComputedStyle(el);
-  const ov = axis === 'y' ? s.overflowY : s.overflowX;
-  if (ov !== 'auto' && ov !== 'scroll') return false;
-  return axis === 'y' ? el.scrollHeight > el.clientHeight + 1 : el.scrollWidth > el.clientWidth + 1;
-}
-
-/** Nearest ancestor of `from` (inside `root`) that scrolls along `axis`. */
-function scrollerFor(from: Element | null, root: Element, axis: Axis): HTMLElement | null {
-  for (let n = from as HTMLElement | null; n && root.contains(n); n = n.parentElement) if (canScroll(n, axis)) return n;
-  return null;
-}
 
 /**
  * `frame`: the scaled device frame; its first child is the screen. `scale` and `rotated` (rotation-locked frame,
@@ -69,7 +56,9 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
     let pending = 0;
     let flushRaf = 0;
     const flush = (el: HTMLElement, axis: Axis) => {
-      if (axis === 'y') el.scrollTop -= pending;
+      // Past the end (or back from it), the content bounces instead (iOS); what scrolls, scrolls.
+      if (pulled(el) || !canMove(el, axis, -pending)) pull(el, axis, -pending);
+      else if (axis === 'y') el.scrollTop -= pending;
       else el.scrollLeft -= pending;
       pending = 0;
       flushRaf = 0;
@@ -145,12 +134,16 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
         else el.scrollTo({ [axis === 'y' ? 'top' : 'left']: target, behavior: 'smooth' });
         return;
       }
+      // Let go past the end: back to rest, no fling.
+      if (pulled(el)) return release(el);
       let vel = v;
       let t0 = performance.now();
       const tick = (now: number) => {
         const dt = Math.min(32, now - t0);
         t0 = now;
         vel *= FRICTION ** (dt / 16);
+        // The fling reaches the end: a bounce with what's left of it.
+        if (!canMove(el, axis, -vel)) return kick(el, axis, -vel);
         if (axis === 'y') el.scrollTop -= vel * dt;
         else el.scrollLeft -= vel * dt;
         if (Math.abs(vel) > 0.02) momentum = requestAnimationFrame(tick);
