@@ -51,6 +51,16 @@ import { t } from '../i18n/ui';
 const T = `transform ${PAGE_MS}ms ${EASE}`;
 const SHADOW = '-8px 0 24px rgba(0,0,0,0.12)';
 /**
+ * The same shadow drawn only to the left (offset and spread so its blur ends at the layer's right edge): beside the
+ * iPhone Duo right column, where the layer lets its controls' shadows past that edge, it doesn't tint the column.
+ */
+const SHADOW_LEFT = '-16px 0 24px -8px rgba(0,0,0,0.12)';
+/**
+ * How far past its edge the app's area still draws: a control's shadow where the page has no side padding (against the
+ * iPhone Duo's column) shows whole, as the app draws it, instead of cut at the edge. The column is above the pages.
+ */
+const SHADOW_ROOM = 24;
+/**
  * The screen's layers, bottom to top: the split panel, pushed pages (beside the tablet rail), the rail (the app's nav: over the pages beside it, so its shadow falls on them), covers (full pages over everything, the rail too),
  * the snackbar (over the pages, under the sheets' and dialogs' routes, as a scaffold has it), dialogs, Inspect.
  */
@@ -325,8 +335,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
   }, [glide]);
   const glideStyle = (glide === null ? {} : { '--glide-from': `${glide}px`, animation: `hcGlide ${PAGE_MS}ms ${EASE}` }) as CSSProperties;
   const appW = R.app.width;
-  /** Off the app area's right edge (and its shadow), from a layer's left. */
-  const offRight = (left: number) => `translateX(${appW - left + 8}px)`;
+  /** Off the app area's right edge, the room it draws past it and its shadow, from a layer's left. */
+  const offRight = (left: number) => `translateX(${appW - left + SHADOW_ROOM + 8}px)`;
   const baseEntry = useMemo(() => ({ ref: stack[0], index: 0 }), [stack]);
   const panelEntry = useMemo(() => ({ ref: { id: SIDE_PANEL_PAGE ?? stack[0].id, params: {} }, index: 0 }), [stack]);
   const pushed = stack.slice(1, end).map((ref, j) => ({ ref, index: j + 1 }));
@@ -451,6 +461,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
             left: 0,
             width: appW,
             overflow: 'clip',
+            overflowClipMargin: SHADOW_ROOM,
             transition: `width ${PAGE_MS}ms ${EASE}`,
             // Under the launch screen there's no app yet (laid out, so its exit can find where the icon lands): its
             // page color would show at the screen's rounded edge, a hairline around the launch.
@@ -550,9 +561,10 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                     width: R.pushes.width,
                     zIndex: underBar ? 20 + k : Z.push + k,
                     background: 'var(--pg)',
-                    boxShadow: p.present && !L.railW && !fades ? SHADOW : 'none',
-                    // Beside the iPhone Duo right column the shadow stays on the left: it would tint the column.
-                    clipPath: L.sideNav ? 'inset(0 0 0 -40px)' : undefined,
+                    boxShadow: p.present && !L.railW && !fades ? (L.sideNav ? SHADOW_LEFT : SHADOW) : 'none',
+                    // Beside the iPhone Duo right column its own shadow stays on the left (it would tint the column);
+                    // its controls' shadows reach past the right edge, as the app's.
+                    clipPath: L.sideNav ? `inset(0 ${-SHADOW_ROOM}px 0 -40px)` : undefined,
                     ...glideStyle,
                   }}
                 >
@@ -587,10 +599,11 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
                     // Above every push, however deep, and the tablet rail (Z.rail).
                     zIndex: Z.cover + k,
                     background: bg ?? 'var(--pg)',
-                    boxShadow: p.present ? SHADOW : 'none',
+                    boxShadow: p.present ? (L.sideNav ? SHADOW_LEFT : SHADOW) : 'none',
                     // Beside the iPhone Duo right column the shadow stays on the left, as a push's: its blur would
-                    // tint the column. A page with a background of its own still reaches under the column.
-                    clipPath: L.sideNav ? `inset(0 ${bg ? -L.sideW : 0}px 0 -40px)` : undefined,
+                    // tint the column. A page with a background of its own still reaches under the column; the others'
+                    // controls' shadows reach past the right edge.
+                    clipPath: L.sideNav ? `inset(0 ${bg ? -L.sideW : -SHADOW_ROOM}px 0 -40px)` : undefined,
                   }}
                 >
                   <EntryView entry={p.item} />
