@@ -1,10 +1,11 @@
 // The comments in memory, per design (Live or a proposal): one request loads a design's comments for every reader
-// (the panel, the pins, the Flow cards, the tab's count), and they refresh together. No connection kept open: they
+// (the panel, the pins, the Flow cards, the tab's count), and they refresh together; the panel's All loads every
+// design's in one request (ALL), filed under each. No connection kept open: they
 // load again when the window comes back to the front and, while someone is reading them (the panel open, commenting),
 // every 30 s. Adding and resolving show at once and are sent after (undone if the store refuses them); editing and
 // deleting wait for the store, which checks the comment is yours.
 import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
-import { BACKEND, type Backend } from './backend';
+import { BACKEND, BACKEND_READY, type Backend } from './backend';
 import { myOwner, ownerSecret } from './owner';
 import type { Comment } from './types';
 
@@ -20,6 +21,8 @@ const STALE_MS = 10_000;
 const EMPTY: CommentsState = { comments: [], status: 'loading', error: null };
 
 let backend: Backend = BACKEND;
+/** Lists wait for this browser's earlier comments to reach the shared store (backend.ts), so they show among them. */
+let ready: Promise<void> = BACKEND_READY;
 const states = new Map<string, CommentsState>();
 const loadedAt = new Map<string, number>();
 const inflight = new Map<string, Promise<void>>();
@@ -28,6 +31,14 @@ const pending = new Map<string, Comment>();
 const listeners = new Map<string, Set<() => void>>();
 /** Readers that want it fresh (the panel, comment mode), per design. */
 const live = new Map<string, number>();
+/** Readers of every design's comments (useAllComments): told when any design's change. */
+const anyListeners = new Set<() => void>();
+/** Counts every change, so every design's comments together are joined again only when one changed. */
+let generation = 0;
+
+/** Every design at once (refresh): its state holds whether they loaded, the comments stay filed under each design. */
+export const ALL_DESIGNS = '*';
+const ALL = ALL_DESIGNS;
 
 /** Whether everyone sees the comments, or only this browser (no shared store connected yet). */
 export const commentsShared = () => backend.kind === 'shared';
@@ -35,28 +46,46 @@ export const commentsShared = () => backend.kind === 'shared';
 /** For the tests: another backend, and nothing in memory. */
 export function setBackendForTests(b: Backend) {
   backend = b;
+  ready = Promise.resolve();
   states.clear();
   loadedAt.clear();
   inflight.clear();
   pending.clear();
+  generation++;
 }
 
 function set(design: string, next: Partial<CommentsState>) {
   states.set(design, { ...(states.get(design) ?? EMPTY), ...next });
+  generation++;
   listeners.get(design)?.forEach((l) => l());
+  anyListeners.forEach((l) => l());
+}
+
+/** A design's comments as loaded, with this browser's not confirmed yet. */
+function loaded(design: string, list: Comment[]) {
+  for (const c of list) pending.delete(c.id);
+  const waiting = [...pending.values()].filter((c) => c.design === design);
+  loadedAt.set(design, Date.now());
+  set(design, { comments: [...list, ...waiting], status: 'ready', error: null });
 }
 
 export function refresh(design: string): Promise<void> {
   const running = inflight.get(design);
   if (running) return running;
-  const p = backend
-    .list(design)
-    .then((list) => {
-      const ids = new Set(list.map((c) => c.id));
-      for (const id of ids) pending.delete(id);
-      const waiting = [...pending.values()].filter((c) => c.design === design);
-      loadedAt.set(design, Date.now());
-      set(design, { comments: [...list, ...waiting], status: 'ready', error: null });
+  const p = ready
+    .then(async () => {
+      if (design !== ALL) return loaded(design, await backend.list(design));
+      const byDesign = new Map<string, Comment[]>();
+      for (const c of await backend.listAll()) {
+        const list = byDesign.get(c.design);
+        if (list) list.push(c);
+        else byDesign.set(c.design, [c]);
+      }
+      // A design loaded before that has none now (its last one deleted) is emptied too.
+      for (const d of states.keys()) if (d !== ALL && !byDesign.has(d)) byDesign.set(d, []);
+      for (const [d, list] of byDesign) loaded(d, list);
+      loadedAt.set(ALL, Date.now());
+      set(ALL, { status: 'ready', error: null });
     })
     .catch((e: unknown) => set(design, { status: 'error', error: e instanceof Error ? e.message : String(e) }))
     .finally(() => inflight.delete(design));
@@ -130,6 +159,38 @@ export function useComments(design: string, { fresh = false }: { fresh?: boolean
 }
 
 const NONE: Comment[] = [];
+
+let joined: { at: number; value: Comment[] } = { at: -1, value: NONE };
+/** Every design's comments loaded, together: joined again only after a change. */
+function everyComment(): Comment[] {
+  if (joined.at !== generation) joined = { at: generation, value: [...states].flatMap(([d, s]) => (d === ALL ? NONE : s.comments)) };
+  return joined.value;
+}
+
+const subscribeAll = (l: () => void) => {
+  const off = subscribe(ALL, l);
+  anyListeners.add(l);
+  return () => {
+    off();
+    anyListeners.delete(l);
+  };
+};
+const noSubscription = () => () => {};
+const ALL_ONLY = [ALL];
+const NO_DESIGNS: string[] = [];
+
+/**
+ * Every design's comments (Live's and every proposal's, the panel's All), in one request; `enabled` false: none, and
+ * nothing loaded. `fresh`: kept up to date while this reader is mounted.
+ */
+export function useAllComments(enabled: boolean, { fresh = false }: { fresh?: boolean } = {}): CommentsState {
+  const comments = useSyncExternalStore(enabled ? subscribeAll : noSubscription, enabled ? everyComment : () => NONE, () => NONE);
+  const status = useSyncExternalStore(enabled ? subscribeAll : noSubscription, () => (enabled ? (states.get(ALL) ?? EMPTY) : EMPTY), () => EMPTY);
+  const designs = enabled ? ALL_ONLY : NO_DESIGNS;
+  useLoad(designs);
+  useFresh(designs, fresh);
+  return useMemo(() => ({ comments, status: status.status, error: status.error }), [comments, status]);
+}
 
 /** The comments of several designs together (a set of devices, each showing its own version). */
 export function useCommentsOf(designs: string[], { fresh = false }: { fresh?: boolean } = {}): Comment[] {

@@ -16,6 +16,10 @@ export interface HeroCanvasConfig {
   brand?: { light: string; dark: string };
   /** The language of HeroCanvas's own interface (its panels, menus and buttons): `en` (default) or `es`. */
   language?: 'en' | 'es';
+  /** Where comments are shared: a Supabase project's address and publishable key (schema in src/comments/supabase.sql).
+   *  Unset: each browser keeps its own. `team`: who can be @mentioned in a comment, each with their Slack member id
+   *  (Profile › ⋯ › Copy member ID), so the store tells them in Slack (supabase.sql's notify_mentions). */
+  comments?: { url: string; key: string; team?: { name: string; slack: string }[] };
 }
 
 type RGB = [number, number, number];

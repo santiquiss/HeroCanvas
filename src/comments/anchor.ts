@@ -1,8 +1,8 @@
 // Where a pin goes on the device: anchored to the component under the click (found again by its name and order in the
 // page), so it follows it when the screen scrolls or the layout changes; else at the same point of the page.
 import { componentInstance } from '../design/component';
-import { SHEET_ATTR } from '../sim/sheetLinks';
-import type { CommentAnchor } from './types';
+import { openSheetLink, SHEET_ATTR } from '../sim/sheetLinks';
+import type { Comment, CommentAnchor } from './types';
 
 /** The page layers carry their page id (sim/DeviceScreen). */
 export const PAGE_ATTR = 'data-page-id';
@@ -160,4 +160,49 @@ export function anchorElement(frame: Element, pageEl: HTMLElement, a: CommentAnc
   const el = a.component ? instances(sheet ?? (a.overlay ? frame : pageEl), a.component, a.overlay)[a.nth] : undefined;
   if (el) return { el, onComponent: true };
   return a.overlay ? null : { el: pageEl, onComponent: false };
+}
+
+/** A comment left on a sheet opens it (once its page is on screen: sim/sheetLinks). */
+export function openSheetOf(c: Comment) {
+  if (c.anchor?.sheet) openSheetLink(c.anchor.sheet, c.link.split('?')[0]);
+}
+
+/**
+ * Whether something of the screen is drawn over an element at a point (a bar the page scrolls under): the topmost
+ * element there, past the comments' own layer, is neither in it nor around it.
+ */
+export function drawnOver(el: Element, x: number, y: number, layer: Element | null): boolean {
+  for (const hit of document.elementsFromPoint(x, y)) {
+    if (layer?.contains(hit)) continue;
+    return !(el.contains(hit) || hit.contains(el));
+  }
+  return false;
+}
+
+/** The nearest box between an element and its device frame that scrolls up and down (a page's list), if any. */
+export function scrollerOf(el: Element, frame: Element): HTMLElement | null {
+  for (let p = el.parentElement; p && p !== frame; p = p.parentElement) {
+    if (p.scrollHeight <= p.clientHeight + 1) continue;
+    const o = getComputedStyle(p).overflowY;
+    if (o === 'auto' || o === 'scroll') return p;
+  }
+  return null;
+}
+
+/**
+ * Scrolls a box so a point of the window (`y`) sits in its middle, the canvas's zoom taken into account. Animated
+ * frame by frame: on the simulator's screens a smooth scrollBy stops after its first step.
+ */
+export function scrollToPoint(scroller: HTMLElement, y: number, ms = 280) {
+  const r = scroller.getBoundingClientRect();
+  const zoom = scroller.offsetHeight ? r.height / scroller.offsetHeight : 1;
+  const from = scroller.scrollTop;
+  const to = Math.max(0, Math.min(scroller.scrollHeight - scroller.clientHeight, from + (y - (r.top + r.height / 2)) / zoom));
+  const start = performance.now();
+  const step = (now: number) => {
+    const k = Math.min(1, (now - start) / ms);
+    scroller.scrollTop = from + (to - from) * (1 - (1 - k) ** 3);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }

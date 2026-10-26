@@ -17,6 +17,9 @@ export const kindOf = (id: string): (typeof KINDS)[number] => KINDS.find((k) => 
 /** Where Live's comments go (a proposal's go under its code, `PJ-12`). */
 export const LIVE = 'live';
 
+/** A link to one comment (`<its link>&comment=<id>`, as the Slack message has it): the canvas opens it there. */
+export const COMMENT_PARAM = 'comment';
+
 /** A component's page in the gallery, as a comment's `page` (the app's pages are their ids). */
 const COMPONENT_PAGE = 'component:';
 export const componentPage = (name: string) => COMPONENT_PAGE + name;
@@ -72,6 +75,8 @@ export interface Comment {
   owner?: string | null;
   /** ISO date of its last edit, if it was edited. */
   editedAt?: string | null;
+  /** Who it @mentions, by their Slack member id (comments/mentions): told in Slack when it's left. */
+  mentions?: string[] | null;
 }
 
 export const MAX_BODY = 4000;

@@ -4,7 +4,7 @@
 
 ### Superpowers for Designers
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.50.1-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.51.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 <img alt="Status: beta" src="https://img.shields.io/badge/status-beta-e0362f">
 <a href="https://github.com/santiquiss/HeroCanvas/actions/workflows/checks.yml"><img alt="Checks" src="https://github.com/santiquiss/HeroCanvas/actions/workflows/checks.yml/badge.svg"></a>
@@ -216,8 +216,9 @@ Other agents can read the same files: they're plain Markdown.
 - **Proposals**: changes kept apart, with versions to compare side by side and a handoff for whoever builds them.
 - **Inspect, Layers, Components**: the component under the cursor with its props and tokens, the tree of components,
   and a gallery of every component and its states.
-- **Comments**: notes for the whole team, right on the screens (kept in the browser, or shared through a Supabase
-  table: `src/comments/supabase.sql`).
+- **Comments**: notes for the whole team, right on the screens, with emoji and @mentions told in Slack; every
+  proposal's in one list, and a link to each (kept in the browser, or shared through a Supabase table:
+  `src/comments/supabase.sql`).
 - **Capture**: any screen as an image or a video, the device turned in 3D with light and motion.
 - **On a real phone**: open your deployed copy on a phone and install it from the browser (a PWA): your app's screens
   at their real size, in your hand.
@@ -336,7 +337,8 @@ Good to know:
 - **Keep it private.** Your app's unreleased designs are on it: put the link behind your host's protection (Vercel's
   Deployment Protection, Netlify's password protection, Cloudflare Access) or your company's login.
 - **Shared comments** need a database: until you connect one, each browser keeps its own. Ask your agent to set up
-  Supabase with `src/comments/supabase.sql` and `src/comments/supabase.json`.
+  Supabase with `src/comments/supabase.sql` and `herocanvas.config.ts` (`comments`: its address and publishable key,
+  and the team to @mention).
 
 ## Contribute
 

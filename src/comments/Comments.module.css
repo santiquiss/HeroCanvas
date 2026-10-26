@@ -56,6 +56,48 @@
   background: #0d99ff;
 }
 
+/* Pins scrolled past an edge of their screen: a marker for that edge that scrolls to the nearest. Beside a device, at
+   its right edge (the screen's top or bottom); on a bare canvas, inside it at that edge's middle. */
+.edge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 4px 0 6px;
+  border: none;
+  border-radius: 13px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: scale 120ms ease;
+}
+.edge:hover {
+  scale: 1.06;
+}
+.edgeAbove {
+  translate: -50% 8px;
+}
+.edgeBelow {
+  translate: -50% calc(-100% - 8px);
+}
+.edgeBeside.edgeAbove {
+  translate: 0 0;
+}
+.edgeBeside.edgeBelow {
+  translate: 0 -100%;
+}
+.edgeCount {
+  padding-right: 2px;
+  color: var(--ui-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
 /* A card beside a pin: a thread, or (bare) a new comment. */
 .popover,
 .popBare {
@@ -601,4 +643,79 @@
   padding: 32px 12px;
   color: var(--ui-text-subtle);
   text-align: center;
+}
+
+/* The emoji button of a field (EmojiButton), and the grid it opens over everything. */
+.emojiBtn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.emojiBtn:hover,
+.emojiBtnOn {
+  background: var(--ui-hover);
+  color: var(--ui-text);
+}
+.emojiGrid {
+  composes: surface from '../theme/surface.module.css';
+  position: fixed;
+  z-index: 1000;
+  display: grid;
+}
+.emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.emoji:hover,
+.emoji:focus-visible {
+  background: var(--ui-hover);
+  outline: none;
+}
+
+/* @mentions: the list a field opens on @ (Mentions), and a mention in a comment's text. */
+.mentionList {
+  composes: surface from '../theme/surface.module.css';
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+.mentionOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.mentionOn {
+  background: var(--ui-hover);
+}
+.mention {
+  color: var(--ui-blue-text);
+  font-weight: 600;
 }

@@ -156,7 +156,7 @@
   "Pages": "Páginas",
   "This screen": "Esta pantalla",
   "This component": "Este componente",
-  "All pages": "Todas las páginas",
+  "All comments": "Todos los comentarios",
   "Resolved": "Resueltos",
   "Couldn't load the comments.": "No se pudieron cargar los comentarios.",
   "Try again": "Reintentar",
@@ -172,5 +172,12 @@
   "{supabase}, ready to go: a free project, the table from {sql} and its address and key in {json}.": "{supabase}, lista para usar: un proyecto gratuito, la tabla de {sql} y su dirección y clave en {json}.",
   "{other} your team already has: the agent writes its adapter in {adapter}.": "{other} que tu equipo ya tenga: el agente escribe su adaptador en {adapter}.",
   "Another database": "Otra base de datos",
-  "Comment {number}": "Comentario {number}"
+  "Comment {number}": "Comentario {number}",
+  "{n} comment above": "{n} comentario más arriba",
+  "{n} comments above": "{n} comentarios más arriba",
+  "{n} comment below": "{n} comentario más abajo",
+  "{n} comments below": "{n} comentarios más abajo",
+  "Add emoji": "Agregar emoji",
+  "Emoji": "Emoji",
+  "People": "Personas"
 }

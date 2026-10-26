@@ -6,6 +6,32 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.51.0 — 2026-10-26
+
+- **All comments, Live's and every proposal's** (Comments panel): "All pages" is now **All comments**, every design's
+  in one request (archived proposals too), with a **Proposal** filter (with how many each). Each card says where it was
+  left (proposal, page, device); threads are numbered per design.
+- **Clicking a comment takes you to it**: on this screen its pin scrolls into view and its thread opens; left on
+  another page, proposal, version or device, the canvas opens the view it was left on first. **A link to one comment**:
+  `?comment=<id>`.
+- **Comments out of view**: a pin scrolled off its screen, or under its header or bottom bar, leaves a marker beside
+  the device (↑ / ↓, the nearest one's avatar and +N); clicking it scrolls to it.
+- **Emoji and @mentions**: a 🙂 in the comment fields; typing @ lists the team (`comments.team`), a mention shows
+  highlighted and the comment keeps who it mentions. With Supabase, a trigger posts them in Slack through an Incoming
+  Webhook (`supabase.sql`: the `mentions` column, `notify_mentions`).
+- **The comments' connection is the team's** (`herocanvas.config.ts` `comments`), so an update can't empty it; a
+  browser's own comments upload to the shared store on their own once it's connected (set aside in
+  `hc.comments.uploaded`).
+- Fix: a page's pins no longer show over another page (a side panel, another tab): they're measured again when the
+  URL's query changes. `npm run update` takes a file made here first and then released without a clash.
+
+**Contract**
+
+- `src/comments/supabase.json` is gone: a copy that shared comments moves its `url` and `key` to
+  `herocanvas.config.ts` as `comments: { url, key }` (optionally `team: [{ name, slack }]`). Re-run
+  `src/comments/supabase.sql` on the project for the `mentions` column and the Slack trigger (it says how to store the
+  webhook in the Vault).
+
 ## 0.50.1 — 2026-10-23
 
 - **The landscape rules' tests run on any app's devices**: a foldable an app leaves out of its catalog skips its cases

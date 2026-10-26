@@ -5,6 +5,10 @@ declare const __HC_VERSION__: string;
 declare const __BUILD_ID__: string;
 /** The interface's language (herocanvas.config.ts `language`). */
 declare const __HC_LANGUAGE__: string;
+/** Where comments are shared (herocanvas.config.ts `comments`); null: this browser only. */
+declare const __HC_COMMENTS__: { url: string; key: string } | null;
+/** Who can be @mentioned in a comment, with their Slack member id (herocanvas.config.ts `comments.team`). */
+declare const __HC_TEAM__: { name: string; slack: string }[];
 
 /** The tool's brand colors (scripts/vite/brand.ts). */
 declare module 'virtual:hc-brand.css';

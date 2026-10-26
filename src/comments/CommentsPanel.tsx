@@ -1,21 +1,27 @@
-// The Comments panel, as Figma's: a search, the filters (this screen, or component in the gallery, or every page,
-// resolved) and the threads of what's on screen (Live or the proposal), newest first. A thread opens beside its pin on the canvas and here, where it
-// unfolds with its replies; opening one left on another view takes the canvas there.
+// The Comments panel, as Figma's: a search, the filters (this screen, or component in the gallery; or all of them, Live's
+// and every proposal's, by proposal; resolved) and the threads, newest first. A thread opens beside its pin on the
+// canvas and here, where it unfolds with its replies; opening one takes the canvas to its pin: scrolled into view, or
+// the view it was left on when it isn't on the canvas.
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { Icon } from '../components/Icon';
 import { findDevice } from '../devices/devices';
 import { useGalleryRoute } from '../gallery/route';
 import { useNavRoot } from '../nav/context';
-import { pageName } from '../nav/stack';
+import { composePages } from '../nav/manifest';
+import { pageName, type Manifest } from '../nav/stack';
+import { SIDE_PANEL_PAGE, sidePanelOnIn } from '../nav/sidePanel';
+import { findProposal, proposalLabel } from '../proposals';
 import { useMode } from '../sim/modes';
+import { CheckDropdown } from '../tools/CheckDropdown';
 import { SearchField } from '../tools/SearchField';
+import { openSheetOf } from './anchor';
 import { useCanvasDesigns, useCommentScope, useCommentsUi } from './CommentsContext';
+import { CommentText } from './MentionField';
 import { Avatar, EditField, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
-import { commentsShared, refresh, useComments, useCommentsOf } from './store';
+import { ALL_DESIGNS, commentsShared, refresh, useAllComments, useComments, useCommentsOf } from './store';
 import { commentLink, filterThreads, resolverName, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
-import { componentOfPage, componentPage, type Comment } from './types';
-import { openSheetLink } from '../sim/sheetLinks';
+import { componentOfPage, componentPage, LIVE } from './types';
 import panel from '../tools/Panel.module.css';
 import styles from './Comments.module.css';
 import { plural, t } from '../i18n/ui';
@@ -23,9 +29,10 @@ import { plural, t } from '../i18n/ui';
 export default function CommentsPanel() {
   const { design, variant } = useCommentScope();
   // Loading and errors are the toolbar version's; the threads, every version's on the canvas (a set's devices).
+  const canvasDesigns = useCanvasDesigns();
   const state = useComments(design, { fresh: true });
-  const comments = useCommentsOf(useCanvasDesigns(), { fresh: true });
-  const { selected, setSelected, commenting, setCommenting, showResolved: resolved, setShowResolved: setResolvedShown } = useCommentsUi();
+  const canvas = useCommentsOf(canvasDesigns, { fresh: true });
+  const { selected, setSelected, commenting, setCommenting, showResolved: resolved, setShowResolved: setResolvedShown, setReveal } = useCommentsUi();
   const nav = useNavRoot();
   const mode = useMode();
   const gallery = useGalleryRoute().name;
@@ -33,24 +40,48 @@ export default function CommentsPanel() {
   const location = useLocation();
   const [scope, setScope] = useState<'page' | 'all'>('page');
   const [query, setQuery] = useState('');
-  // What's on the canvas: the screen's pages in the prototype, a component's page in the gallery; in Flow (and the
-  // gallery's overview) no one page: every page's.
-  const onScreen = new Set(mode === 'prototype' ? nav.stack.map((r) => r.id) : mode === 'components' && gallery ? [componentPage(gallery)] : []);
+  // All: which designs (Live, proposals); none picked is every one.
+  const [picked, setPicked] = useState<string[]>([]);
+  // What's on the canvas: the screen's pages in the prototype (and the side panel, when it's on), a component's page in
+  // the gallery; in Flow (and the gallery's overview) no one page: all of them.
+  const onScreen = new Set(
+    mode === 'prototype'
+      ? [...nav.stack.map((r) => r.id), ...(SIDE_PANEL_PAGE && sidePanelOnIn(new URLSearchParams(location.search)) ? [SIDE_PANEL_PAGE] : [])]
+      : mode === 'components' && gallery
+        ? [componentPage(gallery)]
+        : [],
+  );
   const hasScope = onScreen.size > 0;
-  const pageScope = hasScope && scope === 'page';
-  const all = useMemo(() => threadsOf(comments), [comments]);
-  const numbers = useMemo(() => threadNumbers(all), [all]);
-  const label = (t: Thread) => componentOfPage(t.root.page) ?? pageName(nav.pages, t.root.page);
-  const threads = filterThreads(all, { resolved, variant }).filter((t) => (!pageScope || onScreen.has(t.root.page) || t.root.id === selected) && threadMatches(t, query, label(t)));
+  const everything = !hasScope || scope === 'all';
+  // All of them: every design's, in one request, loaded only once asked for.
+  const allState = useAllComments(everything, { fresh: true });
+  const comments = everything ? allState.comments : canvas;
+  const shown = everything ? allState : state;
+  const threadsAll = useMemo(() => threadsOf(comments), [comments]);
+  const numbers = useMemo(() => threadNumbers(threadsAll), [threadsAll]);
+  // The designs with comments, for the filter: Live first, then the proposals by code.
+  const designs = useMemo(() => {
+    const ds = [...new Set(threadsAll.map((t) => t.root.design))];
+    return ds.sort((a, b) => (a === LIVE ? -1 : b === LIVE ? 1 : a.localeCompare(b, undefined, { numeric: true })));
+  }, [threadsAll]);
+  const label = (t: Thread) => componentOfPage(t.root.page) ?? pageName(pagesOf(t.root.design, nav.proposal?.id, nav.pages), t.root.page);
+  const threads = (everything ? filterThreads(threadsAll, { resolved }) : filterThreads(threadsAll, { resolved, variant })).filter(
+    (t) =>
+      (everything ? !picked.length || picked.includes(t.root.design) : onScreen.has(t.root.page) || t.root.id === selected) &&
+      threadMatches(t, query, label(t)),
+  );
   const here = commentLink(location.pathname, location.search);
   const open = (t: Thread) => {
     if (t.root.id === selected) return setSelected(null);
     setSelected(t.root.id);
-    // The canvas shows the view it was left on, where its pin is, and the sheet it's on (over its page: not under
-    // another one pushed over it).
+    // Left on another page or design: the canvas goes to the view it was left on, and the sheet it's on (over its
+    // page: not under another one pushed over it). Then (or here already) its pin is scrolled into view; when it can't
+    // show as the canvas is (another version or device, a page over it), the canvas goes to its view too.
     const sheetElsewhere = !!t.root.anchor?.sheet && location.pathname !== t.root.link.split('?')[0];
-    if (!onScreen.has(t.root.page) || sheetElsewhere) navigate(t.root.link);
-    openItsSheet(t.root);
+    const elsewhere = !onScreen.has(t.root.page) || !canvasDesigns.includes(t.root.design) || sheetElsewhere;
+    if (elsewhere) navigate(t.root.link);
+    openSheetOf(t.root);
+    setReveal({ root: t.root, go: !elsewhere });
   };
 
   return (
@@ -63,42 +94,58 @@ export default function CommentsPanel() {
             <div className={styles.segmented} role="radiogroup" aria-label={t('Pages')}>
               {(['page', 'all'] as const).map((s) => (
                 <button key={s} role="radio" aria-checked={scope === s} className={scope === s ? styles.segOn : ''} onClick={() => setScope(s)}>
-                  {s === 'page' ? (mode === 'components' ? t('This component') : t('This screen')) : t('All pages')}
+                  {s === 'page' ? (mode === 'components' ? t('This component') : t('This screen')) : t('All comments')}
                 </button>
               ))}
             </div>
           ) : (
-            <span className={panel.muted}>{t('All pages')}</span>
+            <span className={panel.muted}>{t('All comments')}</span>
           )}
           <label className={styles.check}>
             <input type="checkbox" checked={resolved} onChange={(e) => setResolvedShown(e.target.checked)} />
             {t('Resolved')}
           </label>
         </div>
+        {everything && designs.length > 1 && (
+          <CheckDropdown
+            label={t('Proposal')}
+            options={designs.map((d) => ({ value: d, label: designName(d, true), count: threadsAll.filter((x) => x.root.design === d && (resolved || !x.root.resolvedAt)).length }))}
+            selected={picked.filter((d) => designs.includes(d))}
+            onChange={setPicked}
+          />
+        )}
       </div>
-      {state.status === 'error' && (
+      {shown.status === 'error' && (
         <div className={`${panel.section} ${styles.error}`}>
           {t("Couldn't load the comments.")}{' '}
-          <button className={panel.link} onClick={() => void refresh(design)}>
+          <button className={panel.link} onClick={() => void refresh(everything ? ALL_DESIGNS : design)}>
             {t('Try again')}
           </button>
-          <div className={panel.muted}>{state.error}</div>
+          <div className={panel.muted}>{shown.error}</div>
         </div>
       )}
-      {state.status === 'loading' && !comments.length ? (
+      {shown.status === 'loading' && !comments.length ? (
         <div className={panel.section}>
           <span className={panel.muted}>{t('Loading…')}</span>
         </div>
       ) : threads.length ? (
         <div className={styles.cards}>
           {threads.map((t) => (
-            <ThreadCard key={t.root.id} thread={t} number={numbers.get(t.root.id) ?? 0} pageLabel={label(t)} open={t.root.id === selected} elsewhere={t.root.link !== here} onToggle={() => open(t)} />
+            <ThreadCard
+              key={t.root.id}
+              thread={t}
+              number={numbers.get(t.root.id) ?? 0}
+              pageLabel={everything ? `${designName(t.root.design)} · ${label(t)}` : label(t)}
+              open={t.root.id === selected}
+              elsewhere={t.root.link !== here}
+              onToggle={() => open(t)}
+            />
           ))}
         </div>
       ) : (
         <div className={styles.empty}>
           <Icon name="chat_bubble" size={20} />
-          <span>{all.length ? t('Nothing with these filters.') : t('No comments yet.')}</span>
+          <span>{threadsAll.length ? t('Nothing with these filters.') : t('No comments yet.')}</span>
           {hasScope && !commenting && (
             <button className={panel.btn} onClick={() => setCommenting(true)}>
               <Icon name="add_comment" size={14} />
@@ -144,7 +191,7 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
           <span className={styles.author}>{root.author}</span>
           <When c={root} />
         </div>
-        {editing ? <EditField c={root} onDone={() => setEditing(false)} /> : <p className={`${styles.text} ${open ? '' : styles.clamp}`}>{root.body}</p>}
+        {editing ? <EditField c={root} onDone={() => setEditing(false)} /> : <CommentText className={`${styles.text} ${open ? '' : styles.clamp}`} text={root.body} />}
         {!open && replies.length > 0 && (
           <span className={styles.replies}>
             {plural(replies.length, '{n} reply', '{n} replies')}
@@ -169,7 +216,7 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
               className={panel.link}
               onClick={() => {
                 navigate(root.link);
-                openItsSheet(root);
+                openSheetOf(root);
               }}
             >
               {t('Show where it was left')}
@@ -181,9 +228,20 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
   );
 }
 
-/** A comment left on a sheet opens it (once its page is on screen: sim/sheetLinks). */
-function openItsSheet(c: Comment) {
-  if (c.anchor?.sheet) openSheetLink(c.anchor.sheet, c.link.split('?')[0]);
+/** A design as the panel names it: Live, or a proposal's code (`long`: with its title, in the filter). */
+function designName(design: string, long = false): string {
+  if (design === LIVE) return t('Live');
+  const p = findProposal(design);
+  return p && long ? proposalLabel(p) : design;
+}
+
+const manifests = new Map<string, Manifest>();
+/** A design's pages, to name a thread's page: the canvas's own when it's that design's, else composed once. */
+function pagesOf(design: string, current: string | undefined, here: Manifest): Manifest {
+  if (design === (current ?? LIVE)) return here;
+  let m = manifests.get(design);
+  if (!m) manifests.set(design, (m = composePages(design === LIVE ? null : findProposal(design))));
+  return m;
 }
 
 /** The device a comment was left on: its name, and the display when it has several (Galaxy Z Fold7 · Inner). */
@@ -211,7 +269,7 @@ function SharingNote() {
             {fill(t('{supabase}, ready to go: a free project, the table from {sql} and its address and key in {json}.'), {
               supabase: <b>Supabase</b>,
               sql: <code>src/comments/supabase.sql</code>,
-              json: <code>src/comments/supabase.json</code>,
+              json: <code>herocanvas.config.ts</code>,
             })}
           </li>
           <li>

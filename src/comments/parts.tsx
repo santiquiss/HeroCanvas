@@ -1,7 +1,10 @@
 // The pieces a thread is drawn with, the same on the canvas (beside its pin) and in the panel: avatars, a comment, the
-// thread's comments, the reply field, resolve, and your own comment's ⋯ (edit, delete). Figma's comments are the model.
+// thread's comments, the reply field (with its emoji and @mentions), resolve, and your own comment's ⋯ (edit, delete). Figma's comments are the model.
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
+import { EmojiButton } from './EmojiButton';
+import { mentionsOf } from './mentions';
+import { CommentText, useMentions } from './MentionField';
 import { recalledAuthor, rememberAuthor } from '../persist/author';
 import { useMyOwner } from './owner';
 import { addComment, deleteComment, editComment, newCommentId, setResolved } from './store';
@@ -31,7 +34,7 @@ export function Message({ c }: { c: Comment }) {
           <When c={c} />
           {mine && !editing && <OwnActions c={c} onEdit={() => setEditing(true)} hover />}
         </div>
-        {editing ? <EditField c={c} onDone={() => setEditing(false)} /> : <p className={styles.text}>{c.body}</p>}
+        {editing ? <EditField c={c} onDone={() => setEditing(false)} /> : <CommentText className={styles.text} text={c.body} />}
       </div>
     </div>
   );
@@ -145,6 +148,8 @@ export function EditField({ c, onDone }: { c: Comment; onDone: () => void }) {
   const [text, setText] = useState(c.body);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
+  const mention = useMentions(field, text, setText);
   const ready = !!text.trim() && text.trim() !== c.body && !busy;
   const save = async () => {
     if (!text.trim() || busy) return;
@@ -170,15 +175,22 @@ export function EditField({ c, onDone }: { c: Comment; onDone: () => void }) {
     >
       <div className={styles.field}>
         <textarea
+          ref={field}
           className={styles.fieldText}
           rows={1}
           maxLength={MAX_BODY}
           autoFocus
           value={text}
           onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={sendOnEnter(() => void save())}
+          onChange={(e) => {
+            setText(e.target.value);
+            mention.track();
+          }}
+          onSelect={mention.track}
+          onKeyDown={(e) => mention.onKeyDown(e) || sendOnEnter(() => void save())(e)}
         />
+        {mention.list}
+        <EmojiButton text={field} value={text} onChange={setText} />
         <SendButton ready={ready} label={t('Save')} onClick={() => void save()} />
       </div>
       {error && <span className={styles.error}>{error}</span>}
@@ -228,6 +240,8 @@ export function ReplyField({ thread, autoFocus = false }: { thread: Thread; auto
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
+  const mention = useMentions(field, text, setText);
   const ready = !!text.trim() && !!name.trim() && !busy;
   const send = async () => {
     if (!ready) return;
@@ -236,7 +250,7 @@ export function ReplyField({ thread, autoFocus = false }: { thread: Thread; auto
     setError(null);
     rememberAuthor({ name: name.trim() });
     try {
-      await addComment({ ...root, id: newCommentId(), createdAt: new Date().toISOString(), anchor: null, parentId: root.id, author: name.trim(), body: text.trim(), resolvedAt: null, resolvedBy: null });
+      await addComment({ ...root, id: newCommentId(), createdAt: new Date().toISOString(), anchor: null, parentId: root.id, author: name.trim(), body: text.trim(), mentions: mentionsOf(text), resolvedAt: null, resolvedBy: null });
       setText('');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -250,15 +264,22 @@ export function ReplyField({ thread, autoFocus = false }: { thread: Thread; auto
         {ask && <input className={styles.nameField} placeholder={t('Your name')} maxLength={MAX_AUTHOR} value={name} onChange={(e) => setName(e.target.value)} />}
         <div className={styles.field}>
           <textarea
+            ref={field}
             className={styles.fieldText}
             rows={1}
             placeholder={t('Reply')}
             maxLength={MAX_BODY}
             autoFocus={autoFocus && !ask}
             value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={sendOnEnter(() => void send())}
+            onChange={(e) => {
+              setText(e.target.value);
+              mention.track();
+            }}
+            onSelect={mention.track}
+            onKeyDown={(e) => mention.onKeyDown(e) || sendOnEnter(() => void send())(e)}
           />
+          {mention.list}
+          <EmojiButton text={field} value={text} onChange={setText} />
           <SendButton ready={ready} label={t('Reply')} onClick={() => void send()} />
         </div>
         {error && <span className={styles.error}>{error}</span>}

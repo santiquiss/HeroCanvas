@@ -6,7 +6,17 @@ import { useNavRoot } from '../nav/context';
 import { activeVariant, findProposal, VARIANT_PARAM } from '../proposals';
 import { designChoice, parseDevices } from '../sim/deviceSet';
 import { useUrlState } from '../sim/SimContext';
-import { LIVE } from './types';
+import { COMMENT_PARAM, LIVE, type Comment } from './types';
+
+/**
+ * A pin to bring into view on the canvas (CommentLayer): scrolled to in its screen. `go`: when its pin can't show on
+ * the canvas as it is (another page, version or device), the view it was left on is opened. A new one each time, so
+ * asking again for the same pin works.
+ */
+export interface Reveal {
+  root: Comment;
+  go: boolean;
+}
 
 interface CommentsUi {
   /** Comment mode: a click on the screen places a pin instead of reaching the app. */
@@ -21,6 +31,11 @@ interface CommentsUi {
   /** The panel's Resolved filter: resolved threads are listed, and their pins show while the panel does. */
   showResolved: boolean;
   setShowResolved: (on: boolean) => void;
+  reveal: Reveal | null;
+  setReveal: (r: Reveal | null) => void;
+  /** The comment the URL links to (`?comment=`), until the pins open it (CommentLayer). */
+  linked: string | null;
+  setLinked: (id: string | null) => void;
 }
 
 const Ctx = createContext<CommentsUi | null>(null);
@@ -68,9 +83,13 @@ export function screenScope(screen: { design?: string }, global: { design: strin
 /** `exclusive`: what turns off while commenting (Inspect), and turns commenting off when it comes on. */
 export function CommentsProvider({ exclusive, onExclusive, children }: { exclusive: boolean; onExclusive: (on: boolean) => void; children: ReactNode }) {
   const [commenting, setCommentingRaw] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [search] = useSearchParams();
+  // Opened from a link to a comment: it's the open one (its pins load for it), and they open it once it's in.
+  const [linked, setLinked] = useState<string | null>(() => search.get(COMMENT_PARAM));
+  const [selected, setSelected] = useState<string | null>(linked);
   const [panelOpen, setPanelOpen] = useState(false);
   const [showResolved, setShowResolved] = useState(false);
+  const [reveal, setReveal] = useState<Reveal | null>(null);
   const setCommenting = useCallback(
     (on: boolean) => {
       setCommentingRaw(on);
@@ -99,8 +118,8 @@ export function CommentsProvider({ exclusive, onExclusive, children }: { exclusi
     return () => window.removeEventListener('keydown', onKey);
   }, [commenting, setCommenting, selected]);
   const value = useMemo(
-    () => ({ commenting, setCommenting, selected, setSelected, panelOpen, setPanelOpen, showResolved, setShowResolved }),
-    [commenting, setCommenting, selected, panelOpen, showResolved],
+    () => ({ commenting, setCommenting, selected, setSelected, panelOpen, setPanelOpen, showResolved, setShowResolved, reveal, setReveal, linked, setLinked }),
+    [commenting, setCommenting, selected, panelOpen, showResolved, reveal, linked],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

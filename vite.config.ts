@@ -36,6 +36,10 @@ export default defineConfig({
     __HC_VERSION__: JSON.stringify(hcVersion.version),
     // The tool's own tests read its interface in English, whatever the copy's language.
     __HC_LANGUAGE__: JSON.stringify(process.env.VITEST ? 'en' : (hc.language ?? 'en')),
+    // The comments' shared store (herocanvas.config.ts `comments`): the team's, so an update never empties it.
+    __HC_COMMENTS__: JSON.stringify(hc.comments?.key ? { url: hc.comments.url, key: hc.comments.key } : null),
+    // Who can be @mentioned in a comment (`comments.team`); the tests mention their own.
+    __HC_TEAM__: JSON.stringify(process.env.VITEST ? [] : (hc.comments?.team ?? [])),
     __BUILD_ID__: JSON.stringify(String(Date.now())),
   },
   // `npm test`: the logic's unit tests (and the scripts': npm run shot's arguments) and the smoke test (every page, every story renders), in a DOM of happy-dom.

@@ -60,9 +60,16 @@ function write(path, content) {
 
 /** A three-way merge of one file; returns whether it clashed (then it's written with conflict markers). */
 function merge(path, from, to) {
-  const base = show(BASE, path);
   const theirs = show(TARGET, path);
   const mine = readFileSync(path);
+  // Added on both sides (made here first, then released): the same file needs nothing; else a merge from empty.
+  let base;
+  try {
+    base = show(BASE, path);
+  } catch {
+    if (mine.equals(theirs)) return false;
+    base = Buffer.alloc(0);
+  }
   if ([base, theirs, mine].some(isBinary)) {
     // Not mergeable: theirs stays, the new one beside it.
     write(`${path}.herocanvas-new`, theirs);

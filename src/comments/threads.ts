@@ -58,7 +58,7 @@ export function timeAgo(iso: string, now = Date.now()): string {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
 
-/** One or two letters for a pin: "Agustina Salas" → "AS", "Jacob" → "J". */
+/** One or two letters for a pin: "Ana Silva" → "AS", "Casey" → "C". */
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   return ((parts[0]?.[0] ?? '?') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
@@ -72,10 +72,20 @@ export function commentLink(pathname: string, search: string): string {
   return pathname + (s ? `?${s}` : '');
 }
 
-/** Threads by number, in the order they were left (#1 the first), as Figma numbers them: a stable way to name one. */
+/**
+ * Threads by number, in the order they were left (#1 the first), as Figma numbers them: a stable way to name one. Each
+ * design (Live, a proposal) counts its own, so a thread keeps its number however many designs are listed with it.
+ */
 export function threadNumbers(threads: Thread[]): Map<string, number> {
   const roots = threads.map((t) => t.root).sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
-  return new Map(roots.map((r, i) => [r.id, i + 1]));
+  const count = new Map<string, number>();
+  return new Map(
+    roots.map((r) => {
+      const n = (count.get(r.design) ?? 0) + 1;
+      count.set(r.design, n);
+      return [r.id, n];
+    }),
+  );
 }
 
 /** Whether a thread has the text in its comments, its authors or its page. */

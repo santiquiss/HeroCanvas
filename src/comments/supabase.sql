@@ -1,4 +1,4 @@
--- The comments table, for the Supabase project in supabase.json. Run once in the project's SQL Editor (it can run
+-- The comments table, for the Supabase project in herocanvas.config.ts `comments`. Run once in the project's SQL Editor (it can run
 -- again: it only creates what's missing and resets the permissions).
 --
 -- What the site's key (the publishable / anon key) may do: read every comment, add one, resolve or reopen a thread, and
@@ -90,3 +90,54 @@ revoke all on function public.edit_comment(uuid, text, text) from public;
 revoke all on function public.delete_comment(uuid, text) from public;
 grant execute on function public.edit_comment(uuid, text, text) to anon, authenticated;
 grant execute on function public.delete_comment(uuid, text) to anon, authenticated;
+
+-- @mentions: who a comment mentions, by their Slack member id (herocanvas.config.ts `comments.team`). Set when it's
+-- left; editing it later tells no one.
+alter table public.comments add column if not exists mentions text[]
+  check (mentions is null or (cardinality(mentions) between 1 and 20 and array_to_string(mentions, ',') ~ '^[A-Z0-9]+(,[A-Z0-9]+)*$'));
+
+-- Telling who's mentioned, in Slack: a message in the team's channel through an Incoming Webhook that @mentions them (so
+-- Slack notifies them), with what was said and a link that opens the comment. Needs, once, in the Vault (Project
+-- Settings › Vault, or here):
+--   select vault.create_secret('https://hooks.slack.com/services/…', 'comments_slack_webhook');
+--   select vault.create_secret('https://the-site.example', 'comments_site_url');  -- where the designer is published
+-- Without the webhook, comments are left as always and no one is told.
+create extension if not exists pg_net;
+
+create or replace function public.notify_mentions()
+returns trigger
+language plpgsql security definer set search_path = public
+as $$
+declare
+  hook text;
+  site text;
+  who text;
+  said text;
+  msg text;
+begin
+  select decrypted_secret into hook from vault.decrypted_secrets where name = 'comments_slack_webhook';
+  select decrypted_secret into site from vault.decrypted_secrets where name = 'comments_site_url';
+  if hook is null or new.mentions is null then
+    return new;
+  end if;
+  select string_agg('<@' || m || '>', ' ') into who from unnest(new.mentions) as m;
+  -- Slack's own characters, escaped: what was written can't @channel or make links.
+  said := replace(replace(replace(left(new.body, 300), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || case when char_length(new.body) > 300 then '…' else '' end;
+  msg := who || ' ' || replace(replace(replace(new.author, '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || ' mentioned you in *'
+    || case when new.design = 'live' then 'Live' else new.design end || ' · ' || new.page || E'*\n> ' || replace(said, E'\n', E'\n> ');
+  if site is not null then
+    msg := msg || E'\n<' || rtrim(site, '/') || '/#' || new.link || case when position('?' in new.link) > 0 then '&' else '?' end || 'comment=' || new.id || '|Open the comment>';
+  end if;
+  perform net.http_post(url := hook, body := jsonb_build_object('text', msg), headers := '{"Content-Type": "application/json"}'::jsonb);
+  return new;
+exception when others then
+  -- Telling is a courtesy: a comment is never refused because Slack couldn't be told.
+  return new;
+end;
+$$;
+
+revoke all on function public.notify_mentions() from public, anon, authenticated;
+
+drop trigger if exists comments_notify_mentions on public.comments;
+create trigger comments_notify_mentions after insert on public.comments
+  for each row when (new.mentions is not null) execute function public.notify_mentions();

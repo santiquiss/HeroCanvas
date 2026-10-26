@@ -13,6 +13,11 @@ const config: HeroCanvasConfig = {
   // brand: { light: '#0a5cff', dark: '#3d7dff' },
   /** The interface's language: `en` or `es` (Spanish). The app's screens keep their own languages (app/config.ts). */
   // language: 'es',
+  /**
+   * Shared comments: a Supabase project's address and publishable key (its table: src/comments/supabase.sql). Left out,
+   * each browser keeps its own. `team`: who can be @mentioned, with their Slack member id, to tell them in Slack.
+   */
+  // comments: { url: 'https://<project>.supabase.co', key: 'sb_publishable_…', team: [{ name: 'Ana Silva', slack: 'U012AB3CD' }] },
 };
 
 export default config;
