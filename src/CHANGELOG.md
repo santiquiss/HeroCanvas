@@ -6,6 +6,11 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.51.1 — 2026-10-28
+
+- **The Light / Dark switch is as far from the canvas's corner as the zoom bar**: 12px from the top and the right
+  (`src/sim/ThemeSwitch.module.css` `.floating`; 20px from the top before).
+
 ## 0.51.0 — 2026-10-26
 
 - **All comments, Live's and every proposal's** (Comments panel): "All pages" is now **All comments**, every design's
