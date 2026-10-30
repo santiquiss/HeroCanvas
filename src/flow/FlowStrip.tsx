@@ -6,9 +6,8 @@ import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
 import { flowTransitions, stepQuery, stepState } from '../nav/flow';
 import type { Layout } from '../sim/layout';
-import { LazyPreview } from './LazyPreview';
 import { PageCard } from './PageCard';
-import { PreviewScreen } from './PreviewScreen';
+import { FlowThumb } from './FlowThumb';
 import styles from './Flow.module.css';
 
 /** Space between step thumbnails (room for a transition's label). */
@@ -119,7 +118,7 @@ export function FlowStrip({ id, params, w, h, scale, radius, head, labels, curre
                 <PageCard icon={step.kind === 'loading' ? 'hourglass_empty' : 'crop_portrait'} status={def.status} />
               ) : (
                 <div className={styles.thumbInner} style={{ width: w / scale, height: h / scale, transform: `scale(${scale})` }}>
-                  <LazyPreview>{() => <PreviewScreen page={{ id, params }} query={stepQuery(def, step, v)} makeLayout={makeLayout} still />}</LazyPreview>
+                  <FlowThumb page={{ id, params }} query={stepQuery(def, step, v)} makeLayout={makeLayout} />
                 </div>
               )}
             </div>

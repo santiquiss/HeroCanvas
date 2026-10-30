@@ -117,4 +117,17 @@ export const STEPS: TourStep[] = [
     tryIt: 'Pick the camera in the left rail, then Image or Video on the right, and export.',
     spots: ['mode-capture'],
   },
+  {
+    id: 'share',
+    tint: 'indigo',
+    icon: 'link',
+    title: 'Share',
+    line: 'A link for the team, or one for a guest',
+    body: [
+      'Every state is in the URL: the page, the device, the theme, the persona, the proposal. A link opens the same view for anyone on your team.',
+      'Someone outside it gets a guest link: its own password, an end (an hour, a day, a week), and only the screens, without the team’s tools. Guest links are made on your deployed site, where the password is checked.',
+    ],
+    tryIt: 'Open Share at the top right: Copy link for the team, or Preview to see this screen as a guest does.',
+    spots: ['share'],
+  },
 ];

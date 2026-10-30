@@ -1,6 +1,7 @@
 // Designer state shared by the device (event capture), the overlay and the panels.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { closestComponent } from './component';
+import { can } from '../share/view';
 
 interface Design {
   /** Inspect mode: hovering highlights components, clicking selects instead of interacting. */
@@ -168,7 +169,7 @@ export function DesignProvider({
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
       if (t.closest('input, textarea, select, [contenteditable]')) return;
-      if (e.key === 'i' && !e.metaKey && !e.ctrlKey && !e.altKey) setInspect(!inspect);
+      if (e.key === 'i' && !e.metaKey && !e.ctrlKey && !e.altKey && can('inspect')) setInspect(!inspect);
       if (e.key === 'Escape') {
         if (selected || selectedEl) setSelected(null);
         else if (inspect) setInspect(false);

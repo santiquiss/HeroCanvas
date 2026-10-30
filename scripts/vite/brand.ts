@@ -6,6 +6,7 @@ import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { Plugin } from 'vite';
 import { flatten, readPng, resize, writePng, type Image } from './png.ts';
+import type { ViewProfile } from '../../src/share/profiles.ts';
 
 export interface HeroCanvasConfig {
   /** Shown in the browser's tab and the rail's logo. */
@@ -20,6 +21,10 @@ export interface HeroCanvasConfig {
    *  Unset: each browser keeps its own. `team`: who can be @mentioned in a comment, each with their Slack member id
    *  (Profile › ⋯ › Copy member ID), so the store tells them in Slack (supabase.sql's notify_mentions). */
   comments?: { url: string; key: string; team?: { name: string; slack: string }[] };
+  /** Guest links (src/share): `url`, the production site's address, where links are made (a copy running elsewhere,
+   *  as `npm run dev`, sends you there to make one); `profiles`, views a link can open besides HeroCanvas's own
+   *  (src/share/profiles.ts). */
+  share?: { url?: string; profiles?: Record<string, ViewProfile> };
 }
 
 type RGB = [number, number, number];

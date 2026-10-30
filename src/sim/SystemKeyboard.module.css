@@ -379,3 +379,29 @@
 .key.actionOff:active {
   filter: none;
 }
+
+/* ---- The iPhone Duo's own keyboard (iOS and iPadOS 27 Figma, iPhone Duo › Keyboard): iOS's keys at each display's
+   geometry (inline, from SystemKeyboard's DUO), the QuickType bar on top of every layout, and emoji and dictation as
+   bare glyphs, in the bottom row, below it or in a column each beside the keys. */
+.duo .suggest {
+  height: var(--kb-bar-h);
+  box-sizing: border-box;
+  padding: 0 8.5px 2px;
+  font-size: 18px;
+}
+.duo .suggestion {
+  color: var(--kb-tx);
+}
+.bare,
+.bare:active {
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+.duoSide {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}

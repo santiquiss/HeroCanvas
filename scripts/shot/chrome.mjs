@@ -113,9 +113,12 @@ function connect(url) {
   });
 }
 
-/** A page of its own (a session on a new target). */
+/**
+ * A page of its own (a session on a new target), in a window of its own: a tab behind another gets no animation frames,
+ * and a screen that waits for one (a page sliding in) is never drawn. Several pages at once each stay in front.
+ */
 export async function newPage(cdp) {
-  const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank' });
+  const { targetId } = await cdp.send('Target.createTarget', { url: 'about:blank', newWindow: true });
   const { sessionId: s } = await cdp.send('Target.attachToTarget', { targetId, flatten: true });
   await cdp.send('Page.enable', {}, s);
   await cdp.send('Runtime.enable', {}, s);
@@ -148,9 +151,12 @@ export async function newPage(cdp) {
     viewport: (width, height, scale) => cdp.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: scale, mobile: false }, s),
     transparent: () => cdp.send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } }, s),
     reducedMotion: () => cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] }, s),
-    /** A PNG of `clip` (CSS pixels of the page), at the viewport's scale. */
-    async png(clip) {
-      const { data } = await cdp.send('Page.captureScreenshot', { format: 'png', clip: { ...clip, scale: 1 }, captureBeyondViewport: true, fromSurface: true }, s);
+    /**
+     * A PNG of `clip` (CSS pixels of the page), at the viewport's scale. `inView`: a clip inside the viewport, taken as
+     * it's shown (beyond it, Chrome lays the page out again for the picture, and may take it before it's painted).
+     */
+    async png(clip, { inView = false } = {}) {
+      const { data } = await cdp.send('Page.captureScreenshot', { format: 'png', clip: { ...clip, scale: 1 }, captureBeyondViewport: !inView, fromSurface: true }, s);
       return Buffer.from(data, 'base64');
     },
   };

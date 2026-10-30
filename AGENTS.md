@@ -78,6 +78,9 @@ The person's app's own repository is read, never edited: everything goes in Hero
   on a missing or unused one. Never translate what the app's screens show (they keep the app's languages), nor what's
   written for developers and agents (handoffs, prompts, exported files). A team picks it in `herocanvas.config.ts`
   (`language: 'es'`).
+- **Guest views**: a guest link (src/share) shows a profile of the designer (`src/share/profiles.ts`): its modes, its
+  panels by id, its controls. A new panel is left out of them unless a profile names it; a new control a guest
+  shouldn't have asks `can('…')` (`src/share/view.ts`), with a new `ViewControl` if none fits.
 - **Comments say why**, in short sentences, matching the code around them.
 
 ## Before you call it done

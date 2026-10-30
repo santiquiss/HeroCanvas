@@ -7,6 +7,7 @@ import { activeVariant, findProposal, VARIANT_PARAM } from '../proposals';
 import { designChoice, parseDevices } from '../sim/deviceSet';
 import { useUrlState } from '../sim/SimContext';
 import { COMMENT_PARAM, LIVE, type Comment } from './types';
+import { can } from '../share/view';
 
 /**
  * A pin to bring into view on the canvas (CommentLayer): scrolled to in its screen. `go`: when its pin can't show on
@@ -110,7 +111,7 @@ export function CommentsProvider({ exclusive, onExclusive, children }: { exclusi
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement).closest('input, textarea, select, [contenteditable]')) return;
-      if (e.key === 'c' && !e.metaKey && !e.ctrlKey && !e.altKey) setCommenting(!commenting);
+      if (e.key === 'c' && !e.metaKey && !e.ctrlKey && !e.altKey && can('comments')) setCommenting(!commenting);
       else if (e.key === 'Escape' && selected) setSelected(null);
       else if (e.key === 'Escape' && commenting) setCommentingRaw(false);
     };

@@ -4,6 +4,9 @@
 //   POST /__hc/write { path, data } → writes `data` as pretty JSON to `path` (relative to the project root)
 //   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in app/pages.tsx
 //                                    (`null` removes the field; omitted fields are left alone)
+//   POST /__hc/screen { hash, w, h, scale, taps, scroll } → { src }: a screen as a still picture (Flow's, App Store
+//                                    Assets'), drawn once by a headless Chrome (screenCache.ts); GET
+//                                    /__hc/screens/<key>.png serves it; POST /__hc/screens/refresh draws them all again
 //
 // Guard rails: only JSON, only under ALLOWED paths, and only same-origin requests that carry the
 // `x-hc: 1` header (a cross-site page can't send it without a CORS preflight, which is never approved).
@@ -11,6 +14,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { dirname, relative, resolve, sep } from 'node:path';
 import type { Plugin } from 'vite';
+import { screenCache } from './screenCache.ts';
 
 /** Files and folders the app may write. */
 const ALLOWED = ['app/screen-config.json', 'proposals/'];
@@ -77,11 +81,37 @@ export function hcWriter(): Plugin {
       root = c.root;
     },
     configureServer(server) {
+      const screens = screenCache(server, root);
       server.middlewares.use('/__hc', async (req, res) => {
+        // A screen's picture, for an <img> (it can't send the header): only by its key, from the cache.
+        const pic = req.method === 'GET' && req.url?.match(/^\/screens\/([0-9a-f]{40})\.png$/);
+        if (pic) {
+          const png = await screens.read(pic[1]);
+          if (!png) return send(res, 404, { error: 'not found' });
+          res.setHeader('content-type', 'image/png');
+          res.setHeader('cache-control', 'max-age=31536000, immutable');
+          return res.end(png);
+        }
         const host = req.headers.host ?? '';
         const origin = req.headers.origin;
         if (req.headers['x-hc'] !== '1' || (origin && new URL(origin).host !== host)) return send(res, 403, { error: 'forbidden' });
         if (req.method === 'GET' && req.url === '/status') return send(res, 200, { writable: true, root });
+        if (req.method === 'POST' && req.url === '/screen') {
+          try {
+            const spec = JSON.parse(await readBody(req));
+            const ok = typeof spec?.hash === 'string' && [spec.w, spec.h, spec.scale].every((n) => typeof n === 'number' && n > 0 && n < 4000);
+            if (!ok) return send(res, 400, { error: 'a hash, w, h and scale are needed' });
+            const key = await screens.screen(spec, `http://${host}/`);
+            return send(res, 200, { src: `/__hc/screens/${key}.png` });
+          } catch (e) {
+            server.config.logger.warn(`[hc] screen: ${e}`, { timestamp: true });
+            return send(res, 500, { error: String(e) });
+          }
+        }
+        if (req.method === 'POST' && req.url === '/screens/refresh') {
+          screens.refresh();
+          return send(res, 200, { ok: true });
+        }
         if (req.method === 'POST' && req.url === '/manifest') {
           try {
             const { page, ...fields } = JSON.parse(await readBody(req));

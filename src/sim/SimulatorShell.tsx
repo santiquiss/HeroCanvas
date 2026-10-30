@@ -42,6 +42,7 @@ import { screenAttrs } from '../comments/anchor';
 import { DEFAULT_W, PanelHost, usePanelPrefs, type PanelPrefs } from '../tools/PanelHost';
 import { ModeRail } from './ModeRail';
 import { ThemeSwitch } from './ThemeSwitch';
+import { can, showsMode } from '../share/view';
 import { useGalleryRoute } from '../gallery/route';
 import { Toolbar } from './Toolbar';
 import { AllDevices, allDeviceEntries, allDevicesFit } from './AllDevices';
@@ -104,7 +105,8 @@ function DesignerShell() {
   const detailOpen = detailOpenFor(pages, stack, sidePanelOnIn(search));
   // `device=all`: every device side by side (prototype mode); the rest of the shell uses the default device.
   // Capture (`?capture=1`) shows one device: All devices and a set give way to their first.
-  const captureParam = search.get('capture') === '1';
+  // A guest's view without Capture never enters it (src/share/view.ts).
+  const captureParam = search.get('capture') === '1' && showsMode('capture');
   const allDevices = !captureParam && search.get('device') === 'all';
   // Compare's preset: which devices All devices shows (DEVICE_GROUPS).
   const compareGroup = deviceGroup(search.get('compare'));
@@ -171,6 +173,11 @@ function DesignerShell() {
   const rail = mode === 'prototype' ? where : null;
   const location = useLocation();
   const setMode = useSetMode();
+  // A mode the view doesn't keep (a guest's link, an old bookmark): the prototype instead.
+  useEffect(() => {
+    if (!showsMode(mode)) setMode('prototype');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
   // Zoom: Fit (the device keeps clear of the view bar at the top of the canvas) or a fixed scale (1 = 1:1).
   const zoom = parseZoom(search.get('zoom'));
   // The device centers on the canvas itself; the margin for the view bar and zoom is the same above and below.
@@ -441,7 +448,7 @@ function DesignerShell() {
                     </>
                   )}
                   {/* + on each side adds a device to compare with (the view becomes a set). */}
-                  {!capture && [-1, 1].map((dir) => (
+                  {!capture && can('compare') && [-1, 1].map((dir) => (
                     <span
                       key={dir}
                       className={styles.addSide}
@@ -470,14 +477,14 @@ function DesignerShell() {
                       onCrop={(on) => setCapPrefs({ cropPreview: on })}
                     />
                   </div>
-                ) : (
+                ) : can('zoom') && (
                   <ZoomBar zoom={zoom} fitScale={allDevices ? allFit : multi ? multiFitScale : fit} onZoom={(z) => setParam({ zoom: z === 'fit' ? null : String(z) })} />
                 )}
               </>
             )}
               {/* The view bar: Flow's device and orientation; in the prototype, Compare (and in it, its preset, options and
                   Exit). A single device and a set have their headers on the canvas (DeviceHeader). */}
-              {(mode === 'flow' || mode === 'prototype') && !capture && (
+              {(mode === 'flow' || mode === 'prototype') && !capture && can(mode === 'prototype' ? 'compare' : 'devices') && (
               <ViewBar
                 left={rail ? WHERE_RAIL_W : 0}
                 mode={mode}
@@ -500,7 +507,7 @@ function DesignerShell() {
               />
               )}
               {/* The screens' theme, at the same place in every mode that shows them (a component's examples too). */}
-              {(mode === 'prototype' || mode === 'flow' || (mode === 'components' && galleryName)) && !capture && <ThemeSwitch floating />}
+              {(mode === 'prototype' || mode === 'flow' || (mode === 'components' && galleryName)) && !capture && can('theme') && <ThemeSwitch floating />}
             </div>
             {capture ? (
               prefs.right && (

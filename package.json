@@ -20,6 +20,7 @@
     "texts": "node scripts/texts.mjs"
   },
   "dependencies": {
+    "@vercel/functions": "^3.10.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^8.4.0"

@@ -4,6 +4,7 @@
 // (sim/developerHidden). Everything it sets is in the URL, as from the designer.
 import { useSearchParams } from "react-router";
 import { Icon } from "../components/Icon";
+import { can, showsTool, VIEW } from "../share/view";
 import { PERSONA_PARAM, PERSONAS, findPersona } from "./persona";
 import { useNavRoot } from "../nav/context";
 import {
@@ -68,7 +69,7 @@ export function RealControls({
           </button>
         </div>
         <div className={styles.info}>{info}</div>
-        <label className={styles.row}>
+        {showsTool('pages') && <label className={styles.row}>
           <span>{t('Page')}</span>
           <select
             className={styles.select}
@@ -87,8 +88,8 @@ export function RealControls({
               </option>
             ))}
           </select>
-        </label>
-        <div className={styles.row}>
+        </label>}
+        {can('theme') && <div className={styles.row}>
           <span>{t('Theme')}</span>
           <span className={styles.seg}>
             <button aria-pressed={!dark} onClick={() => set("theme", null)}>
@@ -98,8 +99,8 @@ export function RealControls({
               {t('Dark')}
             </button>
           </span>
-        </div>
-        {PERSONAS.length > 0 && <label className={styles.row}>
+        </div>}
+        {PERSONAS.length > 0 && showsTool('scenarios') && <label className={styles.row}>
           <span>{t('Persona')}</span>
           <select
             className={styles.select}
@@ -113,7 +114,7 @@ export function RealControls({
             ))}
           </select>
         </label>}
-        <label className={styles.row}>
+        {can('proposals') && <label className={styles.row}>
           <span>{t('Design')}</span>
           <select
             className={styles.select}
@@ -127,8 +128,8 @@ export function RealControls({
               </option>
             ))}
           </select>
-        </label>
-        {proposal && proposal.variants.length > 1 && (
+        </label>}
+        {can('proposals') && proposal && proposal.variants.length > 1 && (
           <label className={styles.row}>
             <span>{t('Version')}</span>
             <select
@@ -151,9 +152,12 @@ export function RealControls({
           >
             {t('Reload')}
           </button>
-          <button className={styles.btn} onClick={() => set(REAL_PARAM, "0")}>
-            {t('Open the designer')}
-          </button>
+          {/* A guest's view stays on the app: the designer is the team's. */}
+          {!VIEW && (
+            <button className={styles.btn} onClick={() => set(REAL_PARAM, "0")}>
+              {t('Open the designer')}
+            </button>
+          )}
         </div>
       </div>
     </>

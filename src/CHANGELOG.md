@@ -6,6 +6,36 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.52.0 — 2026-10-30
+
+- **Guest links** (Share › Guest link): a link to the deployed site that opens it for a while (1 h, 24 h or 7 days) as
+  a simpler designer: only the screens (Pages and Light / Dark by default), as a persona and on a device picked, where
+  it starts, Pages and changing the device optional, the proposal on screen or Live. The link alone opens it, no
+  password; it can't be revoked, it ends. Someone of the team (with the site's password) sees it as the guest does and
+  comes back with Exit or the logo. What a guest sees is a profile (`src/share/profiles.ts`: modes, panels, controls);
+  a new control a guest shouldn't have asks `can('…')` (`src/share/view.ts`). Share is a menu now (Copy link, Guest
+  link).
+- **Flow's screens as pictures**: each thumbnail is a still picture of the screen instead of the app running in it,
+  so Flow opens and pans light. Locally the dev server draws each once in a headless Chrome
+  (`scripts/vite/screenCache.ts`, `POST /__hc/screen`) and again when the app's code changes; **Draw the screens
+  again** (↻ by the zoom) redraws them all. A deployed site gets them from its build: `node scripts/flow/prerender.mjs
+  <built site>` draws every Flow screen (each variant, each flow step) into `flow-shots/` (about a minute for ~200). A
+  screen with no picture (another device, persona or language, a proposal) is the app live, as before.
+- **Real mode draws a device's system** (`?system=<device>`) and a screen alone (`?bare=1`): what Flow's pictures are
+  made of.
+- **The iPhone Duo's own keyboard** (iOS and iPadOS 27 Figma, iPhone Duo › Keyboard), at each display's size in both
+  orientations (`keyboard` on a display, `DUO` in `src/sim/SystemKeyboard.tsx`), its return key widening for Continue.
+
+### Contract
+
+- **`middleware.ts` (new, the tool's)**: the deployed site's door, the team's password (`SITE_PASSWORD`) and guest
+  links (`SHARE_SECRET` signs them: set it in Vercel's environment to make guest links). It needs
+  `@vercel/functions` (in `package.json`). `herocanvas.config.ts` takes `share: { url }`, the production site's
+  address, where guest links are made.
+- **To have Flow's pictures on the deployed site**, the deploy runs the prerender on the built site before uploading
+  it, e.g. after `vercel build`: `node scripts/flow/prerender.mjs .vercel/output/static` (it needs Chrome: GitHub's
+  runners have it). Without it, Flow draws its screens live, as before.
+
 ## 0.51.1 — 2026-10-28
 
 - **The Light / Dark switch is as far from the canvas's corner as the zoom bar**: 12px from the top and the right

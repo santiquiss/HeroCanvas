@@ -8,6 +8,8 @@ import { Icon } from '../components/Icon';
 import type { Mode } from './modes';
 import { setUiTheme, useUiTheme } from './uiTheme';
 import { t } from '../i18n/ui';
+import { can, leaveView, showsMode } from '../share/view';
+import { useCanLeave } from '../share/ViewBadge';
 import styles from './ModeRail.module.css';
 
 type RailMode = Mode | 'capture';
@@ -21,11 +23,15 @@ export const MODES: { mode: RailMode; label: string; icon: string }[] = [
   { mode: 'capture', label: t('Capture'), icon: 'photo_camera' },
 ];
 
+/** The modes the view keeps (src/share/view.ts). */
+const RAIL_MODES = MODES.filter((m) => showsMode(m.mode));
+
 export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra?: Record<string, string>) => void }) {
   const [search, setSearch] = useSearchParams();
   const capture = mode === 'prototype' && search.get('capture') === '1';
   const current: RailMode = capture ? 'capture' : mode;
   const ui = useUiTheme();
+  const canLeave = useCanLeave();
   const go = (to: RailMode) => {
     if (to === current) return;
     // Into or out of Capture from the prototype: only its param changes, the screen stays.
@@ -52,11 +58,19 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
   return (
     <nav className={styles.rail} aria-label={t('Modes')}>
       {/* The logo (herocanvas.config.ts) at 64px, made by scripts/vite/brand.ts: a square app icon, rounded like one. */}
-      <span className={styles.brand} title="HeroCanvas">
-        <img src={`${import.meta.env.BASE_URL}assets/logo-64.png`} alt="HeroCanvas" width={28} height={28} style={{ borderRadius: 7 }} />
-      </span>
+      {/* In a guest's view, for someone of the team (useCanLeave), the logo goes back to the whole designer. */}
+      {canLeave ? (
+        <button className={`${styles.brand} ${styles.brandBtn}`} title={t('Back to the whole designer')} aria-label={t('Back to the whole designer')} onClick={() => void leaveView()}>
+          <img src={`${import.meta.env.BASE_URL}assets/logo-64.png`} alt="" width={28} height={28} style={{ borderRadius: 7 }} />
+        </button>
+      ) : (
+        <span className={styles.brand} title="HeroCanvas">
+          <img src={`${import.meta.env.BASE_URL}assets/logo-64.png`} alt="HeroCanvas" width={28} height={28} style={{ borderRadius: 7 }} />
+        </span>
+      )}
       <ul className={styles.items}>
-        {MODES.map(({ mode: m, label, icon }) => (
+        {/* A guest's view keeps only its modes; with one, the rail lists none. */}
+        {RAIL_MODES.length > 1 && RAIL_MODES.map(({ mode: m, label, icon }) => (
           <li key={m}>
             <button data-tour={`mode-${m}`} className={`${styles.item} ${current === m ? styles.on : ''}`} aria-label={label} aria-current={current === m ? 'page' : undefined} onClick={() => go(m)}>
               <Icon name={icon} size={20} fill={current === m} />
@@ -68,14 +82,16 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
         ))}
       </ul>
       {/* At the bottom: HeroCanvas itself, opening its page (About: version, credits, license, changelog). */}
+      {can('about') && (
       <button className={`${styles.item} ${styles.end} ${current === 'about' ? styles.on : ''}`} aria-label={t('About HeroCanvas {version}', { version: __HC_VERSION__ })} aria-current={current === 'about' ? 'page' : undefined} onClick={() => go('about')}>
         <Icon name="info" size={20} fill={current === 'about'} />
         <span className={styles.tip} role="tooltip">
           {t('About HeroCanvas {version}', { version: __HC_VERSION__ })}
         </span>
       </button>
+      )}
       {/* The interface's theme (not the screens': the view bar's Light / Dark). */}
-      <button data-tour="ui-theme" className={styles.item} aria-label={ui === 'dark' ? t('Light interface') : t('Dark interface')} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
+      <button data-tour="ui-theme" className={`${styles.item} ${can('about') ? '' : styles.end}`} aria-label={ui === 'dark' ? t('Light interface') : t('Dark interface')} onClick={() => setUiTheme(ui === 'dark' ? 'light' : 'dark')}>
         <Icon name={ui === 'dark' ? 'light_mode' : 'dark_mode'} size={20} />
         <span className={styles.tip} role="tooltip">
           {ui === 'dark' ? t('Light interface') : t('Dark interface')}

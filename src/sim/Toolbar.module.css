@@ -68,27 +68,6 @@
   background: var(--ui-bg);
   color: var(--hl);
 }
-.share {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 112px;
-  min-height: 30px;
-  padding: 6px 12px;
-  justify-content: center;
-  border: none;
-  border-radius: 8px;
-  /* The brand (herocanvas.config.ts, or its logo's color): the one place the tool wears it. */
-  background: var(--hc-brand);
-  color: var(--hc-on-brand);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.share:hover {
-  background: var(--hc-brand-hover);
-}
 /* The panels' toggles: a chip's box (border, height, corners), an icon alone. */
 .panelBtn {
   width: 32px;

@@ -27,6 +27,7 @@ import { usePan } from './usePan';
 import { VIEW_BAR_H } from './ViewBar';
 import styles from './SimulatorShell.module.css';
 import { t } from '../i18n/ui';
+import { can } from '../share/view';
 
 /**
  * Canvas margin around the frames, the same above and below so they center on the frames alone: room for the floating
@@ -44,7 +45,7 @@ const TYPES: [DeviceType, string][] = [
 ];
 
 /** A native device menu (grouped by type) laid invisibly over its children: any click opens it. */
-function DevicePicker({
+export function DevicePicker({
   value,
   onPick,
   title,
@@ -232,7 +233,13 @@ export function DeviceHeader({
   const hasVideo = !!(findDisplay(dev, displayKey).videoSplit && !land && onVideo);
   // Android's system back (sim/back): its devices have one; iOS goes back from the screen itself.
   const hasBack = findDisplay(dev, displayKey).os === 'android';
-  const parts: HeadPart[] = [
+  // A view without device controls (a guest's: src/share/view.ts) keeps the device's name and Android's back.
+  const fixed = !can('devices');
+  if (fixed) {
+    grip = undefined;
+    onRemove = undefined;
+  }
+  const parts: HeadPart[] = fixed ? (hasBack ? ['back'] : []) : [
     ...(hasBack ? (['back'] as const) : []),
     ...(dev.displays.length > 1 ? (['displays'] as const) : []),
     ...(hasVideo ? (['video'] as const) : []),
@@ -387,10 +394,16 @@ export function DeviceHeader({
           <Icon name="drag_indicator" size={16} />
         </span>
       )}
-      <DevicePicker className={styles.devName} value={id} title={t('{device} · change device', { device: dev.name })} onPick={onDevice} tour="device-menu">
-        <span className={styles.devNameText}>{dev.name}</span>
-        {!tight && <Icon name="expand_more" size={16} />}
-      </DevicePicker>
+      {fixed ? (
+        <span className={styles.devName}>
+          <span className={styles.devNameText}>{dev.name}</span>
+        </span>
+      ) : (
+        <DevicePicker className={styles.devName} value={id} title={t('{device} · change device', { device: dev.name })} onPick={onDevice} tour="device-menu">
+          <span className={styles.devNameText}>{dev.name}</span>
+          {!tight && <Icon name="expand_more" size={16} />}
+        </DevicePicker>
+      )}
       {shown.map(chip)}
       {hidden.length > 0 && (
         <button className={`${styles.devChip} ${menu ? styles.devChipOn : ''}`} title={t('More')} aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>

@@ -10,5 +10,8 @@ declare const __HC_COMMENTS__: { url: string; key: string } | null;
 /** Who can be @mentioned in a comment, with their Slack member id (herocanvas.config.ts `comments.team`). */
 declare const __HC_TEAM__: { name: string; slack: string }[];
 
+/** Guest links (herocanvas.config.ts `share`): the production site's address, and the team's own views. */
+declare const __HC_SHARE__: { url: string | null; profiles: Record<string, import('./share/profiles').ViewProfile> };
+
 /** The tool's brand colors (scripts/vite/brand.ts). */
 declare module 'virtual:hc-brand.css';

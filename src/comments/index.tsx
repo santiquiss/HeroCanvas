@@ -8,6 +8,7 @@ import { useComments } from './store';
 import { openByPage } from './threads';
 import styles from './CommentsEager.module.css';
 import { plural } from '../i18n/ui';
+import { can } from '../share/view';
 
 export { CommentsProvider, useCommenting, useCommentsUi } from './CommentsContext';
 
@@ -19,7 +20,8 @@ export function CommentPins({ stage }: { stage: RefObject<HTMLDivElement | null>
   const { commenting, selected, panelOpen } = useCommentsUi();
   const [used, setUsed] = useState(false);
   if ((commenting || selected || panelOpen) && !used) setUsed(true);
-  return used ? (
+  // A view without comments (a guest's: src/share/view.ts) shows none, even from a link to one.
+  return used && can('comments') ? (
     <Suspense fallback={null}>
       <Layer stage={stage} />
     </Suspense>

@@ -73,6 +73,11 @@ export interface Display {
   /** iOS 27 corner status (time + ring): vertical at the top of the right column, horizontal in the top-right corner. */
   cornerStatus?: boolean;
   /**
+   * The system keyboard's own design when it isn't the OS's: the iPhone Duo's (iOS and iPadOS 27 Figma, iPhone Duo ›
+   * Keyboard), an iPhone keyboard at each display's size on both of them, the inner display's iPadOS too.
+   */
+  keyboard?: 'duo-outer' | 'duo-inner';
+  /**
    * The bottom of the safe area when the bars are in the side column (`nav: column`): the system keeps it clear of the
    * screen's corners even with nothing drawn there. Default 0.
    */
@@ -214,6 +219,7 @@ export const ALL_DEVICES: Device[] = [
         hinge: { edge: 'left', r: 8 },
         camera: { corner: 'tr', size: 28, inset: 21 },
         cornerStatus: true,
+        keyboard: 'duo-outer',
         // iOS's safeAreaInsets.bottom on this display, in portrait and in landscape (Xcode 27.1 simulator).
         columnSafeBottom: 34,
       }),
@@ -224,6 +230,7 @@ export const ALL_DEVICES: Device[] = [
         nav: { portrait: 'bottom', landscape: 'column' },
         padX: 24,
         cornerStatus: true,
+        keyboard: 'duo-inner',
         detailW: 418,
         videoSplit: true,
       }),

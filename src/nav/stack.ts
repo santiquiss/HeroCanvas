@@ -19,7 +19,7 @@ export type Manifest = Record<string, PageDef>;
  * screens/Scan/flag).
  */
 /** The URL params that survive navigation: the designer's own, and the app's controls (appConfig.controls). */
-export const SIM_PARAMS: readonly string[] = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', ...(appConfig.sidePanel ? [appConfig.sidePanel.param ?? appConfig.sidePanel.page] : []), 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'appearance', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'capture', ...SHOT_PARAMS, ...(appConfig.controls ?? []).map((c) => c.param)];
+export const SIM_PARAMS: readonly string[] = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', ...(appConfig.sidePanel ? [appConfig.sidePanel.param ?? appConfig.sidePanel.page] : []), 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'appearance', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'system', 'capture', ...SHOT_PARAMS, ...(appConfig.controls ?? []).map((c) => c.param)];
 
 /**
  * Whether the split's right part is in use (the layout's `detailOpen`): a push page over the tab, or the app's side

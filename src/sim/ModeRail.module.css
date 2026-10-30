@@ -108,3 +108,13 @@
     transition: none;
   }
 }
+/* The logo as the way back to the whole designer (a guest's view, for the team). */
+.brandBtn {
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+.brandBtn:hover img {
+  opacity: 0.85;
+}

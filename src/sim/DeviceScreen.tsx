@@ -434,6 +434,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
     <KeyboardInsetCtx.Provider value={L.real ? realKb : kbOpen ? kbH : 0}>
       <div
         ref={setScreen}
+        // The screen's root: a still picture of it waits for it (src/sim/screenStill.tsx).
+        data-hc-screen=""
         data-theme={theme}
         // The app's own theme (appConfig.themes): its tokens' block in app/theme.css.
         data-app-theme={appTheme?.id}
@@ -721,7 +723,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
             </span>
           </div>
         )}
-        {kbField && !L.real && <SystemKeyboard os={L.os} land={L.land} open={kbOpen} field={kbField} bottomInset={L.botIn} width={L.vw} height={L.vh} onHeight={setKbH} />}
+        {kbField && !L.real && <SystemKeyboard os={L.os} design={L.keyboard} land={L.land} open={kbOpen} field={kbField} bottomInset={L.botIn} width={L.vw} height={L.vh} onHeight={setKbH} />}
         {launch.overlay}
         {!L.real && <LandscapeCamera layout={L} />}
         {!L.real && <HomeIndicator layout={L} />}

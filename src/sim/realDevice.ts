@@ -6,6 +6,17 @@ import { ALL_DEVICES as DEVICES, type Device, type DeviceOS, type Display, type 
 
 /** URL param: `1` real mode on, `0` off (the designer, on a phone too); unset, it's on where `realByDefault` says. */
 export const REAL_PARAM = 'real';
+/**
+ * URL param: the catalog device whose system real mode draws (`iphone-16-pro`), for a screen that isn't that device (a
+ * frame in the designer, as App Store Assets' Interact with the screen): its status bar, home indicator and safe area,
+ * as the canvas draws them.
+ */
+export const SYSTEM_PARAM = 'system';
+/**
+ * URL param: `1` draws the screen alone, as a screenshot without its device shows it (`screenOnly`): no camera cut into
+ * it, square corners.
+ */
+export const BARE_PARAM = 'bare';
 
 export interface RealViewport {
   /** The window, in CSS px. */
@@ -53,10 +64,14 @@ const UNKNOWN: Omit<Device, 'type' | 'displays'> = { id: 'real', name: 'This dev
  * The screen as a display: its size in portrait, the safe area as reported, no bezel or corners (the device has its
  * own), and whether it's turned. It turns with the device on every page that supports landscape.
  */
-export function realDisplay(view: RealViewport, platform: Platform): { device: Device; display: Display; land: boolean; known: boolean } {
+export function realDisplay(view: RealViewport, platform: Platform, system?: string | null): { device: Device; display: Display; land: boolean; known: boolean } {
   const land = view.w > view.h;
   const short = Math.min(view.w, view.h);
   const long = Math.max(view.w, view.h);
+  // A device named: its display of this width, drawn with its system (not `real`: the device in hand has none here).
+  const named = system ? DEVICES.find((d) => d.id === system) : undefined;
+  const own = named?.displays.find((x) => Math.abs(x.w - short) <= WIDTH_SLACK);
+  if (named && own) return { device: named, display: { ...own, w: short, h: long, r: 0, bez: 0, ends: 0, bodyR: undefined, hinge: undefined }, land, known: true };
   const match = matchDisplay(short, long, platform);
   const size = { w: short, h: long, r: 0, bez: 0, ends: 0, bodyR: undefined, safe: view.safe, real: true };
   if (match) return { device: match.device, display: { ...match.display, ...size, hinge: undefined }, land, known: true };

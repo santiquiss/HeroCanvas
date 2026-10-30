@@ -13,9 +13,9 @@ import { landscapeFor, supportsLandscape, useScreenConfig } from '../nav/screenC
 import { detailOpenFor } from '../nav/stack';
 import { useDeveloperHidden } from './developerHidden';
 import { DeviceScreen } from './DeviceScreen';
-import { computeLayout } from './layout';
+import { computeLayout, screenOnly } from './layout';
 import { RealControls } from './RealControls';
-import { platformOf, REAL_PARAM, realByDefault, realDisplay, turnedSafe } from './realDevice';
+import { BARE_PARAM, platformOf, REAL_PARAM, realByDefault, realDisplay, SYSTEM_PARAM, turnedSafe } from './realDevice';
 import { SharedSimProvider, SimProvider } from './SimContext';
 import { TouchPointer } from './TouchPointer';
 import { useRealViewport } from './useRealViewport';
@@ -63,19 +63,22 @@ export function RealShell() {
   const detailOpen = detailOpenFor(pages, stack, sidePanelOnIn(search));
   const top = stack[stack.length - 1];
 
+  const system = search.get(SYSTEM_PARAM);
+  const bare = search.get(BARE_PARAM) === '1';
   const { w, h, angle } = view;
   const { top: st, right: sr, bottom: sb, left: sl } = view.safe;
   const { device, display, land, known } = useMemo(
-    () => realDisplay({ w, h, safe: { top: st, right: sr, bottom: sb, left: sl } }, platform),
-    [w, h, st, sr, sb, sl, platform],
+    () => realDisplay({ w, h, safe: { top: st, right: sr, bottom: sb, left: sl } }, platform, system),
+    [w, h, st, sr, sb, sl, platform, system],
   );
   const supported = supportsLandscape(landscapeFor(top.id, def(top.id), cfg), device, display);
   const layout = useMemo(() => {
     // A page with no landscape stays in portrait on a turned device: its safe area turns with the device.
     const shown = land && !supported && display.safe ? { ...display, safe: turnedSafe(display.safe, angle) } : display;
     // The app's layout (its rail, its bar, phone only), and the proposal's over it, as on the canvas.
-    return computeLayout({ display: shown, land, supported, detailOpen, video, ...designLayout(proposal, variant) });
-  }, [display, land, supported, detailOpen, video, angle, proposal, variant]);
+    const L = computeLayout({ display: shown, land, supported, detailOpen, video, ...designLayout(proposal, variant) });
+    return bare ? screenOnly(L) : L;
+  }, [display, land, supported, detailOpen, video, angle, proposal, variant, bare]);
 
   const [frame, setFrame] = useState<HTMLDivElement | null>(null);
   // The browser's own surface (the status bar's background when installed, the page behind the app) takes the

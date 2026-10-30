@@ -13,13 +13,15 @@ import { lastPrototypeUrl } from '../sim/modes';
 import type { PageStatus } from '../nav/types';
 import type { Layout } from '../sim/layout';
 import { useSim } from '../sim/SimContext';
+import { useSidePanel } from '../nav/sidePanel';
 import { STATUS_COLOR } from '../tools/PagesPanel';
 import { ARC_ABOVE, ARC_BELOW, FlowStrip, STEP_GAP } from './FlowStrip';
 import { flowEdges, flowLayout, type FlowEdge, type FlowLane } from './graph';
-import { FlowRootCtx, LazyPreview } from './LazyPreview';
+import { FlowRootCtx } from './LazyPreview';
 import { PageCard } from './PageCard';
 import { PageCommentCount } from '../comments';
-import { PreviewScreen } from './PreviewScreen';
+import { FlowThumb, flowSpecs } from './FlowThumb';
+import { refreshScreens, useCanRefreshScreens, type ScreenSpec } from '../sim/screenStill';
 import styles from './Flow.module.css';
 import { plural, t } from '../i18n/ui';
 
@@ -87,6 +89,16 @@ export function FlowView({ makeLayout }: { makeLayout: (detailOpen: boolean, pag
     () => flowLayout(PAGES, { size, gapX: GAP_X, gapY: GAP_Y, rowW: ROW_N * w + (ROW_N - 1) * GAP_X, lanePad: LANE_PAD, laneTitle: LANE_TITLE, laneGap: LANE_GAP, aspect }),
     [PAGES, size, w, aspect],
   );
+
+  // The screens a deployed site's build draws as pictures (scripts/flow/prerender.mjs reads this).
+  const panelOn = useSidePanel().on;
+  const { theme } = useSim();
+  useEffect(() => {
+    const w = window as unknown as { __hcFlowSpecs?: () => ScreenSpec[] };
+    w.__hcFlowSpecs = () => flowSpecs(PAGES, Object.keys(pos), makeLayout, panelOn, theme);
+    return () => void delete w.__hcFlowSpecs;
+  }, [PAGES, pos, makeLayout, panelOn, theme]);
+  const canRefresh = useCanRefreshScreens();
 
   const [view, setView] = useState<View | null>(() => {
     try {
@@ -232,6 +244,11 @@ export function FlowView({ makeLayout }: { makeLayout: (detailOpen: boolean, pag
         <button title={t('Fit all')} onClick={fit}>
           <Icon name="fit_screen" size={18} />
         </button>
+        {canRefresh && (
+          <button title={t('Draw the screens again')} onClick={() => void refreshScreens()}>
+            <Icon name="refresh" size={18} />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -364,7 +381,7 @@ const FlowGraph = memo(function FlowGraph({ lanes, edges, pos, bounds, w, h, siz
                 <PageCard icon={pageIcon(def)} status={def.status} change={nav.change(id)} />
               ) : (
                 <div className={styles.thumbInner} style={{ width: layout.vw, height: layout.vh, transform: `scale(${S})` }}>
-                  <LazyPreview>{() => <PreviewScreen page={{ id, params }} state={state} makeLayout={makeLayout} still />}</LazyPreview>
+                  <FlowThumb page={{ id, params }} state={state} makeLayout={makeLayout} />
                 </div>
               )}
             </div>

@@ -32,6 +32,8 @@ export const RAIL_W = 72;
 
 export interface Layout {
   os: DeviceOS;
+  /** The display's own keyboard design (devices.ts `keyboard`), if it has one. */
+  keyboard?: 'duo-outer' | 'duo-inner';
   vw: number;
   vh: number;
   land: boolean;
@@ -312,6 +314,7 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
   const bezY = bez + (land ? 0 : ends);
   return {
     os: dev.os,
+    keyboard: dev.keyboard,
     vw,
     vh,
     land,

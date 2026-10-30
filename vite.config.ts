@@ -40,6 +40,8 @@ export default defineConfig({
     __HC_COMMENTS__: JSON.stringify(hc.comments?.key ? { url: hc.comments.url, key: hc.comments.key } : null),
     // Who can be @mentioned in a comment (`comments.team`); the tests mention their own.
     __HC_TEAM__: JSON.stringify(process.env.VITEST ? [] : (hc.comments?.team ?? [])),
+    // Guest links (src/share): where they're made, and the views they can open (the tests see HeroCanvas's own).
+    __HC_SHARE__: JSON.stringify({ url: process.env.VITEST ? null : (hc.share?.url ?? null), profiles: process.env.VITEST ? {} : (hc.share?.profiles ?? {}) }),
     __BUILD_ID__: JSON.stringify(String(Date.now())),
   },
   // `npm test`: the logic's unit tests (and the scripts': npm run shot's arguments) and the smoke test (every page, every story renders), in a DOM of happy-dom.

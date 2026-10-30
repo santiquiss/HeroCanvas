@@ -1,0 +1,250 @@
+.root {
+  position: relative;
+}
+/* The toolbar's Share, in the brand (herocanvas.config.ts, or its logo's color): the one place the tool wears it. */
+.share {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 112px;
+  min-height: 30px;
+  padding: 6px 12px;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: var(--hc-brand);
+  color: var(--hc-on-brand);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share:hover {
+  background: var(--hc-brand-hover);
+}
+.menu {
+  composes: surface from '../theme/surface.module.css';
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 200;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  padding: 6px;
+  font-size: 12px;
+}
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ui-text);
+  text-align: left;
+  cursor: pointer;
+}
+.row:hover {
+  background: var(--ui-hover);
+}
+.rowText {
+  display: grid;
+  gap: 2px;
+}
+.rowTitle {
+  font-weight: 600;
+}
+.rowHint,
+.hint {
+  margin: 0;
+  color: var(--ui-text-muted);
+  line-height: 16px;
+}
+.divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--ui-line);
+}
+.section {
+  display: grid;
+  gap: 10px;
+  padding: 6px 10px 10px;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.label {
+  display: grid;
+  gap: 6px;
+  color: var(--ui-text-2);
+  font-weight: 600;
+}
+.select {
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+}
+/* Its durations, a segmented control as the canvas's Light / Dark. */
+.segments {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--ui-fill);
+}
+.segments button {
+  flex: 1;
+  min-height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+.segments button {
+  min-width: 0;
+  padding: 0 8px;
+}
+.ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.segments button.on {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  box-shadow: 0 1px 2px rgba(15, 20, 30, 0.12);
+}
+.device {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  cursor: pointer;
+}
+.device:hover {
+  background: var(--ui-hover);
+}
+/* The native menu laid over it (DevicePicker): any click opens it. */
+.device select {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.deviceName {
+  flex: 1;
+}
+.label .rowHint {
+  font-weight: 400;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--ui-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.check input {
+  margin: 1px 0 0;
+  accent-color: var(--hc-brand);
+}
+.check > span {
+  display: grid;
+  gap: 2px;
+}
+.check .rowHint {
+  font-weight: 400;
+}
+.field {
+  display: flex;
+  gap: 4px;
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg-subtle);
+  color: var(--ui-text);
+  font: inherit;
+  font-weight: 400;
+}
+.copy {
+  width: 30px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.copy:hover {
+  background: var(--ui-hover);
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.primary {
+  border: none;
+  background: var(--hc-brand);
+  color: var(--hc-on-brand);
+}
+.primary:hover {
+  background: var(--hc-brand-hover);
+}
+.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.secondary {
+  border: 1px solid var(--ui-line-strong);
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+.secondary:hover {
+  background: var(--ui-hover);
+}
+.error {
+  margin: 0;
+  color: var(--ui-red-text);
+}

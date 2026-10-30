@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { useDesign } from '../design/DesignContext';
@@ -12,6 +12,10 @@ import { VersionButton } from './Changelog';
 import { useCommentsUi } from '../comments';
 import { t } from '../i18n/ui';
 import { useGalleryRoute } from '../gallery/route';
+import { ShareMenu } from '../share/ShareMenu';
+import { ViewBadge } from '../share/ViewBadge';
+import { can } from '../share/view';
+import { toolsOn } from '../tools/PanelHost';
 import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
@@ -48,28 +52,37 @@ export function Toolbar(props: ToolbarProps) {
   return (
     <div className={styles.toolbar}>
       {/* Each panel's toggle at its own edge, as in Figma. */}
-      <button className={styles.panelBtn} title={t('Toggle left panel')} onClick={props.onToggleLeft}>
-        <Icon name={props.leftOpen ? 'left_panel_close' : 'left_panel_open'} size={18} />
-      </button>
+      {/* No panel on the left in this view (a guest's link without Pages): no toggle for it. */}
+      {toolsOn('left', props.mode).length > 0 && (
+        <button className={styles.panelBtn} title={t('Toggle left panel')} onClick={props.onToggleLeft}>
+          <Icon name={props.leftOpen ? 'left_panel_close' : 'left_panel_open'} size={18} />
+        </button>
+      )}
       {/* The logo, the modes and HeroCanvas's own version are the rail's (ModeRail); this copy's version stays here,
           opening its changelog. */}
-      <VersionButton />
-      <ProposalMenu />
-      <VariantPicker />
-      <ChangesMenu proposalId={proposalId} />
-      {/* With the proposal it outlines: the changes chip, then Highlight changes. */}
-      <HighlightButton proposalId={proposalId} />
+      {can('about') && <VersionButton />}
+      {can('proposals') && (
+        <>
+          <ProposalMenu />
+          <VariantPicker />
+          <ChangesMenu proposalId={proposalId} />
+          {/* With the proposal it outlines: the changes chip, then Highlight changes. */}
+          <HighlightButton proposalId={proposalId} />
+        </>
+      )}
+      {/* A guest's view (until when it lasts), or one being tried (and the way back). */}
+      <ViewBadge />
       {/* View controls (device, orientation, theme) float at the bottom of the canvas: ViewBar. */}
       <div className={styles.spacer} />
       {/* The actions on the right, closer together than the bar's own spacing. */}
       <div className={styles.actions}>
-      {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && (
+      {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && can('inspect') && (
         <Chip active={inspect} onClick={() => setInspect(!inspect)} title={t('Inspect components (I)')} tour="inspect">
           <Icon name="ads_click" size={18} />
           {t('Inspect')}
         </Chip>
       )}
-      {(props.mode === 'prototype' || (props.mode === 'components' && gallery)) && !capture && (
+      {(props.mode === 'prototype' || (props.mode === 'components' && gallery)) && !capture && can('comments') && (
         <Chip
           active={commenting}
           onClick={() => setCommenting(!commenting)}
@@ -82,32 +95,15 @@ export function Toolbar(props: ToolbarProps) {
       )}
       {/* Capture is in the mode rail (ModeRail). */}
       {/* Capture's picture is exported, not linked: a link here wouldn't bring it. */}
-      {!capture && <ShareButton />}
-      <button className={styles.panelBtn} title={t('Toggle right panel')} onClick={props.onToggleRight}>
-        <Icon name={props.rightOpen ? 'right_panel_close' : 'right_panel_open'} size={18} />
-      </button>
+      {!capture && can('share') && <ShareMenu />}
+      {/* No panel on the right in this view (a guest's): no toggle for it. */}
+      {toolsOn('right', props.mode).length > 0 && (
+        <button className={styles.panelBtn} title={t('Toggle right panel')} onClick={props.onToggleRight}>
+          <Icon name={props.rightOpen ? 'right_panel_close' : 'right_panel_open'} size={18} />
+        </button>
+      )}
       </div>
     </div>
-  );
-}
-
-/**
- * Copies a link to what's on screen: every state is in the URL (page, stack, device, theme, persona, proposal,
- * scenario controls), so the link opens the same view. What's logged while trying the prototype isn't in it.
- */
-function ShareButton() {
-  const [copied, setCopied] = useState(false);
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 1800);
-    return () => clearTimeout(timer);
-  }, [copied]);
-  const share = () => navigator.clipboard.writeText(window.location.href).then(() => setCopied(true));
-  return (
-    <button className={styles.share} onClick={share} title={t('Copy a link to this view')}>
-      <Icon name={copied ? 'check' : 'link'} size={18} />
-      {copied ? t('Link copied') : t('Share')}
-    </button>
   );
 }
 

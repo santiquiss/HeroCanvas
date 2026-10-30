@@ -143,8 +143,60 @@ const IOS_ACTION_ROW: Record<Layer | 'email', string[]> = {
   email: ['→123', '␣', '@', '.', '⏎'],
 };
 
+/** The keyboard designs a display can have of its own (devices.ts `keyboard`). */
+export type KeyboardDesign = 'duo-outer' | 'duo-inner';
+
+/**
+ * The iPhone Duo's keyboard (iOS and iPadOS 27 Figma, iPhone Duo › Keyboard): an iPhone keyboard, at each display's
+ * size, on both of them (the inner one's iPadOS too): the QuickType bar, no number pad (a number field opens the
+ * numbers layer), and emoji and dictation in the bottom row (the outer display upright), below the keys (the inner one
+ * upright) or in columns of their own beside them (either one turned). Measured on the Figma frames, in points.
+ */
+interface DuoGeometry {
+  keyH: number;
+  gap: number;
+  rowGap: number;
+  /** The keys' inset from the keyboard's sides. */
+  padX: number;
+  /** Where the keys start (under the QuickType bar) and the room under them. */
+  top: number;
+  bottom: number;
+  /** The middle letter row's inset at each end. */
+  row2: number;
+  /** Shift and delete (and #+=, 123 on that row): their width and the room before the letters. */
+  side: number;
+  sideGap: number;
+  /** 123 / ABC and return on the bottom row. */
+  switchW: number;
+  /** The bottom row's own inset (the inner display turned). */
+  row4?: number;
+  /** Emoji and dictation: in the bottom row (42 square), below the keys, or in a column each beside them. */
+  extras: { at: 'row'; w: number } | { at: 'below'; top: number; x: number; h: number; bottom: number } | { at: 'sides'; x: number; w: number };
+  radius: number;
+  char: number;
+  special: number;
+  corner: number;
+}
+const DUO: Record<`${KeyboardDesign}-${'port' | 'land'}`, DuoGeometry> = {
+  'duo-outer-port': { keyH: 42, gap: 6, rowGap: 10.67, padX: 17.67, top: 47, bottom: 39, row2: 21.33, side: 50.67, sideGap: 14.67, switchW: 81, extras: { at: 'row', w: 42 }, radius: 10, char: 26, special: 20, corner: 27 },
+  'duo-outer-land': { keyH: 33.33, gap: 6.67, rowGap: 9, padX: 82, top: 49, bottom: 20, row2: 26, side: 60.33, sideGap: 17.67, switchW: 98, extras: { at: 'sides', x: 10, w: 68 }, radius: 8, char: 21, special: 17, corner: 27 },
+  'duo-inner-port': { keyH: 49.67, gap: 9, rowGap: 14, padX: 17.67, top: 47, bottom: 0, row2: 33, side: 74.33, sideGap: 22, switchW: 151.67, extras: { at: 'below', top: 17, x: 63, h: 42, bottom: 16 }, radius: 12, char: 31, special: 24, corner: 32 },
+  'duo-inner-land': { keyH: 42.33, gap: 10, rowGap: 13, padX: 85, top: 47, bottom: 20, row2: 39.67, side: 92.67, sideGap: 26, switchW: 148.33, row4: 23.67, extras: { at: 'sides', x: 12, w: 68 }, radius: 10, char: 27, special: 20, corner: 32 },
+};
+/** Its rows: iOS 27's, the bottom row by where emoji and dictation go. */
+function duoRows(layer: Layer, email: boolean, inRow: boolean): string[][] {
+  const sw = layer === 'letters' ? '→123' : '→ABC';
+  const bottom = [sw, '␣', ...(email ? ['@', '.'] : []), '⏎'];
+  const last = inRow ? ['☺', ...bottom, '🎤'] : bottom;
+  if (layer === 'letters') return [[...'qwertyuiop'], [...'asdfghjkl'], ['⇧', ...'zxcvbnm', '⌫'], last];
+  if (layer === 'numbers') return [[...'1234567890'], [...'-/:;()$&@"'], ['→#+=', ...".,?!'", '⌫'], last];
+  return [[...'[]{}#%^*+='], [...'_\\|~<>€£¥•'], ['→123', ...".,?!'", '⌫'], last];
+}
+
 interface Props {
   os: DeviceOS;
+  /** The display's own keyboard (the iPhone Duo's), instead of its OS's. */
+  design?: KeyboardDesign;
   land: boolean;
   open: boolean;
   /** The focused field, or the last one while the keyboard slides away. */
@@ -157,7 +209,10 @@ interface Props {
   onHeight: (h: number) => void;
 }
 
-export function SystemKeyboard({ os, land, open, field, bottomInset, width, height, onHeight }: Props) {
+export function SystemKeyboard({ os: deviceOS, design, land, open, field, bottomInset, width, height, onHeight }: Props) {
+  // The Duo's keyboard is an iPhone's (its keys, glyphs and colors), at its own geometry.
+  const duo = design ? DUO[`${design}-${land ? 'land' : 'port'}`] : null;
+  const os: DeviceOS = duo ? 'ios' : deviceOS;
   const [layer, setLayer] = useState<Layer>('letters');
   const [shift, setShift] = useState<'off' | 'once' | 'lock'>('off');
   const lastShift = useRef(0);
@@ -184,7 +239,7 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
   const mode = field?.inputMode;
   const numeric = mode === 'numeric' || mode === 'decimal';
   // A number pad on phones; iPadOS keeps its keyboard, on numbers. iOS with an action: numbers and punctuation.
-  const pad = numeric && os !== 'ipad' && !(os === 'ios' && action);
+  const pad = numeric && !duo && os !== 'ipad' && !(os === 'ios' && action);
   // Each time it opens: letters, lower case (numbers for a number field on iPadOS).
   useEffect(() => {
     if (open) {
@@ -237,8 +292,9 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
   const keep = (e: SyntheticEvent) => e.preventDefault();
 
   const email = mode === 'email' && layer === 'letters';
-  const rows =
-    os === 'ios' && action
+  const rows = duo
+    ? duoRows(layer, email, duo.extras.at === 'row')
+    : os === 'ios' && action
       ? [...ROWS.ios[layer].slice(0, -1), IOS_ACTION_ROW[email ? 'email' : layer]]
       : email
         ? [...ROWS[os].letters.slice(0, -1), EMAIL_ROW[os]]
@@ -247,13 +303,13 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
   const label = (key: string) => {
     const k = base(key);
     // iOS 26 glyphs are bigger than the others' (shift, delete and emoji ≈ 26pt).
-    const glyph = os === 'android' ? 22 : os === 'ipad' ? 24 : 26;
+    const glyph = duo ? Math.round(duo.char * 0.8) : os === 'android' ? 22 : os === 'ipad' ? 24 : 26;
     if (k === '⇧') return <KeyGlyph os={os} g={shift === 'lock' ? 'capsLock' : shift === 'once' ? 'shiftOnce' : 'shift'} fill={shift !== 'off'} size={glyph} />;
     if (k === '⏎' && action) return ACTION_LABEL;
     if (k === '⏎') {
       // A glyph on every OS (iOS and iPadOS 26, Android).
       const g = hint === 'search' || hint === 'done' || hint === 'go' || hint === 'send' ? hint : 'return';
-      return <KeyGlyph os={os} g={g} size={os === 'android' ? 22 : 28} />;
+      return <KeyGlyph os={os} g={g} size={duo ? Math.round(duo.char * 0.85) : os === 'android' ? 22 : 28} />;
     }
     if (GLYPH[k]) return <KeyGlyph os={os} g={k} size={glyph} />;
     if (k === '␣') return '';
@@ -283,17 +339,52 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
           '--kb-bar-h': `${Math.round(s * 0.06)}px`,
         } as React.CSSProperties)
       : undefined;
+  const duoVars = duo
+    ? ({
+        '--kb-key-h': `${duo.keyH}px`,
+        '--kb-gap': `${duo.gap}px`,
+        '--kb-row-gap': `${duo.rowGap}px`,
+        '--kb-pad-top': '0px',
+        '--kb-pad-x': `${duo.padX}px`,
+        '--kb-pad-bottom': `${duo.extras.at === 'below' ? 0 : Math.max(duo.bottom, bottomInset)}px`,
+        '--kb-radius': `${duo.radius}px`,
+        '--kb-char-size': `${duo.char}px`,
+        '--kb-special-size': `${duo.special}px`,
+        '--kb-bar-h': `${duo.top}px`,
+        borderRadius: `${duo.corner}px ${duo.corner}px 0 0`,
+      } as React.CSSProperties)
+    : undefined;
+  /** A Duo key's own width (the fixed ones beside the letters and on the bottom row); a letter's flex otherwise. */
+  const duoKey = (k: string, r: number, i: number, n: number): React.CSSProperties | undefined => {
+    if (!duo) return undefined;
+    const kb = base(k);
+    const last = r === rows.length - 1;
+    if (kb === '☺' || kb === '🎤') return { flex: `0 0 ${duo.extras.at === 'row' ? duo.extras.w : 0}px` };
+    // With a typed return key (Continue) it widens for its label, as iOS's does, the space giving the room.
+    if (last && kb === '⏎') return { flex: `0 0 ${action ? Math.round(duo.switchW * 1.3) : duo.switchW}px` };
+    if (last && kb.startsWith('→')) return { flex: `0 0 ${duo.switchW}px` };
+    // Shift and delete (#+= and 123 on the other layers), a wider gap between them and the letters.
+    if (r === 2 && (i === 0 || i === n - 1)) return { flex: `0 0 ${duo.side}px`, [i === 0 ? 'marginRight' : 'marginLeft']: duo.sideGap - duo.gap };
+    return undefined;
+  };
+  const sides = duo?.extras.at === 'sides' ? duo.extras : null;
+  const duoRowPad = (r: number): React.CSSProperties | undefined => {
+    if (!duo) return undefined;
+    if (r === 1 && layer === 'letters') return { padding: `0 ${duo.row2}px` };
+    if (r === rows.length - 1 && duo.row4) return { padding: `0 ${duo.row4}px` };
+    return undefined;
+  };
 
   return (
     <div
       ref={ref}
-      className={`${styles.kb} ${styles[os]} ${land ? styles.land : ''} ${pad ? styles.padPanel : ''} ${open ? styles.open : ''}`}
-      style={{ paddingBottom: os === 'ios' ? 0 : bottomInset, ...ipadVars }}
+      className={`${styles.kb} ${styles[os]} ${land ? styles.land : ''} ${duo ? styles.duo : ''} ${pad ? styles.padPanel : ''} ${open ? styles.open : ''}`}
+      style={{ paddingBottom: os === 'ios' ? 0 : bottomInset, ...ipadVars, ...duoVars }}
       onPointerDown={keep}
       onMouseDown={keep}
       aria-hidden={!open}
     >
-      {pad ? null : os === 'ios' ? null : os === 'android' ? (
+      {pad ? null : os === 'ios' && !duo ? null : os === 'android' ? (
         <div className={styles.toolbar}>
           {['apps', 'sentiment_satisfied', 'content_paste', 'settings', 'palette', 'mic'].map((ic) => (
             <span key={ic} className={styles.tool}>
@@ -340,7 +431,7 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
       ) : (
       <div className={styles.rows}>
         {rows.map((row, r) => (
-          <div key={`${layer}${r}`} className={styles.row}>
+          <div key={`${layer}${r}`} className={styles.row} style={duoRowPad(r)}>
             {row.map((k, i) => {
               if (k.startsWith('·')) return <span key={i} style={{ flex: `${Number(k.slice(1))} 1 0` }} />;
               const w = (action && r === rows.length - 1 && ACTION_W[os][k]) || (k.length === 1 && kind(k) === 'char' ? 1 : (WIDTH[os][k] ?? 1));
@@ -349,12 +440,14 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
               if (kd === 'return' && (blueReturn || action)) cls.push(styles.blue);
               if (kd === 'return' && action) cls.push(styles.action, actionOff ? styles.actionOff : '');
               if (base(k) === '⇧' && shift !== 'off') cls.push(styles.on);
+              // The Duo's emoji and dictation in the bottom row: bare glyphs, no key.
+              if (duo && (base(k) === '☺' || base(k) === '🎤')) cls.push(styles.bare);
               return (
                 <button
                   key={i}
                   tabIndex={-1}
                   className={cls.join(' ')}
-                  style={{ flex: `${w} 1 0` }}
+                  style={duoKey(k, r, i, row.length) ?? { flex: `${w} 1 0` }}
                   data-pop={kd === 'char' && os !== 'ipad' ? (upper ? k.toUpperCase() : k) : undefined}
                   onClick={() => press(k)}
                 >
@@ -371,7 +464,23 @@ export function SystemKeyboard({ os, land, open, field, bottomInset, width, heig
 
       {/* iOS 26's pad: ~40 under its last row before the home indicator's band. */}
       {os === 'ios' && pad && <div style={{ height: land ? Math.max(bottomInset, 16) : Math.max(bottomInset + 40, 56) }} />}
-      {os === 'ios' && !pad && (
+      {duo && duo.extras.at === 'below' && (
+        <div className={styles.below} style={{ height: 'auto', padding: `${duo.extras.top}px ${duo.extras.x}px ${Math.max(duo.extras.bottom, bottomInset)}px` }}>
+          <span style={{ height: duo.extras.h, display: 'flex', alignItems: 'center' }}><KeyGlyph os={os} g="☺" size={30} /></span>
+          <span style={{ height: duo.extras.h, display: 'flex', alignItems: 'center' }}><KeyGlyph os={os} g="🎤" size={30} /></span>
+        </div>
+      )}
+      {duo && sides && (
+        // Turned, emoji and dictation in a column each beside the keys, level with the bottom row.
+        <>
+          {(['☺', '🎤'] as const).map((g, i) => (
+            <span key={g} className={styles.duoSide} style={{ [i ? 'right' : 'left']: sides.x, width: sides.w, bottom: Math.max(duo.bottom, bottomInset), height: duo.keyH }}>
+              <KeyGlyph os={os} g={g} size={Math.round(duo.char * 1.1)} />
+            </span>
+          ))}
+        </>
+      )}
+      {os === 'ios' && !pad && !duo && (
         // Globe (emoji, with a typed return key) and dictation below the keys, in the home indicator's band.
         <div className={styles.below} style={{ height: land ? Math.max(bottomInset + 8, 40) : Math.max(bottomInset + 37, 71) }}>
           <KeyGlyph os={os} g={action ? '☺' : '🌐'} size={27} />
