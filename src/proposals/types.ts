@@ -72,9 +72,26 @@ export const ticketUrl = (ticket: string): string | undefined => (/^https?:\/\//
 export type ProposalLayout = ScreenLayout;
 
 /** What a proposal's pages.tsx exports. */
+/**
+ * Where a change can be seen: a page, its params, and the URL state that shows it (a persona, a Scenarios control,
+ * a flow's step). For a component that isn't on its page as it loads (it shows for a new user, after a tap…).
+ */
+export interface ShowPlace {
+  page: string;
+  params?: Record<string, string>;
+  state?: Record<string, string>;
+  /** How to read it, in a few words: "As Emily, who signed up today". */
+  label?: string;
+}
+
 export interface ProposalCode {
   /** New pages, base pages replaced by id (spread the base entry to change only some fields), or removed (`null`). */
   pages?: Record<string, PageDef | null>;
+  /**
+   * Where each changed component can be seen, by name: the changes popover opens it there (with that state) and
+   * outlines it, and the page is marked changed in Pages. Needed when it isn't on a page as it loads.
+   */
+  show?: Record<string, ShowPlace | ShowPlace[]>;
   /**
    * The page the prototype opens on when the proposal is picked, or for an empty URL (e.g. a sign-up flow). Unset: the
    * picker keeps the page on screen and an empty URL opens Home, as in the base.
@@ -118,6 +135,8 @@ export interface ProposalVariant {
   /** What it tries, for the Proposal panel. */
   description?: string;
   components?: Record<string, Replacement>;
+  /** Where this version's components show, over the proposal's (`ProposalCode.show`). */
+  show?: Record<string, ShowPlace | ShowPlace[]>;
   /** This version's layout, over the proposal's. */
   layout?: ProposalLayout;
 }
@@ -139,6 +158,8 @@ export interface Proposal {
   params: Record<string, string[]>;
   /** Components it adds to the code's library that it also draws on the screens (`ProposalCode.widgets`): new. */
   widgets: string[];
+  /** Where its components show (`ProposalCode.show`), each as a list. */
+  show?: Record<string, ShowPlace[]>;
   /** Its versions, in order (none: a single version). */
   variants: (ProposalVariant & { id: string })[];
   config: ScreenConfig;

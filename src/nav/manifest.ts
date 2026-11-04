@@ -1,5 +1,6 @@
 // The effective manifest: base pages, plus the active proposal's new / replaced pages.
 import type { Proposal } from '../proposals/types';
+import { placesOf } from '../proposals';
 import { BASE_PAGES } from './pages';
 import type { Manifest } from './stack';
 
@@ -27,6 +28,9 @@ export function pageChange(id: string, p: Proposal | null): PageChange {
   if (!p) return null;
   if (!BASE_PAGES[id]) return 'new';
   if (p.pages[id] || (p.config[id] && Object.keys(p.config[id]).length)) return 'changed';
+  // A changed component shows on it (`show`, any version's).
+  if (Object.values(p.show ?? {}).some((places) => places.some((pl) => pl.page === id))) return 'changed';
+  if (p.variants.some((v) => Object.values(placesOf(v.show)).some((places) => places.some((pl) => pl.page === id)))) return 'changed';
   return null;
 }
 

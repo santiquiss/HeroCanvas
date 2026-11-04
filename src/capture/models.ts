@@ -108,6 +108,24 @@ export const DEVICE_MODELS: Record<string, DeviceModel> = {
     ],
     bodies: { main: { w: 67.3, h: 138.4, depth: 7.3, edge: 'round', port: { w: 7.6, h: 1.8 }, buttons: [b('left', 17, 5), b('left', 29, 10), b('left', 43, 10), b('right', 30, 11)] } },
   },
+  // Apple's 8 Plus: 78.1 × 158.4 × 7.5 mm, the SE's keys a little lower (a taller body).
+  ip8plus: {
+    finishes: [
+      { name: 'Space Gray', color: '#3a3a3c' },
+      { name: 'Silver', color: '#e3e4e5' },
+      { name: 'Gold', color: '#f5ddc5' },
+    ],
+    bodies: { main: { w: 78.1, h: 158.4, depth: 7.5, edge: 'round', port: { w: 7.6, h: 1.8 }, buttons: [b('left', 19, 5), b('left', 32, 11), b('left', 47, 11), b('right', 33, 12)] } },
+  },
+  // Apple's 14 Plus: 78.1 × 160.8 × 7.8 mm, the 16e's keys on a taller body.
+  ip14plus: {
+    finishes: [
+      { name: 'Midnight', color: '#2c2f36' },
+      { name: 'Starlight', color: '#f0ebe3' },
+      { name: 'Blue', color: '#a7c1d9' },
+    ],
+    bodies: { main: { w: 78.1, h: 160.8, depth: 7.8, buttons: [b('left', 25, 7), b('left', 38, 13), b('left', 54, 13), b('right', 41, 20)] } },
+  },
   ip16e: {
     finishes: [
       { name: 'Black', color: '#2c2c2e' },

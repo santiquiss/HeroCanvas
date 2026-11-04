@@ -28,6 +28,17 @@ function fixture(over: Partial<Proposal> = {}): Proposal {
 }
 
 describe('proposalChanges', () => {
+  // A component that isn't on its page as it loads says where it shows (`show`): it opens there, and that page is changed.
+  it('marks the page a changed component shows on, in its state', () => {
+    const page = Object.keys(BASE_PAGES)[0];
+    const place = { page, state: { persona: 'new' }, label: 'as a new user' };
+    const c = proposalChanges(fixture({ components: { ListTile: Stub }, show: { ListTile: [place] } }), null, BASE_PAGES);
+    expect(c.components[0].show).toEqual([place]);
+    const pg = c.pages.find((x) => x.id === page);
+    expect(pg?.kind).toBe('changed');
+    expect(pg?.show).toEqual(place);
+    expect(pg?.details).toEqual(['ListTile · as a new user']);
+  });
   // A replaced component is changed when Live has it (a story, overridable, in the code), else new: by componentKind.
   it('counts a component it replaces once, with its note', () => {
     const c = proposalChanges(fixture({ components: { ListTile: Stub }, notes: { ListTile: 'Two lines' } }), null, BASE_PAGES);

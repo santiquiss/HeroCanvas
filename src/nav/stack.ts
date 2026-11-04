@@ -42,12 +42,19 @@ function match(pattern: string, path: string): Params | null {
   return params;
 }
 
+/**
+ * The page a path opens. When several patterns match, the most specific wins (the most fixed segments), as a router
+ * picks `/more/nutrients/visibility` over `/:from/nutrients/:key`; among equals, the manifest's order.
+ */
 export function parsePath(pages: Manifest, path: string): PageRef | null {
+  let best: { ref: PageRef; fixed: number } | null = null;
   for (const [id, def] of Object.entries(pages)) {
     const params = match(def.path, path);
-    if (params) return { id, params };
+    if (!params) continue;
+    const fixed = def.path.split('/').filter((seg) => seg && !seg.startsWith(':')).length;
+    if (!best || fixed > best.fixed) best = { ref: { id, params }, fixed };
   }
-  return null;
+  return best?.ref ?? null;
 }
 
 export function buildPath(pages: Manifest, ref: PageRef): string {

@@ -248,3 +248,14 @@
   margin: 0;
   color: var(--ui-red-text);
 }
+/* Beside a mode's own main action: the toolbar's plain button (its chips'). */
+.share.secondaryShare {
+  min-width: 0;
+  border: 1px solid var(--ui-line-strong);
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font-weight: 500;
+}
+.share.secondaryShare:hover {
+  background: var(--ui-bg-subtle);
+}

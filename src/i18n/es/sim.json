@@ -165,5 +165,8 @@
   "Open: the {display}": "Abrir: {display}",
   "Close: the {display}": "Cerrar: {display}",
   "Live tickets · {count}": "Tickets de Live · {count}",
-  "Open {ticket}": "Abrir {ticket}"
+  "Open {ticket}": "Abrir {ticket}",
+  "On {page}: {how}": "En {page}: {how}",
+  "On {page}": "En {page}",
+  "Open it where it shows": "Abrirlo donde se ve"
 }

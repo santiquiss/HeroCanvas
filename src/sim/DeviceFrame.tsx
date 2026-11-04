@@ -89,7 +89,7 @@ export const frameBox = (l: Layout) => (l.rotLocked ? { w: l.frameH, h: l.frameW
  * A frame in a set or All devices: its own layout, and its own touch pointer (fingertip and drag-to-scroll). `screen`:
  * which device it is, for the comments left on it.
  */
-export function DeviceFrame({ layout, scale, theme, language, active = false, screen }: { layout: Layout; scale: number; theme: 'light' | 'dark'; /** Its own language (a set's device), over `?lang=`. */ language?: Language; active?: boolean; screen?: CanvasScreen }) {
+export function DeviceFrame({ layout, scale, theme, language, active = false, screen, content }: { layout: Layout; scale: number; theme: 'light' | 'dark'; /** Its own language (a set's device), over `?lang=`. */ language?: Language; active?: boolean; screen?: CanvasScreen; /** What the screen shows instead of the app (App Store Assets' Preview: the store's page), its own status bar included. */ content?: React.ReactNode }) {
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   const { inspect } = useDesignRoot();
   // Inspect and comment mode keep their own cursor and click: no fingertip then.
@@ -97,9 +97,11 @@ export function DeviceFrame({ layout, scale, theme, language, active = false, sc
   return (
     <>
       <div ref={setEl} className={styles.frame} style={frameStyle(layout, scale)} {...(screen && screenAttrs(screen))}>
-        <SimProvider layout={layout} theme={theme} language={language}>
-          <DeviceScreen preview={!active} overlays />
-        </SimProvider>
+        {content ?? (
+          <SimProvider layout={layout} theme={theme} language={language}>
+            <DeviceScreen preview={!active} overlays />
+          </SimProvider>
+        )}
         <FrameHardware layout={layout} />
       </div>
       <TouchPointer frame={el} enabled={!inspect && !commenting} scale={scale} rotated={layout.rotLocked} />

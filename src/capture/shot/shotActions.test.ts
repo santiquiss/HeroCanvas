@@ -1,6 +1,6 @@
-// The steps of an agent's shot (shotActions.ts): finding what a step names, typing as React reads it, scrolling.
+// The steps of an agent's shot (shotActions.ts): finding what a step names, typing as React reads it, holding, scrolling.
 import { describe, expect, it, vi } from 'vitest';
-import { findTarget, fingerprint, runStep } from './shotActions';
+import { findTarget, fingerprint, HOLD_MS, runStep } from './shotActions';
 
 function screen(html: string) {
   const root = document.createElement('div');
@@ -41,6 +41,19 @@ describe('runStep', () => {
     root.querySelector('input')!.addEventListener('keydown', onKey);
     runStep(root, { press: 'Enter' });
     expect(onKey).toHaveReturnedWith('Enter');
+  });
+  it('holds an element: pointer down, up after the long press, no click', async () => {
+    vi.useFakeTimers();
+    const root = screen('<button>Card</button>');
+    const seen: string[] = [];
+    const button = root.querySelector('button')!;
+    for (const type of ['pointerdown', 'pointerup', 'click']) button.addEventListener(type, () => seen.push(type));
+    const held = runStep(root, { hold: 'Card' });
+    expect(seen).toEqual(['pointerdown']);
+    await vi.advanceTimersByTimeAsync(HOLD_MS);
+    await held;
+    expect(seen).toEqual(['pointerdown', 'pointerup']);
+    vi.useRealTimers();
   });
   it('says what it could not find', () => {
     const root = screen('<p>x</p>');

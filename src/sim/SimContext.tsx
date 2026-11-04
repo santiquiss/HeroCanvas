@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useKeyboardInset } from './keyboard';
 import { useLocation, useSearchParams } from 'react-router';
 import { SNACKBAR_DURATION, type AlertLevel, type AlertProps, type DialogProps, type SheetLayout, type SheetWidth } from '../kit';
@@ -32,6 +32,11 @@ export interface SheetSpec {
   showPadding?: boolean;
   /** The panel's background (Sheet `surface`): the page's, for lists and cards (menus and filters), instead of the sheet surface. */
   surface?: 'page';
+  /**
+   * Restyles the panel as the app's own sheet draws it, as MFSheetV2's `sheetStyle` does (a radius, a share of the
+   * screen's height). Where the sheet sits for the device (under a corner status) still wins.
+   */
+  sheetStyle?: CSSProperties;
   /**
    * What it holds (`actions`, `content` or a `task`), which decides what it becomes on large screens
    * (sim/sheetPresentation). Without one it's the sheet at every size.

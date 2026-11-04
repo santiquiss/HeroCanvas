@@ -36,6 +36,8 @@ export interface Lighting {
   metal: number;
   /** 0–1: the surface's grain (bead-blasted metal), none to coarse. */
   grain: number;
+  /** Clay: every part (the bezel's backing and the gasket too) in the body's color, matte, no reflections or edge lines. */
+  clay?: boolean;
 }
 export type LightFrom = 'left' | 'top' | 'right';
 export const DEFAULT_LIGHT: Lighting = { from: 'top', brightness: 1, shine: 0.5, metal: 0.5, grain: 0.5 };
@@ -213,10 +215,11 @@ export class DeviceScene {
     // Turned, before the perspective: where the shader looks at it from.
     const turned = (x: number, y: number, z: number) => (s.rot90 ? turn(-y, x, z, s.tilt) : turn(x, y, z, s.tilt));
     for (const q of s.mesh) {
-      const tone = q.tone ?? 1;
-      const c = (q.paint ?? base).map((v) => (v / 255) * tone);
-      // Painted parts (the port's opening, the bezel's backing, the gasket) are matte, not metal.
-      clip(place(q.x, q.y, q.z, s), 0, 0, [...c, 1], turned(q.nx, q.ny, q.nz), turned(q.x, q.y, q.z), q.paint ? -1 : light.metal, [q.x, q.y, q.z]);
+      const tone = light.clay ? 1 : (q.tone ?? 1);
+      const c = (light.clay ? base : (q.paint ?? base)).map((v) => (v / 255) * tone);
+      // Painted parts (the port's opening, the bezel's backing, the gasket) are matte, not metal; in clay, all of it.
+      const metal = light.clay || q.paint ? -1 : light.metal;
+      clip(place(q.x, q.y, q.z, s), 0, 0, [...c, 1], turned(q.nx, q.ny, q.nz), turned(q.x, q.y, q.z), metal, [q.x, q.y, q.z]);
     }
     if (s.face) {
       const { w, h } = s.face;
@@ -259,6 +262,11 @@ export class DeviceScene {
 
   dispose() {
     this.gl.getExtension('WEBGL_lose_context')?.loseContext();
+  }
+
+  /** Whether the browser took its context back (too many at once): it draws nothing until made again. */
+  get lost(): boolean {
+    return this.gl.isContextLost();
   }
 }
 

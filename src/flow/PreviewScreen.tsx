@@ -24,6 +24,7 @@ export function PreviewScreen({
   overlays = false,
   still = false,
   state,
+  theme: themeOf,
 }: {
   page: PageRef;
   query?: URLSearchParams;
@@ -33,8 +34,11 @@ export function PreviewScreen({
   still?: boolean;
   /** State params the page shows (a variant by state), over `query`. */
   state?: Params;
+  /** Its own light or dark (App Store Assets' screenshots); default: the designer's. */
+  theme?: 'light' | 'dark';
 }) {
-  const { theme } = useSim();
+  const sim = useSim();
+  const theme = themeOf ?? sim.theme;
   // Same manifest and proposal as the app, with a static stack for this page.
   const root = useNavRoot();
   const PAGES = root.pages;

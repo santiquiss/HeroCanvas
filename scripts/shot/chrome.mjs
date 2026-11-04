@@ -43,7 +43,10 @@ export async function launch() {
   const profile = await mkdtemp(join(tmpdir(), 'hc-shot-'));
   const proc = spawn(
     findChrome(),
-    ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--use-mock-keychain', '--password-store=basic', '--hide-scrollbars', '--force-color-profile=srgb', '--mute-audio', 'about:blank'],
+    ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--use-mock-keychain', '--password-store=basic', '--hide-scrollbars', '--force-color-profile=srgb', '--mute-audio',
+      // Every page drawing, not only the ones in front: several drawn at once (the screens' pictures).
+      '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling',
+      'about:blank'],
     { stdio: ['ignore', 'ignore', 'pipe'] },
   );
   const wsUrl = await new Promise((resolve, reject) => {

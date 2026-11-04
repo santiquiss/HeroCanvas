@@ -7,8 +7,10 @@ let status: Promise<boolean> | null = null;
 
 /** Whether this session can write project files (dev server running). Checked once. */
 export function canWrite(): Promise<boolean> {
+  // The dev server's own answer, not any 200: a static host that serves the page for every path answers too.
   status ??= fetch('/__hc/status', { headers: HEADERS })
-    .then((r) => r.ok)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((b: { writable?: boolean } | null) => b?.writable === true)
     .catch(() => false);
   return status;
 }

@@ -1,11 +1,13 @@
-// What an agent's shot does on the screens before the picture (`npm run shot`, scripts/shot.mjs): tap a text, type in
-// a field, press a key in it, scroll, wait. The same steps on every frame of the shot (light and dark), except what they share: the
+// What an agent's shot does on the screens before the picture (`npm run shot`, scripts/shot.mjs): tap a text, hold it
+// (a long press), type in a field, press a key in it, scroll, wait. The same steps on every frame of the shot (light and dark), except what they share: the
 // navigation and the overlays (sheets, dialogs) are one for all the frames, so a step whose effect already shows on
 // the others isn't repeated there.
 
 export type ShotStep =
   /** Taps the element with this text (exact, else the smallest that contains it), or a CSS selector as `css:…`. */
   | { click: string }
+  /** Holds the element as `click` names it: a long press (pointer down, then up after HOLD_MS, no click). */
+  | { hold: string }
   /** Types into a field: `into` (a CSS selector), else the focused one, else the first. Replaces its value. */
   | { fill: string; into?: string }
   /** Puts the focus in a field (the system keyboard shows): `into`, else the first. */
@@ -51,6 +53,18 @@ export function tap(el: HTMLElement) {
   el.click();
 }
 
+/** As long as a long press takes: past the 500 ms of Flutter's (kLongPressTimeout) and of the screens' gestures. */
+export const HOLD_MS = 650;
+
+/** A long press: the pointer down, held, and up where it went down; the release isn't a tap. */
+export async function hold(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  const at = { bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, pointerId: 1, isPrimary: true, button: 0 };
+  el.dispatchEvent(new PointerEvent('pointerdown', at));
+  await new Promise((done) => setTimeout(done, HOLD_MS));
+  el.dispatchEvent(new PointerEvent('pointerup', at));
+}
+
 /** Sets a field's value as typing would: React reads it from its `input` event. */
 export function fillField(el: HTMLInputElement | HTMLTextAreaElement, text: string) {
   const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
@@ -74,12 +88,16 @@ function scrollers(root: Element, selector?: string): HTMLElement[] {
   });
 }
 
-/** Does one step on one frame. Throws when what it names isn't there. */
-export function runStep(root: HTMLElement, step: ShotStep) {
+/** Does one step on one frame; a hold returns when it's let go. Throws when what it names isn't there. */
+export function runStep(root: HTMLElement, step: ShotStep): Promise<void> | void {
   if ('click' in step) {
     const el = findTarget(root, step.click);
     if (!el) throw new Error(`Can't find "${step.click}" on the screen`);
     tap(el);
+  } else if ('hold' in step) {
+    const el = findTarget(root, step.hold);
+    if (!el) throw new Error(`Can't find "${step.hold}" on the screen`);
+    return hold(el);
   } else if ('fill' in step) {
     const el = field(root, step.into);
     if (!el) throw new Error(`No field${step.into ? ` "${step.into}"` : ''} on the screen`);

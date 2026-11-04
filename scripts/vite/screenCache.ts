@@ -21,6 +21,8 @@ export interface ScreenSpec {
   h: number;
   scale: number;
   taps?: unknown[];
+  /** Texts put another way before the picture's taken: every text node reading `from` reads `to`. */
+  replace?: { from: string; to: string }[];
   scroll?: unknown[];
 }
 
@@ -28,7 +30,7 @@ export interface ScreenSpec {
 const WATCHED = ['app', 'src', 'public'];
 const IGNORED = ['src/store/', 'app/store-assets.json', 'public/assets/store/'];
 /** Pages open at once in the headless Chrome. */
-const PAGES = 3;
+const PAGES = 6;
 /** A picture that takes longer than this: its Chrome is taken for gone. */
 const DRAW_MS = 45_000;
 /** Chrome closes after this long with nothing to draw. */
@@ -173,6 +175,13 @@ export function screenCache(server: ViteDevServer, root: string) {
           return true;
         })`);
       }
+      if (spec.replace?.length)
+        await page.eval(`(() => {
+          const pairs = ${JSON.stringify(spec.replace)};
+          const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+          for (let n = walk.nextNode(); n; n = walk.nextNode()) for (const p of pairs) if (n.nodeValue.trim() === p.from) n.nodeValue = n.nodeValue.replace(p.from, p.to);
+          return true;
+        })()`);
       await page.eval(`Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; })))
         .then(() => ${QUIET}).then(() => true)`);
       await writeFile(file, await page.png({ x: 0, y: 0, width: spec.w, height: spec.h }, { inView: true }));
@@ -191,7 +200,7 @@ export function screenCache(server: ViteDevServer, root: string) {
     /** The picture of `spec`, drawn if it isn't yet: its key. */
     async screen(spec: ScreenSpec, base: string): Promise<string> {
       const key = createHash('sha1')
-        .update(JSON.stringify([spec.hash, spec.w, spec.h, spec.scale, spec.taps ?? [], spec.scroll ?? [], codeStamp(), salt]))
+        .update(JSON.stringify([spec.hash, spec.w, spec.h, spec.scale, spec.taps ?? [], spec.scroll ?? [], spec.replace ?? [], codeStamp(), salt]))
         .digest('hex');
       const file = join(dir, `${key}.png`);
       if (existsSync(file)) {

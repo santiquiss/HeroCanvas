@@ -32,6 +32,7 @@ Options
 
 Steps, in order, before the picture (on every screen)
   --click <text>       taps the element with that text (or "css:<selector>")
+  --hold <text>        holds it: a long press (same targets as --click)
   --fill <text>        types into the focused field, or the first
   --into <selector>    the field of the --fill, --focus or --press before
   --focus              focuses the first field (the keyboard shows)
@@ -97,6 +98,9 @@ export function parseArgs(argv) {
         break;
       case '--click':
         shot.steps.push({ click: value(i++, a) });
+        break;
+      case '--hold':
+        shot.steps.push({ hold: value(i++, a) });
         break;
       case '--fill':
         shot.steps.push({ fill: value(i++, a) });

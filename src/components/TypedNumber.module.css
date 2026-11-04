@@ -1,0 +1,29 @@
+/* Reads as the value beside a slider; a field once hovered or focused. */
+.typed {
+  flex: none;
+  width: 44px;
+  height: 22px;
+  margin: 0;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.typed:hover:not(:disabled) {
+  border-color: var(--ui-line-strong);
+}
+.typed:focus {
+  outline: none;
+  border-color: var(--ui-blue-text);
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  text-align: left;
+}
+.typed:disabled {
+  opacity: 0.6;
+}

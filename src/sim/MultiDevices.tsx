@@ -52,6 +52,7 @@ export function DevicePicker({
   children,
   className,
   tour,
+  options,
 }: {
   value?: string;
   onPick: (id: string) => void;
@@ -60,6 +61,8 @@ export function DevicePicker({
   className: string;
   /** What the tour points at it by (data-tour). */
   tour?: string;
+  /** Only these, in this order (a view with its own devices: App Store Assets' Preview); else the catalog's, by type. */
+  options?: { id: string; name: string }[];
 }) {
   return (
     <label className={className} title={title} data-tour={tour}>
@@ -73,7 +76,12 @@ export function DevicePicker({
         }}
       >
         {!value && <option value="">{title}</option>}
-        {TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
+        {options?.map((d) => (
+          <option key={d.id} value={d.id}>
+            {d.name}
+          </option>
+        ))}
+        {!options && TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
           <optgroup key={type} label={label}>
             {DEVICES.filter((d) => d.type === type).map((d) => (
               <option key={d.id} value={d.id}>
@@ -171,13 +179,14 @@ function LanguagePicker({ value, onPick, row = false }: { value?: Language; onPi
 }
 
 /** Round + that adds a device next to the current one(s). */
-export function AddDeviceButton({ onPick, side }: { onPick: (id: string) => void; side: 'left' | 'right' | 'between' }) {
+export function AddDeviceButton({ onPick, side, options }: { onPick: (id: string) => void; side: 'left' | 'right' | 'between'; options?: { id: string; name: string }[] }) {
   const between = side === 'between';
   return (
     <DevicePicker
       className={`${styles.addDevice} ${between ? styles.addDeviceSmall : ''}`}
       title={between ? t('Add a device here') : side === 'left' ? t('Add a device on the left') : t('Add a device on the right')}
       onPick={onPick}
+      options={options}
       tour={between ? undefined : 'add-device'}
     >
       <Icon name="add" size={between ? 14 : 20} />
@@ -213,6 +222,7 @@ export function DeviceHeader({
   onRemove,
   className,
   style,
+  devices,
 }: {
   device: string;
   display: string;
@@ -221,7 +231,10 @@ export function DeviceHeader({
   onVideo?: () => void;
   onDevice: (id: string) => void;
   onDisplay: (key: string) => void;
-  onRotate: () => void;
+  /** None: no rotate (a screen that only shows upright). */
+  onRotate?: () => void;
+  /** The devices it can switch to (DevicePicker `options`); none: the catalog's. */
+  devices?: { id: string; name: string }[];
   grip?: Pick<React.HTMLAttributes<HTMLElement>, 'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel'>;
   design?: { value?: string; onPick: (design: string | undefined) => void };
   language?: { value?: Language; onPick: (lang: Language | undefined) => void };
@@ -243,7 +256,7 @@ export function DeviceHeader({
     ...(hasBack ? (['back'] as const) : []),
     ...(dev.displays.length > 1 ? (['displays'] as const) : []),
     ...(hasVideo ? (['video'] as const) : []),
-    'rotate' as const,
+    ...(onRotate ? (['rotate'] as const) : []),
     ...(design ? (['design'] as const) : []),
     ...(language ? (['language'] as const) : []),
   ];
@@ -375,7 +388,7 @@ export function DeviceHeader({
         );
       case 'rotate':
         return (
-          <button key={p} className={styles.devMenuRow} onClick={closing(onRotate)}>
+          <button key={p} className={styles.devMenuRow} onClick={closing(() => onRotate?.())}>
             {check(land)}
             <span className={styles.devMenuLabel}>{t('Landscape')}</span>
           </button>
@@ -399,7 +412,7 @@ export function DeviceHeader({
           <span className={styles.devNameText}>{dev.name}</span>
         </span>
       ) : (
-        <DevicePicker className={styles.devName} value={id} title={t('{device} · change device', { device: dev.name })} onPick={onDevice} tour="device-menu">
+        <DevicePicker className={styles.devName} value={id} title={t('{device} · change device', { device: dev.name })} onPick={onDevice} options={devices} tour="device-menu">
           <span className={styles.devNameText}>{dev.name}</span>
           {!tight && <Icon name="expand_more" size={16} />}
         </DevicePicker>
@@ -482,6 +495,9 @@ export function MultiDevices({
   video = false,
   onVideo,
   onChange,
+  screen,
+  devices,
+  single = false,
 }: {
   items: DeviceItem[];
   layouts: Layout[];
@@ -491,6 +507,15 @@ export function MultiDevices({
   video?: boolean;
   onVideo?: () => void;
   onChange: (items: DeviceItem[]) => void;
+  /**
+   * What each screen shows instead of the app (App Store Assets' Preview: the store's page): the row stays the
+   * prototype's, its headers without what's the app's (version, language, video, rotate).
+   */
+  screen?: (item: DeviceItem, layout: Layout) => React.ReactNode;
+  /** The devices it offers (its + and its headers' lists); none: the catalog's. */
+  devices?: { id: string; name: string }[];
+  /** One device, switched from its header: no + to add one, no × or handle (App Store Assets' Preview). */
+  single?: boolean;
 }) {
   const [active, setActive] = useState(0);
   const gap = deviceGap(items.length);
@@ -577,19 +602,21 @@ export function MultiDevices({
       <div ref={content} className={styles.multiRow} style={{ padding: `${MARGIN}px ${SIDE}px` }}>
         {/* Only the frames are laid out: headers and the end + are positioned around them. */}
         <div className={styles.multiFrames} style={{ gap }}>
-          <span className={`${styles.multiEnd} ${styles.multiEndL}`}>
-            <AddDeviceButton side="left" onPick={(id) => insert(0, id)} />
-          </span>
+          {!single && (
+            <span className={`${styles.multiEnd} ${styles.multiEndL}`}>
+              <AddDeviceButton side="left" options={devices} onPick={(id) => insert(0, id)} />
+            </span>
+          )}
           {items.map((it, i) => {
             const layout = layouts[i];
             const b = frameBox(layout);
             return (
               <Fragment key={i}>
-                {i > 0 && (
+                {i > 0 && !single && (
                   // Zero-width slot in the gap (its negative margins cancel the extra flex gap); hovering the gap shows a small +.
                   <div className={styles.gapSlot} style={{ margin: `0 ${-gap / 2}px` }} hidden={dragging != null}>
                     <div className={styles.gapHit} style={{ width: gap }}>
-                      <AddDeviceButton side="between" onPick={(id) => insert(i, id)} />
+                      <AddDeviceButton side="between" options={devices} onPick={(id) => insert(i, id)} />
                     </div>
                   </div>
                 )}
@@ -607,31 +634,34 @@ export function MultiDevices({
                     display={it.display}
                     land={it.land}
                     video={video}
-                    onVideo={onVideo}
+                    onVideo={screen ? undefined : onVideo}
                     onDevice={(id) => update(i, { device: id, display: findDevice(id).displays[0].key, land: it.land && keepsLandscape(id, null) })}
                     onDisplay={(key) => update(i, { display: key, land: landAfterSwitch(it.device, it.display, key, it.land) })}
-                    onRotate={() => update(i, { land: !it.land })}
-                    grip={{ onPointerDown: (e) => dragStart(i, e), onPointerMove: dragMove, onPointerUp: dragEnd, onPointerCancel: dragEnd }}
-                    design={{ value: it.design, onPick: (design) => update(i, { design }) }}
+                    onRotate={screen ? undefined : () => update(i, { land: !it.land })}
+                    grip={single ? undefined : { onPointerDown: (e) => dragStart(i, e), onPointerMove: dragMove, onPointerUp: dragEnd, onPointerCancel: dragEnd }}
+                    design={screen ? undefined : { value: it.design, onPick: (design) => update(i, { design }) }}
                     // A language of its own only when the app has more than one to show.
-                    language={LANGUAGES.length > 1 ? { value: it.lang, onPick: (lang) => update(i, { lang }) } : undefined}
-                    onRemove={() => remove(i)}
+                    language={!screen && LANGUAGES.length > 1 ? { value: it.lang, onPick: (lang) => update(i, { lang }) } : undefined}
+                    devices={devices}
+                    onRemove={single ? undefined : () => remove(i)}
                   />
                   {/* Touching a device makes it the active one, before the touch reaches the app. In Inspect, so does
                       hovering it with nothing selected: its components highlight at once (a selection stays on its
                       device until a click picks on another). */}
                   <ActiveDevice w={b.w * k} h={b.h * k} active={i === act} onActivate={() => setActive(i)}>
                     <DesignOverride.Provider value={designChoice(it.design)}>
-                      <DeviceFrame layout={layout} scale={k} theme={theme} language={it.lang} active={i === act} screen={{ device: it.device, display: it.display, design: it.design }} />
+                      <DeviceFrame layout={layout} scale={k} theme={theme} language={it.lang} active={i === act} screen={{ device: it.device, display: it.display, design: it.design }} content={screen?.(it, layout)} />
                     </DesignOverride.Provider>
                   </ActiveDevice>
                 </div>
               </Fragment>
             );
           })}
-          <span className={`${styles.multiEnd} ${styles.multiEndR}`}>
-            <AddDeviceButton side="right" onPick={(id) => insert(items.length, id)} />
-          </span>
+          {!single && (
+            <span className={`${styles.multiEnd} ${styles.multiEndR}`}>
+              <AddDeviceButton side="right" options={devices} onPick={(id) => insert(items.length, id)} />
+            </span>
+          )}
         </div>
         <InspectOverlay stage={content} />
         <CommentPins stage={content} />

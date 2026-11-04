@@ -93,7 +93,8 @@ const HOURS_LABEL: Record<number, string> = { 1: t('1 hour'), 24: t('24 hours'),
 
 export const formatUntil = (ms: number) => new Date(ms).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 
-export function ShareMenu() {
+/** `secondary`: beside a mode's own main action (App Store Assets' Export), in the toolbar's plain look. */
+export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
   const [open, setOpen] = useState(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').has(OPEN_PARAM));
   const [copied, setCopied] = useState<string | null>(null);
   const [hours, setHours] = useState<number>(24);
@@ -177,7 +178,7 @@ export function ShareMenu() {
 
   return (
     <div ref={root} className={styles.root}>
-      <button className={styles.share} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="dialog" title={t('Share this view')} data-tour="share">
+      <button className={`${styles.share} ${secondary ? styles.secondaryShare : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="dialog" title={t('Share this view')} data-tour="share">
         <Icon name="link" size={18} />
         {t('Share')}
       </button>

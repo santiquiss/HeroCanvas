@@ -12,6 +12,7 @@ import { useNavRoot } from '../nav/context';
 import { BASE_PAGES } from '../nav/pages';
 import { pageIcon, pageName, variantState } from '../nav/stack';
 import { stepState } from '../nav/flow';
+import type { ShowPlace } from '../proposals/types';
 import { CHANGES_ALL, CHANGES_PARAM, PROPOSALS, proposalChanges, SCOPE_LABEL, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import type { PageDef } from '../nav/types';
 import { useMode, useSetMode } from './modes';
@@ -54,6 +55,18 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
   // New first, then changed, then removed.
   const pages = [...c.pages].sort((a, b) => CHANGE_ORDER.indexOf(a.kind) - CHANGE_ORDER.indexOf(b.kind));
   const total = count.changed + count.new + count.removed;
+
+  // Where a change is declared to show (`show`): that page in that state (a persona, a control), the component outlined,
+  // in the prototype.
+  const openPlace = (place: ShowPlace, name?: string) => {
+    const go = () => nav.open(place.page, place.params ?? {}, { ...place.state, ...(name ? { [CHANGES_PARAM]: name } : {}) });
+    if (mode === 'prototype') go();
+    else {
+      setMode('prototype', {});
+      setTimeout(go);
+    }
+    setOpen(false);
+  };
 
   // Every place a component is, in a rail beside the canvas (WhereRail), with it highlighted: in the prototype, so
   // from Components or Flow it goes back there.
@@ -99,6 +112,7 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                       pg.kind === 'removed'
                         ? undefined
                         : () => {
+                            if (pg.show) return openPlace(pg.show);
                             const step = pg.step && def?.flow?.steps.find((st) => st.id === pg.step!.id);
                             if (step && def) nav.open(pg.id, {}, stepState(def, step));
                             else nav.open(pg.id, def?.variants?.()[0]?.params ?? {}, def && def.variants?.()[0] ? variantState(def, def.variants()[0]) : undefined);
@@ -115,7 +129,10 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
               {c.components.map((cm) => {
                 const where = index?.[cm.name] ?? [];
                 const onPages = new Set(where.map((w) => w.id)).size;
-                const found = !index || where.length > 0;
+                // Declared where it shows (`show`): there, whatever the scan found.
+                const place = cm.show?.[0];
+                const found = !!place || !index || where.length > 0;
+                const placeName = place && pageName({ ...BASE_PAGES, ...nav.pages }, place.page);
                 return (
                   <Item
                     key={cm.name}
@@ -124,18 +141,21 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
                     name={cm.name}
                     details={[
                       `${SCOPE_LABEL[cm.scope].replace(/^./, (ch) => ch.toUpperCase())}${cm.params ? `: ${cm.params.join(', ')}` : ''}${cm.note ? ` · ${cm.note}` : ''}`,
+                      ...(cm.show ?? []).map((pl) => (pl.label ? t('On {page}: {how}', { page: pageName({ ...BASE_PAGES, ...nav.pages }, pl.page), how: pl.label }) : t('On {page}', { page: pageName({ ...BASE_PAGES, ...nav.pages }, pl.page) }))),
                       ...(found ? [] : [t('Not on a page as it loads (a sheet, a dialog, a state)')]),
                     ]}
                     // The card: every place it's on, in the rail beside the canvas (it says "Finding…" while the scan runs).
                     meta={
-                      !index ? (
+                      placeName ? (
+                        placeName
+                      ) : !index ? (
                         <>
                           <Spinner size={11} /> {t('Finding')}
                         </>
                       ) : found ? plural(onPages, '{n} page', '{n} pages') + (where.length > onPages ? ` · ${plural(where.length, '{n} screen', '{n} screens')}` : '') : undefined
                     }
-                    title={t("See every place it's on, beside the canvas")}
-                    onClick={found ? () => showAll(cm.name) : undefined}
+                    title={place ? t('Open it where it shows') : t("See every place it's on, beside the canvas")}
+                    onClick={place ? () => openPlace(place, cm.name) : found ? () => showAll(cm.name) : undefined}
                     secondary={{
                       label: t('Components'),
                       title: t('Open it in Components (the gallery)'),

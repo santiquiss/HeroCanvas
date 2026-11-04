@@ -71,10 +71,17 @@ export interface Shadow {
   blur: number;
   distance: number;
   opacity: number;
+  /** Its color (`#rrggbb`), for a light shadow on a light background (a store image's card); default black. */
+  color?: string;
 }
 export const DEFAULT_SHADOW: Shadow = { blur: 44, distance: 26, opacity: 0.34 };
-/** Pure black at its opacity: neutral on any background, never tinted. */
-export const shadowColor = (s: Shadow) => `rgba(0, 0, 0, ${s.opacity})`;
+/** Black at its opacity by default: neutral on any background. A color of its own, at its opacity. */
+export const shadowColor = (s: Shadow) => {
+  const hex = s.color?.match(/^#([0-9a-f]{6})$/i)?.[1];
+  if (!hex) return `rgba(0, 0, 0, ${s.opacity})`;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return `rgba(${r}, ${g}, ${b}, ${s.opacity})`;
+};
 
 /** Where the shadow falls, in points: away from the light (to the right of a light on the left), and down. */
 export function shadowOffset(light: Lighting | undefined, s: Shadow): [number, number] {

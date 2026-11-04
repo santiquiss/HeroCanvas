@@ -6,6 +6,35 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.53.0 — 2026-11-04
+
+- **What a proposal changes, where to see it** (`show` in `proposal()`): a changed component that isn't on its page as
+  it loads (it shows for a new user, after a tap, in a state) says where it can be seen: a page, its params and the URL
+  state that shows it (a persona, a control), and a label. The changes popover opens it there, outlined ("On
+  Dashboard: as Emily, who signed up today"); that page is listed and marked **Changed** in Pages. A version can have
+  its own places.
+- **Capture's device controls, in sections** (`src/capture/CaptureSections.tsx`): color and metal, angle, light and
+  glare, shadow, each with its fine controls behind a button by its title; numbers typed as well as dragged
+  (`TypedNumber`); a shadow of its own color; clay devices (every part in the body's color, matte).
+- **More devices**: iPhone 8 Plus (5.5″, a Home button) and iPhone 14 Plus (6.5″, a notch); a display may draw
+  other devices inside it (`devices`).
+- **Sheets**: on the iPhone Duo a full-height sheet stops under the corner status too; a tablet's top sheet goes over
+  the status bar; a sheet can take the app's own look (`sheetStyle`: its radius, its height).
+- **A path opens its most specific page** when several patterns match (`/more/nutrients/visibility` over
+  `/:from/nutrients/:key`).
+- **Comments' pins follow content drawn later** (a canvas whose pages draw as they come into view).
+- **`npm run shot -- --hold <text>`**: a long press, as `--click`. The screens' pictures: six at once, texts replaced
+  before they're taken (`replace`), every page drawing in the headless Chrome.
+- **Smaller things**: the dev server's status is its own answer (a static host that answers every path isn't taken
+  for it); `DeviceFrame` takes `content` and `MultiDevices` a `screen`, `devices` and `single` (a canvas of other
+  screens on the prototype's devices); `PreviewScreen` its own `theme`; the device's Home button in the frame's color.
+
+### Contract
+
+- **`show`** (optional) in a proposal's `proposal({ … })` and in a version: `{ Name: { page, params?, state?, label? } }`
+  (or a list). A proposal whose changed component isn't on a page as it loads should declare it; its replacement
+  marks its root with the component's name (`useComponent` or `<Component name>`), so it's found and outlined.
+
 ## 0.52.0 — 2026-10-30
 
 - **Guest links** (Share › Guest link): a link to the deployed site that opens it for a while (1 h, 24 h or 7 days) as

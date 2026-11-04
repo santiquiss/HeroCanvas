@@ -160,8 +160,9 @@
   width: 66px;
   height: 66px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #15181c, #0b0c0e);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  /* A frame of another color (a store image's minimal device) sets its own: the button in its color, a faint ring. */
+  background: var(--hc-home-button, linear-gradient(145deg, #15181c, #0b0c0e));
+  box-shadow: var(--hc-home-ring, inset 0 0 0 2px rgba(255, 255, 255, 0.1));
 }
 /* DeviceFrame screenEdge: two device pixels of the bezel across the screen's edge (a gradient in light, so a masked
    border, not a shadow); above the screen's layers. */

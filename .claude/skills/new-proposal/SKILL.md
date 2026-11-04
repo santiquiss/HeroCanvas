@@ -31,6 +31,11 @@ the mirror (`mirror-screen`). Ask if it isn't clear.
   `{ ...BASE_PAGES.today, component: TodayV2 }`). **Components**: replace one the screens render with `overridable`
   (from `herocanvas`), or add new ones in `components/`. **Versions** (`variants`: A, B…) to compare
   designs of the same change.
+- **Where it shows** (`show`): a changed component that isn't on its page as it loads (it shows for a new user,
+  after a tap, in a state) declares where to see it: `show: { Card: { page: 'dashboard', state: { persona: 'emily' },
+  label: 'as Emily, who signed up today' } }` (a version may have its own). The changes popover opens it there, outlined,
+  and Pages marks that page changed. A replacement marks its root with the component's name (`useComponent` or
+  `<Component name>`), so Inspect and the outline find it.
 - Never copy the mirror: import from `app/` what doesn't change (relative imports), and from the tool only `herocanvas`.
 
 ## 3. The handoff

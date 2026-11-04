@@ -434,7 +434,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
     <KeyboardInsetCtx.Provider value={L.real ? realKb : kbOpen ? kbH : 0}>
       <div
         ref={setScreen}
-        // The screen's root: a still picture of it waits for it (src/sim/screenStill.tsx).
+        // The screen's root: where a tap's place is counted from (App Store Assets keeps the taps that opened a menu), and
+        // what a still picture of it waits for (src/sim/screenStill.tsx).
         data-hc-screen=""
         data-theme={theme}
         // The app's own theme (appConfig.themes): its tokens' block in app/theme.css.
@@ -932,37 +933,44 @@ function SheetFrameOf({ layout: L, screen, s, open, closeSheet, dismiss }: { lay
         })}
       </>
     );
-  // The status in the right column (iPhone Duo outer display): a bottom sheet wide enough to reach the column stops
-  // under it, so it never covers the time and the signal.
+  // The status in the right column (iPhone Duo outer display): a bottom sheet wide enough to reach the column, the
+  // one that hugs its content or the one that takes the screen, stops under it, so it never covers the time and the
+  // signal.
   const sheetW = Math.min(L.vw, sheetMaxWidth(s.width));
-  const underStatus = L.cornerStatus === 'vertical' && (s.layout ?? 'bottomContent') === 'bottomContent' && (L.vw + sheetW) / 2 > L.vw - L.sideW;
+  const underStatus = L.cornerStatus === 'vertical' && ['bottomContent', 'bottomExpanded'].includes(s.layout ?? 'bottomContent') && (L.vw + sheetW) / 2 > L.vw - L.sideW;
   // A top sheet that wide (a day picker) still spans the screen, under the column; its content stops at
   // the column, so nothing of it sits under the time and the signal.
   const reachesColumn = L.cornerStatus === 'vertical' && (L.vw + sheetW) / 2 > L.vw - L.sideW;
   const besideStatus = reachesColumn && s.layout === 'topContent';
-  // A sheet that takes the screen (Bottom Expanded) keeps its content clear of the column as of a safe area: the
-  // column's width in place of its own right padding (the iPhone Duo reports the strip as the window's right inset).
-  const clearOfColumn = reachesColumn && s.layout === 'bottomExpanded';
+  // A top sheet narrower than the screen (a tablet's) goes over the status bar: under it, the time and the battery
+  // would sit half on the sheet and half on the scrim. On a phone it spans the screen and the bar stays, as iOS shows it.
+  const overStatus = open && s.layout === 'topContent' && sheetW < L.vw && !reachesColumn;
+  // Under the status, nothing of the column sits over the sheet: its content reaches its edge (its close too).
   const sheetStyle: CSSProperties = {
-    ...(underStatus ? { maxHeight: L.vh - tallSheetTop(L) } : {}),
+    // The opener's restyle (its own sheet's radius and height), then where the device puts it.
+    ...s.sheetStyle,
+    // As tall as it gets there, kept at the bottom edge (Bottom Expanded grows from the top: the rest goes above it).
+    ...(underStatus ? { maxHeight: L.vh - tallSheetTop(L), marginTop: 'auto' } : {}),
     // …and what slides or scrolls sideways in it is cut there too, not at the sheet's edge.
     ...(besideStatus ? { paddingRight: L.sideW, ['--sheet-pad-r' as string]: '0px' } : {}),
-    ...(clearOfColumn ? { paddingRight: L.sideW } : {}),
   };
   return (
-    <KitSheet
-      layout={s.layout}
-      width={s.width}
-      showPadding={s.showPadding}
-      surface={s.surface}
-      sheetStyle={sheetStyle}
-      open={open}
-      onClose={dismiss}
-      bottomInset={bottomInset}
-      topInset={topInset}
-    >
-      {body()}
-    </KitSheet>
+    <>
+      {overStatus && <span data-status-bar="hidden" hidden />}
+      <KitSheet
+        layout={s.layout}
+        width={s.width}
+        showPadding={s.showPadding}
+        surface={s.surface}
+        sheetStyle={sheetStyle}
+        open={open}
+        onClose={dismiss}
+        bottomInset={bottomInset}
+        topInset={topInset}
+      >
+        {body()}
+      </KitSheet>
+    </>
   );
 }
 

@@ -56,7 +56,7 @@ interface Edge {
 const REVEAL_HERE_MS = 300;
 const REVEAL_THERE_MS = 3000;
 
-export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElement | null> }) {
+export default function CommentLayer({ stage }: { stage: RefObject<HTMLElement | null> }) {
   const { commenting, selected, setSelected, panelOpen, showResolved, reveal, setReveal, linked, setLinked } = useCommentsUi();
   const { version } = useDesign();
   const global = useCommentScope();
@@ -130,6 +130,24 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
   const [edges, setEdges] = useState<Edge[]>([]);
   const raf = useRef(0);
   const layer = useRef<HTMLDivElement>(null);
+  // The stage's own content added later (a bare canvas whose pages draw as they come into view, App Store Assets'
+  // rows): looked at again, as the device's DOM is (`version`). The pins' own layer doesn't count.
+  const [drawn, setDrawn] = useState(0);
+  useEffect(() => {
+    const st = stage.current;
+    if (!st || !shown.length) return;
+    let t = 0;
+    const mo = new MutationObserver((records) => {
+      if (records.every((r) => layer.current?.contains(r.target))) return;
+      window.clearTimeout(t);
+      t = window.setTimeout(() => setDrawn((n) => n + 1), 120);
+    });
+    mo.observe(st, { childList: true, subtree: true });
+    return () => {
+      mo.disconnect();
+      window.clearTimeout(t);
+    };
+  }, [stage, shown.length]);
   useEffect(() => {
     const st = stage.current;
     if ((!shown.length && !draft) || !st) {
@@ -228,7 +246,7 @@ export default function CommentLayer({ stage }: { stage: RefObject<HTMLDivElemen
     return () => cancelAnimationFrame(raf.current);
     // The whole URL, not only its path: a side panel (Coach), a set's devices or a state over the page come and go in
     // its query.
-  }, [shown, draft, version, location.pathname, location.search, stage, global, navigate, setReveal]);
+  }, [shown, draft, version, drawn, location.pathname, location.search, stage, global, navigate, setReveal]);
 
   const byId = new Map(shown.map((t) => [t.root.id, t]));
   const numbers = useMemo(() => threadNumbers(threads), [threads]);

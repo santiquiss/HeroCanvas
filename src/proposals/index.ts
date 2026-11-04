@@ -3,7 +3,7 @@
 import { PROPOSAL_LOOKUP } from '../design/overridableRegistry';
 import type { ScreenConfig } from '../nav/screenConfig';
 import { parseProposalCode } from './code';
-import { normalizeMeta, type Proposal, type ProposalCode, type ProposalMeta } from './types';
+import { normalizeMeta, type Proposal, type ProposalCode, type ProposalMeta, type ShowPlace } from './types';
 import { t } from '../i18n/ui';
 
 const metas = import.meta.glob('/proposals/*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>;
@@ -14,6 +14,15 @@ const storyFiles = Object.keys(import.meta.glob('/proposals/*/components/*.stori
 const storiesIn = (folder: string) => storyFiles.filter((f) => f.split('/')[2] === folder).map((f) => f.split('/').pop()!.replace(/\.stories\.tsx$/, ''));
 
 const slugOf = (path: string) => path.split('/')[2];
+
+/** `show`'s places, each component's as a list. */
+export const placesOf = (show: ProposalCode['show']): Record<string, ShowPlace[]> =>
+  Object.fromEntries(Object.entries(show ?? {}).map(([name, v]) => [name, Array.isArray(v) ? v : [v]]));
+
+/** Where each changed component shows under a version: the proposal's places, then the version's own. */
+export function proposalShow(p: Proposal, variantId: string | null): Record<string, ShowPlace[]> {
+  return { ...p.show, ...placesOf(activeVariant(p, variantId)?.show) };
+}
 
 export const PROPOSALS: Proposal[] = Object.entries(metas)
   .map(([path, raw]) => {
@@ -31,6 +40,7 @@ export const PROPOSALS: Proposal[] = Object.entries(metas)
       notes: code?.notes ?? {},
       params: code?.params ?? {},
       widgets: code?.widgets ?? [],
+      show: placesOf(code?.show),
       variants: Object.entries(code?.variants ?? {}).map(([vid, v]) => ({ id: vid, ...v })),
       config: configs[`/proposals/${folder}/config.json`] ?? {},
       layout: code?.layout ?? {},
@@ -86,6 +96,8 @@ export interface PageChangeItem {
   step?: { id: string; label: string };
   /** What changed, in a few words each: "Content changed", "Settings changed: links, title", "Layout rules changed: split". */
   details: string[];
+  /** Changed only by a component it shows (`show`): where, so opening it opens that state. */
+  show?: ShowPlace;
 }
 
 export interface ComponentChangeItem {
@@ -100,6 +112,8 @@ export interface ComponentChangeItem {
   note?: string;
   /** The parameters it adds to the widget (`params`). */
   params?: string[];
+  /** Where it can be seen (`show`): the popover opens it there. */
+  show?: ShowPlace[];
 }
 
 /** How the panels name a change's scope. */
@@ -140,6 +154,8 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
   for (const name of storiesIn(p.folder)) if (!components.some((c) => c.name === name)) components.push({ name, scope: 'added', note: p.notes[name] });
   // A component it adds to the code's library and draws on the screens as proposed: new, though it replaces Live's drawing.
   for (const c of components) if (p.widgets.includes(c.name)) c.scope = 'added';
+  const show = proposalShow(p, variantId);
+  for (const c of components) if (show[c.name]) c.show = show[c.name];
   const ids = new Set([...Object.keys(p.pages), ...Object.keys(p.config).filter((id) => Object.keys(p.config[id] ?? {}).length)]);
   const pages: PageChangeItem[] = [...ids].map((id) => {
     const base = basePages[id] as Record<string, unknown> | undefined;
@@ -147,6 +163,15 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
     if (!base) return { id, kind: 'new', details: [] };
     return { id, kind: 'changed', details: pageDetails(p, id, base) };
   });
+  // A page a changed component shows on (`show`): changed, saying which, in what state.
+  for (const c of components) {
+    for (const place of c.show ?? []) {
+      const line = place.label ? t('{name} · {where}', { name: c.name, where: place.label }) : c.name;
+      const at = pages.find((pg) => pg.id === place.page && !pg.step);
+      if (at) at.details.push(line);
+      else if (basePages[place.page]) pages.push({ id: place.page, kind: 'changed', details: [line], show: place });
+    }
+  }
   // A flow's new steps: new screens, each its own item (after its page).
   for (const id of ids) {
     const def = p.pages[id];

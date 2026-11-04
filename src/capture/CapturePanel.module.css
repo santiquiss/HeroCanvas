@@ -99,7 +99,7 @@
 }
 .num {
   flex: none;
-  width: 32px;
+  width: 44px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-2);
@@ -401,6 +401,7 @@
 /* An option on or off: its name in the rows' column (one line), the switch where their controls start. */
 .toggle {
   min-height: 30px;
+  justify-content: space-between;
 }
 /* At least the rows' column (its switch where their controls start); a longer name keeps the row's gap before it. */
 .toggle > .label,
@@ -437,4 +438,31 @@
   opacity: 0.35;
   pointer-events: none;
   transition: opacity 200ms ease;
+}
+
+/* A value the caller keeps apart (App Store Assets: one size's own): its name in the caller's color, a reset beside it. */
+.ownName {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+[data-own] > .ownName {
+  color: var(--own-color, var(--ui-blue-text));
+}
+.ownReset {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--own-color, var(--ui-text-muted));
+  cursor: pointer;
+}
+.ownReset:hover {
+  background: color-mix(in srgb, var(--own-color, #888) 14%, transparent);
 }

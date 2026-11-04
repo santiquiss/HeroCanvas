@@ -128,5 +128,6 @@
   "Foldables": "Plegables",
   "Tablets": "Tabletas",
   "A new step": "Un paso nuevo",
-  "Draw the screens again": "Volver a dibujar las pantallas"
+  "Draw the screens again": "Volver a dibujar las pantallas",
+  "{name} · {where}": "{name} · {where}"
 }

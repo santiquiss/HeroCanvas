@@ -16,7 +16,7 @@ const Layer = lazy(() => import('./CommentLayer'));
 const Panel = lazy(() => import('./CommentsPanel'));
 
 /** The pins over the device (the stage's coordinates, like the Inspect outlines). Loaded on the first use. */
-export function CommentPins({ stage }: { stage: RefObject<HTMLDivElement | null> }) {
+export function CommentPins({ stage }: { stage: RefObject<HTMLElement | null> }) {
   const { commenting, selected, panelOpen } = useCommentsUi();
   const [used, setUsed] = useState(false);
   if ((commenting || selected || panelOpen) && !used) setUsed(true);

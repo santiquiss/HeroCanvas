@@ -229,10 +229,10 @@ function useShotApi(stage: RefObject<HTMLDivElement | null>, problem: string | n
           const first = all.find((f) => f.hasAttribute('data-shot-primary')) ?? all[0];
           const rest = all.filter((f) => f !== first);
           const before = rest.map(fingerprint);
-          runStep(first, step);
+          await runStep(first, step);
           await settled(el());
           // What the others share with the first (navigation, sheets) already shows there; the rest is each one's.
-          for (const [i, other] of rest.entries()) if (fingerprint(other) === before[i]) runStep(other, step);
+          for (const [i, other] of rest.entries()) if (fingerprint(other) === before[i]) await runStep(other, step);
           await settled(el());
         }
         // No keyboard in the picture unless a step asked for the focus.

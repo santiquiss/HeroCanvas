@@ -14,6 +14,11 @@ export type Corner = 'tl' | 'tr' | 'br' | 'bl';
 export interface Display {
   key: string;
   label: string;
+  /**
+   * A store image's screen that is no device's (Google Play's 9:16): the catalog's devices drawn in it, at their own
+   * proportions, the first by default.
+   */
+  devices?: string[];
   /** Size in portrait, in points (CSS px). */
   w: number;
   h: number;
@@ -141,8 +146,18 @@ export const ALL_DEVICES: Device[] = [
     type: 'phone',
     displays: [D('main', t('Display'), 375, 667, 'ios', 0, 20, { ends: 90, bodyR: 62, cutout: 'none', homeButton: true, statusH: 20 })],
   },
+  // The iPhone 8 Plus, 7 Plus and 6s Plus: a Home button, 5.5″ at 414×736 (the App Store's 5.5″ screenshots), its body
+  // as the SE's, a little larger.
+  {
+    id: 'ip8plus',
+    name: 'iPhone 8 Plus',
+    type: 'phone',
+    displays: [D('main', t('Display'), 414, 736, 'ios', 0, 20, { ends: 96, bodyR: 64, cutout: 'none', homeButton: true, statusH: 20 })],
+  },
   // The base iPhone: the most common iOS width, a notch (no Dynamic Island).
   { id: 'ip16e', name: 'iPhone 16e', type: 'phone', displays: [D('main', t('Display'), 390, 844, 'ios', 47, 12, { cutout: 'notch', statusH: 47 })] },
+  // The large iPhone with a notch (14 Plus, 13 Pro Max): 6.5–6.7″ at 428×926 (the App Store's 6.5″ screenshots).
+  { id: 'ip14plus', name: 'iPhone 14 Plus', type: 'phone', displays: [D('main', t('Display'), 428, 926, 'ios', 53, 12, { cutout: 'notch', statusH: 47 })] },
   { id: 'ip17', name: 'iPhone 17 Pro', type: 'phone', displays: [D('main', t('Display'), 402, 874, 'ios', 55, 12)] },
   // The 17 Pro's size and screen (6.3″, 2622×1206 at 3×), in new colors (capture/models). A smaller Dynamic Island:
   // 13.49 mm wide against the 17 Pro's 20.76 mm (reported before launch; Apple gives no size), 82 at the 17 Pro's
