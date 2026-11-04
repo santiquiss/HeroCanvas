@@ -89,7 +89,9 @@ export interface ProposalCode {
   pages?: Record<string, PageDef | null>;
   /**
    * Where each changed component can be seen, by name: the changes popover opens it there (with that state) and
-   * outlines it, and the page is marked changed in Pages. Needed when it isn't on a page as it loads.
+   * outlines it, and the page is marked changed in Pages. Needed when it isn't on a page as it loads. By a page's id:
+   * where a page the proposal changes shows its change (a closing screen, a step's state), when its first screen is
+   * as Live's.
    */
   show?: Record<string, ShowPlace | ShowPlace[]>;
   /**

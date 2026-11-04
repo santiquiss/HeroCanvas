@@ -168,5 +168,9 @@
   "Open {ticket}": "Abrir {ticket}",
   "On {page}: {how}": "En {page}: {how}",
   "On {page}": "En {page}",
-  "Open it where it shows": "Abrirlo donde se ve"
+  "Open it where it shows": "Abrirlo donde se ve",
+  "New": "Nuevo",
+  "Changed": "Modificado",
+  "New on this screen: Live doesn’t have it": "Nuevo en esta pantalla: Live no lo tiene",
+  "Changed on this screen: Live shows it otherwise": "Cambiado en esta pantalla: Live lo muestra distinto"
 }

@@ -1074,3 +1074,38 @@
   border-color: var(--ui-text-muted);
   color: var(--ui-text);
 }
+
+/* Pages: Only changes, under the search while a proposal is on: the box, its words, how many pages. */
+.onlyChanges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px 8px;
+  font-size: 12px;
+  color: var(--ui-text);
+  cursor: pointer;
+  user-select: none;
+}
+.onlyChanges input {
+  margin: 0;
+  accent-color: var(--hc-brand);
+}
+/* Only changes' list: a screen per row, its name over what changes on it. */
+.screenRow {
+  align-items: flex-start;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.screenName {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.screenNote {
+  overflow: hidden;
+  font-size: 11px;
+  color: var(--ui-text-subtle);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

@@ -10,21 +10,18 @@
   inset: 0;
   pointer-events: none;
 }
-/* A changed component, marked where it is (so it scrolls with it): solid pink edge, diagonal pink stripes over it; a
-   new one in cyan. */
+/* A changed component, marked where it is (so it scrolls with it): diagonal pink stripes over it; a new one in cyan. */
 :global([data-hl='new']) {
   --hc-hl: var(--hc-hl-new);
-}
-:global([data-hl]) {
-  outline: 2px solid var(--hc-hl) !important;
-  outline-offset: 3px;
 }
 :global([data-hl])::after {
   content: '';
   position: absolute;
-  inset: -3px;
+  /* Only the stripes, over the element and inside it: an edge outside it was cut where the element meets the
+     screen's edge or a scrolling list's. */
+  inset: 0;
   z-index: 50;
-  border-radius: 10px;
+  border-radius: inherit;
   background: repeating-linear-gradient(
     -45deg,
     color-mix(in srgb, var(--hc-hl) 34%, transparent) 0 6px,

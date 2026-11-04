@@ -163,7 +163,15 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
     if (!base) return { id, kind: 'new', details: [] };
     return { id, kind: 'changed', details: pageDetails(p, id, base) };
   });
-  // A page a changed component shows on (`show`): changed, saying which, in what state.
+  // A changed page whose change shows in a state of it (`show` by the page's id: a closing screen, a sheet): opened
+  // there, saying what it is, not on its first screen (where nothing differs).
+  for (const pg of pages) {
+    const place = !pg.step && pg.kind !== 'removed' ? show[pg.id]?.[0] : undefined;
+    if (!place) continue;
+    pg.show = place;
+    if (place.label) pg.details.unshift(place.label);
+  }
+    // A page a changed component shows on (`show`): changed, saying which, in what state.
   for (const c of components) {
     for (const place of c.show ?? []) {
       const line = place.label ? t('{name} · {where}', { name: c.name, where: place.label }) : c.name;

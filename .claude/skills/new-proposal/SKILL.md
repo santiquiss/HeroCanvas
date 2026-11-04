@@ -34,7 +34,9 @@ the mirror (`mirror-screen`). Ask if it isn't clear.
 - **Where it shows** (`show`): a changed component that isn't on its page as it loads (it shows for a new user,
   after a tap, in a state) declares where to see it: `show: { Card: { page: 'dashboard', state: { persona: 'emily' },
   label: 'as Emily, who signed up today' } }` (a version may have its own). The changes popover opens it there, outlined,
-  and Pages marks that page changed. A replacement marks its root with the component's name (`useComponent` or
+  and Pages marks that page changed. The same by a page's id when a page it changes shows its change only in a state
+  (a closing screen after a tap): `show: { checkIn: { page: 'checkIn', state: { ck: 'updated' }, label: 'Get reminded' } }`.
+  A replacement marks its root with the component's name (`useComponent` or
   `<Component name>`), so Inspect and the outline find it.
 - Never copy the mirror: import from `app/` what doesn't change (relative imports), and from the tool only `herocanvas`.
 

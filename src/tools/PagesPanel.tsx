@@ -1,7 +1,7 @@
 // Pages tree built from the manifest: its sections (pageGroups: boot pages, the app's own, App), children by `parent`, variants for pages with params, steps
 // for flows. A step's states (something picked on it) aren't pages: they're in the page inspector and in Flow. Click opens the page with its default chain underneath (a step: held, to look at);
 // rows in the current stack are highlighted.
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { createContext, Fragment, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
@@ -19,6 +19,80 @@ import { pageInFront } from '../nav/sidePanel';
 import { pageGroups } from '../nav/pageGroups';
 import { replayLaunch } from '../sim/launch';
 import { t } from '../i18n/ui';
+import { BASE_PAGES } from '../nav/pages';
+import { CHANGES_PARAM, proposalChanges, VARIANT_PARAM } from '../proposals';
+import { usePageIndex } from '../sim/pageIndex';
+import { useUrlState } from '../sim/SimContext';
+
+/** One screen a proposal changes, as the filtered list shows it: a page, a flow's step, a variant, a component's place. */
+interface ChangedScreen {
+  key: string;
+  page: string;
+  /** What screen of the page: a step, a variant, the state that shows a component. */
+  sub?: string;
+  kind: 'new' | 'changed';
+  /** What changes on it, in a few words (the components it shows). */
+  note?: string;
+  /** Opens it, with these URL params kept too (the list's own filter). */
+  open: (keep: Record<string, string>) => void;
+}
+
+/**
+ * The screens a proposal changes, one by one: its new and changed pages (a declared component place opens in its
+ * state), each new step of a flow, and every screen where a component it changes shows (the changes' scan). Null
+ * without a proposal.
+ */
+function useChangedScreens(): ChangedScreen[] | null {
+  const nav = useNavRoot();
+  const p = nav.proposal;
+  const [variant] = useUrlState<string>(VARIANT_PARAM, '');
+  const index = usePageIndex(p?.id ?? 'live', p ? 'idle' : false);
+  return useMemo(() => {
+    if (!p) return null;
+    const out: ChangedScreen[] = [];
+    const seen = new Set<string>();
+    const add = (sc: ChangedScreen) => {
+      if (seen.has(sc.key)) return;
+      seen.add(sc.key);
+      out.push(sc);
+    };
+    const c = proposalChanges(p, variant || null, BASE_PAGES);
+    // A flow with new steps: those screens, not the whole flow (which would open on its first step).
+    const withNewSteps = new Set(c.pages.filter((pg) => pg.step).map((pg) => pg.id));
+    for (const pg of c.pages) {
+      if (pg.kind === 'removed') continue;
+      const def = nav.pages[pg.id];
+      if (!def) continue;
+      if (pg.step) {
+        const step = def.flow?.steps.find((st) => st.id === pg.step!.id);
+        add({ key: `${pg.id}:${pg.step.id}`, page: pg.id, sub: pg.step.label, kind: pg.kind, open: (keep) => nav.open(pg.id, {}, { ...(step ? stepState(def, step) : {}), ...keep }) });
+      } else if (pg.show) {
+        const place = pg.show;
+        add({ key: `${pg.id}|${place.label ?? ''}`, page: pg.id, sub: place.label, kind: pg.kind, note: pg.details.filter((d) => d !== place.label).join(' · '), open: (keep) => nav.open(place.page, place.params ?? {}, { ...place.state, ...keep }) });
+      } else if (def.flow && withNewSteps.has(pg.id)) {
+        continue;
+      } else {
+        const v = def.variants?.()[0];
+        add({ key: pg.id, page: pg.id, kind: pg.kind, note: pg.details.join(' · '), open: (keep) => nav.open(pg.id, v?.params ?? {}, { ...(v ? variantState(def, v) : {}), ...keep }) });
+      }
+    }
+    // Where a component it changes shows: each screen once, with the components it shows.
+    const notes = new Map<string, string[]>();
+    for (const cm of c.components)
+      for (const pl of index?.[cm.name] ?? []) {
+        if (pl.sheet) continue;
+        const key = pl.label ? `${pl.id}|${pl.label}` : pl.id;
+        notes.set(key, [...(notes.get(key) ?? []), cm.name]);
+        add({ key, page: pl.id, sub: pl.label, kind: 'changed', open: (keep) => nav.open(pl.id, pl.params, { ...pl.state, [CHANGES_PARAM]: cm.name, ...keep }) });
+      }
+    for (const sc of out) if (notes.has(sc.key)) sc.note = [sc.note, ...notes.get(sc.key)!].filter(Boolean).join(' · ');
+    return out;
+  }, [p, variant, index, nav]);
+}
+
+/** The pages a proposal changes (its screens' pages), for the tree's badges. */
+const Changes = createContext<Set<string> | null>(null);
+
 
 export const STATUS_COLOR: Record<PageStatus, string> = { done: '#16a34a', pending: '#f59e0b', placeholder: '#c4c8ce' };
 /** A page's status as its row shows it (the manifest's words are its ids). */
@@ -31,8 +105,47 @@ const modesOf = (pages: Manifest, id: string) => Object.keys(pages).filter((k) =
 /** The open rows, by page id: as you left them when you come back to the tab, and Collapse / Expand all after a reload. */
 const TREE = treeOpen<string>('pages');
 
+/**
+ * Pages' Only changes: on or off, changed only by its checkbox (not by opening a screen, nor by a navigation that
+ * rewrites the URL), remembered per viewer (localStorage) across tabs and reloads.
+ */
+const ONLY_KEY = 'hc.pages.onlyChanges';
+const onlyListeners = new Set<() => void>();
+const readOnly = () => {
+  try {
+    return localStorage.getItem(ONLY_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+let onlyNow = readOnly();
+function setOnlyChanges(on: boolean) {
+  onlyNow = on;
+  try {
+    if (on) localStorage.setItem(ONLY_KEY, '1');
+    else localStorage.removeItem(ONLY_KEY);
+  } catch {
+    // Not kept (private mode): it still holds until the page reloads.
+  }
+  onlyListeners.forEach((l) => l());
+}
+const useOnlyChanges = () =>
+  useSyncExternalStore(
+    (l) => {
+      onlyListeners.add(l);
+      return () => onlyListeners.delete(l);
+    },
+    () => onlyNow,
+  );
+
 export function PagesPanel() {
   const [q, setQ] = useState('');
+  const screens = useChangedScreens();
+  const changedIds = useMemo(() => (screens ? new Set(screens.map((sc) => sc.page)) : null), [screens]);
+  // The hook first, always: a proposal coming or going doesn't change the hooks' order.
+  const onlyOn = useOnlyChanges();
+  const only = !!screens && onlyOn;
+  const shown = (id: string) => matches(pages, id, query);
   const query = q.trim().toLowerCase();
   const { pages } = useNavRoot();
   TREE.useVersion();
@@ -46,18 +159,33 @@ export function PagesPanel() {
     <>
       {/* A search shows every match's branch open, whatever is collapsed: nothing to collapse then. */}
       <SearchField placeholder={t('Search pages')} value={q} onChange={setQ} action={<SearchAction icon={collapsed ? 'expand_all' : 'collapse_all'} title={collapsed ? t('Expand all') : t('Collapse all')} disabled={!!query} onClick={() => TREE.setMode(collapsed ? 'expanded' : 'collapsed')} />} />
+      {/* Looking at a proposal: only the pages it changes (new, changed, or showing a component it changes). */}
+      {changedIds && (
+        <label className={styles.onlyChanges} title={t('Only the screens this proposal adds or changes, or where a component it changes shows')}>
+          <input type="checkbox" checked={only} onChange={(e) => setOnlyChanges(e.target.checked)} />
+          <span>{t('Only changes')}</span>
+          <span className={styles.muted}>{screens!.length}</span>
+        </label>
+      )}
+      <Changes.Provider value={changedIds}>
+      {/* Filtered: the screens it changes, one level, each opening that screen. */}
+      {only ? (
+        <ScreenList screens={screens!.filter((sc) => !query || `${pageName(pages, sc.page)} ${sc.sub ?? ''}`.toLowerCase().includes(query))} />
+      ) : (
       <div style={{ paddingBottom: 12 }}>
-        {LAUNCH && t('Launch screen').toLowerCase().includes(query) && <LaunchRow />}
+        {LAUNCH && !only && t('Launch screen').toLowerCase().includes(query) && <LaunchRow />}
         {groups.map((g) => (
           <Fragment key={g.key}>
             {/* A group's title only while something in it matches the search. */}
-            {g.label && g.roots.some((id) => matches(pages, id, query)) && <div className={styles.treeGroup}>{g.label}</div>}
+            {g.label && g.roots.some(shown) && <div className={styles.treeGroup}>{g.label}</div>}
             {g.roots.map((id) => (
               <PageNode key={id} id={id} depth={0} query={query} />
             ))}
           </Fragment>
         ))}
       </div>
+      )}
+      </Changes.Provider>
     </>
   );
 }
@@ -165,6 +293,10 @@ function Row({ depth, def, label, refOf, state, caret, onCaret, onClick, variant
   const isCurrent = !!refOf && sameRef(refOf, top) && !def.flow && holds;
   const inStack = !!refOf && nav.stack.some((r) => sameRef(r, refOf));
   const cls = [styles.row, isCurrent ? styles.current : inStack ? styles.inStack : ''].join(' ');
+  // Its change: the proposal's on the page, or a component it changes shown on it.
+  const changedPages = useContext(Changes);
+  const pid = refOf?.id ?? pageIdOf(def, nav.pages);
+  const change = nav.change(pid) ?? (changedPages?.has(pid) ? 'changed' : null);
   return (
     <div className={cls} style={{ paddingLeft: 8 + depth * 14 }} onClick={onClick} title={refOf ? nav.href([refOf]) : def.path}>
       {caret !== undefined && (
@@ -191,7 +323,7 @@ function Row({ depth, def, label, refOf, state, caret, onCaret, onClick, variant
       )}
       <span className={styles.name}>{label}</span>
       {count != null && <span className={styles.muted}>{count}</span>}
-      {!variant && nav.change(refOf?.id ?? pageIdOf(def, nav.pages)) && <ChangeBadge change={nav.change(refOf?.id ?? pageIdOf(def, nav.pages))!} />}
+      {!variant && change && <ChangeBadge change={change} />}
       {!variant && def.level !== 'tab' && <span className={styles.badge}>{ROLE_NAMES[def.level]}</span>}
       {!variant && <span className={styles.dot} style={{ background: STATUS_COLOR[def.status ?? 'placeholder'] }} title={def.status && STATUS_WORD[def.status]} />}
     </div>
@@ -222,6 +354,28 @@ function LaunchRow() {
         </span>
       </div>
     </>
+  );
+}
+
+/** A proposal's screens, one level: each its page's icon, its name (and which screen of it), its change; opens it. */
+function ScreenList({ screens }: { screens: ChangedScreen[] }) {
+  const nav = useNavRoot();
+  if (!screens.length) return <p className={styles.muted} style={{ padding: '4px 12px' }}>{t('Nothing changes on a screen yet.')}</p>;
+  return (
+    <div style={{ paddingBottom: 12 }}>
+      {screens.map((sc) => (
+        <div key={sc.key} className={`${styles.row} ${styles.screenRow}`} style={{ paddingLeft: 12 }} onClick={() => sc.open({})} title={sc.note}>
+          <span className={styles.roleIcon}>
+            <Icon name={pageIcon(nav.pages[sc.page])} size={16} />
+          </span>
+          <span className={styles.screenName}>
+            <span className={styles.name}>{sc.sub ? `${pageName(nav.pages, sc.page)} › ${sc.sub}` : pageName(nav.pages, sc.page)}</span>
+            {sc.note && <span className={styles.screenNote}>{sc.note}</span>}
+          </span>
+          <ChangeBadge change={sc.kind} />
+        </div>
+      ))}
+    </div>
   );
 }
 

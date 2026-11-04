@@ -301,5 +301,8 @@
   "{option} · {persona}": "{option} · {persona}",
   "Appearance": "Apariencia",
   "As the app’s settings offer it. Light or dark overrides the system’s, the theme switch above the devices.": "Como la ofrecen los ajustes de la app. Claro u oscuro reemplaza al del sistema, el selector de tema sobre los dispositivos.",
-  "Back to the reference’s": "Volver al de la referencia"
+  "Back to the reference’s": "Volver al de la referencia",
+  "Only changes": "Solo cambios",
+  "Nothing changes on a screen yet.": "Todavía no cambia ninguna pantalla.",
+  "Only the screens this proposal adds or changes, or where a component it changes shows": "Solo las pantallas que esta propuesta agrega o cambia, o donde se ve un componente que cambia"
 }

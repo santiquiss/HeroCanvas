@@ -28,6 +28,15 @@ function fixture(over: Partial<Proposal> = {}): Proposal {
 }
 
 describe('proposalChanges', () => {
+  // A changed page whose change shows in a state of it (`show` by its id): opened there, labelled.
+  it('opens a changed page where its change shows', () => {
+    const page = Object.keys(BASE_PAGES)[0];
+    const place = { page, state: { step: 'end' }, label: 'its last screen' };
+    const c = proposalChanges(fixture({ pages: { [page]: { ...(BASE_PAGES[page] as object), title: 'Other' } as never }, show: { [page]: [place] } }), null, BASE_PAGES);
+    const pg = c.pages.find((x) => x.id === page);
+    expect(pg?.show).toEqual(place);
+    expect(pg?.details[0]).toBe('its last screen');
+  });
   // A component that isn't on its page as it loads says where it shows (`show`): it opens there, and that page is changed.
   it('marks the page a changed component shows on, in its state', () => {
     const page = Object.keys(BASE_PAGES)[0];

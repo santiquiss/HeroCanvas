@@ -6,6 +6,28 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.54.0 — 2026-11-04
+
+- **Highlight changes compares the screen with Live's**: on a screen the proposal changes, the same screen is drawn in
+  Live off screen (following the URL: a flow's step, a state) and the two are lined up as a text diff lines up lines,
+  but on their trees (`src/sim/screenDiff.tsx`). What Live doesn't have is marked **new** (cyan), whole (a row added
+  with its divider is one mark); what Live shows otherwise is marked **changed** (pink), the smallest part that
+  differs. A note on hover says which. Every screen on the canvas is compared, not only the one in use; stills and
+  the changes' scan aren't. A changed screen loses its dashed frame (it said nothing of where); a new one keeps it.
+  Marks are stripes only, inside the element (no edge to be cut at the screen's edge).
+- **Pages' Only changes**: with a proposal on, a checkbox under the search lists every screen it changes on one level
+  — its new and changed pages, each new step of a flow (not the whole flow, which opened on its first step), and every
+  screen where a component it changes shows — each opening that very screen. On until its checkbox is unchecked
+  (opening a screen or navigating keeps it), remembered per viewer. In the tree, a page showing a changed component
+  wears its Changed badge.
+- **`show` by a page's id**: a page a proposal changes, whose change shows only in a state of it (a closing screen
+  after a tap), is opened there and labelled, from the changes popover and Only changes.
+
+### Contract
+
+- **`show`** also takes a page's id: `show: { checkIn: { page: 'checkIn', state: { … }, label: '…' } }`, for a page
+  whose first screen is as Live's. Nothing to adapt otherwise.
+
 ## 0.53.0 — 2026-11-04
 
 - **What a proposal changes, where to see it** (`show` in `proposal()`): a changed component that isn't on its page as
