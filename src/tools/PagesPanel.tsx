@@ -21,7 +21,8 @@ import { replayLaunch } from '../sim/launch';
 import { t } from '../i18n/ui';
 import { BASE_PAGES } from '../nav/pages';
 import { CHANGES_PARAM, proposalChanges, VARIANT_PARAM } from '../proposals';
-import { usePageIndex } from '../sim/pageIndex';
+import { usePageIndex, useScanProgress } from '../sim/pageIndex';
+import { ProgressLine } from '../components/Loading';
 import { useUrlState } from '../sim/SimContext';
 
 /** One screen a proposal changes, as the filtered list shows it: a page, a flow's step, a variant, a component's place. */
@@ -143,6 +144,9 @@ const useOnlyChanges = () =>
 export function PagesPanel() {
   const [q, setQ] = useState('');
   const screens = useChangedScreens();
+  const { proposal } = useNavRoot();
+  // The scan that finds where a changed component shows, while it runs: the list isn't whole yet.
+  const scanning = useScanProgress(proposal?.id ?? 'live');
   const changedIds = useMemo(() => (screens ? new Set(screens.map((sc) => sc.page)) : null), [screens]);
   // The hook first, always: a proposal coming or going doesn't change the hooks' order.
   const onlyOn = useOnlyChanges();
@@ -168,6 +172,12 @@ export function PagesPanel() {
           <span>{t('Only changes')}</span>
           <span className={styles.muted}>{screens!.length}</span>
         </label>
+      )}
+      {changedIds && scanning != null && (
+        <div className={styles.scanNote}>
+          <span>{t('Finding where its changes show · {pct}%', { pct: Math.round(scanning * 100) })}</span>
+          <ProgressLine value={scanning} />
+        </div>
       )}
       <Changes.Provider value={changedIds}>
       {/* Filtered: the screens it changes, one level, each opening that screen. */}

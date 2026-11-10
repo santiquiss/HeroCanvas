@@ -21,12 +21,14 @@ interface Pull {
   raw: number;
   /** What moves (+1) and what's held (-1: sticky parts inside what moves), with their own `translate` before. */
   moved: { el: HTMLElement; sign: 1 | -1; before: string; beforeT: string }[];
+  /** The scroller's own `scroll-snap-type` (inline), put back once it's at rest: see `start`. */
+  snap: string;
   timer: number;
 }
 
 const pulls = new WeakMap<HTMLElement, Pull>();
 /** Springing back: what was moved, until it's restored (a new pull meanwhile takes it over). */
-const backs = new WeakMap<HTMLElement, { moved: Pull['moved']; timer: number }>();
+const backs = new WeakMap<HTMLElement, { moved: Pull['moved']; snap: string; timer: number }>();
 
 /** Whether `el` scrolls along `axis` (its overflow lets it, and its content is longer). */
 export function canScroll(el: HTMLElement, axis: Axis): boolean {
@@ -102,7 +104,11 @@ function start(el: HTMLElement, axis: Axis): Pull {
       const was = back.moved.find((b) => b.el === m.el);
       if (was) Object.assign(m, { before: was.before, beforeT: was.beforeT });
     }
-  const p: Pull = { axis, raw: 0, moved, timer: 0 };
+  // A scroller that snaps (a carousel) stops snapping while its content is away: a snap point is where the moved
+  // child is, so the browser would scroll after it and, once it's back, be left past its end.
+  const snap = back ? back.snap : el.style.scrollSnapType;
+  el.style.scrollSnapType = 'none';
+  const p: Pull = { axis, raw: 0, moved, snap, timer: 0 };
   pulls.set(el, p);
   return p;
 }
@@ -140,8 +146,9 @@ export function release(el: HTMLElement) {
       m.el.style.translate = m.before;
       m.el.style.transition = m.beforeT;
     }
+    el.style.scrollSnapType = p.snap;
   }, 440);
-  backs.set(el, { moved: p.moved, timer });
+  backs.set(el, { moved: p.moved, snap: p.snap, timer });
 }
 
 /** Wheel or trackpad: pulled, and let go when the events stop (a trackpad's momentum keeps them coming a while). */

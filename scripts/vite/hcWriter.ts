@@ -8,6 +8,8 @@
 //   POST /__hc/write { path, data } → writes `data` as pretty JSON to `path` (relative to the project root)
 //   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in app/pages.tsx
 //                                    (`null` removes the field; omitted fields are left alone)
+//   POST /__hc/index { design, again } → { index, at, stale, progress }: where each component shows, made in the dev
+//                                    server's own Chrome (scripts/vite/pageIndexCache.ts); asked again while `stale`
 //   POST /__hc/screen { hash, w, h, scale, taps, scroll } → { src }: a screen as a still picture (Flow's, App Store
 //                                    Assets'), drawn once by a headless Chrome (screenCache.ts); GET
 //                                    /__hc/screens/<key>.png serves it; POST /__hc/screens/refresh draws them all again
@@ -19,6 +21,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { dirname, relative, resolve, sep } from 'node:path';
 import type { Plugin } from 'vite';
 import type { Project } from './projects.ts';
+import { pageIndexCache } from './pageIndexCache.ts';
 import { screenCache } from './screenCache.ts';
 
 /** Files and folders the app may write. */
@@ -92,6 +95,7 @@ export function hcWriter(project: Project): Plugin {
     },
     configureServer(server) {
       const screens = screenCache(server, root, project.app);
+      const indexes = pageIndexCache(server, root, project.id, screens.stamp);
       // Its own base (/<id>/ for a project beside the first): its requests reach it before the base is taken off.
       const base = server.config.base;
       server.middlewares.use(`${base}__hc`, async (req, res) => {
@@ -108,6 +112,15 @@ export function hcWriter(project: Project): Plugin {
         const origin = req.headers.origin;
         if (req.headers['x-hc'] !== '1' || (origin && new URL(origin).host !== host)) return send(res, 403, { error: 'forbidden' });
         if (req.method === 'GET' && req.url === '/status') return send(res, 200, { writable: true, root, project: project.id });
+        if (req.method === 'POST' && req.url === '/index') {
+          try {
+            const { design, again } = JSON.parse(await readBody(req));
+            const answer = typeof design === 'string' ? indexes.get(design, `http://${host}${base}`, again === true) : null;
+            return answer ? send(res, 200, answer) : send(res, 400, { error: 'a design is needed' });
+          } catch (e) {
+            return send(res, 500, { error: String(e) });
+          }
+        }
         if (req.method === 'POST' && req.url === '/screen') {
           try {
             const spec = JSON.parse(await readBody(req));

@@ -27,6 +27,15 @@ export function useCanWrite(): boolean {
   return ok;
 }
 
+/**
+ * Where each component shows in a design, as the dev server has it (scripts/vite/pageIndexCache.ts): `stale` while a
+ * new one is being made there (`progress`, 0–1), with the one before if any. `again`: made anew. `failed`: it can't make it. Null: no answer.
+ */
+export async function serverPageIndex<T>(design: string, again = false): Promise<{ index?: T; at?: number; stale?: boolean; progress?: number; failed?: boolean } | null> {
+  const r = await fetch(import.meta.env.BASE_URL + '__hc/index', { method: 'POST', headers: HEADERS, body: JSON.stringify({ design, again }) }).catch(() => null);
+  return r?.ok ? r.json() : null;
+}
+
 /** Rewrite fields of one page in the manifest (app/pages.tsx). `null` removes a field. */
 export async function patchManifest(page: string, fields: { split?: unknown; sideColumn?: unknown; landscape?: unknown }): Promise<void> {
   const r = await fetch(import.meta.env.BASE_URL + '__hc/manifest', { method: 'POST', headers: HEADERS, body: JSON.stringify({ page, ...fields }) });

@@ -6,6 +6,25 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.56.0 — 2026-11-10
+
+- **A carousel that snaps bounces back to where it was**: while a scroller's content is past its end (the iOS
+  bounce), its `scroll-snap-type` is off, and back once it's at rest. Its snap points moved with the content, so the
+  browser scrolled after them and was left a little past the end (`src/sim/bounce.ts`).
+- **The where-used scan is the dev server's**, in a Chrome of its own (`scripts/vite/pageIndexCache.ts`,
+  `POST /__hc/index`): the designer's tab only asks how far it is, so nothing in it slows down while every page is
+  drawn. What the server made is kept with the code it's from (`node_modules/.cache/hc-index`): after a reload or a
+  restart it's there at once, and after a change to the code the one before shows while the new one is made. A
+  published site, with no dev server, still scans in the tab.
+- **Pages says how far the scan is** under Only changes (Finding where its changes show · 40%), while its list isn't
+  whole yet.
+- **A proposal's where-used scan draws only what it can change**: its new and changed pages, and the pages where a
+  component it replaces shows in Live; every other page is read from Live's index (built first, once per build, when
+  there's none). Pages' Only changes, the changes popover and the where-used rail are ready in a second or two for
+  each proposal after the first, instead of drawing the whole app again for each one. One page at a time, so the
+  longest the scan holds a click back is half what it was. `rescan` still draws every page
+  (`src/sim/pageIndex.tsx`: `pagesToDraw`, `mergeIndex`; `liveNav` in `src/nav/manifest.ts`).
+
 ## 0.55.0 — 2026-11-10
 
 - **Projects**: a copy can hold more than one app (`herocanvas.config.ts` `projects`, `scripts/vite/projects.ts`). The

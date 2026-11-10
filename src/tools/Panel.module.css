@@ -1090,6 +1090,15 @@
   margin: 0;
   accent-color: var(--hc-brand);
 }
+/* While the scan that finds where the changes show runs: how far it is, under Only changes. */
+.scanNote {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px 8px;
+  font-size: 11px;
+  color: var(--ui-text-muted);
+}
 /* Only changes' list: a screen per row, its name over what changes on it. */
 .screenRow {
   align-items: flex-start;

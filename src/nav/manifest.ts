@@ -2,7 +2,8 @@
 import type { Proposal } from '../proposals/types';
 import { placesOf } from '../proposals';
 import { BASE_PAGES } from './pages';
-import type { Manifest } from './stack';
+import { pageTitle, type Manifest } from './stack';
+import type { Nav } from './context';
 
 const cache = new Map<string, Manifest>();
 
@@ -19,6 +20,24 @@ export function composePages(p: Proposal | null): Manifest {
     cache.set(p.id, m);
   }
   return m;
+}
+
+/**
+ * The navigation as Live has it, from a proposal's: Live's pages and no proposal, for screens drawn as Live beside the
+ * proposal's (a shot's Before, the where-used scan). Its stack and its moves stay the caller's.
+ */
+export function liveNav(nav: Nav): Nav {
+  const pages = composePages(null);
+  return {
+    ...nav,
+    pages,
+    proposal: null,
+    tabs: Object.keys(pages).filter((id) => pages[id].level === 'tab'),
+    boots: Object.keys(pages).filter((id) => pages[id].level === 'boot'),
+    change: () => null,
+    def: (id) => pages[id],
+    title: (ref) => pageTitle(pages, ref),
+  };
 }
 
 export type PageChange = 'new' | 'changed' | null;

@@ -75,7 +75,9 @@ for (const proposal of PROPOSALS) {
 // An app without stories has no component pages (an empty `each` is no test, which vitest fails).
 if (STORIES.size)
   describe('Component pages render (all their stories)', () => {
-    it.each([...STORIES.keys()].map((n) => [n]))('%s', async (name) => {
+    // Longer than a test's 5 s: a component that animates frame by frame, in all its stories at once, takes about that
+    // here (no compositor: every frame is a render).
+    it.each([...STORIES.keys()].map((n) => [n]))('%s', { timeout: 15000 }, async (name) => {
       expect(await problemsAt(`/components/${encodeURIComponent(name)}`)).toEqual([]);
     });
   });

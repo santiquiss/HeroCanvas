@@ -199,6 +199,8 @@ export function screenCache(server: ViteDevServer, root: string, appDir = 'app')
   let salt = 0;
 
   return {
+    /** The app's code as one hash: what's made from it (a picture, the where-used index) is that code's. */
+    stamp: codeStamp,
     /** The picture of `spec`, drawn if it isn't yet: its key. */
     async screen(spec: ScreenSpec, base: string): Promise<string> {
       const key = createHash('sha1')
