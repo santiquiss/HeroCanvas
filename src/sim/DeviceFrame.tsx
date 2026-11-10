@@ -104,7 +104,8 @@ export function DeviceFrame({ layout, scale, theme, language, active = false, sc
         )}
         <FrameHardware layout={layout} />
       </div>
-      <TouchPointer frame={el} enabled={!inspect && !commenting} scale={scale} rotated={layout.rotLocked} />
+      {/* A browser window keeps the mouse's own pointer, with its hover. */}
+      <TouchPointer frame={el} enabled={!inspect && !commenting && layout.os !== 'web'} scale={scale} rotated={layout.rotLocked} />
     </>
   );
 }

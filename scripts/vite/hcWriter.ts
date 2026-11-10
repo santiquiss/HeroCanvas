@@ -1,6 +1,10 @@
 // Dev-server endpoint that lets the designer save its data to files in the project (dev only).
 //
-//   GET  /__hc/status            → { writable: true, root }: the project it serves (npm run shot finds its own by it)
+// Each project (scripts/vite/projects.ts) has its own, under its address (/<id>/__hc/…), writing to its own folders:
+// the paths the designer sends name the first project's (`app/…`, `proposals/…`), and are another's own there.
+//
+//   GET  /__hc/status            → { writable: true, root, project }: the copy it serves (npm run shot finds its own by
+//                                    it) and the project's id
 //   POST /__hc/write { path, data } → writes `data` as pretty JSON to `path` (relative to the project root)
 //   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in app/pages.tsx
 //                                    (`null` removes the field; omitted fields are left alone)
@@ -14,16 +18,22 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { dirname, relative, resolve, sep } from 'node:path';
 import type { Plugin } from 'vite';
+import type { Project } from './projects.ts';
 import { screenCache } from './screenCache.ts';
 
 /** Files and folders the app may write. */
 const ALLOWED = ['app/screen-config.json', 'proposals/'];
 
-function allowed(root: string, path: string): string | null {
+/** A path as the designer names it (the first project's folders), in the project's own folders. */
+export function inProject(project: Pick<Project, 'app' | 'proposals'>, path: string): string {
+  return path.replace(/^app\//, `${project.app}/`).replace(/^proposals\//, `${project.proposals}/`);
+}
+
+function allowed(root: string, project: Project, path: string): string | null {
   const abs = resolve(root, path);
   const rel = relative(root, abs).split(sep).join('/');
   if (rel.startsWith('..') || !rel.endsWith('.json')) return null;
-  return ALLOWED.some((a) => (a.endsWith('/') ? rel.startsWith(a) : rel === a)) ? abs : null;
+  return ALLOWED.some((a) => (a.endsWith('/') ? rel.startsWith(a) : rel === a)) ? resolve(root, inProject(project, rel)) : null;
 }
 
 const MANIFEST = 'app/pages.tsx';
@@ -60,19 +70,19 @@ function send(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-function readBody(req: IncomingMessage): Promise<string> {
+function readBody(req: IncomingMessage, max = 2_000_000): Promise<string> {
   return new Promise((ok, fail) => {
     let s = '';
     req.on('data', (c) => {
       s += c;
-      if (s.length > 2_000_000) fail(new Error('too large'));
+      if (s.length > max) fail(new Error('too large'));
     });
     req.on('end', () => ok(s));
     req.on('error', fail);
   });
 }
 
-export function hcWriter(): Plugin {
+export function hcWriter(project: Project): Plugin {
   let root = process.cwd();
   return {
     name: 'hc-writer',
@@ -81,8 +91,10 @@ export function hcWriter(): Plugin {
       root = c.root;
     },
     configureServer(server) {
-      const screens = screenCache(server, root);
-      server.middlewares.use('/__hc', async (req, res) => {
+      const screens = screenCache(server, root, project.app);
+      // Its own base (/<id>/ for a project beside the first): its requests reach it before the base is taken off.
+      const base = server.config.base;
+      server.middlewares.use(`${base}__hc`, async (req, res) => {
         // A screen's picture, for an <img> (it can't send the header): only by its key, from the cache.
         const pic = req.method === 'GET' && req.url?.match(/^\/screens\/([0-9a-f]{40})\.png$/);
         if (pic) {
@@ -95,14 +107,14 @@ export function hcWriter(): Plugin {
         const host = req.headers.host ?? '';
         const origin = req.headers.origin;
         if (req.headers['x-hc'] !== '1' || (origin && new URL(origin).host !== host)) return send(res, 403, { error: 'forbidden' });
-        if (req.method === 'GET' && req.url === '/status') return send(res, 200, { writable: true, root });
+        if (req.method === 'GET' && req.url === '/status') return send(res, 200, { writable: true, root, project: project.id });
         if (req.method === 'POST' && req.url === '/screen') {
           try {
             const spec = JSON.parse(await readBody(req));
             const ok = typeof spec?.hash === 'string' && [spec.w, spec.h, spec.scale].every((n) => typeof n === 'number' && n > 0 && n < 4000);
             if (!ok) return send(res, 400, { error: 'a hash, w, h and scale are needed' });
-            const key = await screens.screen(spec, `http://${host}/`);
-            return send(res, 200, { src: `/__hc/screens/${key}.png` });
+            const key = await screens.screen(spec, `http://${host}${base}`);
+            return send(res, 200, { src: `${base}__hc/screens/${key}.png` });
           } catch (e) {
             server.config.logger.warn(`[hc] screen: ${e}`, { timestamp: true });
             return send(res, 500, { error: String(e) });
@@ -116,24 +128,36 @@ export function hcWriter(): Plugin {
           try {
             const { page, ...fields } = JSON.parse(await readBody(req));
             if (typeof page !== 'string' || !/^[a-zA-Z]\w*$/.test(page)) return send(res, 400, { error: 'bad page id' });
-            const abs = resolve(root, MANIFEST);
+            const abs = resolve(root, inProject(project, MANIFEST));
             let src = readFileSync(abs, 'utf8');
             for (const f of ['split', 'sideColumn', 'landscape'] as const) if (f in fields) src = patchField(src, page, f, fields[f]);
             writeFileSync(abs, src);
-            server.config.logger.info(`[hc] updated ${MANIFEST} (${page})`, { timestamp: true });
+            server.config.logger.info(`[hc] updated ${inProject(project, MANIFEST)} (${page})`, { timestamp: true });
             return send(res, 200, { ok: true });
           } catch (e) {
+            return send(res, 500, { error: String(e) });
+          }
+        }
+        if (req.method === 'POST' && req.url === '/screen') {
+          try {
+            const spec = JSON.parse(await readBody(req));
+            const ok = typeof spec?.hash === 'string' && [spec.w, spec.h, spec.scale].every((n) => typeof n === 'number' && n > 0 && n < 4000);
+            if (!ok) return send(res, 400, { error: 'a hash, w, h and scale are needed' });
+            const key = await screens.screen(spec, `http://${host}${base}`);
+            return send(res, 200, { src: `${base}__hc/screens/${key}.png` });
+          } catch (e) {
+            server.config.logger.warn(`[hc] screen: ${e}`, { timestamp: true });
             return send(res, 500, { error: String(e) });
           }
         }
         if (req.method !== 'POST' || req.url !== '/write') return send(res, 404, { error: 'not found' });
         try {
           const { path, data } = JSON.parse(await readBody(req));
-          const abs = typeof path === 'string' ? allowed(root, path) : null;
+          const abs = typeof path === 'string' ? allowed(root, project, path) : null;
           if (!abs) return send(res, 400, { error: `not allowed: ${path}` });
           mkdirSync(dirname(abs), { recursive: true });
           writeFileSync(abs, JSON.stringify(data, null, 2) + '\n');
-          server.config.logger.info(`[hc] saved ${path}`, { timestamp: true });
+          server.config.logger.info(`[hc] saved ${inProject(project, path)}`, { timestamp: true });
           return send(res, 200, { ok: true });
         } catch (e) {
           return send(res, 500, { error: String(e) });

@@ -37,6 +37,29 @@ describe('proposalChanges', () => {
     expect(pg?.show).toEqual(place);
     expect(pg?.details[0]).toBe('its last screen');
   });
+
+  // Several screens of one flow changed: every place kept, so Only changes lists each one.
+  it('keeps every place a changed page shows in', () => {
+    const page = Object.keys(BASE_PAGES)[0];
+    const places = [
+      { page, state: { step: 'start' }, label: 'its first screen' },
+      { page, state: { step: 'end' }, label: 'its last screen' },
+    ];
+    const c = proposalChanges(fixture({ pages: { [page]: { ...(BASE_PAGES[page] as object), title: 'Other' } as never }, show: { [page]: places } }), null, BASE_PAGES);
+    const pg = c.pages.find((x) => x.id === page);
+    expect(pg?.show).toEqual(places[0]);
+    expect(pg?.places).toEqual(places);
+  });
+  // A flow's step the proposal changes (its flow marks it): its own screen in the list, changed, under its name.
+  it('lists a changed step of a flow as changed', () => {
+    const id = Object.keys(BASE_PAGES).find((k) => BASE_PAGES[k]?.flow?.steps.length);
+    if (!id) return;
+    const base = BASE_PAGES[id]!;
+    const [first, ...rest] = base.flow!.steps;
+    const flow = { ...base.flow!, steps: [{ ...first, label: 'Renamed', change: 'changed' as const }, ...rest] };
+    const c = proposalChanges(fixture({ pages: { [id]: { ...(base as object), flow } as never } }), null, BASE_PAGES);
+    expect(c.pages.find((x) => x.step?.id === first.id)).toMatchObject({ kind: 'changed', step: { id: first.id, label: 'Renamed' } });
+  });
   // A component that isn't on its page as it loads says where it shows (`show`): it opens there, and that page is changed.
   it('marks the page a changed component shows on, in its state', () => {
     const page = Object.keys(BASE_PAGES)[0];

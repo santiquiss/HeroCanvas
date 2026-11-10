@@ -168,6 +168,8 @@ export interface FlowStep {
   next?: FlowNext[];
   /** Loaders: on to `to` after `ms`, unless the step was opened to look at (held). */
   auto?: { to: string; ms: number };
+  /** In a proposal's flow: a step it changes (its screen differs from Live's). Its new steps are found against Live's. */
+  change?: 'changed';
 }
 
 export interface FlowNext {

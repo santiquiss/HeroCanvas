@@ -1,6 +1,8 @@
 // Status bars, camera cutouts and home indicator. All pointer-events:none, z 95+ (above sheets and dialogs).
 import type { CSSProperties } from 'react';
-import { CORNER_STATUS, type Layout } from './layout';
+import { appConfig } from '@app/config';
+import { Icon } from '../components/Icon';
+import { BROWSER_BAR_H, CORNER_STATUS, type Layout } from './layout';
 import styles from './SystemChrome.module.css';
 
 const Battery = ({ level }: { level: number }) => (
@@ -37,8 +39,34 @@ function Camera({ layout }: { layout: Layout }) {
   return <div className={styles.camera} style={{ width: cam.size, height: cam.size, [cam.x]: x, [cam.y]: cam.inset }} />;
 }
 
+/**
+ * A browser window's toolbar (a web app's display), where a phone's status bar is: the window's buttons, back and
+ * forward, and the app's address (appConfig.url, else its name). In the screen's light or dark.
+ */
+function BrowserBar() {
+  return (
+    <div className={styles.browser} style={{ height: BROWSER_BAR_H }}>
+      <span className={styles.lights}>
+        <span />
+        <span />
+        <span />
+      </span>
+      <span className={styles.browserNav}>
+        <Icon name="arrow_back" size={18} />
+        <Icon name="arrow_forward" size={18} />
+        <Icon name="refresh" size={18} />
+      </span>
+      <span className={styles.address}>
+        <Icon name="lock" size={13} />
+        <span>{appConfig.url ?? appConfig.name}</span>
+      </span>
+    </div>
+  );
+}
+
 export function StatusBar({ layout }: { layout: Layout }) {
   const { os, sideNav, phoneLand, camRight, cornerStatus } = layout;
+  if (os === 'web') return layout.bare ? null : <BrowserBar />;
   // No strip in a landscape phone, nor in the video layout's app area (the status shows over the video).
   if (phoneLand || layout.videoH) return null;
   if (cornerStatus) {
@@ -125,14 +153,14 @@ export function LandscapeCamera({ layout }: { layout: Layout }) {
   return layout.cutout === 'notch' ? <div className={styles.landNotch} /> : <div className={styles.landIsland} style={{ height: layout.islandW, marginTop: -layout.islandW / 2 }} />;
 }
 
-const HOME: Record<Layout['os'], CSSProperties> = {
+const HOME: Record<Exclude<Layout['os'], 'web'>, CSSProperties> = {
   ios: { bottom: 8, width: 134, height: 5, borderRadius: 3 },
   android: { bottom: 9, width: 108, height: 4, borderRadius: 2 },
   ipad: { bottom: 7, width: 180, height: 5, borderRadius: 3 },
 };
 
 export function HomeIndicator({ layout }: { layout: Layout }) {
-  if (layout.sideNav || layout.homeButton) return null;
+  if (layout.sideNav || layout.homeButton || layout.os === 'web') return null;
   const s = HOME[layout.os];
   return <div className={styles.home} style={{ ...s, marginLeft: -(s.width as number) / 2 }} />;
 }

@@ -121,9 +121,16 @@ export interface AppConfig {
   layout?: ScreenLayout;
   /**
    * The devices the app is made for (DeviceTargets): the designer offers only those, in every menu, Compare and Capture.
-   * None: every device.
+   * None: every phone, foldable and tablet.
    */
   devices?: DeviceTargets;
+  /**
+   * A web app: its screens are a site's pages, in a computer's browser window (devices `types: ['desktop']`) and in a
+   * tablet's or a phone's browser when it targets them. It isn't in the app stores: no App Store Assets.
+   */
+  web?: boolean;
+  /** A web app's address (`pro.example.com`), shown in a browser window's toolbar. None: its name. */
+  url?: string;
 }
 
 /**
@@ -143,10 +150,15 @@ export interface AppTheme {
  * 'foldable'] }`: Android phones and foldables.
  */
 export interface DeviceTargets {
-  /** iOS (iPhone and iPad) and/or Android. None: both. */
-  platforms?: ('ios' | 'android')[];
-  /** Phones, foldables, tablets. None: all three. */
-  types?: ('phone' | 'foldable' | 'tablet')[];
+  /** iOS (iPhone and iPad), Android, and/or the web (a browser window). None: all. */
+  platforms?: ('ios' | 'android' | 'web')[];
+  /**
+   * Phones, foldables, tablets, desktop (a browser window, a web app's). None: the first three. In the order the
+   * device menus list them: `['desktop', 'tablet', 'phone']` for a web app that also runs on tablets and phones.
+   */
+  types?: ('phone' | 'foldable' | 'tablet' | 'desktop')[];
+  /** The device the canvas opens on (devices.ts `id`, as `web1440`). Default: the iPhone 17 Pro, else the first. */
+  default?: string;
 }
 
 /**
@@ -184,6 +196,11 @@ export interface ScreenLayout {
    * short fade up, for an app that animates it.
    */
   tabTransition?: 'none' | 'fade';
+  /**
+   * A pushed page on a wide screen: beside the page that pushed it, in the right panel of a list and its detail (true,
+   * the default, as an iPad's), or over it, the whole page (false: a web app's pages, each its own address).
+   */
+  splitPushes?: boolean;
   /** The room between the rail and the left column when a page shows two (list and detail; 16 by default), and
    * between the right one and the screen's edge. */
   splitGap?: number;

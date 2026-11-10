@@ -10,7 +10,7 @@ import { systemBack } from './back';
 import { designLayout } from '../design/overridableRegistry';
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { Icon } from '../components/Icon';
-import { DEVICES, findDevice, findDisplay, type DeviceType, foldOf, keepsLandscape, landAfterSwitch } from '../devices/devices';
+import { DEVICE_TYPES, DEVICES, findDevice, findDisplay, foldOf, keepsLandscape, landAfterSwitch } from '../devices/devices';
 import { supportsLandscape } from '../nav/screenConfig';
 import type { Landscape } from '../nav/types';
 import { InspectOverlay } from '../tools/InspectOverlay';
@@ -28,6 +28,7 @@ import { VIEW_BAR_H } from './ViewBar';
 import styles from './SimulatorShell.module.css';
 import { t } from '../i18n/ui';
 import { can } from '../share/view';
+import { ScreenSourceScope, useScreenSourceInfo } from './screenSource';
 
 /**
  * Canvas margin around the frames, the same above and below so they center on the frames alone: room for the floating
@@ -37,12 +38,6 @@ const MARGIN = VIEW_BAR_H + 36 + 12 + 8;
 const SIDE = 64;
 /** The room between devices: generous for a few, tighter as more share the canvas, so they still show large. */
 export const deviceGap = (count: number) => (count <= 2 ? 56 : count === 3 ? 40 : 24);
-
-const TYPES: [DeviceType, string][] = [
-  ['phone', t('Phones')],
-  ['foldable', t('Foldables')],
-  ['tablet', t('Tablets')],
-];
 
 /** A native device menu (grouped by type) laid invisibly over its children: any click opens it. */
 export function DevicePicker({
@@ -81,7 +76,7 @@ export function DevicePicker({
             {d.name}
           </option>
         ))}
-        {!options && TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
+        {!options && DEVICE_TYPES.map(([type, label]) => (
           <optgroup key={type} label={label}>
             {DEVICES.filter((d) => d.type === type).map((d) => (
               <option key={d.id} value={d.id}>
@@ -207,6 +202,21 @@ const NAME_MIN = 84;
  * them (`style.maxWidth`, a device zoomed out), what doesn't fit goes into a ⋯ menu, the least used first; remove
  * stays out, last of all.
  */
+/** What draws the screen, when it isn't the app: its logo, its name in the tooltip, a link to where it's edited. */
+function SourceButton({ source }: { source: NonNullable<ReturnType<typeof useScreenSourceInfo>> }) {
+  const title = [source.label, source.note, source.href && t('Opens where it’s edited')].filter(Boolean).join('\n');
+  const mark = source.logo ? <img className={styles.devSourceLogo} src={source.logo} alt="" /> : <Icon name="extension" size={16} />;
+  return source.href ? (
+    <a className={`${styles.devChip} ${styles.devSource}`} href={source.href} target="_blank" rel="noreferrer" title={title} aria-label={source.label}>
+      {mark}
+    </a>
+  ) : (
+    <span className={`${styles.devChip} ${styles.devSource}`} title={title} aria-label={source.label}>
+      {mark}
+    </span>
+  );
+}
+
 export function DeviceHeader({
   device: id,
   display: displayKey,
@@ -243,6 +253,8 @@ export function DeviceHeader({
   style?: React.CSSProperties;
 }) {
   const dev = findDevice(id);
+  // A screen drawn by another SDK (screenSource): its logo beside the name, linking to where it's edited.
+  const source = useScreenSourceInfo();
   const hasVideo = !!(findDisplay(dev, displayKey).videoSplit && !land && onVideo);
   // Android's system back (sim/back): its devices have one; iOS goes back from the screen itself.
   const hasBack = findDisplay(dev, displayKey).os === 'android';
@@ -256,7 +268,8 @@ export function DeviceHeader({
     ...(hasBack ? (['back'] as const) : []),
     ...(dev.displays.length > 1 ? (['displays'] as const) : []),
     ...(hasVideo ? (['video'] as const) : []),
-    ...(onRotate ? (['rotate'] as const) : []),
+    // A browser window doesn't turn.
+    ...(onRotate && findDisplay(dev, displayKey).os !== 'web' ? (['rotate'] as const) : []),
     ...(design ? (['design'] as const) : []),
     ...(language ? (['language'] as const) : []),
   ];
@@ -274,7 +287,7 @@ export function DeviceHeader({
     const width = (k: string) => el.querySelector<HTMLElement>(`[data-part="${k}"]`)?.offsetWidth ?? 0;
     const GAP_PX = 4;
     const PAD = 8;
-    const fixed = PAD + (grip ? width('grip') + GAP_PX : 0) + Math.min(width('name'), NAME_MIN) + (onRemove ? width('remove') + GAP_PX : 0);
+    const fixed = PAD + (grip ? width('grip') + GAP_PX : 0) + (source ? width('source') + GAP_PX : 0) + Math.min(width('name'), NAME_MIN) + (onRemove ? width('remove') + GAP_PX : 0);
     const sizes = new Map(parts.map((p) => [p, width(p) + GAP_PX]));
     const more = width('more') + GAP_PX;
     const drop: HeadPart[] = [];
@@ -286,7 +299,7 @@ export function DeviceHeader({
     setHidden((h) => (h.join() === drop.join() ? h : drop));
     setTight(total() > room);
     // `parts` is described by `key`.
-  }, [key, room, !!grip, !!onRemove]);
+  }, [key, room, !!grip, !!onRemove, !!source]);
 
   const [menu, setMenu] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -407,6 +420,9 @@ export function DeviceHeader({
           <Icon name="drag_indicator" size={16} />
         </span>
       )}
+      {source && (
+        <SourceButton source={source} />
+      )}
       {fixed ? (
         <span className={styles.devName}>
           <span className={styles.devNameText}>{dev.name}</span>
@@ -439,6 +455,11 @@ export function DeviceHeader({
         {grip && (
           <span className={styles.devGrip} data-part="grip">
             <Icon name="drag_indicator" size={16} />
+          </span>
+        )}
+        {source && (
+          <span className={styles.devChip} data-part="source">
+            <Icon name="link" size={16} />
           </span>
         )}
         <span className={styles.devName} data-part="name">
@@ -626,6 +647,7 @@ export function MultiDevices({
                   }}
                   className={`${styles.multiItem} ${i === act ? styles.multiActive : ''} ${dragging === i ? styles.multiDragging : ''} ${dragging != null && dragging !== i ? styles.multiShifting : ''}`}
                 >
+                  <ScreenSourceScope>
                   {/* No wider than its frame and the gap: zoomed out, neighbours' headers don't overlap (the name gives). */}
                   <DeviceHeader
                     className={it.design || it.lang ? styles.devHeadOwn : undefined}
@@ -653,6 +675,7 @@ export function MultiDevices({
                       <DeviceFrame layout={layout} scale={k} theme={theme} language={it.lang} active={i === act} screen={{ device: it.device, display: it.display, design: it.design }} content={screen?.(it, layout)} />
                     </DesignOverride.Provider>
                   </ActiveDevice>
+                  </ScreenSourceScope>
                 </div>
               </Fragment>
             );

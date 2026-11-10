@@ -118,6 +118,12 @@ export function TouchPointer({ frame, enabled, scale, rotated }: { frame: HTMLEl
 
     const settle = (el: HTMLElement, axis: Axis, v: number, snap: string | null, from: number) => {
       if (snap !== null) {
+        // Let go past the end of a carousel: it springs back to its last item (the bounce, released), snapping restored.
+        if (pulled(el)) {
+          release(el);
+          el.style.scrollSnapType = snap;
+          return;
+        }
         // Rest on the item a flick would carry it to (its own snap position: a card, a page), then restore snapping.
         const pos = axis === 'y' ? el.scrollTop : el.scrollLeft;
         // `v` is the finger's velocity: the content scrolls the other way.

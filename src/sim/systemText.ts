@@ -63,7 +63,7 @@ export const TEXT_SIZES: Record<TextSystem, TextSizeStep[]> = {
 /** The size nobody changed: iOS's Large. On Android it's 100% (`textSizeFor`). */
 export const DEFAULT_TEXT_SIZE = 'l';
 
-export const textSystemOf = (os: 'ios' | 'android' | 'ipad'): TextSystem => (os === 'android' ? 'android' : 'ios');
+export const textSystemOf = (os: 'ios' | 'android' | 'ipad' | 'web'): TextSystem => (os === 'android' ? 'android' : 'ios');
 
 const ALL_STEPS = [...TEXT_SIZES.ios, ...TEXT_SIZES.android];
 

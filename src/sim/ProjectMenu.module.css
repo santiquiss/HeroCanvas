@@ -1,0 +1,79 @@
+/* ProjectMenu: the toolbar's project picker, as the design picker beside it (ProposalMenu). */
+.root {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  max-width: 220px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.trigger:hover,
+.triggerOpen {
+  background: var(--ui-bg-subtle);
+}
+.trigger:focus-visible {
+  outline: 2px solid #0d99ff;
+  outline-offset: 1px;
+}
+.name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.menu {
+  composes: surface from '../theme/surface.module.css';
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.row:hover,
+.row:focus-visible {
+  background: var(--ui-hover);
+  outline: none;
+}
+.rowOn {
+  background: var(--ui-bg-subtle);
+}
+.check {
+  display: flex;
+  width: 16px;
+  color: var(--ui-text-2);
+}
+.rowName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

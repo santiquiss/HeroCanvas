@@ -138,7 +138,7 @@ export function PageInspector() {
         <div className={styles.sectionTitle}>{t('Layout')}</div>
         <div className={styles.kv}>
           <Pair k={t('Viewport')} v={`${L.vw} × ${L.vh}`} />
-          <Pair k={t('Class')} v={`${L.isTablet ? t('Tablet') : t('Phone')} · ${L.os} · ${L.horizontalSizeClass}${L.land ? ` · ${t('landscape')}` : ''}${L.rotLocked ? ` · ${t('rotation locked')}` : ''}`} />
+          <Pair k={t('Class')} v={`${L.os === 'web' ? t('Desktop') : L.isTablet ? t('Tablet') : t('Phone')} · ${L.os} · ${L.horizontalSizeClass}${L.land ? ` · ${t('landscape')}` : ''}${L.rotLocked ? ` · ${t('rotation locked')}` : ''}`} />
           <Pair k={t('Navigation')} v={navigationOf(L)} />
           <ListDetailRows />
           {L.sideNav && <Pair k={t('Right column')} v={sideColumnFor(top.id, def, cfg) === 'nav' ? t('The navigation, under the status') : t('Empty: kept for the status')} />}
@@ -272,9 +272,12 @@ function LandscapeSupport({ id }: { id: string }) {
   const setting = landscapeFor(id, nav.def(id), cfg);
   const onCanvas = canvasDisplays(search);
   const displays = onCanvas.length ? onCanvas : DEVICES.flatMap((device) => device.displays.map((display) => ({ device, display })));
-  const turning = displays.filter(({ device, display }) => supportsLandscape(setting, device, display));
+  // A browser window doesn't turn: not counted.
+  const turnable = displays.filter(({ display }) => display.os !== 'web');
+  if (!turnable.length) return null;
+  const turning = turnable.filter(({ device, display }) => supportsLandscape(setting, device, display));
   const name = ({ device, display }: { device: Device; display: Display }) => `${device.name}${device.displays.length > 1 ? ` · ${display.label.split(' ')[0]}` : ''}`;
-  const value = !turning.length ? t('Not supported · portrait only') : turning.length === displays.length ? t('Supported') : t('Supported on {devices}', { devices: turning.map(name).join(', ') });
+  const value = !turning.length ? t('Not supported · portrait only') : turning.length === turnable.length ? t('Supported') : t('Supported on {devices}', { devices: turning.map(name).join(', ') });
   return (
     <>
       <span className={styles.k} title={t('Whether the page turns with the device. Set in code: landscape, in app/pages.tsx')}>

@@ -4,7 +4,8 @@ import { appConfig } from '@app/config';
 import type { DeviceTargets } from '../contract';
 import { t } from '../i18n/ui';
 
-export type DeviceOS = 'ios' | 'android' | 'ipad';
+/** `web`: a browser window on a computer (a web app's): its toolbar where a phone's status bar is, no keyboard on screen. */
+export type DeviceOS = 'ios' | 'android' | 'ipad' | 'web';
 
 /** Where the app's navigation goes. Default: `bottom` below 600px wide, `rail` (left) from 600. */
 export type NavPlacement = 'bottom' | 'rail' | 'column';
@@ -109,7 +110,7 @@ export interface SafeArea {
   left: number;
 }
 
-export type DeviceType = 'phone' | 'foldable' | 'tablet';
+export type DeviceType = 'phone' | 'foldable' | 'tablet' | 'desktop';
 
 export interface Device {
   id: string;
@@ -259,6 +260,12 @@ export const ALL_DEVICES: Device[] = [
   { id: 'gtabs9', name: 'Galaxy Tab S9', type: 'tablet', displays: [D('main', t('Display'), 800, 1280, 'android', 18, 20, { rot: true })] },
   { id: 'ipad11', name: 'iPad Pro 11″', type: 'tablet', displays: [D('main', t('Display'), 834, 1210, 'ipad', 26, 22, { rot: true })] },
   { id: 'ipad13', name: 'iPad Pro 13″', type: 'tablet', displays: [D('main', t('Display'), 1032, 1376, 'ipad', 26, 22, { rot: true })] },
+  // A web app's: a browser window, its page as wide as the screens most use (a laptop's 1280 and 1440, a monitor's
+  // 1920) and as tall as what's left under the browser's toolbar (the display's status bar, BROWSER_BAR_H). Only for
+  // an app that targets them (appConfig.devices `types: ['desktop']`).
+  { id: 'web1280', name: 'Laptop 1280', type: 'desktop', displays: [D('main', t('Window'), 1280, 800, 'web', 10, 1)] },
+  { id: 'web1440', name: 'Desktop 1440', type: 'desktop', displays: [D('main', t('Window'), 1440, 900, 'web', 10, 1)] },
+  { id: 'web1920', name: 'Desktop 1920', type: 'desktop', displays: [D('main', t('Window'), 1920, 1080, 'web', 10, 1)] },
 ];
 
 /**
@@ -278,22 +285,54 @@ const GROUPS: DeviceGroup[] = [
   { id: 'phones', label: t('Phones'), has: (d) => d.type === 'phone' },
   { id: 'foldables', label: t('Foldables'), has: (d) => d.type === 'foldable' },
   { id: 'tablets', label: t('Tablets'), has: (d) => d.type === 'tablet' },
+  { id: 'desktop', label: t('Desktop'), has: (d) => d.type === 'desktop' },
 ];
 
-/** A device's platform: iOS for iPhones and iPads (iPadOS), else Android. */
-export const platformOf = (d: Device): 'ios' | 'android' => (d.displays[0].os === 'android' ? 'android' : 'ios');
+/**
+ * How a display is used: with a mouse (`fine`, a browser window on a computer) or a finger (`coarse`, every phone,
+ * foldable and tablet), as CSS's `pointer` media feature names them. The screen's root carries it (`data-pointer`): an
+ * app's component made for a finger adapts to a mouse by it (its touch target, its hover), as Flutter's
+ * `VisualDensity.adaptivePlatformDensity` and `MaterialTapTargetSize` do on desktop.
+ */
+export type Pointer = 'fine' | 'coarse';
+export const pointerOf = (os: DeviceOS): Pointer => (os === 'web' ? 'fine' : 'coarse');
 
-/** The devices an app's targets keep; every device when they keep none (a mistyped target never empties the menus). */
+/** A device's platform: iOS for iPhones and iPads (iPadOS), the web for a browser window, else Android. */
+export const platformOf = (d: Device): 'ios' | 'android' | 'web' => {
+  const os = d.displays[0].os;
+  return os === 'android' ? 'android' : os === 'web' ? 'web' : 'ios';
+};
+
+/** What an app is for when it doesn't say: phones, foldables and tablets (a browser window only when it asks). */
+const MOBILE: DeviceType[] = ['phone', 'foldable', 'tablet'];
+
+/**
+ * The devices an app's targets keep; every mobile one when they keep none (a mistyped target never empties the menus).
+ * In the targets' kinds' order: an app for the web first lists its windows.
+ */
 export function targetDevices(t: DeviceTargets | undefined, all = ALL_DEVICES): Device[] {
-  const kept = all.filter((d) => (!t?.platforms?.length || t.platforms.includes(platformOf(d))) && (!t?.types?.length || t.types.includes(d.type)));
-  return kept.length ? kept : all;
+  const types: DeviceType[] = t?.types?.length ? t.types : MOBILE;
+  const kept = all.filter((d) => (!t?.platforms?.length || t.platforms.includes(platformOf(d))) && types.includes(d.type));
+  const ordered = kept.sort((a, b) => types.indexOf(a.type) - types.indexOf(b.type));
+  return ordered.length ? ordered : all.filter((d) => MOBILE.includes(d.type));
 }
 
 /** The devices the designer offers: the app's targets (appConfig.devices), all of them by default. */
 export const DEVICES: Device[] = targetDevices(appConfig.devices);
 
-/** The device the canvas opens on: the iPhone 17 Pro, or the app's first target when it isn't one. */
-export const DEFAULT_DEVICE = DEVICES.some((d) => d.id === 'ip17') ? 'ip17' : DEVICES[0].id;
+const TYPE_LABELS: Record<DeviceType, string> = { phone: t('Phones'), foldable: t('Foldables'), tablet: t('Tablets'), desktop: t('Desktop') };
+
+/** The device menus' groups: the kinds the app's devices are, in its targets' order (a web app's windows first). */
+export const DEVICE_TYPES: [DeviceType, string][] = [...new Set(DEVICES.map((d) => d.type))].map((type) => [type, TYPE_LABELS[type]]);
+
+/** A device's icon in the menus: a computer's window, a tablet, or a phone. */
+export const deviceIcon = (d: Device) => (d.type === 'desktop' ? 'computer' : d.displays[0].w >= 600 ? 'tablet' : 'smartphone');
+
+/**
+ * The device the canvas opens on: the app's own (appConfig.devices `default`), else the iPhone 17 Pro, or the app's
+ * first target when it isn't one.
+ */
+export const DEFAULT_DEVICE = [appConfig.devices?.default, 'ip17'].find((id) => id && DEVICES.some((d) => d.id === id)) ?? DEVICES[0].id;
 
 /** Compare's presets the app's devices fill: none empty, none that would show them all again besides All devices. */
 export const DEVICE_GROUPS: DeviceGroup[] = GROUPS.filter((g) => {

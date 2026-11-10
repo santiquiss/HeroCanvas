@@ -8,14 +8,14 @@ import { ChangesMenu, HighlightButton } from './ChangesMenu';
 import { useUrlState } from './SimContext';
 import { useProposalParam } from '../tools/ProposalPanel';
 import { ProposalMenu } from './ProposalMenu';
-import { VersionButton } from './Changelog';
+import { ProjectMenu } from './ProjectMenu';
 import { useCommentsUi } from '../comments';
 import { t } from '../i18n/ui';
 import { useGalleryRoute } from '../gallery/route';
 import { ShareMenu } from '../share/ShareMenu';
 import { ViewBadge } from '../share/ViewBadge';
 import { can } from '../share/view';
-import { toolsOn } from '../tools/PanelHost';
+import { useToolsOn } from '../tools/PanelHost';
 import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
@@ -49,18 +49,20 @@ export function Toolbar(props: ToolbarProps) {
     setCommenting(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [capture]);
+  // The panels this view shows (none on a side: no toggle for it).
+  const leftTools = useToolsOn('left', props.mode).length;
+  const rightTools = useToolsOn('right', props.mode).length;
   return (
     <div className={styles.toolbar}>
       {/* Each panel's toggle at its own edge, as in Figma. */}
       {/* No panel on the left in this view (a guest's link without Pages): no toggle for it. */}
-      {toolsOn('left', props.mode).length > 0 && (
+      {leftTools > 0 && (
         <button className={styles.panelBtn} title={t('Toggle left panel')} onClick={props.onToggleLeft}>
           <Icon name={props.leftOpen ? 'left_panel_close' : 'left_panel_open'} size={18} />
         </button>
       )}
-      {/* The logo, the modes and HeroCanvas's own version are the rail's (ModeRail); this copy's version stays here,
-          opening its changelog. */}
-      {can('about') && <VersionButton />}
+      {/* The logo, the modes and the versions are the rail's (ModeRail); here, with more than one, the project. */}
+      {can('about') && <ProjectMenu />}
       {can('proposals') && (
         <>
           <ProposalMenu />
@@ -97,7 +99,7 @@ export function Toolbar(props: ToolbarProps) {
       {/* Capture's picture is exported, not linked: a link here wouldn't bring it. */}
       {!capture && can('share') && <ShareMenu />}
       {/* No panel on the right in this view (a guest's): no toggle for it. */}
-      {toolsOn('right', props.mode).length > 0 && (
+      {rightTools > 0 && (
         <button className={styles.panelBtn} title={t('Toggle right panel')} onClick={props.onToggleRight}>
           <Icon name={props.rightOpen ? 'right_panel_close' : 'right_panel_open'} size={18} />
         </button>

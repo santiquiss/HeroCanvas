@@ -19,6 +19,7 @@ export { hasSymbol, Icon } from './components/Icon';
 // The simulator, as a screen sees it: its layout and state, the language, the navigation.
 export { liveSearch, useHeaderInset, usePadB, usePadL, usePadR, useScreenInsets, useSharedState, useSim, useUrlNumber, useUrlParams, useUrlPatch, useUrlState } from './sim/SimContext';
 export { useBackHandler } from './sim/back';
+export { ScreenSource, type ScreenSourceInfo } from './sim/screenSource';
 export { holdKeyboard, inputBar, KEYBOARD_GAP, ownsFocus, useKeyboardInset } from './sim/keyboard';
 export { useAppControl, usePersona } from './sim/persona';
 export { useLanguage } from './sim/language';
@@ -45,7 +46,7 @@ export { DEVELOPER_HIDDEN } from './sim/developerHidden';
 export type { DropDownAlign } from './sim/DropDownLayer';
 export { EASE, KEYBOARD_MOTION, KEYBOARD_MS, PAGE_MS } from './sim/motion';
 export { computeLayout, CONTENT_MAX_W, SEARCH_BAR_H, TAB_BAR_ROOM, tallSheetTop, tasksKeepNav, type Layout } from './sim/layout';
-export { findDevice, findDisplay, type Display } from './devices/devices';
+export { findDevice, findDisplay, pointerOf, type Display, type Pointer } from './devices/devices';
 export { PreviewScreen } from './flow/previewScreenApi';
 export { RAIL_PARAM } from './design/overridableRegistry';
 

@@ -6,6 +6,41 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.55.0 — 2026-11-10
+
+- **Projects**: a copy can hold more than one app (`herocanvas.config.ts` `projects`, `scripts/vite/projects.ts`). The
+  first is the copy's own (`app/`, `proposals/`) at the site's root; each other lives in `<dir>/app` and
+  `<dir>/proposals` and is served at `/<id>/`: `npm run dev` serves them all on one port (each its own Vite, its HMR
+  at its own path), `vite build` builds each into `dist/<id>/`, `npm test` runs each (`HC_PROJECT=<id>`: its own tests
+  and the smoke test), `npm run shot -- … --project <id>`. A project can share another's components, theme and
+  connectors (`shares`); nothing else crosses: proposals (`@proposals`), what the browser keeps (`projectKey`,
+  `src/project.ts`), comments (a `project` column), the dev server's writes. Proposal codes are the copy's: an
+  author's series goes on across projects. The toolbar's menu at the top left goes from one to another.
+- **The copy's version in the mode rail**, under the logo (its changelog opens beside it); the toolbar's top left is the
+  project menu.
+- **Desktop**: browser windows for a web app (Laptop 1280, Desktop 1440, Desktop 1920; os `web`, type `desktop`): the
+  browser's toolbar where a phone's status bar is (the app's address, `appConfig.url`), no keyboard on screen, no
+  rotation, no 3D body in Capture. Only for an app that targets them.
+- **A mouse or a finger** (`data-pointer` on the screen's root and the gallery's: `fine` in a browser window,
+  `coarse` on phones, foldables and tablets; `pointerOf`, from `herocanvas`): an app's components adapt to a mouse by
+  it (a smaller touch target, a hover, a focus ring), as Flutter's desktop density does. A browser window keeps the
+  mouse's own pointer and its hover, not the simulator's fingertip.
+- **Pushed pages as whole pages** (`appConfig.layout.splitPushes: false`): on a wide screen a pushed page covers the
+  one that pushed it instead of opening beside it (a web app's pages, each its own address).
+
+### Contract
+
+- `appConfig.devices.types` takes `'desktop'`, `platforms` takes `'web'`, and the order of `types` is the device menus'
+  order; `devices.default` is the device the canvas opens on. With no `types`, an app gets phones, foldables and
+  tablets as before (never a browser window).
+- `appConfig.web`: a web app; `appConfig.url`: its address in the browser's toolbar.
+- `Layout['os']` can be `'web'`: code that maps every OS (a record per OS) needs a value for it, or to leave it out.
+- Comments with a shared store: run `src/comments/supabase.sql` again (it adds `project`) before deploying a copy with
+  more than one project.
+- New (optional): `ScreenLayout.splitPushes` (true by default: nothing to adapt).
+- New: `pointerOf` and `Pointer` from `herocanvas`, and `data-pointer` on the screen's root (nothing to adapt).
+- `/__hc/*` is under the project's base (`import.meta.env.BASE_URL + '__hc/…'`); a tool's own call to it uses that.
+
 ## 0.54.0 — 2026-11-04
 
 - **Highlight changes compares the screen with Live's**: on a screen the proposal changes, the same screen is drawn in

@@ -4,9 +4,17 @@ import { ALL_DEVICES, platformOf, targetDevices } from './devices';
 
 const ids = (t: Parameters<typeof targetDevices>[0]) => targetDevices(t).map((d) => d.id);
 
+const MOBILE = ALL_DEVICES.filter((d) => d.type !== 'desktop').map((d) => d.id);
+
 describe('targetDevices', () => {
-  it('keeps every device with no targets', () => {
-    expect(ids(undefined)).toEqual(ALL_DEVICES.map((d) => d.id));
+  it('keeps every phone, foldable and tablet with no targets', () => {
+    expect(ids(undefined)).toEqual(MOBILE);
+  });
+  it('keeps browser windows only for an app that asks, listed in its kinds’ order', () => {
+    const kept = targetDevices({ types: ['desktop', 'phone'] });
+    expect(kept[0].type).toBe('desktop');
+    expect(new Set(kept.map((d) => d.type))).toEqual(new Set(['desktop', 'phone']));
+    expect(kept.filter((d) => d.type === 'desktop').every((d) => platformOf(d) === 'web')).toBe(true);
   });
   it('keeps iPhones and iPads for iOS', () => {
     const kept = targetDevices({ platforms: ['ios'] });
@@ -23,6 +31,6 @@ describe('targetDevices', () => {
     expect(new Set(kept.map(platformOf))).toEqual(new Set(['ios', 'android']));
   });
   it('never empties the menus', () => {
-    expect(targetDevices({ platforms: ['windows' as 'ios'] }).length).toBe(ALL_DEVICES.length);
+    expect(ids({ platforms: ['windows' as 'ios'] })).toEqual(MOBILE);
   });
 });

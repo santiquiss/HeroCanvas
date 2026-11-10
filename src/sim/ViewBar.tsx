@@ -4,17 +4,10 @@
 // right. Each mode shows what applies to it. Whether a page supports landscape is page
 // config: Page panel → Orientation.
 import { Icon } from '../components/Icon';
-import { DEVICE_GROUPS, DEVICES, deviceGroup, foldOf, type Device, type DeviceType, type Display } from '../devices/devices';
+import { DEVICE_GROUPS, DEVICE_TYPES, DEVICES, deviceGroup, deviceIcon, foldOf, type Device, type Display } from '../devices/devices';
 import type { Mode } from './modes';
 import { t } from '../i18n/ui';
 import styles from './Toolbar.module.css';
-
-/** Device menu groups. */
-const DEVICE_TYPES: [DeviceType, string][] = [
-  ['phone', t('Phones')],
-  ['foldable', t('Foldables')],
-  ['tablet', t('Tablets')],
-];
 
 /** Room the canvas keeps for the bar at its top. */
 export const VIEW_BAR_H = 64;
@@ -86,10 +79,10 @@ export function ViewBar(p: ViewBarProps) {
         </>
       ) : (
         <label className={styles.select}>
-          <Icon name={p.device.displays[0].w >= 600 ? 'tablet' : 'smartphone'} size={18} />
+          <Icon name={deviceIcon(p.device)} size={18} />
           <span>{p.device.name}</span>
           <select value={p.device.id} onChange={(e) => p.onDevice(e.target.value)} title={t('Device')}>
-            {DEVICE_TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
+            {DEVICE_TYPES.map(([type, label]) => (
               <optgroup key={type} label={label}>
                 {DEVICES.filter((d) => d.type === type).map((d) => (
                   <option key={d.id} value={d.id}>

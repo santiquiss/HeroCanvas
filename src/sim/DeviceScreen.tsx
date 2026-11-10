@@ -36,6 +36,7 @@ import { DropDownLayer } from './DropDownLayer';
 import { useSim, type SheetSpec, type SnackbarSpec } from './SimContext';
 import { isTextField, KeyboardInsetCtx, useKeyboardInset } from './keyboard';
 import { CornerStatusImage, HomeIndicator, LandscapeCamera, StatusBar } from './SystemChrome';
+import { pointerOf } from '../devices/devices';
 import { SystemKeyboard } from './SystemKeyboard';
 import { useAccessibility } from './scenario';
 import { isRtl, useLanguage } from './language';
@@ -445,6 +446,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         // Right to left (Arabic, Hebrew…), the screen mirrors: rows, bars and the status bar flip, as iOS and Android do.
         dir={isRtl(language) ? 'rtl' : 'ltr'}
         data-device-screen
+        // A mouse or a finger (devices.ts pointerOf): the app's components adapt to it (their touch targets, hover).
+        data-pointer={pointerOf(L.os)}
         // Lists on iPhone and iPad bounce at their ends (sim/bounce); Android's stop.
         data-bounce={L.os !== 'android' && !L.real ? '' : undefined}
         {...(preview ? {} : captureProps)}
@@ -724,7 +727,8 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
             </span>
           </div>
         )}
-        {kbField && !L.real && <SystemKeyboard os={L.os} design={L.keyboard} land={L.land} open={kbOpen} field={kbField} bottomInset={L.botIn} width={L.vw} height={L.vh} onHeight={setKbH} />}
+        {/* A computer's keyboard is its own: a browser window shows none. */}
+        {kbField && !L.real && L.os !== 'web' && <SystemKeyboard os={L.os} design={L.keyboard} land={L.land} open={kbOpen} field={kbField} bottomInset={L.botIn} width={L.vw} height={L.vh} onHeight={setKbH} />}
         {launch.overlay}
         {!L.real && <LandscapeCamera layout={L} />}
         {!L.real && <HomeIndicator layout={L} />}

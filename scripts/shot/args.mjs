@@ -1,7 +1,7 @@
 // `npm run shot`'s arguments (scripts/shot.mjs): which screens to shoot, how, and the steps before each picture. Pure:
 // argv in, a plan out; the URL each shot opens. Tested in args.test.mjs.
 
-export const DEFAULTS = { scale: 2, theme: 'both', base: null, outDir: 'shots' };
+export const DEFAULTS = { scale: 2, theme: 'both', base: null, project: null, outDir: 'shots' };
 
 /**
  * One shot: `route` (the app's, as the designer's address writes it after `#`: `/today?proposal=PJ-3`), its options
@@ -28,6 +28,7 @@ Options
   --padding <pt>       room around (default 40)
   --gap <pt>           room between the two (default 40)
   --base <url>         the designer (default: this project's dev server, wherever it runs; else one is started)
+  --project <id>       another of the copy's projects (herocanvas.config.ts \`projects\`): its screens, at /<id>/
   --out-dir <folder>   with --batch: where the PNGs go (default shots/)
 
 Steps, in order, before the picture (on every screen)
@@ -42,11 +43,11 @@ Steps, in order, before the picture (on every screen)
 
 const NUM = new Set(['--scale', '--padding', '--gap', '--wait']);
 
-/** argv (after the script) → `{ shots, batch, base, outDir, help }`. Throws with a message on a bad argument. */
+/** argv (after the script) → `{ shots, batch, base, project, outDir, help }`. Throws with a message on a bad argument. */
 export function parseArgs(argv) {
   /** @type {Shot} */
   const shot = { route: '', steps: [] };
-  const out = { shots: [shot], batch: null, base: DEFAULTS.base, outDir: DEFAULTS.outDir, help: false };
+  const out = { shots: [shot], batch: null, base: DEFAULTS.base, project: DEFAULTS.project, outDir: DEFAULTS.outDir, help: false };
   const value = (i, flag) => {
     const v = argv[i + 1];
     if (v === undefined || (v.startsWith('--') && !/^--?\d/.test(v))) throw new Error(`Missing the value of ${flag}`);
@@ -72,6 +73,10 @@ export function parseArgs(argv) {
         break;
       case '--base':
         out.base = value(i++, a);
+        break;
+      case '--project':
+        out.project = value(i++, a);
+        if (!/^[a-z0-9-]+$/.test(out.project)) throw new Error('--project takes a project id (herocanvas.config.ts `projects`)');
         break;
       case '--theme': {
         const t = value(i++, a);

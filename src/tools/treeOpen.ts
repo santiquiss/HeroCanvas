@@ -2,6 +2,7 @@
 // finds the tree as it was. Collapse all / Expand all is remembered per viewer (localStorage), and so are the rows
 // when their keys outlive the page (Pages' ids; Layers' elements only while they're on screen).
 import { useSyncExternalStore } from 'react';
+import { projectKey } from '../project';
 
 /** `default`: each row as the panel opens it; `collapsed` / `expanded`: every row closed / open (Collapse / Expand all). */
 export type TreeMode = 'default' | 'collapsed' | 'expanded';
@@ -36,7 +37,7 @@ const read = (key: string): Saved => {
 export function treeOpen<K extends string>(id: string): TreeOpen<K>;
 export function treeOpen<K extends object>(id: string, opts: { weak: true }): TreeOpen<K>;
 export function treeOpen(id: string, { weak = false } = {}): TreeOpen<string | object> {
-  const KEY = `hc.tree.${id}`;
+  const KEY = projectKey(`hc.tree.${id}`);
   const saved = read(KEY);
   let mode: TreeMode = saved.mode ?? 'default';
   const fresh = () => (weak ? new WeakMap<object, boolean>() : new Map<string, boolean>(saved.rows ?? []));

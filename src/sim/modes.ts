@@ -8,6 +8,7 @@ import { useCallback, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { HOME } from '../nav/home';
 import { SIM_PARAMS } from '../nav/stack';
+import { projectKey } from '../project';
 
 export type Mode = 'prototype' | 'components' | 'flow' | 'tokens' | 'about';
 
@@ -15,9 +16,9 @@ export const MODE_PATHS: Record<Exclude<Mode, 'prototype'>, string> = { componen
 
 /** The tokens' routes: `#/tokens…`, and the gallery's from before (`#/components/tokens…`). */
 export const isTokensPath = (pathname: string) => /^\/(components\/)?tokens(\/|$)/.test(pathname);
-const LAST_PROTO = 'hc.lastProto';
+const LAST_PROTO = projectKey('hc.lastProto');
 /** Each mode's last place (path + query), so switching back returns there: the prototype's screen, the component open. */
-const lastKey = (mode: Mode) => (mode === 'prototype' ? LAST_PROTO : `hc.last.${mode}`);
+const lastKey = (mode: Mode) => (mode === 'prototype' ? LAST_PROTO : projectKey(`hc.last.${mode}`));
 
 export function modeOf(pathname: string): Mode {
   if (isTokensPath(pathname)) return 'tokens';

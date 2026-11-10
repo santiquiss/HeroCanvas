@@ -47,6 +47,11 @@ export function useCommentsUi(): CommentsUi {
   return c;
 }
 
+/** The comment asked to be shown on the canvas (the panel's click), or null: outside the comments' provider too. */
+export function useCommentReveal(): Reveal | null {
+  return useContext(Ctx)?.reveal ?? null;
+}
+
 /** Whether comment mode is on, anywhere (false outside the comments' provider: a frame in Flow or the gallery). */
 export function useCommenting(): boolean {
   return useContext(Ctx)?.commenting ?? false;

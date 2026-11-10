@@ -57,7 +57,9 @@ const CLEAN_EVERY = 100;
 type Chrome = Awaited<ReturnType<typeof launch>>;
 type Page = ShotPage;
 
-export function screenCache(server: ViteDevServer, root: string) {
+export function screenCache(server: ViteDevServer, root: string, appDir = 'app') {
+  // A project beside the first (scripts/vite/projects.ts): its app's folder too.
+  const watched = [...new Set([...WATCHED, appDir])];
   const dir = resolve(root, 'node_modules/.cache/hc-screens');
   mkdirSync(dir, { recursive: true });
   // The cache kept to its size: the pictures shown longest ago go (each one shown is touched, so it's recent).
@@ -80,7 +82,7 @@ export function screenCache(server: ViteDevServer, root: string) {
   let drawn = 0;
   const ignored = (abs: string) => {
     const rel = relative(root, abs).split(sep).join('/');
-    return !WATCHED.some((w) => rel.startsWith(w + '/')) || IGNORED.some((i) => rel.startsWith(i));
+    return !watched.some((w) => rel.startsWith(w + '/')) || IGNORED.some((i) => rel.startsWith(i));
   };
 
   // The app's code, as one hash of its files' sizes and times: worked out again only after a change.
@@ -98,7 +100,7 @@ export function screenCache(server: ViteDevServer, root: string) {
         }
       }
     };
-    for (const w of WATCHED) if (existsSync(resolve(root, w))) walk(resolve(root, w));
+    for (const w of watched) if (existsSync(resolve(root, w))) walk(resolve(root, w));
     return (stamp = h.digest('hex'));
   };
   let staleTimer: ReturnType<typeof setTimeout> | undefined;
@@ -200,7 +202,7 @@ export function screenCache(server: ViteDevServer, root: string) {
     /** The picture of `spec`, drawn if it isn't yet: its key. */
     async screen(spec: ScreenSpec, base: string): Promise<string> {
       const key = createHash('sha1')
-        .update(JSON.stringify([spec.hash, spec.w, spec.h, spec.scale, spec.taps ?? [], spec.scroll ?? [], spec.replace ?? [], codeStamp(), salt]))
+        .update(JSON.stringify([base, spec.hash, spec.w, spec.h, spec.scale, spec.taps ?? [], spec.scroll ?? [], spec.replace ?? [], codeStamp(), salt]))
         .digest('hex');
       const file = join(dir, `${key}.png`);
       if (existsSync(file)) {

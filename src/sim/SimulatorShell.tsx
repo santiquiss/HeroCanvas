@@ -49,6 +49,7 @@ import { AllDevices, allDeviceEntries, allDevicesFit } from './AllDevices';
 import { deviceSetParams, parseDevices, type DeviceItem } from './deviceSet';
 import { AddDeviceButton, DeviceHeader, MultiDevices, multiFit, multiLayouts } from './MultiDevices';
 import { FpsMeter } from './FpsMeter';
+import { ScreenSourceScope } from './screenSource';
 import { usePan } from './usePan';
 import { DEVICE_SORTS, parseZoom, VIEW_BAR_H, ViewBar, ZoomBar, type Arrange, type DeviceSort } from './ViewBar';
 import { TouchPointer } from './TouchPointer';
@@ -56,6 +57,7 @@ import { NO_APP } from '../nav/noApp';
 import { TourBeacons } from '../tour/Beacons';
 import styles from './SimulatorShell.module.css';
 import { t } from '../i18n/ui';
+import { projectKey } from '../project';
 
 /**
  * Measures the stage. A callback ref, because the stage element is replaced when switching
@@ -79,7 +81,7 @@ function useStageSize() {
 }
 
 /** The designer, or just the app at the real size of the device it's opened on (sim/RealShell). */
-const COMPARE_FROM = 'hc.compareFrom';
+const COMPARE_FROM = projectKey('hc.compareFrom');
 /** `?device=` for Compare (All devices). */
 const COMPARE_ALL = 'all';
 
@@ -428,7 +430,7 @@ function DesignerShell() {
                       {frameNode}
                     </CaptureStage>
                   ) : (
-                    <>
+                    <ScreenSourceScope>
                       {frameNode}
                       {/* The device's header above it, as each one of a set has. */}
                       <DeviceHeader
@@ -445,7 +447,7 @@ function DesignerShell() {
                       />
                       <InspectOverlay stage={spacerRef} />
                       <CommentPins stage={spacerRef} />
-                    </>
+                    </ScreenSourceScope>
                   )}
                   {/* + on each side adds a device to compare with (the view becomes a set). */}
                   {!capture && can('compare') && [-1, 1].map((dir) => (
@@ -458,7 +460,7 @@ function DesignerShell() {
                     </span>
                   ))}
                 </div>
-                <StageTouch frame={frameEl} scale={scale} rotated={shownLayout.rotLocked} />
+                <StageTouch frame={frameEl} scale={scale} rotated={shownLayout.rotLocked} mouse={shownLayout.os === 'web'} />
               </div>
             )}
             {mode === 'prototype' && (
@@ -576,11 +578,14 @@ function RevealComment({ update }: { update: (p: Partial<PanelPrefs>) => void })
   return null;
 }
 
-/** The touch pointer, in the prototype outside Inspect and comment mode (they keep their cursor and click instead). */
-function StageTouch({ frame, scale, rotated }: { frame: HTMLElement | null; scale: number; rotated: boolean }) {
+/**
+ * The touch pointer, in the prototype outside Inspect and comment mode (they keep their cursor and click instead); a
+ * browser window (`mouse`) keeps the mouse's own, with its hover.
+ */
+function StageTouch({ frame, scale, rotated, mouse }: { frame: HTMLElement | null; scale: number; rotated: boolean; mouse: boolean }) {
   const { inspect } = useDesignRoot();
   const { commenting } = useCommentsUi();
-  return <TouchPointer frame={frame} enabled={!inspect && !commenting} scale={scale} rotated={rotated} />;
+  return <TouchPointer frame={frame} enabled={!inspect && !commenting && !mouse} scale={scale} rotated={rotated} />;
 }
 
 /**

@@ -4,7 +4,7 @@
 import { TypedNumber } from '../components/TypedNumber';
 import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
-import { DEVICES, foldOf, type Device, type DeviceType, type Display } from '../devices/devices';
+import { DEVICE_TYPES, DEVICES, foldOf, type Device, type Display } from '../devices/devices';
 import type { Layout } from '../sim/layout';
 import panel from '../tools/Panel.module.css';
 import styles from './CapturePanel.module.css';
@@ -25,11 +25,6 @@ import type { InteractionRecording } from './video/useRecording';
 import { plural, t } from '../i18n/ui';
 
 const SCALES = [1, 2, 3, 4];
-const TYPES: [DeviceType, string][] = [
-  ['phone', t('Phones')],
-  ['foldable', t('Foldables')],
-  ['tablet', t('Tablets')],
-];
 
 function download(blob: Blob, name: string) {
   const a = document.createElement('a');
@@ -248,7 +243,7 @@ export function CapturePanel(p: CapturePanelProps) {
           <label className={`${styles.select} ${deviceLocked ? styles.locked : ''}`}>
             <span>{p.device.name}</span>
             <select value={p.device.id} disabled={deviceLocked} onChange={(e) => p.onDevice(e.target.value)}>
-              {TYPES.filter(([type]) => DEVICES.some((d) => d.type === type)).map(([type, label]) => (
+              {DEVICE_TYPES.map(([type, label]) => (
                 <optgroup key={type} label={label}>
                   {DEVICES.filter((d) => d.type === type).map((d) => (
                     <option key={d.id} value={d.id}>

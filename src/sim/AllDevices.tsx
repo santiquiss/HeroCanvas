@@ -4,7 +4,7 @@
 // in all, so a flow can be checked on every size at once. Inspect stays off here; the label opens that device.
 import type { ProposalLayout } from '../proposals/types';
 import { useRef } from 'react';
-import { DEVICES, type Device, type DeviceGroup, type DeviceType, type Display } from '../devices/devices';
+import { DEVICE_TYPES, DEVICES, type Device, type DeviceGroup, type DeviceType, type Display } from '../devices/devices';
 import { DeviceFrame, frameBox } from './DeviceFrame';
 import { computeLayout, type Layout } from './layout';
 import { usePan } from './usePan';
@@ -14,7 +14,8 @@ import { t } from '../i18n/ui';
 
 const LABEL_H = 40;
 const GAP = 40;
-const TYPE_ORDER: DeviceType[] = ['phone', 'foldable', 'tablet'];
+/** All devices' rows: the app's kinds, in its targets' order. */
+const TYPE_ORDER: DeviceType[] = DEVICE_TYPES.map(([type]) => type);
 
 export interface Entry {
   device: Device;

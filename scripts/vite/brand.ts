@@ -7,6 +7,7 @@ import { resolve } from 'node:path';
 import type { Plugin } from 'vite';
 import { flatten, readPng, resize, writePng, type Image } from './png.ts';
 import type { ViewProfile } from '../../src/share/profiles.ts';
+import type { ProjectConfig } from './projects.ts';
 
 export interface HeroCanvasConfig {
   /** Shown in the browser's tab and the rail's logo. */
@@ -25,6 +26,10 @@ export interface HeroCanvasConfig {
    *  as `npm run dev`, sends you there to make one); `profiles`, views a link can open besides HeroCanvas's own
    *  (src/share/profiles.ts). */
   share?: { url?: string; profiles?: Record<string, ViewProfile> };
+  /** The team's apps, when it has more than one (scripts/vite/projects.ts): the first is the copy's own (app/,
+   *  proposals/), each other in a folder of its own and at /<id>/, sharing what `shares` names. The toolbar's menu goes
+   *  from one to another. Unset: the one app at the root. */
+  projects?: ProjectConfig[];
 }
 
 type RGB = [number, number, number];

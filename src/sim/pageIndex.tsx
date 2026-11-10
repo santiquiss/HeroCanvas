@@ -25,6 +25,7 @@ import { computeLayout } from './layout';
 import { whenIdle } from './idle';
 import { liveSearch, SharedSimProvider } from './SimContext';
 import { SHEET_ATTR, SheetLinkScopeCtx, sheetLinkScope } from './sheetLinks';
+import { projectKey } from '../project';
 
 /** A page in one of its variants (its label: "Inbox"), where a component is. */
 export interface PagePlace extends PageRef {
@@ -81,7 +82,7 @@ const done = new Map<string, PageIndex>();
 /** When each design's index was built (ms), cached or now. */
 const builtAt = new Map<string, number>();
 
-const CACHE = (key: string) => `hc.pageIndex.${__BUILD_ID__}.${key}`;
+const CACHE = (key: string) => projectKey(`hc.pageIndex.${__BUILD_ID__}.${key}`);
 /** The design's index from the browser's cache, if this build has one. */
 function cached(key: string): PageIndex | null {
   if (done.has(key)) return done.get(key)!;
@@ -101,7 +102,7 @@ function store(key: string, index: PageIndex) {
   builtAt.set(key, Date.now());
   try {
     // One build's indexes at a time: older builds' go.
-    for (const k of Object.keys(localStorage)) if (k.startsWith('hc.pageIndex.') && !k.startsWith(`hc.pageIndex.${__BUILD_ID__}.`)) localStorage.removeItem(k);
+    for (const k of Object.keys(localStorage)) if (k.startsWith(projectKey('hc.pageIndex.')) && !k.startsWith(CACHE(''))) localStorage.removeItem(k);
     localStorage.setItem(CACHE(key), JSON.stringify({ at: builtAt.get(key), index }));
   } catch {
     /* storage unavailable or full: it's kept for the session */

@@ -1,19 +1,19 @@
-// Proposal registry: every folder in proposals/ (the project's root) with a proposal.json. Picked up automatically.
+// Proposal registry: every folder in the project's proposals/ (`@proposals`: proposals/ at the copy's root, or a
+// project's own, scripts/vite/projects.ts) with a proposal.json. Picked up automatically.
 // A proposal is known by its code (proposals/code.ts), not by its folder: `id` is the code.
 import { PROPOSAL_LOOKUP } from '../design/overridableRegistry';
 import type { ScreenConfig } from '../nav/screenConfig';
 import { parseProposalCode } from './code';
+import { byFolder, folderOf } from './folders';
 import { normalizeMeta, type Proposal, type ProposalCode, type ProposalMeta, type ShowPlace } from './types';
 import { t } from '../i18n/ui';
 
-const metas = import.meta.glob('/proposals/*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>;
-const configs = import.meta.glob('/proposals/*/config.json', { eager: true, import: 'default' }) as Record<string, ScreenConfig>;
-const codes = import.meta.glob('/proposals/*/pages.tsx', { eager: true, import: 'default' }) as Record<string, ProposalCode>;
+const metas = byFolder(import.meta.glob('@proposals/*/proposal.json', { eager: true, import: 'default' }) as Record<string, ProposalMeta>, 'proposal.json');
+const configs = byFolder(import.meta.glob('@proposals/*/config.json', { eager: true, import: 'default' }) as Record<string, ScreenConfig>, 'config.json');
+const codes = byFolder(import.meta.glob('@proposals/*/pages.tsx', { eager: true, import: 'default' }) as Record<string, ProposalCode>, 'pages.tsx');
 /** The components each proposal has stories for, by its folder: a story file is named after its component. Not loaded. */
-const storyFiles = Object.keys(import.meta.glob('/proposals/*/components/*.stories.tsx'));
-const storiesIn = (folder: string) => storyFiles.filter((f) => f.split('/')[2] === folder).map((f) => f.split('/').pop()!.replace(/\.stories\.tsx$/, ''));
-
-const slugOf = (path: string) => path.split('/')[2];
+const storyFiles = Object.keys(import.meta.glob('@proposals/*/components/*.stories.tsx'));
+const storiesIn = (folder: string) => storyFiles.filter((f) => folderOf(f, 'components') === folder).map((f) => f.split('/').pop()!.replace(/\.stories\.tsx$/, ''));
 
 /** `show`'s places, each component's as a list. */
 export const placesOf = (show: ProposalCode['show']): Record<string, ShowPlace[]> =>
@@ -25,10 +25,9 @@ export function proposalShow(p: Proposal, variantId: string | null): Record<stri
 }
 
 export const PROPOSALS: Proposal[] = Object.entries(metas)
-  .map(([path, raw]) => {
-    const folder = slugOf(path);
+  .map(([folder, raw]) => {
     const meta = normalizeMeta(raw);
-    const code = codes[`/proposals/${folder}/pages.tsx`];
+    const code = codes[folder];
     return {
       // Without a code (a proposal.json written by hand: `npm test` fails on it) the folder stands in.
       id: meta.code || folder,
@@ -42,7 +41,7 @@ export const PROPOSALS: Proposal[] = Object.entries(metas)
       widgets: code?.widgets ?? [],
       show: placesOf(code?.show),
       variants: Object.entries(code?.variants ?? {}).map(([vid, v]) => ({ id: vid, ...v })),
-      config: configs[`/proposals/${folder}/config.json`] ?? {},
+      config: configs[folder] ?? {},
       layout: code?.layout ?? {},
     };
   })
@@ -92,12 +91,14 @@ export const highlightOnly = (value: string | null): string | null => (value && 
 export interface PageChangeItem {
   id: string;
   kind: 'new' | 'changed' | 'removed';
-  /** A new step of the page's flow (the page itself changed): its id and label. */
+  /** A new or changed step of the page's flow (the page itself changed): its id and label. */
   step?: { id: string; label: string };
   /** What changed, in a few words each: "Content changed", "Settings changed: links, title", "Layout rules changed: split". */
   details: string[];
   /** Changed only by a component it shows (`show`): where, so opening it opens that state. */
   show?: ShowPlace;
+  /** Every state its change shows in (`show` by the page's id, several screens of one flow): `show` is the first. */
+  places?: ShowPlace[];
 }
 
 export interface ComponentChangeItem {
@@ -166,9 +167,11 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
   // A changed page whose change shows in a state of it (`show` by the page's id: a closing screen, a sheet): opened
   // there, saying what it is, not on its first screen (where nothing differs).
   for (const pg of pages) {
-    const place = !pg.step && pg.kind !== 'removed' ? show[pg.id]?.[0] : undefined;
+    const places = !pg.step && pg.kind !== 'removed' ? show[pg.id] : undefined;
+    const place = places?.[0];
     if (!place) continue;
     pg.show = place;
+    if (places!.length > 1) pg.places = places;
     if (place.label) pg.details.unshift(place.label);
   }
     // A page a changed component shows on (`show`): changed, saying which, in what state.
@@ -180,15 +183,24 @@ export function proposalChanges(p: Proposal, variantId: string | null, basePages
       else if (basePages[place.page]) pages.push({ id: place.page, kind: 'changed', details: [line], show: place });
     }
   }
-  // A flow's new steps: new screens, each its own item (after its page).
+  // A flow's new and changed steps: those screens, each its own item, in the flow's order.
   for (const id of ids) {
     const def = p.pages[id];
     const base = basePages[id] as { flow?: { steps: { id: string }[] } } | undefined;
     if (!def?.flow || !base) continue;
     const had = new Set((base.flow?.steps ?? []).map((st) => st.id));
-    const at = pages.findIndex((pg) => pg.id === id) + 1;
-    const added = def.flow.steps.filter((st) => !had.has(st.id));
-    pages.splice(at, 0, ...added.map((st) => ({ id, kind: 'new' as const, step: { id: st.id, label: st.label }, details: [t('A new step')] })));
+    // Before the page's own item (its states that no step opens alone come after its steps).
+    const at = Math.max(0, pages.findIndex((pg) => pg.id === id));
+    const steps = def.flow.steps.filter((st) => !had.has(st.id) || st.change === 'changed');
+    pages.splice(
+      at,
+      0,
+      ...steps.map((st) =>
+        had.has(st.id)
+          ? { id, kind: 'changed' as const, step: { id: st.id, label: st.label }, details: [t('A changed step')] }
+          : { id, kind: 'new' as const, step: { id: st.id, label: st.label }, details: [t('A new step')] },
+      ),
+    );
   }
   return { components, pages };
 }

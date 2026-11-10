@@ -8,7 +8,7 @@ let status: Promise<boolean> | null = null;
 /** Whether this session can write project files (dev server running). Checked once. */
 export function canWrite(): Promise<boolean> {
   // The dev server's own answer, not any 200: a static host that serves the page for every path answers too.
-  status ??= fetch('/__hc/status', { headers: HEADERS })
+  status ??= fetch(import.meta.env.BASE_URL + '__hc/status', { headers: HEADERS })
     .then((r) => (r.ok ? r.json() : null))
     .then((b: { writable?: boolean } | null) => b?.writable === true)
     .catch(() => false);
@@ -29,12 +29,12 @@ export function useCanWrite(): boolean {
 
 /** Rewrite fields of one page in the manifest (app/pages.tsx). `null` removes a field. */
 export async function patchManifest(page: string, fields: { split?: unknown; sideColumn?: unknown; landscape?: unknown }): Promise<void> {
-  const r = await fetch('/__hc/manifest', { method: 'POST', headers: HEADERS, body: JSON.stringify({ page, ...fields }) });
+  const r = await fetch(import.meta.env.BASE_URL + '__hc/manifest', { method: 'POST', headers: HEADERS, body: JSON.stringify({ page, ...fields }) });
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? `HTTP ${r.status}`);
 }
 
 /** Write a JSON file (path relative to the project root, must be allowed by the dev server). */
 export async function writeJson(path: string, data: unknown): Promise<void> {
-  const r = await fetch('/__hc/write', { method: 'POST', headers: HEADERS, body: JSON.stringify({ path, data }) });
+  const r = await fetch(import.meta.env.BASE_URL + '__hc/write', { method: 'POST', headers: HEADERS, body: JSON.stringify({ path, data }) });
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? `HTTP ${r.status}`);
 }

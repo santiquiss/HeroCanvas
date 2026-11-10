@@ -24,6 +24,7 @@ import { FlowThumb, flowSpecs } from './FlowThumb';
 import { refreshScreens, useCanRefreshScreens, type ScreenSpec } from '../sim/screenStill';
 import styles from './Flow.module.css';
 import { plural, t } from '../i18n/ui';
+import { projectKey } from '../project';
 
 /** Thumbnail scale relative to the device. */
 const S = 0.32;
@@ -43,7 +44,7 @@ const LANE_GAP = 160;
 const FAR_K = 0.35;
 /** How much a constant-size label may grow on the canvas (far out it stops: it would cover its neighbours). */
 const MAX_INV = 3.5;
-const VIEW_KEY = 'hc.flowView';
+const VIEW_KEY = projectKey('hc.flowView');
 /** A pan or zoom is done once nothing has moved for this long: then the view is saved (state, storage, the % shown). */
 const SETTLE_MS = 160;
 

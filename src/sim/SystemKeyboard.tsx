@@ -9,12 +9,14 @@ import styles from './SystemKeyboard.module.css';
 
 type Field = HTMLInputElement | HTMLTextAreaElement;
 type Layer = 'letters' | 'numbers' | 'symbols';
+/** The systems with a keyboard on screen (a browser window's is the computer's). */
+type KeyboardOS = Exclude<DeviceOS, 'web'>;
 
 /**
  * Rows per OS and layer. Specials are tokens: ⇧ shift, ⌫ delete, ⏎ return, ␣ space, ☺ emoji, 🌐 globe, 🎤 mic,
  * ⌨ hide, →123 / →ABC / →#+= switch layers, ·N indents a row by N key widths.
  */
-const ROWS: Record<DeviceOS, Record<Layer, string[][]>> = {
+const ROWS: Record<KeyboardOS, Record<Layer, string[][]>> = {
   ios: {
     letters: [[...'qwertyuiop'], ['·0.5', ...'asdfghjkl', '·0.5'], ['⇧', '·0.15', ...'zxcvbnm', '·0.15', '⌫'], ['→123', '☺', '␣', '⏎']],
     numbers: [[...'1234567890'], [...'-/:;()$&@"'], ['→#+=', '·0.15', ...".,?!'", '·0.15', '⌫'], ['→ABC', '☺', '␣', '⏎']],
@@ -35,7 +37,7 @@ const ROWS: Record<DeviceOS, Record<Layer, string[][]>> = {
 };
 
 /** Widths in key units; letters are 1. */
-const WIDTH: Record<DeviceOS, Record<string, number>> = {
+const WIDTH: Record<KeyboardOS, Record<string, number>> = {
   // iOS 26 at 393pt: letters 32, shift / delete 44, 123 and emoji 42, return 90, space the rest (187).
   ios: { '⇧': 1.375, '⌫': 1.375, '→#+=': 1.375, '→123': 1.31, '→ABC': 1.31, '☺': 1.31, '⏎': 2.81, '␣': 5.84 },
   android: { '⇧': 1.5, '⌫': 1.5, '→#+=': 1.5, '→123': 1.5, '→ABC': 1.5, '☺': 1, '⏎': 1.5, '␣': 4 },
@@ -112,7 +114,7 @@ const IOS_PAD_LETTERS: Record<string, string> = { '2': 'ABC', '3': 'DEF', '4': '
 const ANDROID_PAD = ['1', '2', '3', '-', '4', '5', '6', '␣', '7', '8', '9', '⌫', ',', '0', '.', '⏎'];
 
 /** Email fields: @ and . beside a shorter space (letters layer's last row). */
-const EMAIL_ROW: Record<DeviceOS, string[]> = {
+const EMAIL_ROW: Record<KeyboardOS, string[]> = {
   ios: ['→123', '☺', '␣', '@', '.', '⏎'],
   android: ['→123', '@', '☺', '␣', '.', '⏎'],
   ipad: ['→123', '☺', '@', '␣', '.', '→123ʳ', '⌨'],
@@ -129,7 +131,7 @@ const EMAIL_ROW: Record<DeviceOS, string[]> = {
  *   iPadOS: its return key, where Apple keeps it (the right end of the middle row).
  */
 const ACTION_LABEL = 'Continue';
-const ACTION_W: Record<DeviceOS, Record<string, number>> = {
+const ACTION_W: Record<KeyboardOS, Record<string, number>> = {
   // Measured on the iOS 26 keyboard with a Continue key, in letter-key widths.
   ios: { '→123': 1.83, '→ABC': 1.83, '␣': 4.88, '.': 1.48, '@': 1.48, '⏎': 3.48 },
   android: { '⏎': 2.6, '␣': 2.9 },
@@ -194,7 +196,7 @@ function duoRows(layer: Layer, email: boolean, inRow: boolean): string[][] {
 }
 
 interface Props {
-  os: DeviceOS;
+  os: KeyboardOS;
   /** The display's own keyboard (the iPhone Duo's), instead of its OS's. */
   design?: KeyboardDesign;
   land: boolean;
@@ -212,7 +214,7 @@ interface Props {
 export function SystemKeyboard({ os: deviceOS, design, land, open, field, bottomInset, width, height, onHeight }: Props) {
   // The Duo's keyboard is an iPhone's (its keys, glyphs and colors), at its own geometry.
   const duo = design ? DUO[`${design}-${land ? 'land' : 'port'}`] : null;
-  const os: DeviceOS = duo ? 'ios' : deviceOS;
+  const os: KeyboardOS = duo ? 'ios' : deviceOS;
   const [layer, setLayer] = useState<Layer>('letters');
   const [shift, setShift] = useState<'off' | 'once' | 'lock'>('off');
   const lastShift = useRef(0);

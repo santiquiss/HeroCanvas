@@ -7,7 +7,7 @@ import { NO_APP } from '../nav/noApp';
 import kitCss from '../kit/tokens.css?raw';
 import tourCss from '../tour/theme.css?raw';
 
-const appFiles = import.meta.glob(['@app/**/theme.css', '@app/theme/**/*.css'], { eager: true, query: '?raw', import: 'default' }) as Record<string, string>;
+const appFiles = import.meta.glob(['@shared/theme/**/*.css', '@app/**/theme.css', '@app/theme/**/*.css'], { eager: true, query: '?raw', import: 'default' }) as Record<string, string>;
 
 /** The app's token stylesheets (the tour's with no app), after the kit's. */
 export const TOKEN_CSS: string[] = [kitCss, ...(NO_APP ? [tourCss] : Object.values(appFiles))];

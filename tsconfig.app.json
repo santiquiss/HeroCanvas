@@ -28,8 +28,9 @@
       "herocanvas": ["./src/index.ts"],
       "herocanvas/ios": ["./src/ios/index.tsx"],
       "@app": ["./app/index.ts"],
-      "@app/*": ["./app/*"]
+      "@app/*": ["./app/*"],
+      "@proposals/*": ["./proposals/*"]
     }
   },
-  "include": ["src", "app", "proposals"]
+  "include": ["src", "app", "proposals", "pro"]
 }

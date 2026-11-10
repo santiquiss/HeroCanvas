@@ -33,6 +33,8 @@ export interface ToolDef {
   whileInspecting?: boolean;
   /** Drawn in its tab after the title: something to see without opening it (the proposal's change counts). */
   badge?: ComponentType;
+  /** Only where the files can be written (the dev server): out of sight on the published site, view only. */
+  editing?: boolean;
 }
 
 export const TOOLS: ToolDef[] = [

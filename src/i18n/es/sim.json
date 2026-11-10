@@ -172,5 +172,10 @@
   "New": "Nuevo",
   "Changed": "Modificado",
   "New on this screen: Live doesn’t have it": "Nuevo en esta pantalla: Live no lo tiene",
-  "Changed on this screen: Live shows it otherwise": "Cambiado en esta pantalla: Live lo muestra distinto"
+  "Changed on this screen: Live shows it otherwise": "Cambiado en esta pantalla: Live lo muestra distinto",
+  "Window": "Ventana",
+  "Desktop": "Escritorio",
+  "Project: which of the team’s apps": "Proyecto: cuál de las apps del equipo",
+  "Projects": "Proyectos",
+  "Opens where it’s edited": "Abre donde se edita"
 }

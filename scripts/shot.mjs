@@ -64,6 +64,8 @@ async function main() {
   const shots = args.batch ? batchShots(JSON.parse(await readFile(args.batch, 'utf8'))) : args.shots;
 
   const app = await designer(args.base);
+  // Another project of the copy: the same server, at its own address.
+  if (args.project) app.base = `${app.base.replace(/\/+$/, '')}/${args.project}/`;
   const browser = await launch();
   let failed = 0;
   try {

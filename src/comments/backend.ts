@@ -9,6 +9,7 @@
 import { sha256Hex } from './owner';
 import type { Comment } from './types';
 import { t } from '../i18n/ui';
+import { PROJECT, PROJECTS, projectKey } from '../project';
 
 export interface Backend {
   /** `shared`: everyone sees the same comments; `local`: only this browser. */
@@ -42,7 +43,12 @@ interface Row {
   owner?: string | null;
   edited_at?: string | null;
   mentions?: string[] | null;
+  /** The copy's project (herocanvas.config.ts `projects`): '' for its first. */
+  project?: string;
 }
+
+/** This project's comments: '' for the copy's first (and every comment from before projects), another's id. */
+const PROJECT_ID = PROJECT.root ? '' : PROJECT.id;
 
 const fromRow = (r: Row): Comment => ({
   id: r.id,
@@ -78,6 +84,8 @@ const toRow = (c: Comment): Row => ({
   resolved_at: c.resolvedAt,
   resolved_by: c.resolvedBy,
   owner: c.owner ?? null,
+  // Only beside the first project: a table from before projects (supabase.sql) still takes the first's.
+  ...(PROJECT_ID ? { project: PROJECT_ID } : {}),
   // Only when it mentions someone: a table from before mentions (supabase.sql) still takes every other comment.
   ...(c.mentions?.length ? { mentions: c.mentions } : {}),
 });
@@ -97,16 +105,18 @@ export function supabaseBackend(url: string, key: string): SharedBackend {
     return r;
   };
   const rpc = (fn: string, args: Record<string, unknown>) => call(`/rpc/${fn}`, { method: 'POST', body: JSON.stringify(args) });
+  // Only this project's; the first's (a table from before projects has no column) asks for none while it's alone.
+  const ofProject = PROJECT_ID || PROJECTS.length > 1 ? `project=eq.${encodeURIComponent(PROJECT_ID)}&` : '';
   const resolve = (id: string, by: string | null, at: string | null) =>
     call(`/comments?id=eq.${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ resolved_at: at, resolved_by: by }) });
   return {
     kind: 'shared',
     async list(design) {
-      const r = await call(`/comments?design=eq.${encodeURIComponent(design)}&order=created_at.asc&limit=2000`);
+      const r = await call(`/comments?${ofProject}design=eq.${encodeURIComponent(design)}&order=created_at.asc&limit=2000`);
       return ((await r.json()) as Row[]).map(fromRow);
     },
     async listAll() {
-      const r = await call('/comments?order=created_at.asc&limit=5000');
+      const r = await call(`/comments?${ofProject}order=created_at.asc&limit=5000`);
       return ((await r.json()) as Row[]).map(fromRow);
     },
     async add(c) {
@@ -145,7 +155,7 @@ export function supabaseBackend(url: string, key: string): SharedBackend {
 }
 
 /** Where a browser keeps its comments while no shared store is connected (localBackend). */
-const LOCAL_KEY = 'hc.comments';
+const LOCAL_KEY = projectKey('hc.comments');
 
 /**
  * The comments this browser kept before the shared store was connected, sent to it: everyone sees them from then on.

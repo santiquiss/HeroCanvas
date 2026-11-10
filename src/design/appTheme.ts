@@ -4,7 +4,11 @@
 import { NO_APP } from '../nav/noApp';
 import tourCss from '../tour/theme.css?raw';
 
-const appCss = Object.values(import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>).join('\n');
+// A project that shares another's theme (scripts/vite/projects.ts): that one first, its own over it.
+const appCss = Object.values({
+  ...import.meta.glob('@shared/theme/**/theme.css', { eager: true, query: '?raw', import: 'default' }),
+  ...import.meta.glob('@app/**/theme.css', { eager: true, query: '?raw', import: 'default' }),
+} as Record<string, string>).join('\n');
 
 export const APP_THEME_CSS: string = NO_APP ? tourCss : appCss;
 

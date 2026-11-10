@@ -365,6 +365,15 @@
   color: var(--hc-canvas-text);
   white-space: nowrap;
 }
+/* What draws the screen when it isn't the app (screenSource): its logo, small and quiet beside the name. */
+.devSource {
+  text-decoration: none;
+}
+.devSourceLogo {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
 .devNameText {
   min-width: 0;
   overflow: hidden;

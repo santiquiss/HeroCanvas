@@ -1,10 +1,11 @@
 // The designer's mode rail (Preline's mini sidebar, our way): a column at the left edge, light like the toolbar, with the logo at the top
 // and the modes as icons below it. A mode's name shows in a tooltip beside it on hover or keyboard focus (its
 // aria-label too); the current one is lit. At the bottom, HeroCanvas itself (ⓘ: the About page, its version in the
-// tooltip; the rail is too narrow for any version number) over the interface's light / dark switch (uiTheme). Capture is the prototype's (`?capture=1`), listed as one more mode.
+// tooltip) over the interface's light / dark switch (uiTheme); under the logo, this copy's version, small. Capture is the prototype's (`?capture=1`), listed as one more mode.
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
+import { VersionButton } from './Changelog';
 import type { Mode } from './modes';
 import { setUiTheme, useUiTheme } from './uiTheme';
 import { t } from '../i18n/ui';
@@ -68,6 +69,8 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
           <img src={`${import.meta.env.BASE_URL}assets/logo-64.png`} alt="HeroCanvas" width={28} height={28} style={{ borderRadius: 7 }} />
         </span>
       )}
+      {/* This copy's version under the logo, opening its changelog. */}
+      {can('about') && <VersionButton rail />}
       <ul className={styles.items}>
         {/* A guest's view keeps only its modes; with one, the rail lists none. */}
         {RAIL_MODES.length > 1 && RAIL_MODES.map(({ mode: m, label, icon }) => (

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_DEVICES as DEVICES } from '../devices/devices';
+import { ALL_DEVICES } from '../devices/devices';
 import { computeLayout } from '../sim/layout';
 import { deviceMesh, radiiOf } from './body';
 import { DEVICE_MODELS } from './models';
+
+// A browser window (desktop) has no body: Capture draws it flat.
+const DEVICES = ALL_DEVICES.filter((d) => d.type !== 'desktop');
 
 describe('the devices’ 3D models', () => {
   it('cover every device and display, with colors', () => {

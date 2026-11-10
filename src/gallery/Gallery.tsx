@@ -27,6 +27,10 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import styles from './Gallery.module.css';
 import { TokensView } from './TokensView';
 import { plural, t } from '../i18n/ui';
+import { DEFAULT_DEVICE, findAnyDevice, pointerOf } from '../devices/devices';
+
+/** The gallery's components as the app's first device uses them: with a mouse for a web app, a finger else. */
+const GALLERY_POINTER = pointerOf(findAnyDevice(DEFAULT_DEVICE).displays[0].os);
 
 export function Gallery() {
   const { name, tokens } = useGalleryRoute();
@@ -48,7 +52,7 @@ export function Gallery() {
       ) : (
         // The canvas comments are left on (comments/anchor): each example a page of the component's.
         <div className={styles.scroll} {...screenAttrs(GALLERY_SCREEN)}>
-          <div ref={setRoot} data-theme={theme} data-app-theme={appTheme?.id} lang={language} {...captureProps} className={styles.root} style={{ cursor: inspect ? 'crosshair' : undefined }}>
+          <div ref={setRoot} data-theme={theme} data-app-theme={appTheme?.id} data-pointer={GALLERY_POINTER} lang={language} {...captureProps} className={styles.root} style={{ cursor: inspect ? 'crosshair' : undefined }}>
             {name ? mod ? <ComponentPage key={name} mod={mod} /> : <Missing name={name} /> : <Overview />}
           </div>
         </div>

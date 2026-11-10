@@ -5,10 +5,17 @@ import { useDesignRoot } from '../design/DesignContext';
 import { useSimQuery, type Mode } from '../sim/modes';
 import { TOOLS } from './registry';
 import { showsTool } from '../share/view';
+import { useCanWrite } from '../persist/devApi';
 
 /** A side's tools in a mode, those the view keeps (a guest's: src/share/view.ts). */
 export const toolsOn = (side: 'left' | 'right', mode: Mode) =>
   TOOLS.filter((t) => t.side === side && (t.modes ?? ['prototype', 'components']).includes(mode) && showsTool(t.id));
+
+/** The side's tools shown here: those for editing only where the files can be written. */
+export function useToolsOn(side: 'left' | 'right', mode: Mode) {
+  const writable = useCanWrite();
+  return toolsOn(side, mode).filter((t) => !t.editing || writable);
+}
 import styles from './Panel.module.css';
 import { t } from '../i18n/ui';
 
@@ -71,7 +78,7 @@ export function PanelHost({
   only?: string[];
 }) {
   const { inspect } = useDesignRoot();
-  const onSide = toolsOn(side, mode).filter((t) => !only || only.includes(t.id));
+  const onSide = useToolsOn(side, mode).filter((t) => !only || only.includes(t.id));
   const inspector = inspect ? onSide.filter((t) => t.whileInspecting) : [];
   // The tab that was active comes back when Inspect ends: the inspector never becomes the remembered tool.
   const tools = inspector.length ? inspector : onSide.filter((t) => !t.whileInspecting);

@@ -34,6 +34,11 @@ alter table public.comments add column if not exists edited_at timestamptz;
 
 create index if not exists comments_design on public.comments (design, created_at);
 
+-- 0.53.0: the copy's project it was left on (herocanvas.config.ts `projects`): '' for its first (every comment left
+-- before), another's id. Each project reads only its own.
+alter table public.comments add column if not exists project text not null default '' check (project ~ '^[a-z0-9-]{0,40}$');
+create index if not exists comments_project on public.comments (project, design, created_at);
+
 alter table public.comments enable row level security;
 
 -- Only what the plugin needs: read, add, and the two columns of resolving.
@@ -126,7 +131,8 @@ begin
   msg := who || ' ' || replace(replace(replace(new.author, '&', '&amp;'), '<', '&lt;'), '>', '&gt;') || ' mentioned you in *'
     || case when new.design = 'live' then 'Live' else new.design end || ' · ' || new.page || E'*\n> ' || replace(said, E'\n', E'\n> ');
   if site is not null then
-    msg := msg || E'\n<' || rtrim(site, '/') || '/#' || new.link || case when position('?' in new.link) > 0 then '&' else '?' end || 'comment=' || new.id || '|Open the comment>';
+    -- A project beside the first is at its own address (/<id>/).
+    msg := msg || E'\n<' || rtrim(site, '/') || '/' || case when new.project <> '' then new.project || '/' else '' end || '#' || new.link || case when position('?' in new.link) > 0 then '&' else '?' end || 'comment=' || new.id || '|Open the comment>';
   end if;
   perform net.http_post(url := hook, body := jsonb_build_object('text', msg), headers := '{"Content-Type": "application/json"}'::jsonb);
   return new;

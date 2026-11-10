@@ -93,7 +93,7 @@ export const useCanRefreshScreens = () => useSource()?.kind === 'dev';
 
 /** Every picture drawn again by the dev server (one whose data isn't in its code: a date, a fetched image). */
 export async function refreshScreens() {
-  await fetch('/__hc/screens/refresh', { method: 'POST', headers: { 'x-hc': '1' } }).catch(() => {});
+  await fetch(import.meta.env.BASE_URL + '__hc/screens/refresh', { method: 'POST', headers: { 'x-hc': '1' } }).catch(() => {});
 }
 
 // A few at a time: the browser's connections are the page's too.
@@ -117,7 +117,7 @@ function drawn(spec: ScreenSpec): Promise<string> {
   let p = asked.get(key);
   if (!p) {
     p = inTurn(async () => {
-      const r = await fetch('/__hc/screen', { method: 'POST', headers: { 'x-hc': '1', 'content-type': 'application/json' }, body: key });
+      const r = await fetch(import.meta.env.BASE_URL + '__hc/screen', { method: 'POST', headers: { 'x-hc': '1', 'content-type': 'application/json' }, body: key });
       if (!r.ok) throw new Error(`screen: ${r.status}`);
       const { src } = (await r.json()) as { src: string };
       const img = new Image();

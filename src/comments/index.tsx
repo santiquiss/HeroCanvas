@@ -10,7 +10,7 @@ import styles from './CommentsEager.module.css';
 import { plural } from '../i18n/ui';
 import { can } from '../share/view';
 
-export { CommentsProvider, useCommenting, useCommentsUi } from './CommentsContext';
+export { CommentsProvider, useCommenting, useCommentReveal, useCommentsUi } from './CommentsContext';
 
 const Layer = lazy(() => import('./CommentLayer'));
 const Panel = lazy(() => import('./CommentsPanel'));

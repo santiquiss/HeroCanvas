@@ -390,3 +390,28 @@
   color: var(--ui-text-muted);
 }
 
+/* A mode's main action in the toolbar (App Store Assets' Export): the brand's button, as Share is elsewhere. */
+.mainAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 112px;
+  min-height: 30px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--hc-brand);
+  color: var(--hc-on-brand);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mainAction:hover:not(:disabled) {
+  background: var(--hc-brand-hover);
+}
+.mainAction:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

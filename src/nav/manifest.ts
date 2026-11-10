@@ -45,3 +45,9 @@ export function newSteps(id: string, p: Proposal | null): string[] {
   const had = new Set((base.flow?.steps ?? []).map((st) => st.id));
   return def.flow.steps.filter((st) => !had.has(st.id)).map((st) => st.id);
 }
+
+/** What a proposal does to one step of a page's flow: adds it (new), changes its screen (its flow says so), or nothing. */
+export function stepChange(id: string, stepId: string, p: Proposal | null): 'new' | 'changed' | null {
+  if (newSteps(id, p).includes(stepId)) return 'new';
+  return p?.pages[id]?.flow?.steps.find((st) => st.id === stepId)?.change ?? null;
+}

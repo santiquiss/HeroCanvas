@@ -16,7 +16,7 @@ export interface LiveTicket {
   summary?: string;
 }
 
-const files = import.meta.glob('/proposals/tickets.json', { eager: true, import: 'default' }) as Record<string, LiveTicket[]>;
+const files = import.meta.glob('@proposals/tickets.json', { eager: true, import: 'default' }) as Record<string, LiveTicket[]>;
 
 /** Live's tickets, the newest first. */
 export const LIVE_TICKETS: LiveTicket[] = [...(Object.values(files)[0] ?? [])].sort((a, b) => b.created.localeCompare(a.created));

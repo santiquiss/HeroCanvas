@@ -25,6 +25,8 @@ export interface LayoutInput {
   tabBarHeight?: number;
   /** The navigation floats over the pages (ScreenLayout.navOverPages). */
   navOverPages?: boolean;
+  /** Pushed pages open beside their page on wide screens (ScreenLayout.splitPushes, true by default). */
+  splitPushes?: boolean;
 }
 
 /** The tablet rail's width in Live (NavigationRail: its column of 48 and the room around it). */
@@ -147,8 +149,10 @@ export interface Layout {
   real: boolean;
 }
 
-const SB_H: Record<DeviceOS, number> = { ios: 54, android: 48, ipad: 24 };
-const BOT_IN: Record<DeviceOS, number> = { ios: 34, android: 24, ipad: 20 };
+/** A browser window's toolbar (its tab, its address): where a phone's status bar is, drawn by StatusBar. */
+export const BROWSER_BAR_H = 44;
+const SB_H: Record<DeviceOS, number> = { ios: 54, android: 48, ipad: 24, web: BROWSER_BAR_H };
+const BOT_IN: Record<DeviceOS, number> = { ios: 34, android: 24, ipad: 20, web: 0 };
 const COLUMN_W = 86;
 /** Space between side-by-side panes (list–detail, the split panel, a side panel), unless the display sets `columnGap`. */
 export const COLUMN_GAP = 24;
@@ -231,7 +235,7 @@ export const ISLAND_W = 124;
 /** The notch's width (iPhone 16e): 162×34 hanging from the top edge. */
 export const NOTCH_W = 162;
 
-export function computeLayout({ display: full, land: wantLand, supported, detailOpen, video = false, railWidth = RAIL_W, splitGap, userInRail = false, compactOnly = false, tabBarHeight, navOverPages = false }: LayoutInput): Layout {
+export function computeLayout({ display: full, land: wantLand, supported, detailOpen, video = false, railWidth = RAIL_W, splitGap, userInRail = false, compactOnly = false, tabBarHeight, navOverPages = false, splitPushes = true }: LayoutInput): Layout {
   const land = wantLand && supported;
   const rotLocked = wantLand && !supported;
   // Video layout: a 16:9 area across the top of the screen; the app lays out in the rest, as a display of its own
@@ -277,7 +281,7 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
   const mainW = vw - railW - sideW;
   // Master–detail when there's room for two columns, in either orientation (a tablet in portrait too: an iPad 11"
   // has 762 next to the rail; an iPad mini's 672 stays one column).
-  const split = isTablet && mainW >= 720;
+  const split = isTablet && mainW >= 720 && splitPushes;
   const dashOpen = split && detailOpen;
   const detailW = split ? (dev.detailW ?? Math.round(mainW / 2)) : vw;
   const detailLeft = split ? railW + mainW - detailW : railW;

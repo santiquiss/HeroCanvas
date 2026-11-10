@@ -78,8 +78,8 @@ export const changelogBody = (md: string) => render(md.slice(md.indexOf('\n## ')
 
 const APP_BODY = appChangelog ? changelogBody(appChangelog) : null;
 
-/** A toolbar button with its panel under it. */
-function Popup({ label, title, panelTitle, children }: { label: ReactNode; title: string; panelTitle: string; children: ReactNode }) {
+/** A button with its panel: under it in the toolbar, beside it in the mode rail (`rail`). */
+function Popup({ label, title, panelTitle, rail = false, children }: { label: ReactNode; title: string; panelTitle: string; rail?: boolean; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -97,11 +97,11 @@ function Popup({ label, title, panelTitle, children }: { label: ReactNode; title
   }, [open]);
   return (
     <span ref={box} className={styles.wrap}>
-      <button className={`${styles.version} ${open ? styles.versionOn : ''}`} title={title} aria-label={title} aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button className={`${rail ? styles.railVersion : styles.version} ${open ? styles.versionOn : ''}`} title={title} aria-label={title} aria-expanded={open} onClick={() => setOpen(!open)}>
         {label}
       </button>
       {open && (
-        <div className={styles.panel} role="dialog" aria-label={panelTitle}>
+        <div className={`${styles.panel} ${rail ? styles.panelBeside : ''}`} role="dialog" aria-label={panelTitle}>
           <div className={styles.head}>
             <span>{panelTitle}</span>
             <button className={styles.close} aria-label={t('Close')} onClick={() => setOpen(false)}>
@@ -115,10 +115,10 @@ function Popup({ label, title, panelTitle, children }: { label: ReactNode; title
   );
 }
 
-/** This copy's version: the team's changelog. */
-export function VersionButton() {
+/** This copy's version: the team's changelog. In the mode rail (`rail`), its number small, under the logo. */
+export function VersionButton({ rail = false }: { rail?: boolean }) {
   return (
-    <Popup label={`v${__APP_VERSION__}`} title={t("This copy's changes (CHANGELOG.md)")} panelTitle={t('Changelog')}>
+    <Popup label={`v${__APP_VERSION__}`} title={t("This copy's changes (CHANGELOG.md)")} panelTitle={t('Changelog')} rail={rail}>
       {APP_BODY ?? <p>{t("No CHANGELOG.md at the project's root: start one to keep track of your mirror and proposals.")}</p>}
     </Popup>
   );

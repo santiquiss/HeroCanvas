@@ -4,8 +4,9 @@ import { DEFAULT_SHADOW, type ExportOptions, type Shadow } from './exportImage';
 import { DEFAULT_SEQUENCE, sequenceOf, type Sequence } from './video/motion';
 import type { VideoContainer } from './video/plan';
 import { t } from '../i18n/ui';
+import { projectKey } from '../project';
 
-const KEY = 'hc.capture';
+const KEY = projectKey('hc.capture');
 
 export type CapturePrefs = Pick<ExportOptions, 'scale' | 'shadow' | 'background' | 'format' | 'quality' | 'padding'> & {
   /** The canvas: the picture fitted to it, or at its real size (a pixel of the file a pixel of the screen). */

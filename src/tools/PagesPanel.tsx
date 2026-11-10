@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
 import { useNavRoot } from '../nav/context';
 import { stepOf, stepState } from '../nav/flow';
-import { newSteps } from '../nav/manifest';
+import { stepChange } from '../nav/manifest';
 import { ChangeBadge } from '../flow/FlowView';
 import type { Manifest } from '../nav/stack';
 import { isVariantState, pageIcon, pageName, ROLE_ICONS, ROLE_NAMES, sameRef, variantState } from '../nav/stack';
@@ -57,7 +57,7 @@ function useChangedScreens(): ChangedScreen[] | null {
       out.push(sc);
     };
     const c = proposalChanges(p, variant || null, BASE_PAGES);
-    // A flow with new steps: those screens, not the whole flow (which would open on its first step).
+    // A flow with new or changed steps: those screens, not the whole flow (which would open on its first step).
     const withNewSteps = new Set(c.pages.filter((pg) => pg.step).map((pg) => pg.id));
     for (const pg of c.pages) {
       if (pg.kind === 'removed') continue;
@@ -67,8 +67,10 @@ function useChangedScreens(): ChangedScreen[] | null {
         const step = def.flow?.steps.find((st) => st.id === pg.step!.id);
         add({ key: `${pg.id}:${pg.step.id}`, page: pg.id, sub: pg.step.label, kind: pg.kind, open: (keep) => nav.open(pg.id, {}, { ...(step ? stepState(def, step) : {}), ...keep }) });
       } else if (pg.show) {
-        const place = pg.show;
-        add({ key: `${pg.id}|${place.label ?? ''}`, page: pg.id, sub: place.label, kind: pg.kind, note: pg.details.filter((d) => d !== place.label).join(' · '), open: (keep) => nav.open(place.page, place.params ?? {}, { ...place.state, ...keep }) });
+        // Each state the page's change shows in (several screens of one flow), its own row.
+        const labels = new Set((pg.places ?? [pg.show]).map((pl) => pl.label));
+        for (const place of pg.places ?? [pg.show])
+          add({ key: `${pg.id}|${place.label ?? ''}`, page: pg.id, sub: place.label, kind: pg.kind, note: pg.details.filter((d) => !labels.has(d)).join(' · '), open: (keep) => nav.open(place.page, place.params ?? {}, { ...place.state, ...keep }) });
       } else if (def.flow && withNewSteps.has(pg.id)) {
         continue;
       } else {
@@ -257,13 +259,14 @@ function StepRows({ id, step, n, depth, query }: { id: string; step: FlowStep; n
   const here = top.id === id && stepOf(def.flow!, search).id === step.id;
   if (query && !step.label.toLowerCase().includes(query) && !nav.pages[id].name?.toLowerCase().includes(query) && !pageName(nav.pages, id).toLowerCase().includes(query)) return null;
   const open = () => nav.open(id, top.id === id ? top.params : {}, stepState(def, step));
+  const change = stepChange(id, step.id, nav.proposal);
   return (
     <div className={[styles.row, here ? styles.current : ''].join(' ')} style={{ paddingLeft: 8 + depth * 14 }} title={step.note} onClick={open}>
       <span className={styles.stepNum}>{n}</span>
       <Icon name={step.kind === 'loading' ? 'hourglass_empty' : 'crop_portrait'} size={16} />
       <span className={styles.name}>{step.label}</span>
-      {/* A step the proposal adds to the flow: a new screen, as a new page is. */}
-      {newSteps(id, nav.proposal).includes(step.id) && <ChangeBadge change="new" />}
+      {/* A step the proposal adds to the flow (a new screen, as a new page is) or whose screen it changes. */}
+      {change && <ChangeBadge change={change} />}
     </div>
   );
 }
