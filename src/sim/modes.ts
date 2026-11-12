@@ -3,6 +3,7 @@
 //   components → #/components[/Name]  (gallery)
 //   flow       → #/flow               (all pages on a canvas)
 //   tokens     → #/tokens[/group]      (the design tokens; #/components/tokens… still opens them)
+//   store      → #/app-store-assets    (the store screenshots, made from the prototype's screens)
 //   about      → #/about               (HeroCanvas itself: its version, license and changelog)
 import { useCallback, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
@@ -10,9 +11,9 @@ import { HOME } from '../nav/home';
 import { SIM_PARAMS } from '../nav/stack';
 import { projectKey } from '../project';
 
-export type Mode = 'prototype' | 'components' | 'flow' | 'tokens' | 'about';
+export type Mode = 'prototype' | 'components' | 'flow' | 'tokens' | 'store' | 'about';
 
-export const MODE_PATHS: Record<Exclude<Mode, 'prototype'>, string> = { components: '/components', flow: '/flow', tokens: '/tokens', about: '/about' };
+export const MODE_PATHS: Record<Exclude<Mode, 'prototype'>, string> = { components: '/components', flow: '/flow', tokens: '/tokens', store: '/app-store-assets', about: '/about' };
 
 /** The tokens' routes: `#/tokens…`, and the gallery's from before (`#/components/tokens…`). */
 export const isTokensPath = (pathname: string) => /^\/(components\/)?tokens(\/|$)/.test(pathname);
@@ -24,6 +25,7 @@ export function modeOf(pathname: string): Mode {
   if (isTokensPath(pathname)) return 'tokens';
   if (pathname.startsWith(MODE_PATHS.components)) return 'components';
   if (pathname.startsWith(MODE_PATHS.flow)) return 'flow';
+  if (pathname.startsWith(MODE_PATHS.store)) return 'store';
   if (pathname === MODE_PATHS.about) return 'about';
   return 'prototype';
 }

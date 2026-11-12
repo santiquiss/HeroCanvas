@@ -23,6 +23,8 @@ export interface ScreenSpec {
   taps?: unknown[];
   /** Texts put another way before the picture's taken: every text node reading `from` reads `to`. */
   replace?: { from: string; to: string }[];
+  /** Colors put another way before the picture's taken: src/store/recolor.ts. */
+  recolor?: { from: string; to: string }[];
   scroll?: unknown[];
 }
 
@@ -184,6 +186,8 @@ export function screenCache(server: ViteDevServer, root: string, appDir = 'app')
           for (let n = walk.nextNode(); n; n = walk.nextNode()) for (const p of pairs) if (n.nodeValue.trim() === p.from) n.nodeValue = n.nodeValue.replace(p.from, p.to);
           return true;
         })()`);
+      // The canvas's own (src/store/recolor.ts), loaded alone from the dev server, as the replay is.
+      if (spec.recolor?.length) await page.eval(`import('/src/store/recolor.ts').then((m) => (m.recolor(document.body, ${JSON.stringify(spec.recolor)}), true))`);
       await page.eval(`Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; })))
         .then(() => ${QUIET}).then(() => true)`);
       await writeFile(file, await page.png({ x: 0, y: 0, width: spec.w, height: spec.h }, { inView: true }));
@@ -204,7 +208,7 @@ export function screenCache(server: ViteDevServer, root: string, appDir = 'app')
     /** The picture of `spec`, drawn if it isn't yet: its key. */
     async screen(spec: ScreenSpec, base: string): Promise<string> {
       const key = createHash('sha1')
-        .update(JSON.stringify([base, spec.hash, spec.w, spec.h, spec.scale, spec.taps ?? [], spec.scroll ?? [], spec.replace ?? [], codeStamp(), salt]))
+        .update(JSON.stringify([base, spec.hash, spec.w, spec.h, spec.scale, spec.taps ?? [], spec.scroll ?? [], spec.replace ?? [], spec.recolor ?? [], codeStamp(), salt]))
         .digest('hex');
       const file = join(dir, `${key}.png`);
       if (existsSync(file)) {

@@ -45,7 +45,7 @@ export { useOverlay } from './sim/useOverlay';
 export { DEVELOPER_HIDDEN } from './sim/developerHidden';
 export type { DropDownAlign } from './sim/DropDownLayer';
 export { EASE, KEYBOARD_MOTION, KEYBOARD_MS, PAGE_MS } from './sim/motion';
-export { computeLayout, CONTENT_MAX_W, SEARCH_BAR_H, TAB_BAR_ROOM, tallSheetTop, tasksKeepNav, type Layout } from './sim/layout';
+export { anchoredFloats, computeLayout, CONTENT_MAX_W, SEARCH_BAR_H, TAB_BAR_ROOM, tallSheetTop, tasksKeepNav, type Layout } from './sim/layout';
 export { findDevice, findDisplay, pointerOf, type Display, type Pointer } from './devices/devices';
 export { PreviewScreen } from './flow/previewScreenApi';
 export { RAIL_PARAM } from './design/overridableRegistry';

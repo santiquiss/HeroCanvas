@@ -1,12 +1,13 @@
 // Comment mode and the open thread, shared by the toolbar, the pins on the device and the panel. Small and loaded with
 // the designer; the pins and the panel (CommentLayer, CommentsPanel) load the first time they're needed.
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { useSearchParams } from 'react-router';
+import { useLocation, useSearchParams } from 'react-router';
+import { modeOf } from '../sim/modes';
 import { useNavRoot } from '../nav/context';
 import { activeVariant, findProposal, VARIANT_PARAM } from '../proposals';
 import { designChoice, parseDevices } from '../sim/deviceSet';
 import { useUrlState } from '../sim/SimContext';
-import { COMMENT_PARAM, LIVE, type Comment } from './types';
+import { COMMENT_PARAM, LIVE, storeDesign, type Comment } from './types';
 import { can } from '../share/view';
 
 /**
@@ -61,8 +62,12 @@ export function useCommenting(): boolean {
 export function useCommentScope(): { design: string; variant: string | null } {
   const { proposal } = useNavRoot();
   const [param] = useUrlState<string>(VARIANT_PARAM, '');
-  const design = proposal?.id ?? LIVE;
-  const variant = proposal ? (activeVariant(proposal, param || null)?.id ?? null) : null;
+  const { pathname } = useLocation();
+  const [search] = useSearchParams();
+  // App Store Assets: the listing on screen's (Live's or a listing proposal's), apart from the app's.
+  const store = modeOf(pathname) === 'store';
+  const design = store ? storeDesign(search.get('listing')) : (proposal?.id ?? LIVE);
+  const variant = !store && proposal ? (activeVariant(proposal, param || null)?.id ?? null) : null;
   return useMemo(() => ({ design, variant }), [design, variant]);
 }
 
@@ -71,7 +76,9 @@ export function useCanvasDesigns(): string[] {
   const global = useCommentScope();
   const [search] = useSearchParams();
   const devices = search.get('devices');
-  return useMemo(() => [global.design, ...parseDevices(devices).map((it) => screenScope(it, global).design)], [devices, global]);
+  const { pathname } = useLocation();
+  const store = modeOf(pathname) === 'store';
+  return useMemo(() => [global.design, ...(store ? [] : parseDevices(devices).map((it) => screenScope(it, global).design))], [devices, global, store]);
 }
 
 /**

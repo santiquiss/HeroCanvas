@@ -47,3 +47,27 @@ export async function writeJson(path: string, data: unknown): Promise<void> {
   const r = await fetch(import.meta.env.BASE_URL + '__hc/write', { method: 'POST', headers: HEADERS, body: JSON.stringify({ path, data }) });
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? `HTTP ${r.status}`);
 }
+
+/** Save an image in the project (public/assets/store/); its path from the site's root (`assets/store/…`). */
+export async function uploadImage(file: File): Promise<string> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  const r = await fetch(import.meta.env.BASE_URL + '__hc/upload', { method: 'POST', headers: HEADERS, body: JSON.stringify({ name: file.name, base64: btoa(bin) }) });
+  const body = (await r.json().catch(() => ({}))) as { path?: string; error?: string };
+  if (!r.ok || !body.path) throw new Error(body.error ?? `HTTP ${r.status}`);
+  await servedImage(body.path);
+  return body.path;
+}
+
+/**
+ * Waits until the dev server serves a file just written to public/ (it does once its watcher has seen it, a moment
+ * later): an image asked for before that fails, and the browser doesn't ask again, so the layer would draw nothing.
+ */
+async function servedImage(path: string): Promise<void> {
+  for (let i = 0; i < 50; i++) {
+    const r = await fetch(`${import.meta.env.BASE_URL}${path}`, { method: 'HEAD', cache: 'no-store' }).catch(() => null);
+    if (r?.ok && r.headers.get('content-type')?.startsWith('image/')) return;
+    await new Promise((done) => setTimeout(done, 100));
+  }
+}

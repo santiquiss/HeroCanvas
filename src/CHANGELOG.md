@@ -6,6 +6,21 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## Unreleased
+
+Made in MF Designer and sent in one batch (`npm run tool:export`); version and tag when it's merged.
+
+- **App Store Assets** (`src/store`, a mode of its own): the app's App Store listing made from its screens, each
+  screenshot a canvas of layers (the screen in a 3D device, texts, images, backgrounds), every size the store asks for,
+  a preview of the store's page, and the set exported as a zip. Its comments apart from the app's (`store`,
+  `store:<shot>`). Images dropped in are saved in the project (`POST /__hc/upload` → `public/assets/store/`), its
+  layout in `app/store-assets.json`.
+- **Contract**: new, `anchoredFloats` from `herocanvas` (the sheet rule's width: a task is a dialog from 600 wide), for
+  an app's own overlay that follows it (nothing to adapt).
+- **Contract**: new (optional), a project's `handoff: 'code'` (herocanvas.config.ts `projects`): its builders read the
+  mirror's code, so its proposals need no `handoff.md` (`proposalHandoff.test.ts` skips them; the default, `'file'`,
+  asks for one as before: nothing to adapt).
+
 ## 0.56.0 — 2026-11-10
 
 - **A carousel that snaps bounces back to where it was**: while a scroller's content is past its end (the iOS

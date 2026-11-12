@@ -4,12 +4,13 @@ import { systemBack } from './back';
 import { schemeIn } from './appThemes';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
-import { deviceGroup, findDevice, findDisplay, keepsLandscape, landAfterSwitch } from '../devices/devices';
+import { deviceGroup, findDevice, findDisplay, keepsLandscape, landAfterSwitch, type Display } from '../devices/devices';
 import { DesignProvider, useDesign, useDesignRoot } from '../design/DesignContext';
 import { SelectionInUrl } from '../design/SelectionInUrl';
 import { Gallery } from '../gallery/Gallery';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlowView } from '../flow/FlowView';
+import { StoreAssets } from '../store/StoreAssets';
 import { About } from './About';
 import { useMode, useRememberMode, useSetMode, type Mode } from './modes';
 import { useNavRoot } from '../nav/context';
@@ -162,6 +163,9 @@ function DesignerShell() {
       computeLayout({ display, land, supported: supportsLandscape(pageId ? landscapeFor(pageId, def(pageId), cfg) : pageLandscape, device, display), detailOpen: open, video, ...design }),
     [device, display, land, def, cfg, pageLandscape, video, design],
   );
+  // App Store Assets: a page on a store size's display, portrait, with the design on screen (a proposal's rail). The
+  // mode draws it framed, or the screen alone (screenOnly).
+  const storeLayout = useCallback((d: Display, open: boolean) => computeLayout({ display: d, land: false, supported: true, detailOpen: open, ...design }), [design]);
   const layout = useMemo(
     () => computeLayout({ display, land, supported, detailOpen, video, ...design }),
     [display, land, supported, detailOpen, video, design],
@@ -382,6 +386,10 @@ function DesignerShell() {
             ) : mode === 'components' || mode === 'tokens' ? (
               <ErrorBoundary label={t('Gallery')} fill resetKey={location.pathname + location.search}>
                 <Gallery />
+              </ErrorBoundary>
+            ) : mode === 'store' ? (
+              <ErrorBoundary label={t('App Store Assets')} fill resetKey={location.search}>
+                <StoreAssets layoutFor={storeLayout} />
               </ErrorBoundary>
             ) : mode === 'flow' ? (
               <ErrorBoundary label={t('Flow')} fill resetKey={location.search}>

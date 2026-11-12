@@ -1,0 +1,675 @@
+/* App Store Assets' Preview: the listing as the App Store shows it, on several devices side by side. Measures from
+   Apple's App Store template (iOS 27), in points; the store's page is drawn light, as the template's. */
+
+/* ---------------------------------------------------------------- the view */
+/* The prototype's canvas (SimulatorShell .stage, MultiDevices), in place of App Store Assets' screenshots. */
+.view {
+  display: flex;
+}
+.note {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, 40px);
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: 13px;
+}
+/* A screen, in its own corners. */
+.screen {
+  position: relative;
+  overflow: hidden;
+}
+/* The language and the screens' Light / Dark, where the prototype has its Light / Dark (ThemeSwitch floating). */
+.topRight {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- the store's page */
+.store {
+  --as-bg: #fff;
+  --as-label: #000;
+  --as-label2: rgba(60, 60, 67, 0.6);
+  --as-gray: #8e8e93;
+  --as-gray2: #aeaeb2;
+  --as-sep: #bfbfbf;
+  --as-fill: rgba(118, 118, 128, 0.12);
+  --as-skeleton: #ececf0;
+  --as-glass: rgba(250, 250, 252, 0.58);
+  --as-glass-hi: rgba(255, 255, 255, 0.95);
+  --as-glass-lo: rgba(255, 255, 255, 0.5);
+  --as-glass-rim: rgba(0, 0, 0, 0.07);
+  --as-control: #1a1a1a;
+  --as-tab: #1f1f1f;
+  --as-tab-on-bg: rgba(0, 0, 0, 0.07);
+  position: relative;
+  overflow: hidden;
+  background: var(--as-bg);
+  color: var(--as-label);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-align: left;
+  letter-spacing: normal;
+}
+.scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Liquid Glass (the template's Regular): a translucent fill that lightens and saturates what's behind it, a bright rim
+   on its top edge and a hairline around it, a soft shadow under it. */
+.glass {
+  background: var(--as-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(1.9) brightness(1.04);
+  backdrop-filter: blur(14px) saturate(1.9) brightness(1.04);
+  box-shadow:
+    inset 0 1px 0.5px var(--as-glass-hi),
+    inset 0 -0.5px 0.5px var(--as-glass-lo),
+    0 0 0 0.5px var(--as-glass-rim),
+    0 8px 22px rgba(0, 0, 0, 0.12);
+}
+/* Small: its shadow close under it (a wide one reads as a halo on a picture). */
+.glassButton {
+  width: 46px !important;
+  height: 46px !important;
+  box-shadow:
+    inset 0 1px 0.5px var(--as-glass-hi),
+    inset 0 -0.5px 0.5px var(--as-glass-lo),
+    0 0 0 0.5px var(--as-glass-rim),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--as-control);
+}
+/* In the iPhone Duo's column: one over the other, centered in it, 10 apart (the template's 50 at 169 and 229). */
+.columnButtons {
+  position: absolute;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+/* What can be tapped on the store's page (Back, the search's result): it takes the pointer, as the bar around it doesn't. */
+.tappable {
+  pointer-events: auto;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  font: inherit;
+}
+button.tappable:active,
+.searchCell.tappable:active {
+  opacity: 0.6;
+}
+/* The compact bar (scrolled past Get): a subtle glass over the page, behind the buttons, its edge a hairline. */
+.compactBg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 4;
+  background: color-mix(in srgb, var(--as-bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  backdrop-filter: blur(20px) saturate(1.8);
+  box-shadow: 0 0.33px 0 var(--as-sep);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+.store[data-compact] .compactBg {
+  opacity: 1;
+}
+/* Its small icon, centered on the bar; Get in share's place. Faded in and out (compositor only). */
+.compactIcon {
+  display: flex;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.85);
+  opacity: 0;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.compactSwap {
+  position: relative;
+  display: grid;
+  place-items: center end;
+}
+.compactSwap > * {
+  grid-area: 1 / 1;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.compactGet {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.store[data-compact] .compactIcon {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+.store[data-compact] .compactGet {
+  opacity: 1;
+  transform: none;
+}
+.store[data-compact] .shareSlot {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.headerInner {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.topButtons {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+/* The header art: its picture center-cropped under the status bar; over it, behind the status bar, the same picture
+   flipped upside down (its top edge meeting the picture's) and blurred. */
+.headerArt {
+  position: relative;
+  overflow: hidden;
+}
+.headerArt img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+.headerMain {
+  position: absolute;
+  left: 0;
+}
+.headerMirror {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  overflow: hidden;
+}
+.headerMirror img {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* Flipped on its own middle: its top row lands at the box's bottom edge, against the picture's top. */
+  transform: scaleY(-1);
+}
+.headerBlur {
+  filter: blur(14px);
+}
+
+/* App page header: icon 118, then name (22 semibold), subtitle (15 medium) and Get, 40 below them. */
+/* 21 from the header art (or the bar) to the icon, 22 under it to the line: as the store shows it. */
+.appHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 21px 20px 22px;
+}
+.appIcon {
+  flex: none;
+  background: var(--as-skeleton) center / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+/* As tall as the icon at least: the name on its top edge, Get on its bottom one (more lines: it grows). */
+.appHeaderText {
+  flex: 1;
+  min-width: 0;
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+.appName {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: -0.35px;
+}
+.appSubtitle {
+  color: var(--as-label2);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.5px;
+}
+.getButton {
+  display: grid;
+  place-items: center;
+  width: 71px;
+  height: 30px;
+  border-radius: 100px;
+  background: #0088ff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+/* App Page Metadata: label 11 (uppercase), value 22 rounded, a line under it 13; hairlines between. */
+.metaWrap {
+  position: relative;
+}
+.metadata {
+  display: flex;
+  padding: 14px 20px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.metadata::-webkit-scrollbar {
+  display: none;
+}
+.metaWrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 0;
+  height: 0.33px;
+  background: var(--as-sep);
+}
+/* One width for every cell: two and a bit on an iPhone, the rest sideways. */
+.metaCell {
+  position: relative;
+  flex: none;
+  width: 139px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 71px;
+  text-align: center;
+  white-space: nowrap;
+}
+.metaCell + .metaCell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 0.33px;
+  height: 40px;
+  background: var(--as-sep);
+}
+.metaLabel {
+  color: var(--as-gray2);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+.metaValue {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  margin-top: 5px;
+  color: var(--as-gray);
+  font-family: ui-rounded, 'SF Pro Rounded', -apple-system, system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.4px;
+}
+.metaSub {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--as-gray);
+  font-size: 13px;
+  line-height: 18px;
+}
+.stars {
+  color: var(--as-gray);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* Screenshots: side by side, 10 apart, 20 in from the screen's edge, scrolling sideways. */
+.carousel {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 20px;
+  scrollbar-width: none;
+}
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+.carouselStill {
+  overflow: hidden;
+}
+.shot {
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  background: #f2f2f7;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  scroll-snap-align: start;
+}
+.shot > div {
+  pointer-events: none;
+}
+
+/* Search toolbar: a frosted field (48 tall) and a round close button. */
+/* The scroll edge: over the content, under the bars. A blur that fades out downward (its mask), and the page's color
+   over it from the top, so what scrolls under them softens into the page instead of meeting a line. */
+.scrollEdge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--as-bg) 0%, color-mix(in srgb, var(--as-bg) 82%, transparent) 45%, transparent 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+.searchToolbar {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  z-index: 5;
+  display: flex;
+  gap: 12px;
+}
+.searchField {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--as-control);
+}
+.searchText {
+  flex: 1;
+  color: var(--as-label);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* Search cell: icon 60, name 15 semibold, category 13, Get on a tertiary fill; a metadata line; three screenshots. */
+.searchCell {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 20px 0;
+}
+.cellHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+}
+.cellTitles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cellName {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.23px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cellCategory {
+  overflow: hidden;
+  color: var(--as-label2);
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.1px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cellGet {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 33px;
+  border-radius: 100px;
+  background: var(--as-fill);
+  color: #0088ff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.cellMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 20px;
+  color: var(--as-gray);
+  font-family: ui-rounded, 'SF Pro Rounded', -apple-system, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.cellMeta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* A result still loading. */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 12px 20px;
+}
+.phRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.phIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: 13px;
+  background: var(--as-skeleton);
+}
+.phLines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.phLines span {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--as-skeleton);
+}
+.phGet {
+  width: 74px;
+  height: 33px;
+  border-radius: 100px;
+  background: var(--as-skeleton);
+}
+.phShots {
+  display: flex;
+  gap: 10px;
+}
+.phShots span {
+  flex: 1;
+  border-radius: 12.7px;
+  background: var(--as-skeleton);
+}
+
+/* Tab bar: the four tabs in a glass pill, Search in its own circle (54), 25 in from the edges. */
+.tabBar {
+  position: absolute;
+  left: 21px;
+  right: 21px;
+  bottom: 21px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.tabs {
+  flex: 1;
+  display: flex;
+  height: 62px;
+  padding: 4px;
+  border-radius: 999px;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0 8px;
+  border-radius: 100px;
+  color: var(--as-tab);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 12px;
+}
+.templateGlyph {
+  display: block;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+/* Each tab's glyph in a 28 tall box, so their different heights sit on one line. */
+.tabIcon {
+  display: grid;
+  place-items: center;
+  height: 28px;
+}
+.getRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.inApp {
+  width: 60px;
+  color: var(--as-gray);
+  font-size: 10px;
+  line-height: 12px;
+}
+.tabOn {
+  background: var(--as-tab-on-bg);
+  color: #0088ff;
+  font-weight: 600;
+}
+.searchTab {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  color: var(--as-label);
+}
+.searchTabOn {
+  color: #0088ff;
+}
+/* In the iPhone Duo's column: upright, centered in it, near the bottom (the template's Vertical tab bar, 48 wide). */
+.tabBarColumn {
+  left: auto;
+  right: 0;
+  bottom: 25px;
+  flex-direction: column;
+  gap: 12px;
+}
+.tabBarColumn .tabs {
+  flex: none;
+  flex-direction: column;
+  width: 48px;
+  height: auto;
+  padding: 6px 0;
+  gap: 2px;
+}
+/* Each tab a 48 square, 2 apart, its glyph centered (the template's _Tab Bar Button - iPhone Duo): not flexed, or the
+   column shrinks it to its glyph. The selected one's fill 2 in from its edges. */
+.tabBarColumn .tab {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+}
+.tabBarColumn .tabOn {
+  background: none;
+  position: relative;
+}
+.tabBarColumn .tabOn::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 100px;
+  background: var(--as-tab-on-bg);
+}
+.tabBarColumn .tabOn > * {
+  position: relative;
+}
+.tabBarColumn .tab > span:last-child {
+  display: none;
+}
+.tabBarColumn .searchTab {
+  width: 48px;
+  height: 48px;
+}
+
+/* Dark: the store's own dark colors (iOS's system grays). */
+.store[data-dark] {
+  --as-bg: #000;
+  --as-label: #fff;
+  --as-label2: rgba(235, 235, 245, 0.6);
+  --as-gray: #8e8e93;
+  --as-gray2: #636366;
+  --as-sep: #38383a;
+  --as-fill: rgba(118, 118, 128, 0.24);
+  --as-skeleton: #1c1c1e;
+  --as-glass: rgba(36, 36, 40, 0.6);
+  --as-glass-hi: rgba(255, 255, 255, 0.22);
+  --as-glass-lo: rgba(255, 255, 255, 0.06);
+  --as-glass-rim: rgba(255, 255, 255, 0.1);
+  --as-control: #fff;
+  --as-tab: #f2f2f2;
+  --as-tab-on-bg: rgba(255, 255, 255, 0.14);
+}

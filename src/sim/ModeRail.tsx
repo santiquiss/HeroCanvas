@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
+import { appConfig } from '@app/config';
 import { VersionButton } from './Changelog';
 import type { Mode } from './modes';
 import { setUiTheme, useUiTheme } from './uiTheme';
@@ -22,10 +23,12 @@ export const MODES: { mode: RailMode; label: string; icon: string }[] = [
   { mode: 'tokens', label: t('Tokens'), icon: 'palette' },
   // The device as an image for marketing, turned in 3D; the right panel becomes its settings (src/capture).
   { mode: 'capture', label: t('Capture'), icon: 'photo_camera' },
+  // The store screenshots, made from the prototype's screens at each store's sizes (src/store).
+  { mode: 'store', label: t('App Store Assets'), icon: 'storefront' },
 ];
 
-/** The modes the view keeps (src/share/view.ts). */
-const RAIL_MODES = MODES.filter((m) => showsMode(m.mode));
+/** The modes the view keeps (src/share/view.ts); a web app (appConfig.web) is in no store. */
+const RAIL_MODES = MODES.filter((m) => showsMode(m.mode) && !(m.mode === 'store' && appConfig.web));
 
 export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra?: Record<string, string>) => void }) {
   const [search, setSearch] = useSearchParams();

@@ -1,0 +1,2128 @@
+/* App Store Assets: the canvas (the picked asset: a screenshot set in a row that scrolls sideways) and its two panels
+   (StoreSidePanels: the assets at the left, the requirements at the right). */
+.root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--ui-bg-subtle);
+  color: var(--ui-text);
+}
+
+.panel {
+  height: 100%;
+  overflow-y: auto;
+  padding: 12px;
+}
+.group {
+  margin: 10px 8px 2px;
+  color: var(--ui-text-subtle);
+  font-size: 11px;
+  font-weight: 500;
+}
+.size {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.size:hover {
+  background: var(--ui-hover);
+}
+.sizeOn,
+.sizeOn:hover {
+  background: var(--ui-fill);
+}
+.sizeName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+/* A required asset: a small dot after its name. */
+.req {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ui-text-muted);
+}
+.sizeNote {
+  grid-column: 1;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+}
+.count {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  color: var(--ui-text-2);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.countShort {
+  color: var(--ui-amber-text);
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 12px;
+}
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.sub {
+  margin: 2px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.button:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  width: max-content;
+  padding: 8px 0 0;
+}
+/* The sizes, one under the other; the whole canvas scrolls both ways (and pans with the middle button). */
+.rows {
+  height: 100%;
+  overflow: auto;
+  padding: 8px 24px 96px;
+}
+/* As wide as its screenshots, not the view: its title (sticky) has the whole row to stay at the left in. */
+.row {
+  width: max-content;
+  min-width: 100%;
+  margin-bottom: 36px;
+}
+/* What the size is stays at the canvas's left edge while its screenshots scroll sideways under the view, lined up
+   with the store's name above (sticky counts from inside the canvas's padding; -8 undoes the head's own). */
+.rowHead {
+  position: sticky;
+  left: -8px;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  text-align: left;
+}
+.rowTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+/* A size's breakpoint, in its color (as the Layer panel marks values). */
+.bpChip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bp) 16%, transparent);
+  color: var(--bp);
+  font-size: 11px;
+  font-weight: 600;
+}
+.headLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* Listing graphics: each at its proportions, its name and sizes under it. */
+.graphics {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-end;
+  gap: 28px;
+  height: 100%;
+  overflow: auto;
+  padding: 16px 24px 96px;
+}
+.graphic {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+.graphic .placeholder {
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.graphicOn .placeholder {
+  border-color: var(--ui-blue-text);
+  color: var(--ui-blue-text);
+}
+.graphicCaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.graphicText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.card {
+  position: relative;
+  flex: none;
+  margin: 0;
+}
+/* Over the open screenshot, not cut by it: the picked layer's outline and handles, above every layer and the
+   screenshots beside it. Only the handles take the pointer. */
+.shotOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.thumb {
+  display: block;
+  /* Shift + click picks several layers: it doesn't select the screenshots' texts. */
+  user-select: none;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px var(--ui-line),
+    0 6px 20px rgb(0 0 0 / 0.08);
+  background: var(--pg);
+}
+/* The screenshot the right panel edits: a ring around it. */
+/* Picked with Shift, to share one background. */
+.cardPicked .thumb {
+  box-shadow: 0 0 0 2px var(--ui-bg-subtle), 0 0 0 4px var(--ui-amber-text);
+}
+/* Several screenshots picked: what they can do together, in the header. */
+.unifyBar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 2px 10px;
+  border-radius: 8px;
+  background: var(--ui-amber-soft);
+  color: var(--ui-amber-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cardOn .thumb {
+  box-shadow: 0 0 0 2px var(--ui-bg-subtle), 0 0 0 4px var(--ui-blue-text);
+}
+.caption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.number {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+  font-size: 11px;
+  font-weight: 600;
+}
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-text-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.icon:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.icon:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* A choice: the system's menu under a field of ours, its chevron inside with room to the edge. */
+.dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  max-width: 220px;
+  padding: 0 6px 0 10px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.dropdown:hover {
+  background: var(--ui-hover);
+}
+.dropdown select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.dropdownValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* A place the store has room for: dashed; the next one to fill holds the add controls. */
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+.loading {
+  background: var(--ui-line);
+  animation: loading 1.2s ease-in-out infinite alternate;
+}
+@keyframes loading {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+.place {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1.5px dashed var(--ui-line);
+  border-radius: 6px;
+  text-align: center;
+}
+.placeNext {
+  border-color: var(--ui-line-strong);
+  background: var(--ui-bg);
+  color: var(--ui-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.placeNext:hover {
+  border-color: var(--ui-text-muted);
+  color: var(--ui-text);
+}
+.place .dropdown {
+  max-width: 100%;
+}
+.numberEmpty {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
+  color: var(--ui-text-muted);
+}
+.addNote {
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+
+/* Something HeroCanvas doesn't make yet: its shape at the store's proportions. */
+.placeholder {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px dashed var(--ui-line-strong);
+  border-radius: 6px;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+/* A graphic's file in its place (StoreData.graphics): as the store shows it, on a hairline. */
+.graphicFile {
+  flex: none;
+  display: block;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  overflow: hidden;
+  background: none;
+  box-shadow: 0 0 0 1px var(--ui-line-subtle);
+  cursor: pointer;
+}
+.graphicFile img {
+  display: block;
+}
+
+/* The right panel: the picked asset's requirements, then the store's advice. */
+.guide {
+  padding: 4px 4px 16px;
+  border-bottom: 1px solid var(--ui-line-subtle);
+}
+.guide + .guide {
+  padding-top: 16px;
+  border-bottom: none;
+}
+.guideTitle {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.guideText {
+  margin: 8px 0 0;
+  color: var(--ui-text-2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge_yes {
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+.badge_conditional {
+  background: var(--ui-amber-soft);
+  color: var(--ui-amber-text);
+}
+.badge_recommended {
+  background: var(--ui-blue-soft);
+  color: var(--ui-blue-text);
+}
+.badge_no {
+  background: var(--ui-fill);
+  color: var(--ui-text-2);
+}
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+.facts dt {
+  color: var(--ui-text-muted);
+}
+.facts dd {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  color: var(--ui-text);
+}
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+.rules {
+  margin: 12px 0 0;
+  padding-left: 16px;
+  color: var(--ui-text-2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.rules li + li {
+  margin-top: 6px;
+}
+.soon {
+  margin: 12px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 12px 0 0;
+  font-size: 11px;
+}
+.sources a {
+  color: var(--ui-blue-text);
+}
+
+/* Export's choices, on the designer's floating surface. */
+.menuWrap {
+  position: relative;
+}
+.menu {
+  composes: surface from '../theme/surface.module.css';
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  width: 280px;
+  padding: 6px;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.menuItem:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.menuItem:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.menuCount {
+  flex: none;
+  color: var(--ui-text-muted);
+}
+.menuNote {
+  margin: 4px 10px 6px;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* On a deployed site: the set as committed, to look at. */
+.readOnly {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--ui-fill);
+  color: var(--ui-text-2);
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: 1px;
+}
+
+/* The Screenshot tab: what a screenshot's composition is made of. */
+.emptyPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 32px 16px;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+.emptyPanel strong {
+  color: var(--ui-text);
+  font-size: 13px;
+}
+.wide {
+  justify-content: center;
+  width: 100%;
+  margin-top: 12px;
+}
+.fieldTitle {
+  margin: 16px 0 8px;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12px;
+}
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.sliderHead {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ui-text-2);
+}
+.slider input[type='range'] {
+  width: 100%;
+  accent-color: var(--ui-blue-text);
+}
+/* A slider in one row (Slider `inline`), as the device sections draw theirs: label, track, value. */
+.sliderInline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  font-size: 12px;
+}
+.sliderInline > input[type='range'] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--ui-text);
+}
+.sliderLabel {
+  flex: none;
+  width: 72px;
+  color: var(--ui-text-muted);
+}
+.sliderNum {
+  flex: none;
+  width: 44px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-text-2);
+}
+.sliderNumWide {
+  width: auto;
+  min-width: 32px;
+}
+.sliderInline .range {
+  flex: 1;
+  min-width: 0;
+}
+.range[data-inline] .rangeFill,
+.range[data-inline] input::-webkit-slider-thumb {
+  background: var(--ui-text);
+}
+.range[data-inline] input::-moz-range-thumb {
+  background: var(--ui-text);
+}
+/* Inline sliders as a table: one column of labels, the tracks in the middle all as long, and the values as wide as
+   the widest of them, so the tracks line up. */
+.sliderTable {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) max-content;
+  column-gap: 8px;
+  align-items: center;
+}
+.sliderTable > .sliderInline {
+  display: contents;
+}
+.sliderTable .sliderLabel,
+.sliderTable .sliderNum {
+  width: auto;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+.sliderTable .sliderNum {
+  justify-content: flex-end;
+}
+.sliderNum {
+  white-space: nowrap;
+}
+.sliderTable > .sliderInline > input {
+  width: 100%;
+  margin: 0;
+}
+/* A stretch on one track (RangeSlider): two ranges over it, only their handles taking the pointer. */
+.range {
+  position: relative;
+  height: 20px;
+}
+.rangeTrack,
+.rangeFill {
+  position: absolute;
+  top: 50%;
+  /* As thick as the browser's own track beside it. */
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+.rangeTrack {
+  left: 0;
+  right: 0;
+  /* The handles' centers run half a handle in from each end: the fill is placed on that run. */
+  background: var(--ui-fill-strong, var(--ui-line-strong));
+}
+.rangeFill {
+  background: var(--ui-blue-text);
+}
+.range[data-off] .rangeFill {
+  background: var(--ui-text-subtle);
+}
+.range input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.range input::-webkit-slider-runnable-track {
+  background: none;
+}
+.range input::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--ui-blue-text);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+  pointer-events: auto;
+  cursor: grab;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.range input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--ui-blue-text);
+  pointer-events: auto;
+  cursor: grab;
+}
+.segments {
+  display: flex;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--ui-fill);
+}
+.segment {
+  flex: 1;
+  padding: 0 10px;
+  white-space: nowrap;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.segmentOn {
+  background: var(--ui-bg);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  color: var(--ui-text);
+}
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 6px;
+}
+.swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+  cursor: pointer;
+}
+.swatchOn {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12), 0 0 0 2px var(--ui-bg), 0 0 0 4px var(--ui-blue-text);
+}
+.colorValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.colorValue input[type='color'] {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+/* A layer of the open screenshot: its outline (its box, or a turned device's shape) hinted on hover, drawn when
+   picked, in screen pixels at any zoom. */
+.ring {
+  position: absolute;
+  pointer-events: none;
+}
+.layerBox[data-pickable]:hover > .ring {
+  outline: calc(1px / var(--store-zoom, 1)) solid var(--ui-blue-text);
+}
+.ringOn {
+  outline: calc(2px / var(--store-zoom, 1)) solid var(--ui-blue-text);
+}
+.ring .handle {
+  pointer-events: auto;
+}
+/* The lines a dragged layer's center lines up with: the image's middle, another layer's center. */
+.snapLine {
+  position: absolute;
+  z-index: 5;
+  background: #ff2d87;
+  pointer-events: none;
+}
+.snapV {
+  top: 0;
+  bottom: 0;
+  width: calc(1px / var(--store-zoom, 1));
+  transform: translateX(-50%);
+}
+.snapH {
+  left: 0;
+  right: 0;
+  height: calc(1px / var(--store-zoom, 1));
+  transform: translateY(-50%);
+}
+
+/* The left panel with a screenshot open: back to the assets, Add, the layers (front first), the background last. */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 10px -4px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.back:hover {
+  background: var(--ui-hover);
+  color: var(--ui-text);
+}
+.addRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin: 10px 0 12px;
+}
+.addBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px 6px;
+  border: 1px solid var(--ui-line);
+  border-radius: 8px;
+  background: var(--ui-bg);
+  color: var(--ui-text-2);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.addBtn:hover:not(:disabled) {
+  border-color: var(--ui-line-strong);
+  color: var(--ui-text);
+}
+.addBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.layers {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.layerRow {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+}
+/* The layers list's title, and folding every group at its right. */
+.layersHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 4px;
+}
+/* Its margins are the header's: the title and the button share one middle. */
+.layersHead .fieldTitle {
+  margin: 0;
+}
+/* A group's fold, before its name; the other rows keep its room. */
+.layerFold,
+.layerFoldSpace {
+  flex: none;
+  width: 18px;
+  height: 24px;
+}
+.layerFold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ui-text-subtle);
+  cursor: pointer;
+}
+.layerFold:hover {
+  color: var(--ui-text);
+}
+.layerFoldSpace {
+  margin-right: -6px;
+}
+.layerRow:hover {
+  background: var(--ui-hover);
+}
+.layerRowOn,
+.layerRowOn:hover {
+  background: var(--ui-fill);
+}
+.layerHidden .layerPick {
+  opacity: 0.45;
+}
+.layerPick {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.layerName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.layerSwatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.15);
+}
+.layerActions {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.textField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.textField textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.gap {
+  height: 6px;
+}
+
+/* A layer's box on the open screenshot; its corner's handle sizes it (kept the same on screen at any zoom). */
+.layerBox {
+  touch-action: none;
+}
+.handle {
+  position: absolute;
+  width: calc(10px / var(--store-zoom, 1));
+  height: calc(10px / var(--store-zoom, 1));
+  border: calc(1.5px / var(--store-zoom, 1)) solid var(--ui-blue-text);
+  border-radius: calc(2px / var(--store-zoom, 1));
+  background: #fff;
+  transform: translate(-50%, -50%);
+}
+
+/* Adjust the screen: the prototype live in a dialog over everything. */
+.dialogShim {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 0.45);
+}
+.dialog {
+  composes: surface from '../theme/surface.module.css';
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+}
+.dialogHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  font-size: 12px;
+}
+.dialogHead div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 420px;
+  color: var(--ui-text-muted);
+}
+.dialogHead strong {
+  color: var(--ui-text);
+  font-size: 14px;
+}
+.dialogScreen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--pg, #fff);
+  box-shadow: 0 0 0 1px var(--ui-line);
+  color: var(--ui-text-muted);
+}
+.dialogScreen iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  transform-origin: top left;
+}
+.dialogFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+.primary {
+  border-color: transparent;
+  background: var(--ui-blue-text);
+  color: #fff;
+}
+.primary:hover:not(:disabled) {
+  background: var(--ui-blue-text);
+  filter: brightness(1.08);
+}
+.first {
+  margin-top: 0;
+}
+
+/* A device's look: Capture's own sections, under the layer's place (a fieldset only to disable them all at once). */
+.captureLook {
+  min-width: 0;
+  margin: 12px -12px 0;
+  padding: 0;
+  border: none;
+}
+.captureLook:disabled {
+  opacity: 0.6;
+}
+
+
+/* Position (PositionFields): Figma's, in the panel's look. */
+.alignRow {
+  display: flex;
+  gap: 8px;
+}
+.alignGroup {
+  display: flex;
+  flex: 1;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--ui-fill);
+}
+.alignButton {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.alignButton:hover:not(:disabled) {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+.alignButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.numRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+.numField {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--ui-fill);
+  color: var(--ui-text);
+  font-size: 12px;
+}
+.numField:focus-within {
+  border-color: var(--ui-blue-text);
+  background: var(--ui-bg);
+}
+.numField input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+.numField input:disabled {
+  color: var(--ui-text-2);
+}
+.numPrefix,
+.numUnit {
+  color: var(--ui-text-muted);
+}
+.constraints {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 8px;
+}
+.constraintSelects {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.constraintSelects > * {
+  max-width: none;
+}
+/* The diagram: a box with a tick on each side and a cross inside, the constraints picked lit. */
+.cBox {
+  position: relative;
+  height: 68px;
+  border-radius: 8px;
+  background: var(--ui-fill);
+}
+.cInner {
+  position: absolute;
+  inset: 18px 22px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 4px;
+}
+.cTick {
+  position: absolute;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.cTick::before {
+  content: '';
+  position: absolute;
+  border-radius: 1px;
+  background: var(--ui-text-muted);
+}
+.cTick:hover:not(:disabled)::before {
+  background: var(--ui-text);
+}
+.cTickOn::before {
+  background: var(--ui-blue-text) !important;
+}
+.cTick:disabled {
+  cursor: default;
+}
+.cTop,
+.cBottom {
+  left: 50%;
+  width: 14px;
+  height: 16px;
+  transform: translateX(-50%);
+}
+.cTop {
+  top: 1px;
+}
+.cBottom {
+  bottom: 1px;
+}
+.cTop::before,
+.cBottom::before {
+  left: 6px;
+  top: 4px;
+  width: 2px;
+  height: 8px;
+}
+.cLeft,
+.cRight {
+  top: 50%;
+  width: 20px;
+  height: 14px;
+  transform: translateY(-50%);
+}
+.cLeft {
+  left: 1px;
+}
+.cRight {
+  right: 1px;
+}
+.cLeft::before,
+.cRight::before {
+  top: 6px;
+  left: 6px;
+  width: 9px;
+  height: 2px;
+}
+.cMidH {
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+}
+.cMidH::before {
+  top: 4px;
+  left: 3px;
+  width: 18px;
+  height: 2px;
+}
+.cMidV {
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+}
+.cMidV::before {
+  top: 3px;
+  left: 4px;
+  width: 2px;
+  height: 16px;
+}
+
+/* The layer panel: Capture's sections, edge to edge. */
+.layerPanel {
+  padding: 0;
+}
+.position {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.positionNote {
+  margin: -2px 0 0;
+  color: var(--ui-text-muted);
+  font-size: 11px;
+}
+.numPrefix {
+  display: grid;
+  place-items: center;
+  min-width: 12px;
+  cursor: ew-resize;
+  user-select: none;
+  touch-action: none;
+}
+.numOff .numPrefix {
+  cursor: default;
+}
+
+/* A layer's ⋯: on its row's hover, its menu open or picked. */
+.layerMore {
+  opacity: 0;
+}
+.layerRow:hover .layerMore,
+.layerRowOn .layerMore,
+.layerRowMenu .layerMore,
+.layerMore:focus-visible {
+  opacity: 1;
+}
+.layerMenu {
+  composes: surface from '../theme/surface.module.css';
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 4px;
+}
+.layerMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.layerMenuItem:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.layerMenuItem:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.layerMenuDanger {
+  color: var(--ui-red-text);
+}
+.layerPanel .captureLook {
+  margin: 0;
+}
+
+/* Dragging a layer in the list: it fades, and a line shows where it lands. */
+.layers li {
+  position: relative;
+}
+.layerDragged {
+  opacity: 0.4;
+}
+.dropBefore::before,
+.dropAfter::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ui-blue-text);
+  pointer-events: none;
+}
+.dropBefore::before {
+  top: -1px;
+}
+.dropAfter::after {
+  bottom: -1px;
+}
+
+/* The open screenshot's name at the top of its layers: its number as the canvas shows it. */
+.shotTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Background presets: each drawn as a small screenshot, its name under it. */
+.presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 48px);
+  justify-content: space-between;
+  gap: 8px 6px;
+  margin: 10px 0 8px;
+}
+.preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ui-text-subtle);
+  cursor: pointer;
+}
+.presetImage {
+  position: relative;
+  overflow: hidden;
+  width: 48px;
+  height: 104px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+.presetOn .presetImage {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12), 0 0 0 2px var(--ui-bg), 0 0 0 4px var(--ui-blue-text);
+}
+.presetName {
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.presetDraw {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 400px;
+  height: 866px;
+  transform: scale(0.12);
+  transform-origin: top left;
+}
+.presetActions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.subTitle {
+  margin: 14px 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ui-text-subtle);
+}
+.paletteRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+/* A unit that switches (percent or points). */
+.numUnitButton {
+  padding: 0 2px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+.numUnitButton:hover:not(:disabled) {
+  color: var(--ui-text);
+  background: var(--ui-hover);
+}
+/* The reference's chip, on its size row. */
+.row {
+  --bp-compact: #30b158;
+}
+[data-bp='compact'] {
+  --bp: var(--bp-compact);
+}
+/* A value one store size has of its own (Only on…): marked apart from the breakpoints', the field itself in its color. */
+[data-bp='device'],
+.captureLook {
+  --bp: #e8459b;
+}
+/* Capture's sections (the device's look) mark this size's own in the same color. */
+.captureLook {
+  --own-color: var(--bp);
+}
+.numField[data-bp='device'] {
+  background: color-mix(in srgb, var(--bp) 12%, transparent);
+  box-shadow: inset 0 0 0 1px var(--bp);
+  color: var(--bp);
+}
+.slider[data-bp='device'] .sliderHead {
+  color: var(--bp);
+}
+.numFrom {
+  box-shadow: inset 3px 0 0 var(--bp);
+}
+.bpMark {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: var(--bp);
+}
+.linkButton {
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ui-blue-text);
+  font: inherit;
+  cursor: pointer;
+}
+.linkButton:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* The listing's proposal open, in the toolbar's picker: its name, its status, make it Live or remove it. */
+.listingEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 3px;
+  padding: 10px 8px 8px;
+  border-top: 1px solid var(--ui-line-subtle);
+}
+.listingName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ui-text-2);
+  font-size: 12px;
+}
+.listingName input {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 6px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+}
+.listingStatus {
+  composes: segments;
+}
+.listingStatus .segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.listingActions {
+  display: flex;
+  gap: 8px;
+}
+.listingActions .button {
+  flex: 1;
+  justify-content: center;
+}
+.buttonPrimary,
+.buttonPrimary:hover:not(:disabled) {
+  border-color: #0d99ff;
+  background: #0d99ff;
+  color: #fff;
+}
+.buttonDanger,
+.buttonDanger:hover:not(:disabled) {
+  border-color: #e5484d;
+  background: #e5484d;
+  color: #fff;
+}
+
+/* The store, picked where its name is the canvas's title: its mark, its name, a chevron; the system's menu over it. */
+.storePicker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  margin-left: -8px;
+  padding: 0 6px 0 8px;
+  border-radius: 8px;
+  color: var(--ui-text);
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex: none;
+  cursor: pointer;
+}
+.storePicker:hover {
+  background: var(--ui-hover);
+}
+.storePicker select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* A device's screen as its picture (screenImage.tsx); while it's drawn, a light sweeps across it (on the compositor). */
+.screenStill {
+  position: relative;
+  overflow: hidden;
+  background: #f2f2f4;
+}
+.screenStill[data-dark] {
+  background: #161616;
+}
+.screenStill img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.screenLoading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: screenSweep 1.2s ease-in-out infinite;
+}
+.screenStill[data-dark].screenLoading::after {
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.12) 50%, transparent 70%);
+}
+.screenLoading img {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+@keyframes screenSweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* A layer past its image's edge, in the panel: where it goes on, or (past the first or last) that it's cut. */
+.crossing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.crossingCut {
+  color: var(--ui-amber-text);
+}
+
+/* Interact with the screen's header, at its right: who's using the app in it, and the page. */
+.dialogHeadRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+/* A component layer whose story is gone (renamed, removed): said where it was. */
+.missing {
+  padding: 8px;
+  border: 1px dashed currentColor;
+  border-radius: 8px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Undo and Redo, in the toolbar's actions. */
+.undo {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* Align and Distribute, several layers picked: one row of icon buttons. */
+.alignRow {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+/* The Layer panel's sections, on one rhythm: 10 between rows, 8 inside a row (a caption and its control), a
+   subgroup set apart by a line. Margins of their own are dropped: the column's gap spaces them. */
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sectionBody > *,
+.sectionBody .slider,
+.sectionBody .guideText {
+  margin: 0;
+}
+/* A note under the control it explains, nearer it than the next row. */
+.sectionBody > .guideText:not(:first-child) {
+  margin-top: -4px;
+}
+.sectionBody .guideText {
+  font-size: 11px;
+}
+.sectionBody .gap {
+  height: 0;
+  margin: 0;
+}
+.subhead {
+  margin: 4px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--ui-line-subtle);
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.captioned {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.caption,
+.toggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ui-text-2);
+  font-size: 12px;
+}
+.sliderEnd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.sliderHead {
+  align-items: center;
+}
+/* Back to the reference's value: small, in this size's color, beside the value it resets. */
+.resetValue {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--bp, var(--ui-text-muted));
+  cursor: pointer;
+}
+.resetValue:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bp, #888) 14%, transparent);
+}
+/* This size's own: a toggle, a choice or a slider's name in its color. */
+.toggleRow[data-bp='device'] .toggleLabel,
+.captioned:has([data-bp='device']) .caption,
+.captioned[data-bp='device'] > .caption,
+.sliderInline[data-bp='device'] .sliderLabel {
+  color: var(--bp);
+}
+.segments[data-bp='device'] {
+  box-shadow: inset 0 0 0 1px var(--bp);
+}
+/* A typed field (a family's name), as the panel's others. */
+.field {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--ui-fill);
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--ui-blue-text);
+  background: var(--ui-bg);
+}
+/* A color's hex, typed beside its swatch. */
+.colorValue .hexField {
+  flex: none;
+  width: 76px;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--ui-fill);
+  color: var(--ui-text-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+.colorValue .hexField:focus {
+  outline: none;
+  border-color: var(--ui-blue-text);
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+/* A choice under its caption spans the row (Model). */
+.captioned .dropdown {
+  width: 100%;
+  max-width: none;
+}
+.captioned .dropdownValue {
+  flex: 1;
+}
+/* W and H linked: the side that leads is typed (its letter in blue, a lock beside it), the other follows its shape. */
+.sizeRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+.leadLock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-muted);
+  cursor: pointer;
+}
+.leadLock:hover:not(:disabled) {
+  background: var(--ui-fill);
+  color: var(--ui-text);
+}
+.numLeads .numPrefix {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ui-blue-text);
+  font-weight: 600;
+}
+/* Calculated: no fill, a dashed edge, its number muted. */
+.numFollows {
+  border: 1px dashed var(--ui-line-strong);
+  background: transparent;
+}
+.numFollows input {
+  color: var(--ui-text-muted);
+}
+/* A layer shown or hidden on this size alone: its eye in this size's color. */
+.icon[data-bp='device'] {
+  color: var(--bp);
+}
+/* The export's modal: its title, a bar, how many and how long, what it's drawing, Cancel. */
+.exportDialog {
+  align-items: stretch;
+  width: min(560px, calc(100vw - 32px));
+  padding: 20px;
+}
+.exportHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+}
+.exportHead div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--ui-text-muted);
+}
+.exportHead strong {
+  color: var(--ui-text);
+  font-size: 14px;
+}
+.exportBar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--ui-fill);
+}
+/* Grows on the compositor: its width is the bar's, scaled to the share done. */
+.exportBar span {
+  display: block;
+  height: 100%;
+  background: var(--ui-blue-text);
+  transform-origin: left;
+  transition: transform 0.6s ease;
+}
+.exportNumbers {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: -6px;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.exportError {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.exportActions {
+  display: flex;
+  justify-content: flex-end;
+}
+/* What to export (ExportPicker): sizes by languages, a tick each; a row's or column's name ticks it whole. */
+.pickDialog {
+  width: min(720px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+}
+.pickScroll {
+  min-height: 0;
+  overflow: auto;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--ui-line-subtle);
+  scrollbar-width: thin;
+}
+.pickTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.pickTable th,
+.pickTable td {
+  padding: 0;
+  border-bottom: 1px solid var(--ui-line-subtle);
+  text-align: center;
+}
+.pickTable tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.pickTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ui-bg-subtle);
+}
+.pickTable th[scope='row'],
+.pickCorner {
+  text-align: left;
+}
+.pickTable tbody tr:hover {
+  background: var(--ui-bg-subtle);
+}
+.pickHead,
+.pickCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  color: var(--ui-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pickHead:hover .pickTick,
+.pickCell:hover .pickTick {
+  border-color: var(--ui-blue-text);
+}
+.pickColumn {
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+}
+.pickCell {
+  justify-content: center;
+}
+.pickLabel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 600;
+}
+.pickColumn .pickLabel {
+  font-weight: 600;
+  font-variant: all-small-caps;
+  letter-spacing: 0.02em;
+}
+.pickSize {
+  white-space: nowrap;
+}
+.pickMeta {
+  color: var(--ui-text-muted);
+  font-weight: 400;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pickTick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--ui-line);
+  border-radius: 4px;
+  background: var(--ui-bg);
+}
+.pickTick[data-state='all'],
+.pickTick[data-state='some'] {
+  border-color: var(--ui-blue-text);
+  background: var(--ui-blue-text);
+  color: #fff;
+}
+.pickGraphics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0 0;
+}
+.pickGraphicsTitle {
+  width: 100%;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.pickGraphics .pickHead {
+  width: auto;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+.pickActions {
+  align-items: center;
+  gap: 8px;
+}
+.pickCount {
+  margin-right: auto;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+/* The export's log: written as a terminal writes, a line a screenshot made, on the designer's own colors. */
+.exportLog {
+  height: 220px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ui-bg-subtle);
+  box-shadow: inset 0 0 0 1px var(--ui-line-subtle);
+  color: var(--ui-text);
+  font: 11.5px/1.6 ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  scrollbar-width: thin;
+}
+.logLine {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-items: center;
+  white-space: nowrap;
+}
+/* Which, size, language, pixels, time: columns, so they line up down the log. */
+.logRow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 104px) 48px minmax(0, 1fr) 40px;
+  gap: 8px;
+}
+.logRow > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.logCheck {
+  color: var(--ui-green-text);
+}
+/* Being drawn: the same line, quieter, until it's made. */
+.logDrawing {
+  color: var(--ui-text-muted);
+}
+.logDrawing .logLang {
+  color: inherit;
+}
+.logWarn {
+  color: var(--ui-amber-text);
+}
+.logMuted,
+.logShot,
+.logTime {
+  color: var(--ui-text-muted);
+}
+.logTime {
+  text-align: right;
+}
+.logLang {
+  color: var(--ui-blue-text);
+}
+/* The line being drawn: a ring turning on the compositor. */
+.logSpin {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--ui-line-strong);
+  border-top-color: var(--ui-text);
+  border-radius: 50%;
+  animation: logSpin 0.8s linear infinite;
+}
+@keyframes logSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
