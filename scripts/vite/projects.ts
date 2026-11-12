@@ -19,6 +19,12 @@ export interface ProjectConfig {
    * `connectors/*.json` that compare those components and tokens against the code).
    */
   shares?: { components?: string; theme?: string; connectors?: string };
+  /**
+   * What tells its builders what a proposal changes: `file` (the default), each proposal's `handoff.md`, which a test
+   * asks of every proposal that changes something; `code`, the mirror's code itself (its comments say why), so its
+   * proposals need none.
+   */
+  handoff?: 'file' | 'code';
 }
 
 export interface Project {
@@ -32,6 +38,7 @@ export interface Project {
   /** Its address from the site's root: '' for the first, `<id>/` for the others. */
   path: string;
   shares: NonNullable<ProjectConfig['shares']>;
+  handoff: NonNullable<ProjectConfig['handoff']>;
 }
 
 /** The project a copy has when it declares none: its app at the root. */
@@ -49,6 +56,7 @@ export function projectsOf(configs: ProjectConfig[] | undefined): Project[] {
       proposals: dir ? `${dir}/proposals` : 'proposals',
       path: i === 0 ? '' : `${p.id}/`,
       shares: p.shares ?? {},
+      handoff: p.handoff ?? 'file',
     };
   });
 }

@@ -9,6 +9,9 @@ import { useUrlState } from './SimContext';
 import { useProposalParam } from '../tools/ProposalPanel';
 import { ProposalMenu } from './ProposalMenu';
 import { ProjectMenu } from './ProjectMenu';
+import { ListingMenu } from '../store/ListingMenu';
+import { ExportButton } from '../store/ExportPicker';
+import { PreviewButton } from '../store/preview/StorePreview';
 import { useCommentsUi } from '../comments';
 import { t } from '../i18n/ui';
 import { useGalleryRoute } from '../gallery/route';
@@ -63,7 +66,9 @@ export function Toolbar(props: ToolbarProps) {
       )}
       {/* The logo, the modes and the versions are the rail's (ModeRail); here, with more than one, the project. */}
       {can('about') && <ProjectMenu />}
-      {can('proposals') && (
+      {/* App Store Assets' proposals are the listing's (its screenshots), never the app's: its screens are always Live. */}
+      {props.mode === 'store' && <ListingMenu />}
+      {props.mode !== 'store' && can('proposals') && (
         <>
           <ProposalMenu />
           <VariantPicker />
@@ -78,17 +83,17 @@ export function Toolbar(props: ToolbarProps) {
       <div className={styles.spacer} />
       {/* The actions on the right, closer together than the bar's own spacing. */}
       <div className={styles.actions}>
-      {props.mode !== 'flow' && props.mode !== 'tokens' && !capture && can('inspect') && (
+      {props.mode !== 'flow' && props.mode !== 'tokens' && props.mode !== 'store' && !capture && can('inspect') && (
         <Chip active={inspect} onClick={() => setInspect(!inspect)} title={t('Inspect components (I)')} tour="inspect">
           <Icon name="ads_click" size={18} />
           {t('Inspect')}
         </Chip>
       )}
-      {(props.mode === 'prototype' || (props.mode === 'components' && gallery)) && !capture && can('comments') && (
+      {(props.mode === 'prototype' || props.mode === 'store' || (props.mode === 'components' && gallery)) && !capture && can('comments') && (
         <Chip
           active={commenting}
           onClick={() => setCommenting(!commenting)}
-          title={props.mode === 'components' ? t('Comment: click on the component to leave one (C)') : t('Comment: click on the screen to leave one (C)')}
+          title={props.mode === 'components' ? t('Comment: click on the component to leave one (C)') : props.mode === 'store' ? t('Comment: click on a screenshot to leave one (C)') : t('Comment: click on the screen to leave one (C)')}
           tour="comment"
         >
           <Icon name="add_comment" size={18} />
@@ -97,7 +102,10 @@ export function Toolbar(props: ToolbarProps) {
       )}
       {/* Capture is in the mode rail (ModeRail). */}
       {/* Capture's picture is exported, not linked: a link here wouldn't bring it. */}
-      {!capture && can('share') && <ShareMenu />}
+      {props.mode === 'store' && <PreviewButton className={styles.chip} activeClassName={styles.active} />}
+      {!capture && can('share') && <ShareMenu secondary={props.mode === 'store'} />}
+      {/* App Store Assets' main action is its export, at the right: Share steps back beside it. */}
+      {props.mode === 'store' && <ExportButton className={styles.mainAction} />}
       {/* No panel on the right in this view (a guest's): no toggle for it. */}
       {rightTools > 0 && (
         <button className={styles.panelBtn} title={t('Toggle right panel')} onClick={props.onToggleRight}>

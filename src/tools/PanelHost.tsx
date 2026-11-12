@@ -11,7 +11,7 @@ import { useCanWrite } from '../persist/devApi';
 export const toolsOn = (side: 'left' | 'right', mode: Mode) =>
   TOOLS.filter((t) => t.side === side && (t.modes ?? ['prototype', 'components']).includes(mode) && showsTool(t.id));
 
-/** The side's tools shown here: those for editing only where the files can be written. */
+/** The side's tools shown here: those for editing (App Store Assets' layers) only where the files can be written. */
 export function useToolsOn(side: 'left' | 'right', mode: Mode) {
   const writable = useCanWrite();
   return toolsOn(side, mode).filter((t) => !t.editing || writable);

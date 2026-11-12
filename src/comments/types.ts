@@ -17,6 +17,18 @@ export const kindOf = (id: string): (typeof KINDS)[number] => KINDS.find((k) => 
 /** Where Live's comments go (a proposal's go under its code, `PJ-12`). */
 export const LIVE = 'live';
 
+/**
+ * App Store Assets' comments go apart from the app's: `store` for the Live listing, `store:L4` for a listing proposal.
+ * Each screenshot is a page of it (`store:<shot id>`), the size row it's on its example (the pin stays on that image).
+ */
+export const STORE = 'store';
+export const storeDesign = (listing: string | null) => (listing ? `${STORE}:${listing}` : STORE);
+export const storePage = (shot: string) => `${STORE}:${shot}`;
+/** The screenshot a comment's page is, or null when it isn't App Store Assets'. */
+export const shotOfPage = (page: string): string | null => (page.startsWith(`${STORE}:`) ? page.slice(STORE.length + 1) : null);
+/** The canvas of App Store Assets: its screenshots side by side, each its size row's example. */
+export const STORE_SCREEN = { device: '', display: '', bare: true };
+
 /** A link to one comment (`<its link>&comment=<id>`, as the Slack message has it): the canvas opens it there. */
 export const COMMENT_PARAM = 'comment';
 

@@ -7,6 +7,7 @@ import { BASE_PAGES } from '../nav/pages';
 import { proposalChanges, PROPOSALS } from '../proposals';
 import type { Proposal } from '../proposals/types';
 import { hasProposalNotes } from '../proposals/sources';
+import { PROJECT } from '../project';
 
 // A proposal with two takes on the rail (NavigationRail, in the code) and a component the code doesn't have
 // (EmptyState), that also adds a screen; and its specification, a part for each version.
@@ -103,8 +104,9 @@ describe('proposalHandoff', () => {
   });
 });
 
-// The handoff file is only as good as the specification: a proposal that changes something has to have one.
-describe.runIf(PROPOSALS.length)('every proposal', () => {
+// The handoff file is only as good as the specification: a proposal that changes something has to have one. Unless
+// the project's handoff is its code (herocanvas.config.ts `projects`, `handoff: 'code'`).
+describe.runIf(PROPOSALS.length && PROJECT.handoff === 'file')('every proposal', () => {
   it.each(PROPOSALS.map((p) => [p.folder, p] as const))('%s has a handoff.md', (_folder, p) => {
     const changes = proposalChanges(p, null, BASE_PAGES);
     if (changes.components.length || changes.pages.length) expect(hasProposalNotes(p.folder)).toBe(true);

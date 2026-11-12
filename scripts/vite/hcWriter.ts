@@ -6,6 +6,8 @@
 //   GET  /__hc/status            → { writable: true, root, project }: the copy it serves (npm run shot finds its own by
 //                                    it) and the project's id
 //   POST /__hc/write { path, data } → writes `data` as pretty JSON to `path` (relative to the project root)
+//   POST /__hc/upload { name, base64 } → saves an image (png, jpg, webp, svg) in public/assets/store/, named after
+//                                    `name` (lowercase, a number added when taken) → { path } from the site's root
 //   POST /__hc/manifest { page, split, sideColumn, landscape } → rewrites those fields of one page in app/pages.tsx
 //                                    (`null` removes the field; omitted fields are left alone)
 //   POST /__hc/index { design, again } → { index, at, stale, progress }: where each component shows, made in the dev
@@ -16,7 +18,7 @@
 //
 // Guard rails: only JSON, only under ALLOWED paths, and only same-origin requests that carry the
 // `x-hc: 1` header (a cross-site page can't send it without a CORS preflight, which is never approved).
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { dirname, relative, resolve, sep } from 'node:path';
 import type { Plugin } from 'vite';
@@ -25,7 +27,7 @@ import { pageIndexCache } from './pageIndexCache.ts';
 import { screenCache } from './screenCache.ts';
 
 /** Files and folders the app may write. */
-const ALLOWED = ['app/screen-config.json', 'proposals/'];
+const ALLOWED = ['app/screen-config.json', 'app/store-assets.json', 'proposals/'];
 
 /** A path as the designer names it (the first project's folders), in the project's own folders. */
 export function inProject(project: Pick<Project, 'app' | 'proposals'>, path: string): string {
@@ -40,6 +42,21 @@ function allowed(root: string, project: Project, path: string): string | null {
 }
 
 const MANIFEST = 'app/pages.tsx';
+
+/** Where uploaded images go (App Store Assets' image layers), served from the site's root. */
+const UPLOADS = 'public/assets/store';
+const IMAGE_EXT = /\.(png|jpe?g|webp|svg)$/;
+
+/** A free file name for an upload: lowercase letters, digits and dashes, its extension kept, a number when taken. */
+function uploadName(dir: string, name: string): string | null {
+  const ext = name.toLowerCase().match(IMAGE_EXT)?.[0];
+  if (!ext) return null;
+  const base = name.toLowerCase().slice(0, -ext.length).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'image';
+  for (let n = 1; ; n++) {
+    const file = `${base}${n > 1 ? `-${n}` : ''}${ext}`;
+    if (!existsSync(resolve(dir, file))) return file;
+  }
+}
 
 /** A JS value as a TS literal in the manifest's style: `{ a: 1, b: 'x' }`. */
 function literal(v: unknown): string {
@@ -160,6 +177,20 @@ export function hcWriter(project: Project): Plugin {
             return send(res, 200, { src: `${base}__hc/screens/${key}.png` });
           } catch (e) {
             server.config.logger.warn(`[hc] screen: ${e}`, { timestamp: true });
+            return send(res, 500, { error: String(e) });
+          }
+        }
+        if (req.method === 'POST' && req.url === '/upload') {
+          try {
+            const { name, base64 } = JSON.parse(await readBody(req, 16_000_000));
+            const dir = resolve(root, UPLOADS);
+            const file = typeof name === 'string' && typeof base64 === 'string' ? uploadName(dir, name) : null;
+            if (!file) return send(res, 400, { error: 'an image (png, jpg, webp, svg) is needed' });
+            mkdirSync(dir, { recursive: true });
+            writeFileSync(resolve(dir, file), Buffer.from(base64, 'base64'));
+            server.config.logger.info(`[hc] saved ${UPLOADS}/${file}`, { timestamp: true });
+            return send(res, 200, { path: `assets/store/${file}` });
+          } catch (e) {
             return send(res, 500, { error: String(e) });
           }
         }

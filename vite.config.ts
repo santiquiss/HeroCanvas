@@ -43,7 +43,7 @@ function projectConfig(project: Project): UserConfig {
       __APP_VERSION__: JSON.stringify(pkg.version),
       __HC_VERSION__: JSON.stringify(hcVersion.version),
       // The project this build shows, and every project (the toolbar's menu goes from one to another).
-      __HC_PROJECT__: JSON.stringify({ id: project.id, root: project.root, path: project.path }),
+      __HC_PROJECT__: JSON.stringify({ id: project.id, root: project.root, path: project.path, handoff: project.handoff }),
       __HC_PROJECTS__: JSON.stringify(process.env.VITEST ? [] : PROJECTS.map((p) => ({ id: p.id, name: p.name, path: p.path }))),
       // The proposal codes the other projects took (as the server or the build started): a new one here doesn't.
       __HC_OTHER_CODES__: JSON.stringify(PROJECTS.filter((p) => p.id !== project.id).flatMap((p) => takenCodes(ROOT, p))),

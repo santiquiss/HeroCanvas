@@ -21,7 +21,8 @@ import { CommentText } from './MentionField';
 import { Avatar, EditField, Message, OwnActions, ReplyField, ResolveButton, useMine, When } from './parts';
 import { ALL_DESIGNS, commentsShared, refresh, useAllComments, useComments, useCommentsOf } from './store';
 import { commentLink, filterThreads, resolverName, threadMatches, threadNumbers, threadsOf, timeAgo, type Thread } from './threads';
-import { componentOfPage, componentPage, LIVE } from './types';
+import { componentOfPage, componentPage, LIVE, shotOfPage, STORE } from './types';
+import { shotsNow } from '../store/shots';
 import panel from '../tools/Panel.module.css';
 import styles from './Comments.module.css';
 import { plural, t } from '../i18n/ui';
@@ -64,7 +65,7 @@ export default function CommentsPanel() {
     const ds = [...new Set(threadsAll.map((t) => t.root.design))];
     return ds.sort((a, b) => (a === LIVE ? -1 : b === LIVE ? 1 : a.localeCompare(b, undefined, { numeric: true })));
   }, [threadsAll]);
-  const label = (t: Thread) => componentOfPage(t.root.page) ?? pageName(pagesOf(t.root.design, nav.proposal?.id, nav.pages), t.root.page);
+  const label = (t: Thread) => shotLabel(t.root.page) ?? componentOfPage(t.root.page) ?? pageName(pagesOf(t.root.design, nav.proposal?.id, nav.pages), t.root.page);
   const threads = (everything ? filterThreads(threadsAll, { resolved }) : filterThreads(threadsAll, { resolved, variant })).filter(
     (t) =>
       (everything ? !picked.length || picked.includes(t.root.design) : onScreen.has(t.root.page) || t.root.id === selected) &&
@@ -231,8 +232,19 @@ function ThreadCard({ thread, number, pageLabel, open, elsewhere, onToggle }: { 
 /** A design as the panel names it: Live, or a proposal's code (`long`: with its title, in the filter). */
 function designName(design: string, long = false): string {
   if (design === LIVE) return t('Live');
+  // App Store Assets': its Live listing, or a listing proposal's code.
+  if (design === STORE) return t('App Store');
+  if (design.startsWith(`${STORE}:`)) return `${t('App Store')} · ${design.slice(STORE.length + 1)}`;
   const p = findProposal(design);
   return p && long ? proposalLabel(p) : design;
+}
+
+/** An App Store screenshot as a thread names it: its place in the listing on screen ("Screenshot 3"). */
+function shotLabel(page: string): string | null {
+  const id = shotOfPage(page);
+  if (!id) return null;
+  const n = shotsNow().findIndex((s) => s.id === id);
+  return n >= 0 ? t('Screenshot {n}', { n: n + 1 }) : t('Screenshot');
 }
 
 const manifests = new Map<string, Manifest>();
