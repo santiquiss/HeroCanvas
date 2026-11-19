@@ -33,6 +33,8 @@ when the task is one of these):
   `app/` filled with its mirror (settings, tokens, navigation, one page per screen).
 - **`mirror-screen`**: one screen or component of the app, built or fixed to match its code.
 - **`new-proposal`**: a change to the app as a proposal (`proposals/<slug>`), with versions and a handoff.
+- **`proposal-spec`**: a proposal's spec (`npm run spec`): its screens and states with pictures and structure, and
+  its handoff, as files read from a link by the developers and their agents; required once it's in review or handed off.
 - **`new-persona`**: one or several personas, from what about a user changes the app's screens and the person's
   answers: each with its mock data and an optional photo (`npm run persona:avatar`).
 - **`update-herocanvas`**: a newer HeroCanvas into this copy (`npm run update`), its clashes resolved and the team's

@@ -1,10 +1,8 @@
 // Proposal panel: base vs proposals, create one, edit its meta and status, and see what it changes.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { Icon } from '../components/Icon';
-import { loadLibrary, useLibrary } from '../design/library';
-import { HANDOFF_NOTES_FILE, proposalHandoff } from '../design/proposalHandoff';
-import { PROPOSAL_STORIES } from '../design/stories';
+import { useLibrary } from '../design/library';
 import { ChangeBadge } from '../flow/FlowView';
 import { componentKind, useGalleryNav, useGalleryRoute } from '../gallery/route';
 import { useNavRoot } from '../nav/context';
@@ -15,7 +13,8 @@ import { recalledAuthor, rememberAuthor } from '../persist/author';
 import { useCanWrite, writeJson } from '../persist/devApi';
 import { authorLetters, defaultAuthorLetters, MAX_AUTHOR_LETTERS, nextProposalCode } from '../proposals/code';
 import { RETIRED_CODES } from '../proposals/retired';
-import { hasProposalNotes, loadProposalNotes } from '../proposals/sources';
+import { HANDOFF_NOTES_FILE, hasProposalNotes } from '../proposals/sources';
+import { loadSpecMeta, specOf, specUrl, type SpecMeta } from '../proposals/specs';
 import { activeVariant, CHANGES_PARAM, findProposal, listedProposals, PROPOSALS, proposalChanges, proposalPath, SCOPE_LABEL, slugify, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import { modeOf } from '../sim/modes';
 import { useUrlState } from '../sim/SimContext';
@@ -261,7 +260,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
         )}
       </div>
 
-      <HandoffSection p={p} />
+      <SpecSection p={p} />
 
       <div className={styles.section}>
         <div className={styles.sectionTitle}>{t('Files')}</div>
@@ -271,6 +270,7 @@ function ActiveProposal({ p }: { p: Proposal }) {
           <br />· pages.tsx — {t('new / replaced pages (code)')}
           <br />· components/ — {t('new components + stories')}
           <br />· {HANDOFF_NOTES_FILE} — {t('the specification for whoever implements it')}
+          <br />· spec.json — {t('the screens and states its spec shows')}
         </div>
       </div>
     </>
@@ -278,77 +278,71 @@ function ActiveProposal({ p }: { p: Proposal }) {
 }
 
 /**
- * The proposal as a file of instructions for whoever implements it in the app (a coding agent, a person): what
- * changes and where in the app's code, the proposal's specification (its handoff.md) and how to check it. For the
- * version on screen.
+ * The proposal's spec (`npm run spec`): its screens and states with pictures, their structure and its handoff, as
+ * files anyone reads from a link — the developers and their agents, without the designer. Its links, or how to make it.
  */
-function HandoffSection({ p }: { p: Proposal }) {
-  const [variant] = useUrlState<string>(VARIANT_PARAM, '');
-  const [done, setDone] = useState<'copied' | 'saved' | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const version = activeVariant(p, variant || null);
-
-  const build = async () => {
-    const [library, notes] = await Promise.all([loadLibrary(), loadProposalNotes(p.folder)]);
-    // The link opens this proposal and version on the page it starts on, with its changes outlined.
-    const query = new URLSearchParams({ proposal: p.id, ...(version ? { [VARIANT_PARAM]: version.id } : {}), [CHANGES_PARAM]: '1' });
-    return proposalHandoff({
-      proposal: p,
-      variantId: version?.id ?? null,
-      changes: proposalChanges(p, version?.id ?? null, BASE_PAGES),
-      basePages: BASE_PAGES,
-      library,
-      libraryCommit: library.version,
-      notes,
-      stories: (PROPOSAL_STORIES.get(p.id) ?? []).map((m) => ({ component: m.component, names: m.stories.map((s) => s.name), note: m.note })),
-      link: `${window.location.origin}${window.location.pathname}#/${p.start ?? HOME}?${query}`,
-      date: new Date().toISOString().slice(0, 10),
-    });
+function SpecSection({ p }: { p: Proposal }) {
+  const spec = specOf(p.folder, p.id);
+  const [meta, setMeta] = useState<SpecMeta | null | 'loading'>('loading');
+  const [copied, setCopied] = useState<'people' | 'agents' | null>(null);
+  const path = spec?.path ?? null;
+  useEffect(() => {
+    let live = true;
+    if (!path) return setMeta(null);
+    setMeta('loading');
+    loadSpecMeta(path).then((m) => live && setMeta(m));
+    return () => {
+      live = false;
+    };
+  }, [path]);
+  const copy = async (who: 'people' | 'agents') => {
+    await navigator.clipboard.writeText(specUrl(path!, who === 'people' ? 'index.html' : 'index.md'));
+    setCopied(who);
+    window.setTimeout(() => setCopied(null), 1500);
   };
-  const run = async (what: 'copied' | 'saved', deliver: (text: string) => void | Promise<void>) => {
-    try {
-      setError(null);
-      await deliver(await build());
-      setDone(what);
-      window.setTimeout(() => setDone(null), 1500);
-    } catch (e) {
-      setError(String(e));
-    }
-  };
-  const download = (text: string) => {
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/markdown' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `handoff-${p.id}${version ? `-${version.id}` : ''}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const command = `npm run spec -- ${p.id}`;
+  const ready = !!path && meta !== 'loading' && meta !== null;
 
   return (
     <div className={styles.section}>
-      <div className={styles.sectionTitle}>{t('Handoff for agents')}</div>
+      <div className={styles.sectionTitle}>{t('Spec')}</div>
       <p className={styles.muted} style={{ margin: '0 0 8px', lineHeight: '16px' }}>
-        {t("A file of instructions to implement {target} in the app: what changes and where it is in the app's code, the specification ({file}) and how to check it. No simulator code in it. Built on the spot, from the proposal as it is.", {
-          target: version ? t('version {id}', { id: version.id.toUpperCase() }) : t('the proposal'),
-          file: HANDOFF_NOTES_FILE,
-        })}
+        {t("The proposal as files anyone opens from a link, without the designer: each screen and state in pictures, its structure (components, props, spacing, tokens) and the handoff's logic. What the developers and their agents build from.")}
       </p>
       {!hasProposalNotes(p.folder) && (
         <p style={{ margin: '0 0 8px', lineHeight: '16px', color: 'var(--ui-amber-text)' }}>
-          {t('{file} is missing: without the specification the file says what changes, not how. Ask the agent to write it.', { file: HANDOFF_NOTES_FILE })}
+          {t('{file} is missing: the spec takes its logic from it.', { file: HANDOFF_NOTES_FILE })}
         </p>
       )}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        <button className={styles.btn} onClick={() => run('copied', (text) => navigator.clipboard.writeText(text))}>
-          <Icon name={done === 'copied' ? 'check' : 'content_copy'} size={14} />
-          {done === 'copied' ? t('Copied') : t('Copy instructions')}
-        </button>
-        <button className={styles.btn} onClick={() => run('saved', download)}>
-          <Icon name={done === 'saved' ? 'check' : 'download'} size={14} />
-          {done === 'saved' ? t('Downloaded') : t('Download .md')}
-        </button>
-      </div>
-      {error && <span style={{ color: 'var(--ui-red-text)' }}>{error}</span>}
+      {!spec ? (
+        <p style={{ margin: 0, lineHeight: '16px', color: 'var(--ui-amber-text)' }}>
+          {t('No spec yet: list its screens and states in {file}, then run {command}.', { file: 'spec.json', command })}
+        </p>
+      ) : !ready ? (
+        <p style={{ margin: 0, lineHeight: '16px', color: meta === 'loading' && path ? 'var(--ui-text-2)' : 'var(--ui-amber-text)' }}>
+          {meta === 'loading' && path ? t('Looking for it…') : t('Not generated yet, or not published: run {command}.', { command })}
+        </p>
+      ) : (
+        <>
+          <p className={styles.muted} style={{ margin: '0 0 8px', lineHeight: '16px' }}>
+            {t('{n} screens · generated {date} from version {version}. Generate it again after every change.', { n: String(spec.screens), date: meta.generated, version: meta.version })}
+          </p>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <a className={styles.btn} href={specUrl(path, 'index.html')} target="_blank" rel="noreferrer">
+              <Icon name="open_in_new" size={14} />
+              {t('Open')}
+            </a>
+            <button className={styles.btn} onClick={() => copy('people')}>
+              <Icon name={copied === 'people' ? 'check' : 'link'} size={14} />
+              {copied === 'people' ? t('Copied') : t('Link for people')}
+            </button>
+            <button className={styles.btn} onClick={() => copy('agents')}>
+              <Icon name={copied === 'agents' ? 'check' : 'smart_toy'} size={14} />
+              {copied === 'agents' ? t('Copied') : t('Link for agents')}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

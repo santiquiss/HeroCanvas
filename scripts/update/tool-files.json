@@ -9,6 +9,7 @@
     ".claude/skills/connect-app",
     ".claude/skills/mirror-screen",
     ".claude/skills/new-proposal",
+    ".claude/skills/proposal-spec",
     ".claude/skills/new-persona",
     ".claude/skills/update-herocanvas"
   ],

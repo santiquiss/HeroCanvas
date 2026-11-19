@@ -47,6 +47,13 @@ describe('gate', () => {
     expect(await teamToken('team-pass')).toBe('L_OypwTjyNVC1SAsG930RrCEp05bbVfujJM3AU5gQQs');
   });
 
+  it('lets anyone read a proposal’s spec, and nothing beside it', async () => {
+    const o = { name: 'X', sitePassword: 'team-pass', shareSecret: 's', profiles: [] };
+    expect(await gate(new Request('https://x.test/spec/PS-9-0123456789abcdef01234567/index.md'), o)).toBe('next');
+    expect(await gate(new Request('https://x.test/specs'), o)).not.toBe('next');
+    expect(await gate(new Request('https://x.test/'), o)).not.toBe('next');
+  });
+
   it('closes the site without SITE_PASSWORD, and asks for it without the cookie', async () => {
     expect(asResponse(await gate(req('/'), { ...opts, sitePassword: undefined })).status).toBe(503);
     expect(asResponse(await gate(req('/'), opts)).status).toBe(401);
@@ -100,6 +107,17 @@ describe('gate', () => {
     const data = await readToken('secret', new URL(url).pathname.slice('/__s/'.length));
     expect(data?.h).toEqual(['pages']);
     expect(data?.c).toEqual(['devices']);
+  });
+
+  it('carries only the app, signed; nothing but true turns it on', async () => {
+    const make = async (app: unknown) => {
+      const res = asResponse(await gate(req('/__share', { method: 'POST', cookie: await teamCookie(), body: JSON.stringify({ hours: 24, profile: 'simple', start: '#/today', app }) }), opts));
+      return new URL(((await res.json()) as { url: string }).url).pathname;
+    };
+    const path = await make(true);
+    expect((await readToken('secret', path.slice('/__s/'.length)))?.a).toBe(1);
+    expect((await readToken('secret', (await make('yes')).slice('/__s/'.length)))?.a).toBeUndefined();
+    expect(asResponse(await gate(req(path), opts)).status).toBe(303);
   });
 
   it('lets someone of the team back out of a guest view, and no guest', async () => {

@@ -273,3 +273,25 @@ export function textOverflowOf(el: Element): { maxLines: number; overflow: 'elli
   }
   return null;
 }
+
+/** Not drawn: no box (display none), or hidden. */
+export const unseen = (el: Element) => el.getClientRects().length === 0 || getComputedStyle(el).visibility === 'hidden';
+
+/**
+ * A page layer that shows: not hidden, and not covered whole by a page layer drawn over it (a push or a cover that
+ * spans it on a phone; beside it, in a split, both show). Within the screen it's clipped to.
+ */
+export function showing(page: HTMLElement): boolean {
+  if (unseen(page)) return false;
+  const screen = page.closest('[data-theme]') ?? page.parentElement!;
+  const s = screen.getBoundingClientRect();
+  const clip = (r: DOMRect) => ({ l: Math.max(r.left, s.left), t: Math.max(r.top, s.top), r: Math.min(r.right, s.right), b: Math.min(r.bottom, s.bottom) });
+  const own = clip(page.getBoundingClientRect());
+  if (own.r - own.l < 1 || own.b - own.t < 1) return false;
+  return ![...screen.querySelectorAll<HTMLElement>('[data-hc-page]')].some((q) => {
+    // Pages later in the document are drawn over this one (their z-index only grows).
+    if (q === page || q.contains(page) || page.contains(q) || !(page.compareDocumentPosition(q) & Node.DOCUMENT_POSITION_FOLLOWING) || unseen(q)) return false;
+    const o = clip(q.getBoundingClientRect());
+    return o.l <= own.l + 1 && o.t <= own.t + 1 && o.r >= own.r - 1 && o.b >= own.b - 1;
+  });
+}

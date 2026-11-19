@@ -38,6 +38,9 @@ describe('the device in hand', () => {
     expect([phone.known, phone.device.type, phone.display.os, phone.display.w, phone.display.h]).toEqual([false, 'phone', 'ios', 385, 700]);
     const tablet = realDisplay({ w: 1180, h: 820, safe: NONE }, 'android');
     expect([tablet.device.type, tablet.display.os, tablet.land, tablet.display.rot]).toEqual(['tablet', 'android', true, true]);
+    // A computer's window a tablet's size or more: a browser window, with a mouse.
+    const window = realDisplay({ w: 1512, h: 787, safe: NONE }, 'other');
+    expect([window.device.type, window.display.os, window.display.rot, window.display.w, window.display.h, window.land]).toEqual(['desktop', 'web', undefined, 1512, 787, false]);
   });
 
   it('lays out with the safe area the device reports', () => {

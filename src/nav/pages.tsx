@@ -1,6 +1,7 @@
 // The connected app's pages (app/pages.tsx) and navigation, as the tools read them. With none (no app connected yet:
 // a fresh copy), HeroCanvas's own tour stands in (src/tour): a small app of its own, so every part of the
 // designer has something real to show while explaining itself.
+import { setTopBannerHeight } from '../sim/topBanner';
 import { BASE_PAGES as APP_PAGES, navigation as APP_NAVIGATION } from '@app';
 import { appConfig } from '@app/config';
 import type { AppNavigation, LaunchConfig } from '../contract';
@@ -16,6 +17,7 @@ export { NO_APP };
 
 export const BASE_PAGES: Record<string, PageDef> = NO_APP ? TOUR_PAGES : APP_PAGES;
 export const NAVIGATION: AppNavigation = NO_APP ? TOUR_NAVIGATION : APP_NAVIGATION;
+setTopBannerHeight(NAVIGATION.TopBanner?.useHeight);
 // What the simulator presents with: the app's own components over the kit's (kit/appKit).
 setAppKit(NAVIGATION.kit);
 /** The app's launch (the tour's with none), or none: it opens straight on its first screen. */

@@ -7,11 +7,12 @@ import { t } from '../i18n/ui';
 import { APP_CONTROLS, DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/persona';
 import { PersonaPicker } from '../tools/PersonaPicker';
 import { TOOLS } from '../tools/registry';
-import { DEFAULT_DEVICE, DEVICES } from '../devices/devices';
+import { DEFAULT_DEVICE, deviceIcon, DEVICES } from '../devices/devices';
+import { REAL_PARAM } from '../sim/realDevice';
 import { DevicePicker } from '../sim/MultiDevices';
 import { activeVariant, CHANGES_PARAM, findProposal, VARIANT_PARAM, WHERE_PARAM } from '../proposals';
 import { LINK_HOURS, type ViewControl } from './profiles';
-import { ALLOW_PARAM, HIDE_PARAM, PROFILES, SHARE_URL } from './view';
+import { ALLOW_PARAM, APP_PARAM, HIDE_PARAM, PROFILES, SHARE_URL } from './view';
 import styles from './ShareMenu.module.css';
 
 /** In the hash's query: open Share's guest link on arrival (from "Make it on the production site"). */
@@ -43,6 +44,14 @@ function currentProposal() {
 }
 /** What a proposal brings with it in the URL: its version, and its changes outlined. */
 const PROPOSAL_PARAMS = ['proposal', VARIANT_PARAM, CHANGES_PARAM, WHERE_PARAM];
+
+/**
+ * A browser window's device (a web app's Desktop, Laptop): on a computer it can open expanded, the app filling the
+ * window at its real size with no designer around it (real mode, `?real=1`).
+ */
+const expands = (id: string) => DEVICES.find((d) => d.id === id)?.displays[0].os === 'web';
+/** This view's link, expanded. */
+const expandedHref = () => `${window.location.origin}${window.location.pathname}${withParams(window.location.hash || '#/', { [REAL_PARAM]: '1' })}`;
 
 /** What a device brings with it in the URL: its display, landscape, a set or Compare. */
 const DEVICE_PARAMS = ['device', 'display', 'land', 'devices', 'compare'];
@@ -124,7 +133,12 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
   useEffect(() => {
     if (open) setLive(false);
   }, [open]);
-  const start = startOf(onScreen, persona, device, live);
+  // Only the app: the guest gets it expanded, filling their window, with no way to the designer (a browser window's
+  // device only): someone trying it, as a coach would.
+  const [appOnlyChecked, setAppOnly] = useState(false);
+  const appOnly = appOnlyChecked && expands(device);
+  const base = startOf(onScreen, persona, device, live);
+  const start = appOnly ? withParams(base, { [REAL_PARAM]: '1' }) : base;
   const root = useRef<HTMLDivElement>(null);
 
   // Arrived from another copy to make a guest link: the menu opens, the param leaves the URL.
@@ -161,7 +175,7 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
   const make = async () => {
     setState({ kind: 'making' });
     try {
-      const res = await fetch('/__share', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ hours, profile, start, hide, allow }) });
+      const res = await fetch('/__share', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ hours, profile, start, hide, allow, app: appOnly }) });
       // No door here (the dev server, a copy hosted without it): the production site makes them.
       if (!(res.headers.get('content-type') ?? '').includes('application/json')) return setState({ kind: 'elsewhere' });
       const body = (await res.json()) as Partial<Made> & { error?: string };
@@ -192,6 +206,15 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
               <span className={styles.rowHint}>{t('For the team: opens this same view')}</span>
             </span>
           </button>
+          {expands(currentDevice()) && (
+            <button className={styles.row} onClick={() => copy('expanded', expandedHref())}>
+              <Icon name={copied === 'expanded' ? 'check' : 'open_in_full'} size={18} />
+              <span className={styles.rowText}>
+                <span className={styles.rowTitle}>{copied === 'expanded' ? t('Link copied') : t('Copy expanded link')}</span>
+                <span className={styles.rowHint}>{t('For the team: only the app, filling the window')}</span>
+              </span>
+            </button>
+          )}
           <div className={styles.divider} />
           <div className={styles.section}>
             <div className={styles.head}>
@@ -261,7 +284,7 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
                 <div className={styles.label}>
                   {t('On a computer, on')}
                   <DevicePicker className={styles.device} value={device} title={t('Device')} onPick={setDevice}>
-                    <Icon name={DEVICES.find((d) => d.id === device)!.type === 'tablet' ? 'tablet' : 'smartphone'} size={16} />
+                    <Icon name={deviceIcon(DEVICES.find((d) => d.id === device)!)} size={16} />
                     <span className={styles.deviceName}>{DEVICES.find((d) => d.id === device)!.name}</span>
                     <Icon name="expand_more" size={16} />
                   </DevicePicker>
@@ -274,7 +297,17 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
                     <span className={styles.rowHint}>{onScreen ? t('As it is now, with its theme') : t('The app’s first screen')}</span>
                   </span>
                 </label>
-                {optional.map((id) => {
+                {expands(device) && (
+                  <label className={styles.check}>
+                    <input type="checkbox" checked={appOnlyChecked} onChange={(e) => setAppOnly(e.target.checked)} />
+                    <span>
+                      {t('Only the app')}
+                      <span className={styles.rowHint}>{t('Expanded, filling their window, with no way to the designer: for someone to try it')}</span>
+                    </span>
+                  </label>
+                )}
+                {/* Only the app has no panels or controls to give. */}
+                {!appOnly && optional.map((id) => {
                   const tool = TOOLS.find((x) => x.id === id);
                   return (
                     <label key={id} className={styles.check}>
@@ -283,7 +316,7 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
                     </label>
                   );
                 })}
-                {extra.map((c) => (
+                {!appOnly && extra.map((c) => (
                   <label key={c} className={styles.check}>
                     <input type="checkbox" checked={allowed.includes(c)} onChange={(e) => setAllowed((a) => (e.target.checked ? [...a, c] : a.filter((x) => x !== c)))} />
                     <span>{ALLOW_LABEL[c] ?? c}</span>
@@ -301,7 +334,7 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
                 </div>
                 {state.kind === 'error' && <p className={styles.error}>{state.message}</p>}
                 <div className={styles.actions}>
-                  <a className={styles.secondary} href={`${window.location.pathname}${withParams(start, { view: profile, [HIDE_PARAM]: hide.join('+'), [ALLOW_PARAM]: allow.join('+') })}`} target="_blank" rel="noreferrer" title={t('Opens this view as a guest sees it, in a new tab')}>
+                  <a className={styles.secondary} href={`${window.location.pathname}${withParams(start, { view: profile, [HIDE_PARAM]: hide.join('+'), [ALLOW_PARAM]: allow.join('+'), [APP_PARAM]: appOnly ? '1' : '' })}`} target="_blank" rel="noreferrer" title={t('Opens this view as a guest sees it, in a new tab')}>
                     {t('Preview')}
                   </a>
                   <button className={styles.primary} onClick={make} disabled={state.kind === 'making'}>

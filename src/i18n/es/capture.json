@@ -224,5 +224,9 @@
   "Chrome didn't send frames of the device": "Chrome no envió fotogramas del dispositivo",
   "Nothing was recorded": "No se grabó nada",
   "Lighting": "Luz",
-  "Closed": "Cerrado"
+  "Closed": "Cerrado",
+  "Minimal": "Minimalista",
+  "Realistic": "Realista",
+  "Sand": "Arena",
+  "Back to the reference’s": "Volver al de la referencia"
 }

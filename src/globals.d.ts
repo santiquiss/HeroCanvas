@@ -17,7 +17,7 @@ declare const __HC_SHARE__: { url: string | null; profiles: Record<string, impor
 declare module 'virtual:hc-brand.css';
 
 /** The project this build shows (herocanvas.config.ts `projects`): the first is the root, the others at `path`. */
-declare const __HC_PROJECT__: { id: string; root: boolean; path: string };
+declare const __HC_PROJECT__: { id: string; root: boolean; path: string; handoff: 'file' | 'code' };
 /** Every project of the copy, for the toolbar's menu; empty with only one. */
 declare const __HC_PROJECTS__: { id: string; name: string; path: string }[];
 /** The proposal codes the copy's other projects took or retired: a code is the copy's, never given twice. */

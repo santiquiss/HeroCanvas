@@ -17,11 +17,14 @@ export interface View {
   hidden: string[];
   /** Of the profile's extra controls, those this link gives back (`?view-allow=devices`). */
   allowed: ViewControl[];
+  /** Only the app (`?view-app=1`): real mode, filling the window, with no way to the designer (sim/RealShell). */
+  appOnly: boolean;
 }
 
 /** The URL's params for the panels a tried view leaves out and the controls it gives back. */
 export const HIDE_PARAM = 'view-hide';
 export const ALLOW_PARAM = 'view-allow';
+export const APP_PARAM = 'view-app';
 
 /** The link's extra controls the profile allows: no other. */
 const allowedOf = (profile: ViewProfile, raw: string | null | undefined) => parseHidden(raw).filter((c): c is ViewControl => (profile.extra ?? []).includes(c as ViewControl));
@@ -29,12 +32,13 @@ const allowedOf = (profile: ViewProfile, raw: string | null | undefined) => pars
 const KEY = 'hc.view';
 const HIDE_KEY = 'hc.view.hide';
 const ALLOW_KEY = 'hc.view.allow';
+const APP_KEY = 'hc.view.app';
 
 function fromCookie(): View | null {
   const raw = typeof document === 'undefined' ? '' : (document.cookie.split('; ').find((c) => c.startsWith('hc_view=')) ?? '');
-  const [id, expires, hidden, allowed] = raw.slice('hc_view='.length).split('.');
+  const [id, expires, hidden, allowed, app] = raw.slice('hc_view='.length).split('.');
   const profile = PROFILES[id];
-  return profile && Number(expires) > 0 ? { id, profile, expires: Number(expires), hidden: parseHidden(hidden), allowed: allowedOf(profile, allowed) } : null;
+  return profile && Number(expires) > 0 ? { id, profile, expires: Number(expires), hidden: parseHidden(hidden), allowed: allowedOf(profile, allowed), appOnly: app === 'app' } : null;
 }
 
 function tried(): View | null {
@@ -46,8 +50,10 @@ function tried(): View | null {
       sessionStorage.removeItem(KEY);
       sessionStorage.removeItem(HIDE_KEY);
       sessionStorage.removeItem(ALLOW_KEY);
+      sessionStorage.removeItem(APP_KEY);
       q.delete(HIDE_PARAM);
       q.delete(ALLOW_PARAM);
+      q.delete(APP_PARAM);
       // Back to the whole designer: the param did its job, it leaves the URL.
       q.delete('view');
       const rest = q.toString();
@@ -57,10 +63,11 @@ function tried(): View | null {
       sessionStorage.setItem(KEY, asked);
       sessionStorage.setItem(HIDE_KEY, parseHidden(q.get(HIDE_PARAM)).join('+'));
       sessionStorage.setItem(ALLOW_KEY, parseHidden(q.get(ALLOW_PARAM)).join('+'));
+      sessionStorage.setItem(APP_KEY, q.get(APP_PARAM) === '1' ? '1' : '');
     }
     const id = sessionStorage.getItem(KEY);
     if (!id || !PROFILES[id]) return null;
-    return { id, profile: PROFILES[id], expires: null, hidden: parseHidden(sessionStorage.getItem(HIDE_KEY)), allowed: allowedOf(PROFILES[id], sessionStorage.getItem(ALLOW_KEY)) };
+    return { id, profile: PROFILES[id], expires: null, hidden: parseHidden(sessionStorage.getItem(HIDE_KEY)), allowed: allowedOf(PROFILES[id], sessionStorage.getItem(ALLOW_KEY)), appOnly: sessionStorage.getItem(APP_KEY) === '1' };
   } catch {
     return null;
   }
@@ -77,7 +84,8 @@ if (typeof window !== 'undefined' && !VIEW?.expires) {
     const asked = q.get('view');
     const hidden = parseHidden(q.get(HIDE_PARAM)).join('+');
     const allowed = parseHidden(q.get(ALLOW_PARAM)).join('+');
-    const changed = !VIEW || asked !== VIEW.id || hidden !== VIEW.hidden.join('+') || allowed !== VIEW.allowed.join('+');
+    const app = q.get(APP_PARAM) === '1';
+    const changed = !VIEW || asked !== VIEW.id || hidden !== VIEW.hidden.join('+') || allowed !== VIEW.allowed.join('+') || app !== VIEW.appOnly;
     if ((asked === 'full' && VIEW) || (asked && asked !== 'full' && PROFILES[asked] && changed)) window.location.reload();
   });
 }

@@ -114,3 +114,36 @@
   place-items: center;
   color: inherit;
 }
+
+/* The way back to the designer (RealExit): a pill at the top's center, out of sight until it's needed. */
+.exit {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 2000;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 10px;
+  border: none;
+  border-radius: 16px;
+  background: rgba(21, 24, 28, 0.78);
+  color: #ffffff;
+  font: 500 13px/16px Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(15, 20, 30, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -8px);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.15s ease;
+}
+.exitShown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+.exit:hover {
+  background: rgba(21, 24, 28, 0.92);
+}

@@ -403,6 +403,21 @@
   font-weight: 600;
   cursor: pointer;
 }
+/* Real size, an item of its own beside the header: it leaves the canvas, it doesn't change the device. */
+.devChipApart,
+.devChipApart:hover {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--hc-canvas-chip-solid);
+  box-shadow: 0 0 0 1px var(--hc-canvas-chip-line);
+}
+.devChipApart:hover {
+  background: color-mix(in srgb, var(--hc-canvas-icon) 10%, var(--hc-canvas-chip-solid));
+}
 .devChip:hover {
   background: color-mix(in srgb, currentColor 10%, transparent);
 }

@@ -191,8 +191,8 @@ export function AddDeviceButton({ onPick, side, options }: { onPick: (id: string
 
 
 /** What a header can show after its device's name, in order; the first of `DROP` go into its ⋯ menu first. */
-type HeadPart = 'back' | 'displays' | 'video' | 'rotate' | 'design' | 'language';
-const DROP: HeadPart[] = ['language', 'design', 'video', 'back', 'rotate', 'displays'];
+type HeadPart = 'back' | 'displays' | 'video' | 'rotate' | 'real' | 'design' | 'language';
+const DROP: HeadPart[] = ['language', 'design', 'video', 'back', 'real', 'rotate', 'displays'];
 /** The name keeps at least this much (or all of it, if shorter) before a control moves into the menu. */
 const NAME_MIN = 84;
 
@@ -226,6 +226,7 @@ export function DeviceHeader({
   onDevice,
   onDisplay,
   onRotate,
+  onReal,
   grip,
   design,
   language,
@@ -243,6 +244,8 @@ export function DeviceHeader({
   onDisplay: (key: string) => void;
   /** None: no rotate (a screen that only shows upright). */
   onRotate?: () => void;
+  /** Expand view (real mode, sim/RealShell): the app fills the window. Only for a browser window's display, the one a computer is. */
+  onReal?: () => void;
   /** The devices it can switch to (DevicePicker `options`); none: the catalog's. */
   devices?: { id: string; name: string }[];
   grip?: Pick<React.HTMLAttributes<HTMLElement>, 'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel'>;
@@ -270,6 +273,8 @@ export function DeviceHeader({
     ...(hasVideo ? (['video'] as const) : []),
     // A browser window doesn't turn.
     ...(onRotate && findDisplay(dev, displayKey).os !== 'web' ? (['rotate'] as const) : []),
+    // Real size on a computer is its window: only a browser window's display is drawn as it.
+    ...(onReal && findDisplay(dev, displayKey).os === 'web' ? (['real'] as const) : []),
     ...(design ? (['design'] as const) : []),
     ...(language ? (['language'] as const) : []),
   ];
@@ -358,6 +363,12 @@ export function DeviceHeader({
             <Icon name="screen_rotation" size={16} />
           </button>
         );
+      case 'real':
+        return (
+          <button key={p} className={`${styles.devChip} ${styles.devChipApart}`} title={t('Expand view')} aria-label={t('Expand view')} onClick={onReal}>
+            <Icon name="open_in_full" size={16} />
+          </button>
+        );
       case 'design':
         return <DesignPicker key={p} value={design!.value} onPick={design!.onPick} />;
       case 'language':
@@ -404,6 +415,13 @@ export function DeviceHeader({
           <button key={p} className={styles.devMenuRow} onClick={closing(() => onRotate?.())}>
             {check(land)}
             <span className={styles.devMenuLabel}>{t('Landscape')}</span>
+          </button>
+        );
+      case 'real':
+        return (
+          <button key={p} className={styles.devMenuRow} onClick={closing(() => onReal?.())}>
+            <Icon name="open_in_full" size={16} className={styles.devMenuCheck} />
+            <span className={styles.devMenuLabel}>{t('Expand view')}</span>
           </button>
         );
       case 'design':

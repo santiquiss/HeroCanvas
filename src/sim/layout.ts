@@ -73,6 +73,8 @@ export interface Layout {
   sideW: number;
   /** Status bar height. */
   sbH: number;
+  /** The app's banner under the status bar (AppNavigation.TopBanner): its height, 0 with none. Pages start under it. */
+  bannerH: number;
   /** Bottom inset (home indicator area). */
   botIn: number;
   /** Left safe area (phone landscape camera). */
@@ -191,6 +193,8 @@ export const CONTENT_MAX_W = 640;
 
 export const TAB_BAR_H = 62;
 export const SEARCH_BAR_H = 56;
+/** A tab's content ends this far over what floats at its bottom (the search bar, the tab bar): `padB` is their top plus this. */
+export const CONTENT_OVER_BARS = 24;
 const BAR_GAP = 12;
 /**
  * Whether the app's nav (tab bar, column) stays while a task covers the tab you were on (a chat, a search): on
@@ -292,7 +296,7 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
   // Clears the bottom chrome of the tab pages (a home, a list): the search pill, plus the tab bar on phones.
   // An app that gives its bar's height (tabBarHeight): the bar over the bottom inset; else the tour's search pill and bar.
   const chromeTop = tabBarHeight != null ? botIn + (bottomNav ? tabBarHeight : 0) : tabPadB + SEARCH_BAR_H + (bottomNav ? TAB_BAR_ROOM : 0);
-  const padB = chromeTop + 24;
+  const padB = chromeTop + CONTENT_OVER_BARS;
   const padBPush = botIn + 24;
   // Two columns beside the rail: the left one a design's own distance from it (a proposal's splitGap), and the right
   // one as far from the screen's edge, so the two sides match; else padX.
@@ -338,6 +342,7 @@ export function computeLayout({ display: full, land: wantLand, supported, detail
     headerInsetR,
     sideW,
     sbH,
+    bannerH: 0,
     botIn,
     safeL,
     railW,
@@ -398,10 +403,16 @@ export function listDetailActive(layout: Layout, width: number, minWidth: number
 /** Phone-style navigation: pushed pages slide over the previous one, which shifts back 25% (bottom-nav layouts). */
 export const phoneMotion = (layout: Layout) => layout.isPhone || layout.bottomNav;
 
-/** Scale that fits the (possibly rotated) frame into the stage with a 24px margin. */
+/** Room on each side of the device on the stage: the + that adds a device to compare sits in it. */
+export const STAGE_SIDE = 48;
+
+/**
+ * Scale that fits the (possibly rotated) frame into the stage: STAGE_SIDE on each side (the stage's content is as
+ * wide, so a narrower margin would push the device off center, against the right panel), 24px above and below.
+ */
 export function fitScale(layout: Layout, availW: number, availH: number): number {
   const bb = layout.rotLocked ? { w: layout.frameH, h: layout.frameW } : { w: layout.frameW, h: layout.frameH };
-  return Math.max(0.1, Math.min(1, (availW - 48) / bb.w, (availH - 48) / bb.h));
+  return Math.max(0.1, Math.min(1, (availW - 2 * STAGE_SIDE) / bb.w, (availH - 48) / bb.h));
 }
 
 /**

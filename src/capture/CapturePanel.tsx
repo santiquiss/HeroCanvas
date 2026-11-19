@@ -19,7 +19,8 @@ import type { Tilt } from './tilt';
 import { recordableMime, VIDEO_CONTAINERS, videoOptionsOf, type VideoContainer } from './video/plan';
 import { sequenceDuration, sequenceName } from './video/motion';
 import { MotionRows } from './MotionRows';
-import { AngleSection, ColorSection, LightingSection, Seg, ShadowSection, Toggle } from './CaptureSections';
+import { clayLight } from './minimal';
+import { AngleSection, ColorSection, LightingSection, MinimalColorSection, Seg, ShadowSection, Toggle } from './CaptureSections';
 import { canRecord } from './video/recording';
 import type { InteractionRecording } from './video/useRecording';
 import { plural, t } from '../i18n/ui';
@@ -91,6 +92,10 @@ export function CapturePanel(p: CapturePanelProps) {
   const { prefs, setPrefs } = p;
   // Screen only: no device to color, turn, light or shade.
   const bare = prefs.frame === 'screen';
+  // What the file is drawn with: the device's finish and light, or, minimal, its clay (the panel still edits the finish's).
+  const minimal = !bare && prefs.look === 'minimal';
+  const drawColor = minimal ? prefs.minimalColor : p.color;
+  const drawLight = useMemo(() => (minimal ? clayLight(p.light) : p.light), [minimal, p.light]);
   const preset = presetOf(prefs.size);
   const [persona, pickPersona] = usePersonaParam();
   const [busy, setBusy] = useState(false);
@@ -110,7 +115,7 @@ export function CapturePanel(p: CapturePanelProps) {
   // Fit by its scale, Custom by its size.
   const file = `${p.name}${prefs.crop === 'custom' && !bare ? `-${prefs.size[0]}x${prefs.size[1]}` : `@${prefs.scale}x`}.${ext}`;
 
-  const render = (format: ImageFormat) => exportImage(p.frame!, p.layout, p.spec, { ...effectivePrefs(prefs), format, tilt: p.tilt, color: p.color, light: p.light, shadowLook: prefs.shadowLook });
+  const render = (format: ImageFormat) => exportImage(p.frame!, p.layout, p.spec, { ...effectivePrefs(prefs), format, tilt: p.tilt, color: drawColor, light: drawLight, shadowLook: prefs.shadowLook });
   const run = async (job: () => Promise<void>) => {
     if (!p.frame) return;
     setBusy(true);
@@ -140,7 +145,7 @@ export function CapturePanel(p: CapturePanelProps) {
     onHold?.('export', busy);
     return () => onHold?.('export', false);
   }, [video, busy, onHold]);
-  const videoOpts = useMemo(() => videoOptionsOf(prefs, bare, p.light, playedLength(recorded, prefs.playbackSpeed), p.tilt), [prefs, bare, p.light, recorded, p.tilt]);
+  const videoOpts = useMemo(() => videoOptionsOf(prefs, bare, drawLight, playedLength(recorded, prefs.playbackSpeed), p.tilt), [prefs, bare, drawLight, recorded, p.tilt]);
   const recState = p.interaction.state;
   const recordable = canRecord();
   // The clip's size: the canvas's plan (SimulatorShell), which is the clip's in video mode.
@@ -163,10 +168,10 @@ export function CapturePanel(p: CapturePanelProps) {
         {
           ...videoOpts,
           container: container.id,
-          color: p.color,
+          color: drawColor,
           background: bgNow,
           // The glare as the canvas shows it, drawn on each frame at its turn.
-          glare: prefs.glare ? { light: lightSide(p.light), strength: prefs.glareStrength, side: prefs.glareSide, softness: prefs.glareSoftness } : null,
+          glare: prefs.glare ? { light: lightSide(drawLight), strength: prefs.glareStrength, side: prefs.glareSide, softness: prefs.glareSoftness } : null,
         },
         setProgress,
         recorded ? { rec: recorded, touches: prefs.showTouches, speed: prefs.playbackSpeed } : null,
@@ -285,9 +290,17 @@ export function CapturePanel(p: CapturePanelProps) {
             <Seg value={p.land ? 'land' : 'port'} options={[['port', t('Portrait')], ['land', t('Landscape')]]} onChange={(v) => (v === 'land') !== p.land && p.onRotate()} disabled={deviceLocked} />
             <Seg value={p.dark ? 'dark' : 'light'} options={[['light', t('Light')], ['dark', t('Dark')]]} onChange={(v) => (v === 'dark') !== p.dark && p.onTheme()} disabled={deviceLocked} />
           </div>
+          {/* How the device is drawn: as it is (its finish and metal), or minimal, clay in one color. */}
           {!bare && (
             <>
-          <ColorSection finishes={p.finishes} color={p.color} onColor={p.onColor} light={p.light} onLight={p.onLight} />
+              <div className={styles.pair}>
+                <Seg value={prefs.look} options={[['device', t('Realistic')], ['minimal', t('Minimal')]]} onChange={(look) => setPrefs({ look })} />
+              </div>
+              {prefs.look === 'minimal' ? (
+                <MinimalColorSection color={prefs.minimalColor} onColor={(minimalColor) => setPrefs({ minimalColor })} />
+              ) : (
+                <ColorSection finishes={p.finishes} color={p.color} onColor={p.onColor} light={p.light} onLight={p.onLight} />
+              )}
             </>
           )}
         </section>

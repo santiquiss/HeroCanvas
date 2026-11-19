@@ -1,6 +1,7 @@
 // Capture's device controls, shared by every view that shows a device in 3D (Capture's panel, App Store Assets' device
 // layers): its color and metal, its angle, the light and the glass's glare, its shadow. Each takes its values and
 // tells what changed; where they're kept is the caller's.
+import { MINIMAL_COLORS } from './minimal';
 import { TypedNumber } from '../components/TypedNumber';
 import { useState } from 'react';
 import { Icon } from '../components/Icon';
@@ -146,6 +147,30 @@ export function Toggle({ label, checked, onChange, disabled = false, title, own 
       </span>
       <button role="switch" aria-checked={checked} aria-label={label} disabled={disabled} className={`${panel.switch} ${checked ? panel.switchOn : ''}`} onClick={() => onChange(!checked)} />
     </div>
+  );
+}
+
+/** A minimal device's color: a few clays a click away, or any color. */
+export function MinimalColorSection({ color, onColor }: { color: string; onColor: (c: string) => void }) {
+  const same = (c: string) => c.toLowerCase() === color.toLowerCase();
+  return (
+    <>
+      <div className={styles.subTitle}>
+        <span className={styles.ownName}>{t('Color')}</span>
+        <span className={styles.titleEnd}>
+          <span className={styles.muted}>{MINIMAL_COLORS.find((f) => same(f.color))?.name ?? t('Custom')}</span>
+        </span>
+      </div>
+      <div className={styles.swatches}>
+        {MINIMAL_COLORS.map((f) => (
+          <button key={f.color} className={`${styles.swatch} ${same(f.color) ? styles.swatchOn : ''}`} style={{ background: f.color }} title={f.name} onClick={() => onColor(f.color)} />
+        ))}
+        <label className={`${styles.swatch} ${styles.custom} ${MINIMAL_COLORS.some((f) => same(f.color)) ? '' : styles.swatchOn}`} title={t('Any color')}>
+          <input type="color" value={color} onChange={(e) => onColor(e.target.value)} />
+          <Icon name="palette" size={14} />
+        </label>
+      </div>
+    </>
   );
 }
 

@@ -76,9 +76,13 @@ export function realDisplay(view: RealViewport, platform: Platform, system?: str
   const size = { w: short, h: long, r: 0, bez: 0, ends: 0, bodyR: undefined, safe: view.safe, real: true };
   if (match) return { device: match.device, display: { ...match.display, ...size, hinge: undefined }, land, known: true };
   const tablet = short >= 600;
-  const os: DeviceOS = platform === 'android' ? 'android' : tablet ? 'ipad' : 'ios';
-  const display: Display = { key: 'main', label: 'Display', os, rot: tablet, ...size };
-  return { device: { ...UNKNOWN, type: tablet ? 'tablet' : 'phone', displays: [display] }, display, land, known: false };
+  // A computer's window (neither iOS nor Android) a tablet's size or more is a browser window, as the canvas's desktops:
+  // the web's display, a mouse's pointer (hover, the hand), not a touch screen's.
+  const desktop = platform === 'other' && tablet;
+  const os: DeviceOS = platform === 'android' ? 'android' : desktop ? 'web' : tablet ? 'ipad' : 'ios';
+  // A browser window doesn't turn: its width and height as they are, never landscape (the canvas's desktops too).
+  const display: Display = desktop ? { key: 'main', label: 'Display', os, ...size, w: view.w, h: view.h } : { key: 'main', label: 'Display', os, rot: tablet, ...size };
+  return { device: { ...UNKNOWN, type: desktop ? 'desktop' : tablet ? 'tablet' : 'phone', displays: [display] }, display, land: desktop ? false : land, known: false };
 }
 
 /**

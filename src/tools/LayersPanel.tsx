@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { CATALOG } from '../design/catalog';
 import { useDesign } from '../design/DesignContext';
-import { componentIcon, elementKind, groupLayout, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, textOf, type Corners } from '../design/element';
+import { componentIcon, elementKind, groupLayout, KIND_ICON, TIER_ICON, kindLabel, layerKind, mixesText, shapeCorners, showing, textOf, unseen, type Corners } from '../design/element';
 import { COMPONENT_STATUSES, componentState, statusOf } from '../design/componentState';
 import { useLibrary } from '../design/library';
 import { componentHint, componentInstance } from '../design/component';
@@ -31,28 +31,6 @@ type LNode =
 const KEYS = new WeakMap<Element, string>();
 let nextKey = 0;
 const keyOf = (el: Element) => (el instanceof HTMLElement && el.dataset.hc) || KEYS.get(el) || (KEYS.set(el, `l${nextKey++}`), KEYS.get(el)!);
-
-/** Not drawn: no box (display none), or hidden. */
-const unseen = (el: Element) => el.getClientRects().length === 0 || getComputedStyle(el).visibility === 'hidden';
-
-/**
- * A page layer that shows: not hidden, and not covered whole by a page layer drawn over it (a push or a cover that
- * spans it on a phone; beside it, in a split, both show). Within the screen it's clipped to.
- */
-function showing(page: HTMLElement): boolean {
-  if (unseen(page)) return false;
-  const screen = page.closest('[data-theme]') ?? page.parentElement!;
-  const s = screen.getBoundingClientRect();
-  const clip = (r: DOMRect) => ({ l: Math.max(r.left, s.left), t: Math.max(r.top, s.top), r: Math.min(r.right, s.right), b: Math.min(r.bottom, s.bottom) });
-  const own = clip(page.getBoundingClientRect());
-  if (own.r - own.l < 1 || own.b - own.t < 1) return false;
-  return ![...screen.querySelectorAll<HTMLElement>('[data-hc-page]')].some((q) => {
-    // Pages later in the document are drawn over this one (their z-index only grows).
-    if (q === page || q.contains(page) || page.contains(q) || !(page.compareDocumentPosition(q) & Node.DOCUMENT_POSITION_FOLLOWING) || unseen(q)) return false;
-    const o = clip(q.getBoundingClientRect());
-    return o.l <= own.l + 1 && o.t <= own.t + 1 && o.r >= own.r - 1 && o.b >= own.b - 1;
-  });
-}
 
 /**
  * The rows under an element. Pages and components always; other elements in a page or a component (`layers`), as

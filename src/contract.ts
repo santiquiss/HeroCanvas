@@ -50,6 +50,13 @@ export interface AppNavigation {
    */
   Overlays?: ComponentType;
   /**
+   * A banner under the status bar, over every page (optional): what the app shows across the top whatever the screen
+   * (viewing someone else's account, working offline). `useHeight` says how tall it is now (0: none); while it's up,
+   * every page starts that much lower (`layout.headerY`, `layout.padT`, `useScreenInsets().top`), and `Component` is
+   * drawn from the screen's top edge: `statusHeight` of status bar (to paint behind it), then its `height`.
+   */
+  TopBanner?: { useHeight: () => number; Component: ComponentType<{ height: number; statusHeight: number }> };
+  /**
    * The iPhone Duo column's toolbar (optional): the page on top's back or close and its symbol-only actions, drawn
    * vertically under the corner status, as the app's own bar draws its controls. Pages hand them over with
    * useColumnBar. None: the kit's round buttons.

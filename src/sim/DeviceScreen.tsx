@@ -11,7 +11,7 @@ import { findProposal } from '../proposals';
 import { HOME, LAUNCH, NAVIGATION } from '../nav/pages';
 import { useLaunch } from './launch';
 import { LaunchPhaseCtx } from './launchPhase';
-const { SideNav, SideRail, TabBar, Overlays: AppOverlays, ColumnBar: AppColumnBar } = NAVIGATION;
+const { SideNav, SideRail, TabBar, Overlays: AppOverlays, ColumnBar: AppColumnBar, TopBanner } = NAVIGATION;
 /** The app's own wrapper around each screen (AppNavigation.Screen), or none. */
 const AppScreen = NAVIGATION.Screen ?? (({ children }: { children: ReactNode }) => <>{children}</>);
 import { Icon } from '../components/Icon';
@@ -27,7 +27,7 @@ import { sideColumnFor, splitFor, useScreenConfig, type ScreenConfig } from '../
 import type { PageDef, PageRef, SplitConfig } from '../nav/types';
 import { ChangesOverlay } from './ChangesOverlay';
 import { LocateFlash } from './locate';
-import { anchoredFloats, listDetailActive, phoneMotion, tallSheetTop, tasksKeepNav, type Layout } from './layout';
+import { anchoredFloats, CONTENT_OVER_BARS, listDetailActive, phoneMotion, tallSheetTop, tasksKeepNav, type Layout } from './layout';
 import { EASE, EXIT_MS, PAGE_MS, SWAP, TAB_IN_MS } from './motion';
 import { screenRegions } from './regions';
 import { boxInScreen, counterpartIn } from './anchor';
@@ -67,7 +67,7 @@ const SHADOW_ROOM = 24;
  * The screen's layers, bottom to top: the split panel, pushed pages (beside the tablet rail), the rail (the app's nav: over the pages beside it, so its shadow falls on them), covers (full pages over everything, the rail too),
  * the snackbar (over the pages, under the sheets' and dialogs' routes, as a scaffold has it), dialogs, Inspect.
  */
-const Z = { panel: 20, push: 40, rail: 70, cover: 71, column: 84, snackbar: 85, dialog: 91, inspect: 97 };
+const Z = { panel: 20, push: 40, rail: 70, cover: 71, banner: 80, column: 84, snackbar: 85, dialog: 91, inspect: 97 };
 
 interface Entry {
   ref: PageRef;
@@ -474,7 +474,15 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         <LaunchPhaseCtx.Provider value={launch.phase}>
         <AppScreen>
         {/* The device in hand shows its own status, camera, home indicator and keyboard. */}
-        {!L.real && <StatusBar layout={L} />}
+        {/* Wrapped without a box (`display: contents`), marked as the system's: a spec of the screen leaves it out. */}
+        {!L.real && <div data-hc-system="" style={{ display: 'contents' }}><StatusBar layout={L} /></div>}
+        {/* The app's banner: from the screen's top (behind the status bar) to where the pages now start; over the pages
+            and a cover, under the snackbar and the sheets. */}
+        {TopBanner && L.bannerH > 0 && (
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: L.sbH + L.bannerH, zIndex: Z.banner }}>
+            <TopBanner.Component height={L.bannerH} statusHeight={L.sbH} />
+          </div>
+        )}
 
         {/* The app's area (no z-index of its own, so its layers still stack with the nav); it clips its layers to it. */}
         <div
@@ -608,16 +616,21 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
               // `transition: 'up'`: it rises from the bottom of the screen and goes back down.
               const up = nav.def(p.item.ref.id).transition === 'up';
               const fades = nav.def(p.item.ref.id).transition === 'fade';
+              // Replaced by a page that fades in over it (Sign in for Sign up, `open`): it stays as it is under the new
+              // one until it's gone, instead of fading out too, which let the screen's color show through halfway.
+              const underFadeIn = fades && !p.present && coverL.slice(k + 1).some((q) => q.present && nav.def(q.item.ref.id).transition === 'fade');
+              // Moved aside (25% left) only by a page that slides in over it: one that fades in or rises leaves it still.
+              const slidOver = coverL.slice(k + 1).some((q) => q.present && !nav.def(q.item.ref.id).transition);
               return (
                 <Layer
                   key={p.key}
                   page={nav.title(p.item.ref)}
                   pageId={p.item.ref.id}
-                  open={p.present}
+                  open={p.present || underFadeIn}
                   animateIn={p.animateIn}
                   covered={covered(coverL, k)}
                   fade={fades}
-                  openT={covered(coverL, k) && !up ? 'translateX(-25%)' : 'translate(0, 0)'}
+                  openT={slidOver && !up ? 'translateX(-25%)' : 'translate(0, 0)'}
                   closedT={up ? 'translate(0, 100%)' : fades ? 'translate(0, 0)' : offRight(R.covers.left)}
                   style={{
                     position: 'absolute',
@@ -731,7 +744,7 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         {kbField && !L.real && L.os !== 'web' && <SystemKeyboard os={L.os} design={L.keyboard} land={L.land} open={kbOpen} field={kbField} bottomInset={L.botIn} width={L.vw} height={L.vh} onHeight={setKbH} />}
         {launch.overlay}
         {!L.real && <LandscapeCamera layout={L} />}
-        {!L.real && <HomeIndicator layout={L} />}
+        {!L.real && <div data-hc-system="" style={{ display: 'contents' }}><HomeIndicator layout={L} /></div>}
         </AppScreen>
         </LaunchPhaseCtx.Provider>
       </div>
@@ -853,7 +866,7 @@ function SnackbarLayer({ layout: L }: { layout: Layout }) {
   if (!s) return null;
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: Z.snackbar, pointerEvents: 'none' }}>
-      <KitSnackbar text={s.text} level={s.level} action={s.action} open={!!snackbar} bottomInset={L.botIn} endInset={L.sideNav ? L.sideW : 0} />
+      <KitSnackbar text={s.text} level={s.level} action={s.action} open={!!snackbar} bottomInset={s.aboveBars ? L.padB - CONTENT_OVER_BARS : L.botIn} endInset={L.sideNav ? L.sideW : 0} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ proposals/<yyyy-mm-slug>/
   pages.tsx       export default proposal({ pages, components, variants })   (optional)
   components/     new or replaced components, with their stories              (optional)
   handoff.md      what changes, in the app's terms, for whoever builds it
+  spec.json       the screens and states its spec shows, once it's ready      (section 5)
 ```
 
 ## 1. Ask where it goes
@@ -44,8 +45,7 @@ the mirror (`mirror-screen`). Ask if it isn't clear.
 
 `handoff.md`: what changes in each component and screen, **in the app's terms** (its components, their parameters,
 its tokens, its routes), the logic, the data it needs, the texts in every language, and what stays as it is. A part
-for one version under `### Version A`. Keep it current with every change: the Proposal panel builds the file for
-whoever implements it from this.
+for one version under `### Version A`. Keep it current with every change: the proposal's spec carries it as its logic.
 
 ## 4. Show it
 
@@ -53,3 +53,10 @@ whoever implements it from this.
 light and dark. Show the person, iterate, and move the status on when they say so: `draft`, `review` (someone has to
 look at it), `handed-off` (shown as Dev handoff: its ticket for the developers, `ticket`). Dropped: `"archived": true`.
 Built in the app: merged into Live and its folder deleted.
+
+## 5. Its spec, when it's ready
+
+Not while it's being designed: once the person says it's ready to share (in review) or to build (dev handoff), its
+spec, with the `proposal-spec` skill: `spec.json` (every screen and state it adds or changes), `npm run spec -- <code>`,
+read as its reader would, and its two links (a person's, an agent's) wherever the proposal goes. What the developers
+and their agents build from; generated again after every change while it's in review or handed off.

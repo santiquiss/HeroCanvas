@@ -6,6 +6,62 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.57.0 — 2026-11-19
+
+- **A proposal's spec** (`npm run spec -- <code>`, `scripts/spec.mjs`): the proposal as files anyone opens from a link
+  without the designer, at `/spec/<code>-<key>/` (no password: the key in the address, kept in the proposal's
+  `spec.json`, keeps it private; the site's gate lets `/spec/` through). Each screen and state `spec.json` lists, in
+  light and dark, with its structure read from the screen (`src/capture/spec/tree.ts`: components and props, boxes,
+  spacing, text styles, tokens; what it adds to Live marked `+`) and the logic from `handoff.md`: `index.html` for a
+  person (a contents beside it to every section and screen, every heading a link), `index.md` for an agent (a contents
+  to each screen's outline and JSON; each screen's file links the previous, the next and the index). The device's
+  status bar and home indicator are the system's: left out of it. The **`proposal-spec`** skill writes, generates,
+  reads and shares it; `new-proposal` points to it.
+- **The spec replaces Handoff for agents**: the Proposal panel's **Spec** section opens it and copies its links for
+  people and for agents, or says how to make it (`src/proposals/specs.ts`). The file of instructions it built
+  (`src/design/proposalHandoff.ts`) is gone. A proposal in review or handed off has its spec generated: `npm test`
+  checks it (`src/proposals/specs.test.ts`), the team's earlier ones listed in `proposals/specs-pending.json`.
+- **Capture's Minimal look**: the 3D device in one matte color, as clay, in the place of its finish and metal
+  (`src/capture/minimal.ts`, Capture's Style).
+- **Layers knows what shows**: a page covered whole by another (a push or a cover on a phone) isn't listed as if it
+  showed (`showing`, `unseen` in `src/design/element.ts`).
+- **Real mode on a computer is a browser window**: a computer's window (neither iOS nor Android) a tablet's size or
+  more is the web's display, as the canvas's desktops: a mouse's pointer (`data-pointer="fine"`: hover, the hand), no
+  finger drawn, and never turned on its side (it was a tablet in landscape, so a page with no landscape came out
+  rotated, and touch's rules applied). Expand view on Pro's desktops showed no row's hover (`src/sim/realDevice.ts`,
+  `src/sim/RealShell.tsx`).
+- **A page that fades in over another one, replacing it, crossfades without a flash** (`transition: 'fade'`, opened
+  with `open`: Sign in to Sign up): the page leaving stays as it is under the new one until it's gone, instead of fading
+  out at the same time, which let the screen's color (the page color) show through halfway, and doesn't move: a page
+  under another one moves aside (25% left) only when that one slides in over it (`src/sim/DeviceScreen.tsx`).
+- **At Fit, a wide device keeps clear of the right panel**: Fit left 24px on each side, but the stage's content is
+  48px wider on each side (the room for the + that adds a device), so a device as wide as the stage (a desktop, a
+  tablet on its side) sat 24px off center, against the right panel. Both use `STAGE_SIDE` now, 48px on each side
+  (`src/sim/layout.ts`).
+- **Expand view from the device's header**: beside a browser window's header (Desktop 1440, Laptop 1280), an item of
+  its own with an expand icon opens real mode (`?real=1`): the app fills the window, at its real size. Its way back,
+  Exit expanded view with a minimize icon, is a pill at the top's center that shows on entering and when the pointer
+  reaches the top edge, and hides by itself, so the app shows as it is; it goes back to the designer as it was. Only
+  where the designer is the default (a computer), not where real mode is a phone's own (`src/sim/MultiDevices.tsx`,
+  `src/sim/RealShell.tsx`).
+- **Share an expanded view, or only the app**: with a browser window's device, Share has Copy expanded link for the
+  team, and a guest link can be Only the app: expanded, filling the guest's window, with no way to the designer (no
+  Exit expanded view, whatever the URL says), for someone to try it. It's signed in the link (`a`), carried in the
+  view's cookie and, tried with Preview, in `?view-app=1` (`src/share/gate.ts`, `src/share/view.ts`,
+  `src/share/ShareMenu.tsx`). Its device picker shows a computer's icon for a desktop.
+
+### Contract
+
+- New (optional): `AppNavigation.TopBanner` (`{ useHeight, Component }`): a banner under the status bar over every
+  page; while it's up every page starts that much lower (nothing to adapt).
+- New: `anchoredFloats` from `herocanvas` (the sheet rule's width: a task is a dialog from 600 wide), for an app's own
+  overlay that follows it (nothing to adapt).
+- New (optional): a project's `handoff: 'code'` (herocanvas.config.ts `projects`): its builders read the mirror's code,
+  so its proposals need no `handoff.md` (the default, `'file'`, asks for one as before: nothing to adapt).
+- New (optional): a proposal's `spec.json` and `npm run spec`; a team lists its proposals in review or handed off
+  before specs in `proposals/specs-pending.json` (or generates their specs) for `npm test` to pass.
+- Removed: the Proposal panel's Handoff for agents (its file is the spec now): nothing in `src/index.ts` changes.
+
 ## 0.56.0 — 2026-11-10
 
 - **A carousel that snaps bounces back to where it was**: while a scroller's content is past its end (the iOS

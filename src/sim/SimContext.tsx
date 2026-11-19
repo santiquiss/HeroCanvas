@@ -9,6 +9,7 @@ import { tappedControl, type SheetKind, type SheetPresentation } from './sheetPr
 import type { StateParams } from '../nav/types';
 import { LANG_PARAM, LanguageCtx, languageIn, type Language } from './language';
 import { t } from '../i18n/ui';
+import { useTopBannerHeight } from './topBanner';
 
 /** What a sheet built on the kit's Sheet (ActionSheet…) needs from the layer. */
 export interface SheetFrame {
@@ -75,6 +76,11 @@ export interface SnackbarSpec {
   level?: AlertLevel;
   /** The Alert's action (Retry): pressing it closes the snackbar first. */
   action?: AlertProps['action'];
+  /**
+   * Over what floats at a tab's bottom (the search bar, the tab bar), not on it: for a message about what the tab
+   * shows, read with the bars in place. Default: at the screen's bottom, as the platform's.
+   */
+  aboveBars?: boolean;
   /** How long it stays, in ms (the platform's default: 4 s). */
   duration?: number;
   /** Once it's gone, and why. */
@@ -342,7 +348,13 @@ export function SimProvider({ layout, theme, language, children }: { layout: Lay
   );
 }
 
-function ScreenSim({ layout, theme, shared, children }: { layout: Layout; theme: 'light' | 'dark'; shared: Shared; children: ReactNode }) {
+function ScreenSim({ layout: asMeasured, theme, shared, children }: { layout: Layout; theme: 'light' | 'dark'; shared: Shared; children: ReactNode }) {
+  // The app's banner under the status bar (AppNavigation.TopBanner): while it's up, every page starts under it.
+  const bannerH = useTopBannerHeight();
+  const layout = useMemo(
+    () => (bannerH ? { ...asMeasured, bannerH, padT: asMeasured.padT + bannerH, headerY: asMeasured.headerY + bannerH } : asMeasured),
+    [asMeasured, bannerH],
+  );
   const value = useMemo(() => ({ ...shared, layout, theme }), [shared, layout, theme]);
   return <SimCtx.Provider value={value}>{children}</SimCtx.Provider>;
 }
@@ -385,7 +397,7 @@ export function usePadL(): number {
 export function useScreenInsets(): { top: number; bottom: number; left: number; right: number; keyboard: number } {
   const { layout } = useSim();
   const keyboard = useKeyboardInset();
-  return { top: layout.sbH, bottom: layout.botIn, left: layout.safeL, right: 0, keyboard };
+  return { top: layout.sbH + layout.bannerH, bottom: layout.botIn, left: layout.safeL, right: 0, keyboard };
 }
 
 /**

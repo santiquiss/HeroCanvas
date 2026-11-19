@@ -23,6 +23,7 @@ import { CapturePreviewBar, CaptureStage, RecordingBadge } from '../capture/Capt
 import { ScreenGlare } from '../capture/ScreenGlare';
 import { bodyOf, modelOf } from '../capture/models';
 import { DEFAULT_LIGHT, lightSide, type Lighting } from '../capture/scene';
+import { clayLight, minimalFrame } from '../capture/minimal';
 import { FLAT, tiltCss, type Tilt } from '../capture/tilt';
 import { exportPlan } from '../capture/exportImage';
 import { effectivePrefs, playedLength, useCapturePrefs, videoOn } from '../capture/prefs';
@@ -33,8 +34,9 @@ import { isStill, loopsAlone, sequenceDuration, sequenceMotion } from '../captur
 import { useRecording } from '../capture/video/useRecording';
 import { FrameHardware, frameBox, frameStyle } from './DeviceFrame';
 import { RealShell, useRealMode } from './RealShell';
+import { REAL_PARAM } from './realDevice';
 import { designLayout, railFoldedIn, VARIANT_PARAM } from '../design/overridableRegistry';
-import { computeLayout, fitScale, screenOnly } from './layout';
+import { computeLayout, fitScale, screenOnly, STAGE_SIDE } from './layout';
 import { SharedSimProvider, SimProvider } from './SimContext';
 import { InspectOverlay } from '../tools/InspectOverlay';
 import { CommentPins, CommentsProvider, useCommentsUi } from '../comments';
@@ -187,7 +189,7 @@ function DesignerShell() {
   const box = frameBox(layout);
   const capture = captureParam && mode === 'prototype';
   const model = modelOf(device.id);
-  const bodyColor = colors[device.id] ?? model.finishes[0].color;
+  const finishColor = colors[device.id] ?? model.finishes[0].color;
   const bodySpec = bodyOf(device.id, display.key);
   const [capPrefs, setCapPrefs] = useCapturePrefs();
   // An interaction recorded on the device, to be a video's screen (capture/video/useRecording).
@@ -210,10 +212,14 @@ function DesignerShell() {
       ? { sequence: capPrefs.sequence, rest: tilt, duration: playedLength(recorded, capPrefs.playbackSpeed) ?? sequenceDuration(capPrefs.sequence), screen: playScreen }
       : null;
   // One object while nothing changes: the canvas redraws the body when it does.
-  const look = useMemo(
+  const finishLook = useMemo(
     () => ({ ...light, ...(materials[device.id] ?? { metal: model.metal ?? DEFAULT_LIGHT.metal, grain: model.grain ?? DEFAULT_LIGHT.grain }) }),
     [light, materials, device.id, model],
   );
+  // Minimal (Capture's Style): the device in one color, matte, as clay, in the place of its finish and its metal.
+  const minimal = capture && capPrefs.frame === 'device' && capPrefs.look === 'minimal';
+  const bodyColor = minimal ? capPrefs.minimalColor : finishColor;
+  const look = useMemo(() => (minimal ? clayLight(finishLook) : finishLook), [minimal, finishLook]);
   const setLook = (l: Lighting) => {
     setLight(l);
     setMaterials((m) => ({ ...m, [device.id]: { metal: l.metal, grain: l.grain } }));
@@ -322,7 +328,7 @@ function DesignerShell() {
     <div
       ref={setFrameEl}
       className={`${styles.frame} ${capture ? styles.turned : ''}`}
-      style={{ ...frameStyle(shownLayout, scale, capture ? tiltCss(shownTilt) : ''), ...(capture ? { zIndex: 1, transition: 'none', boxShadow: 'none' } : {}) }}
+      style={{ ...frameStyle(shownLayout, scale, capture ? tiltCss(shownTilt) : ''), ...(capture ? { zIndex: 1, transition: 'none', boxShadow: 'none' } : {}), ...(minimal ? minimalFrame(capPrefs.minimalColor) : {}) }}
       {...screenAttrs({ device: device.id, display: display.key })}
     >
       <DeviceScreen />
@@ -418,7 +424,7 @@ function DesignerShell() {
                   ref={spacerRef}
                   style={{
                     position: 'relative',
-                    width: Math.max(stage.w, (capHalf ? capHalf[0] * 2 : box.w) * scale + 96),
+                    width: Math.max(stage.w, (capHalf ? capHalf[0] * 2 : box.w) * scale + 2 * STAGE_SIDE),
                     height: Math.max(stage.h, capHalf ? capHalf[1] * 2 * scale + 96 : box.h * scale + 2 * VIEW_BAR_H),
                     // Capture: the picture's area and nothing past it (the turned frame and its body reach further, and
                     // would stretch the scroll past the background).
@@ -444,6 +450,8 @@ function DesignerShell() {
                         onDevice={(id) => setParam({ device: id, display: null, ...landOn(id, null) })}
                         onDisplay={(key) => setParam({ display: key, land: landAfterSwitch(device.id, display.key, key, land) ? '1' : null })}
                         onRotate={() => setParam({ land: land ? null : '1' })}
+                        // Pushed, not replaced: the browser's back returns from it too, as its X does.
+                        onReal={() => setSearch((prev) => { const next = new URLSearchParams(prev); next.set(REAL_PARAM, '1'); return next; })}
                       />
                       <InspectOverlay stage={spacerRef} />
                       <CommentPins stage={spacerRef} />
@@ -529,9 +537,9 @@ function DesignerShell() {
                 interaction={interaction}
                 onHold={holdPreview}
                 finishes={model.finishes}
-                color={bodyColor}
+                color={finishColor}
                 onColor={(c) => setColors((m) => ({ ...m, [device.id]: c }))}
-                light={look}
+                light={finishLook}
                 onLight={setLook}
                 frame={frameEl}
                 layout={shownLayout}

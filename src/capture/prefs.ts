@@ -4,6 +4,7 @@ import { DEFAULT_SHADOW, type ExportOptions, type Shadow } from './exportImage';
 import { DEFAULT_SEQUENCE, sequenceOf, type Sequence } from './video/motion';
 import type { VideoContainer } from './video/plan';
 import { t } from '../i18n/ui';
+import { MINIMAL_COLOR } from './minimal';
 import { projectKey } from '../project';
 
 const KEY = projectKey('hc.capture');
@@ -20,6 +21,10 @@ export type CapturePrefs = Pick<ExportOptions, 'scale' | 'shadow' | 'background'
   glareSoftness: number;
   /** The device in 3D, or its screen alone: square, no frame, what a screenshot would be. */
   frame: 'device' | 'screen';
+  /** How the 3D device is drawn: as it is (its finish and metal), or minimal: one color, matte, as clay (minimal.ts). */
+  look: 'device' | 'minimal';
+  /** A minimal device's color (`#rrggbb`). */
+  minimalColor: string;
   /** The canvas veils what the file leaves out, and cuts what it cuts; off, the whole device shows. */
   cropPreview: boolean;
   /** The shadow's look: softness, distance, darkness; a preset's, or its own (`custom`). */
@@ -41,7 +46,7 @@ export type CapturePrefs = Pick<ExportOptions, 'scale' | 'shadow' | 'background'
   /** How fast a recorded interaction plays in the clip: 1x as recorded, 1.5x, 2x (the clip shorter by as much). */
   playbackSpeed: PlaybackSpeed;
 };
-const DEFAULTS: CapturePrefs = { scale: 3, shadow: true, background: null, format: 'png', quality: 0.92, padding: 120, preview: 'fit', frame: 'device', glare: false, glareStrength: 0.8, glareSide: 'top', glareSoftness: 0, cropPreview: true, shadowLook: DEFAULT_SHADOW, shadowPreset: 'medium', crop: 'fit', size: [1320, 2868], output: 'image', sequence: DEFAULT_SEQUENCE, videoContainer: 'mp4', fps: 60, motionBlur: true, showTouches: true, playbackSpeed: 1 };
+const DEFAULTS: CapturePrefs = { scale: 3, shadow: true, background: null, format: 'png', quality: 0.92, padding: 120, preview: 'fit', frame: 'device', look: 'device', minimalColor: MINIMAL_COLOR, glare: false, glareStrength: 0.8, glareSide: 'top', glareSoftness: 0, cropPreview: true, shadowLook: DEFAULT_SHADOW, shadowPreset: 'medium', crop: 'fit', size: [1320, 2868], output: 'image', sequence: DEFAULT_SEQUENCE, videoContainer: 'mp4', fps: 60, motionBlur: true, showTouches: true, playbackSpeed: 1 };
 
 export type PlaybackSpeed = 1 | 1.5 | 2;
 export const PLAYBACK_SPEEDS: PlaybackSpeed[] = [1, 1.5, 2];
@@ -128,7 +133,7 @@ export function exportBackground(prefs: CapturePrefs, alpha: boolean): string | 
  * fixed size or padding, no background, no crop to preview.
  */
 export function effectivePrefs(prefs: CapturePrefs): CapturePrefs {
-  return prefs.frame === 'screen' ? { ...prefs, shadow: false, glare: false, crop: 'fit', padding: 0, background: null, cropPreview: false } : prefs;
+  return prefs.frame === 'screen' ? { ...prefs, look: 'device', shadow: false, glare: false, crop: 'fit', padding: 0, background: null, cropPreview: false } : prefs;
 }
 
 /** A clip is made of the device in 3D only: with Screen only there's nothing to turn, so the export is a picture. */

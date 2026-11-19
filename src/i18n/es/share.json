@@ -38,5 +38,9 @@
   "Copy message": "Copiar mensaje",
   "Anyone with the link sees this screen, without the team’s tools, until it expires.": "Quien tenga el enlace ve esta pantalla, sin las herramientas del equipo, hasta que venza.",
   "Guest links are made on the production site, where they’re checked.": "Los enlaces de invitado se crean en el sitio de producción, donde se verifican.",
-  "Back to the whole designer": "Volver al diseñador completo"
+  "Back to the whole designer": "Volver al diseñador completo",
+  "Copy expanded link": "Copiar enlace expandido",
+  "For the team: only the app, filling the window": "Para el equipo: solo la app, ocupando la ventana",
+  "Only the app": "Solo la app",
+  "Expanded, filling their window, with no way to the designer: for someone to try it": "Expandida, ocupando su ventana, sin acceso al diseñador: para que alguien la pruebe"
 }

@@ -48,6 +48,8 @@ export interface LinkData {
   s: string;
   h?: string[];
   c?: string[];
+  /** Only the app: real mode, the app filling the guest's window, with no way to the designer (someone trying it). */
+  a?: 1;
 }
 
 const enc = new TextEncoder();
@@ -86,7 +88,7 @@ export async function readToken(secret: string, token: string): Promise<LinkData
   if (!body || !mac || !same(mac, b64(await hmac(secret, `link:${body}`)))) return null;
   try {
     const d = JSON.parse(unb64(body)) as LinkData;
-    return typeof d.e === 'number' && typeof d.p === 'string' && typeof d.s === 'string' && (d.h == null || Array.isArray(d.h)) && (d.c == null || Array.isArray(d.c)) ? d : null;
+    return typeof d.e === 'number' && typeof d.p === 'string' && typeof d.s === 'string' && (d.h == null || Array.isArray(d.h)) && (d.c == null || Array.isArray(d.c)) && (d.a == null || d.a === 1) ? d : null;
   } catch {
     return null;
   }
@@ -135,6 +137,9 @@ const redirect = (location: string, cookies: string[]) => {
 /** A short pause on a wrong password makes guessing slow. */
 const pause = () => new Promise((r) => setTimeout(r, 600));
 
+/** Where the proposals' specs are served: open to anyone with the link. */
+const SPEC = '/spec/';
+
 /** What a phone asks for by itself when the site is added to its home screen, without the browser's cookie. */
 const OPEN = new Set(['/manifest.webmanifest', '/pwa/icon-180.png', '/pwa/icon-192.png', '/pwa/icon-512.png']);
 
@@ -177,7 +182,7 @@ export async function gate(request: Request, o: GateOptions): Promise<Response |
     if (request.method !== 'POST') return json({ error: 'POST only' }, 405);
     if (!isTeam) return json({ error: 'Sign in with the team password first.' }, 401);
     if (!o.shareSecret) return json({ error: 'Set SHARE_SECRET in the Vercel project to make guest links.' }, 503);
-    let body: { hours?: unknown; profile?: unknown; start?: unknown; hide?: unknown; allow?: unknown };
+    let body: { hours?: unknown; profile?: unknown; start?: unknown; hide?: unknown; allow?: unknown; app?: unknown };
     try {
       body = (await request.json()) as typeof body;
     } catch {
@@ -190,7 +195,7 @@ export async function gate(request: Request, o: GateOptions): Promise<Response |
     const ids = (v: unknown) => parseHidden(Array.isArray(v) ? v.join('+') : '');
     const hide = ids(body.hide);
     const allow = ids(body.allow);
-    const data: LinkData = { e: now + hours * 3600, p: profile, s: safeHash(String(body.start ?? '')), ...(hide.length ? { h: hide } : {}), ...(allow.length ? { c: allow } : {}) };
+    const data: LinkData = { e: now + hours * 3600, p: profile, s: safeHash(String(body.start ?? '')), ...(hide.length ? { h: hide } : {}), ...(allow.length ? { c: allow } : {}), ...(body.app === true ? { a: 1 as const } : {}) };
     const token = await makeToken(o.shareSecret, data);
     return json({ url: `${url.origin}${LINK}${token}`, expires: data.e * 1000 });
   }
@@ -202,10 +207,13 @@ export async function gate(request: Request, o: GateOptions): Promise<Response |
     if (!data || !o.profiles.includes(data.p)) return html(messagePage(o.name, "This link isn't valid. Ask whoever shared it for a new one."), 404);
     if (data.e <= now) return html(expiredPage(o.name), 410);
     const age = data.e - now;
-    return redirect('/' + data.s, [cookie(GUEST_COOKIE, await guestToken(o.shareSecret!, data.e, data.p), age), cookie(VIEW_COOKIE, [data.p, data.e * 1000, ...[data.h, data.c].map((l) => parseHidden((l ?? []).join('+')).join('+'))].join('.'), age, false)]);
+    return redirect('/' + data.s, [cookie(GUEST_COOKIE, await guestToken(o.shareSecret!, data.e, data.p), age), cookie(VIEW_COOKIE, [data.p, data.e * 1000, ...[data.h, data.c].map((l) => parseHidden((l ?? []).join('+')).join('+')), data.a ? 'app' : ''].join('.'), age, false)]);
   }
 
-  if (OPEN.has(url.pathname)) return 'next';
+  // A proposal's spec (`npm run spec`, public/spec/<code>-<key>/): made to be read by whoever is given its link, an
+  // agent included, which has no cookie to show. Its key is in the path (a parameter wouldn't follow the links
+  // between its files), so the address is the secret; there's no list of them to find one from.
+  if (OPEN.has(url.pathname) || url.pathname.startsWith(SPEC)) return 'next';
   if (isTeam) return 'next';
 
   const guest = cookieOf(request, GUEST_COOKIE);

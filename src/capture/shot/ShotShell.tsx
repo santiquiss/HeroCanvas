@@ -10,6 +10,7 @@
 //
 // `window.__shot` is what the script drives: `ready()` once the screens have settled, `act(steps)` (shotActions.ts),
 // `finish()` before the picture, `rect()` the area to cut.
+import { screenTree, type SpecNode } from '../spec/tree';
 import { sidePanelOnIn } from '../../nav/sidePanel';
 import { APP_THEME_PARAM, appearanceIn, findAppTheme } from '../../sim/appThemes';
 import { designLayout, railFoldedIn, VARIANT_PARAM } from '../../design/overridableRegistry';
@@ -202,6 +203,8 @@ export interface ShotApi {
   /** Before and after: drops Before if it looks like After. Why only one screen shows, if it does. */
   finish(): Promise<CompareNote>;
   rect(): { x: number; y: number; width: number; height: number };
+  /** The proposal's screen as data (`npm run spec`): its components and layers, src/capture/spec/tree.ts. */
+  tree(): { device: { width: number; height: number }; nodes: SpecNode[] };
 }
 
 declare global {
@@ -252,6 +255,14 @@ function useShotApi(stage: RefObject<HTMLDivElement | null>, problem: string | n
       rect() {
         const r = el().getBoundingClientRect();
         return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height };
+      },
+      tree() {
+        const all = frames();
+        const first = all.find((f) => f.hasAttribute('data-shot-primary')) ?? all[0];
+        // The screen inside the frame's bezel: where the app draws.
+        const screen = first.querySelector<HTMLElement>('[data-theme]') ?? first;
+        const r = screen.getBoundingClientRect();
+        return { device: { width: Math.round(r.width), height: Math.round(r.height) }, nodes: screenTree(screen, first.dataset.shotFrame === 'dark' ? 'dark' : 'light') };
       },
     };
     return () => {
