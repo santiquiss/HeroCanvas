@@ -14,12 +14,12 @@ export type Manifest = Record<string, PageDef>;
 
 /**
  * Simulator params, screen config overrides and the active proposal survive every navigation. So does a
- * sidebar the user folded (`rail`), and
+ * sidebar the user folded (`rail`), the walkthrough's step (`walk`, `walkmarks`: walkthrough/engine), and
  * PostHog flags read by more than one page (a user's flag doesn't change from one screen to the next: `lsv2`,
  * screens/Scan/flag).
  */
 /** The URL params that survive navigation: the designer's own, and the app's controls (appConfig.controls). */
-export const SIM_PARAMS: readonly string[] = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', ...(appConfig.sidePanel ? [appConfig.sidePanel.param ?? appConfig.sidePanel.page] : []), 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'appearance', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'system', 'capture', ...SHOT_PARAMS, ...(appConfig.controls ?? []).map((c) => c.param)];
+export const SIM_PARAMS: readonly string[] = ['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'theme', 'video', ...(appConfig.sidePanel ? [appConfig.sidePanel.param ?? appConfig.sidePanel.page] : []), 'cfg', 'proposal', 'variant', 'rail', 'changes', 'where', 'persona', 'apptheme', 'appearance', 'textsize', 'bold', 'lang', 'lsv2', 'real', 'system', 'capture', 'walk', 'walkmarks', ...SHOT_PARAMS, ...(appConfig.controls ?? []).map((c) => c.param)];
 
 /**
  * Whether the split's right part is in use (the layout's `detailOpen`): a push page over the tab, or the app's side

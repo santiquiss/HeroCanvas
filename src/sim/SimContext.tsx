@@ -183,6 +183,9 @@ export function useUrlNumber(key: string, fallback: number | null): [number | nu
 }
 
 type Store = Record<string, unknown>;
+/** Sent on `window` to put the prototype's state back as it opens (the Walkthrough, between steps). */
+export const RESET_APP_EVENT = 'hc:reset-app';
+
 const StoreCtx = createContext<{ store: Store; set: (key: string, v: unknown) => void } | null>(null);
 
 /**
@@ -316,6 +319,20 @@ export function SharedSimProvider({ children, fixed = false }: { children: React
     [toast, toastText, oos, sheet, openSheet, closeSheet, dialog, openDialog, closeDialog, snackbar, showSnackbar, hideSnackbar],
   );
   const [store, setStore] = useState<Store>({});
+  // A walkthrough's step starts from the app as it opens: what was done in the prototype is forgotten, and what was
+  // open is closed.
+  useEffect(() => {
+    const reset = () => {
+      // A field left focused keeps the system keyboard up on the next step.
+      if (document.activeElement instanceof HTMLElement && document.activeElement.closest('[data-hc-screen]')) document.activeElement.blur();
+      setStore({});
+      setDialog(null);
+      closeSheet();
+      hideSnackbar();
+    };
+    window.addEventListener(RESET_APP_EVENT, reset);
+    return () => window.removeEventListener(RESET_APP_EVENT, reset);
+  }, [closeSheet, hideSnackbar]);
   const setKey = useCallback((key: string, v: unknown) => setStore((s) => (Object.is(s[key], v) ? s : { ...s, [key]: v })), []);
   const storeValue = useMemo(() => ({ store, set: setKey }), [store, setKey]);
   return (

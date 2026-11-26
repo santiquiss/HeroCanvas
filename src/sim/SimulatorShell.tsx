@@ -39,6 +39,7 @@ import { designLayout, railFoldedIn, VARIANT_PARAM } from '../design/overridable
 import { computeLayout, fitScale, screenOnly, STAGE_SIDE } from './layout';
 import { SharedSimProvider, SimProvider } from './SimContext';
 import { InspectOverlay } from '../tools/InspectOverlay';
+import { WalkMarks } from '../walkthrough/WalkMarks';
 import { CommentPins, CommentsProvider, useCommentsUi } from '../comments';
 import { screenAttrs } from '../comments/anchor';
 import { DEFAULT_W, PanelHost, usePanelPrefs, type PanelPrefs } from '../tools/PanelHost';
@@ -474,6 +475,9 @@ function DesignerShell() {
             {mode === 'prototype' && (
               <>
                 <FpsMeter />
+                {/* A proposal's walkthrough: its numbers beside the devices, over everything in the canvas (one device,
+                    a set or all of them), and going on from a tap on any. */}
+                {!capture && <WalkMarks />}
                 {capture && interaction.active && (
                   <RecordingBadge seconds={interaction.state.status === 'recording' ? interaction.state.seconds : 0} starting={interaction.state.status === 'starting'} onStop={interaction.stop} />
                 )}

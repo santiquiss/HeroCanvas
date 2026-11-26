@@ -38,10 +38,6 @@
 .dropdown {
   display: inline-flex;
 }
-/* Its list hangs from it: floating, it's already positioned. */
-.dropdown:not(.floating) {
-  position: relative;
-}
 .trigger {
   display: inline-flex;
   align-items: center;
@@ -58,12 +54,9 @@
   font-weight: 500;
   cursor: pointer;
 }
+/* Placed by ui-sdk in the top layer, lined up with its chip's end. */
 .menu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 30;
   min-width: 200px;
   display: flex;
   flex-direction: column;
@@ -84,10 +77,15 @@
   text-align: left;
   cursor: pointer;
 }
-.option:hover,
-.option:focus-visible {
+.option[data-highlighted] {
   background: var(--ui-fill);
   outline: none;
+}
+.check {
+  visibility: hidden;
+}
+.option[data-selected] .check {
+  visibility: visible;
 }
 .optionLabel {
   flex: 1;

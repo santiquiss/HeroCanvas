@@ -84,6 +84,73 @@ export interface ShowPlace {
   label?: string;
 }
 
+/**
+ * What a walkthrough's step points at, on the screen: a text as it's shown ("Save as a target…"), a component by its
+ * name (`component:MFSegmentedSwitch`), or a selector (`css:button[title='Options']`). The first one drawn and not
+ * covered; `#2` after it for the second ("Rest#2").
+ */
+export type WalkTarget = string;
+
+/**
+ * One thing done on the screen on a step's way in. A target alone is a tap on it. A field is named by a target too:
+ * the field itself, or the one in it or around it (its label's text, `component:MFTextFormField`); unset, the focused
+ * field, else the first.
+ */
+export type WalkAction =
+  | WalkTarget
+  /** A long press. */
+  | { hold: WalkTarget }
+  /** Puts the focus in a field: the system keyboard shows. */
+  | { focus: WalkTarget }
+  /** Types into a field, a letter at a time, with the keyboard up. Replaces its value. */
+  | { type: string; into?: WalkTarget }
+  /** A key in a field (`Enter`). */
+  | { press: string; into?: WalkTarget }
+  /** A swipe on a pager or carousel (`on` it, else the first on the screen): `left` to the next page, `right` back. */
+  | { swipe: 'left' | 'right'; on?: WalkTarget }
+  /** Scrolls the screen's scrolling areas (or the one `in` selects, CSS) to `y` points, or to their end. */
+  | { scroll: number | 'end'; in?: string }
+  /** Waits, in milliseconds (an animation the next action needs over). */
+  | { wait: number };
+
+/** A numbered mark on the screen: what it points at, and what to say about it. */
+export interface WalkMark {
+  target: WalkTarget;
+  note: string;
+  /** Tapping it on the screen goes to the next step (the app does what the tap does). One a step. */
+  next?: boolean;
+}
+
+/** One state of the feature to look at. */
+export interface WalkStep {
+  /** Its id, the proposal's own and unlike any other step's (`today-override`): what a link to it carries (`?walk=`). */
+  id: string;
+  title: string;
+  /** A sentence or two. */
+  body: string;
+  /** Where it shows: the page, its params and its state (the persona, the scenario). */
+  place: ShowPlace;
+  /**
+   * What's done there to reach it, in order, when it's opened from the list, an arrow or a link: a target alone is a
+   * tap; or a long press, typing in a field (the keyboard shows), a key, a scroll, a wait.
+   */
+  actions?: WalkAction[];
+  marks?: WalkMark[];
+}
+
+/**
+ * One thing to do with the feature, start to end, in a few steps: "Discover it", "Change today's target", "Delete
+ * one". Simple each; a proposal has as many as it has things to show.
+ */
+export interface WalkStory {
+  title: string;
+  /** What it shows, in a line (the list of stories). */
+  line: string;
+  /** A Material Symbol for its row. */
+  icon?: string;
+  steps: WalkStep[];
+}
+
 export interface ProposalCode {
   /** New pages, base pages replaced by id (spread the base entry to change only some fields), or removed (`null`). */
   pages?: Record<string, PageDef | null>;
@@ -104,6 +171,11 @@ export interface ProposalCode {
    * with `overridable` (design/overridable). The replacement gets the same props.
    */
   components?: Record<string, Replacement>;
+  /**
+   * A guided tour of the proposal (the Walkthrough panel): its stories, each a few steps with what to look at. Walked
+   * by tapping what a step marks on the screen, or with the arrows; never by itself.
+   */
+  walkthrough?: WalkStory[];
   /** What a replaced component changes, in a few words (the changes popover): `{ Button: 'Adds variant test' }`. */
   notes?: Record<string, string>;
   /**
@@ -162,6 +234,8 @@ export interface Proposal {
   widgets: string[];
   /** Where its components show (`ProposalCode.show`), each as a list. */
   show?: Record<string, ShowPlace[]>;
+  /** Its guided tour (none: no stories). */
+  walkthrough?: WalkStory[];
   /** Its versions, in order (none: a single version). */
   variants: (ProposalVariant & { id: string })[];
   config: ScreenConfig;

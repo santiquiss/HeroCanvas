@@ -4,7 +4,7 @@
 
 ### Superpowers for Designers
 
-<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.57.0-3b6fd8"></a>
+<a href="src/CHANGELOG.md"><img alt="Version" src="https://img.shields.io/badge/version-0.58.0-3b6fd8"></a>
 <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-3b6fd8"></a>
 <img alt="Status: beta" src="https://img.shields.io/badge/status-beta-e0362f">
 <a href="https://github.com/santiquiss/HeroCanvas/actions/workflows/checks.yml"><img alt="Checks" src="https://github.com/santiquiss/HeroCanvas/actions/workflows/checks.yml/badge.svg"></a>
@@ -214,6 +214,9 @@ Other agents can read the same files: they're plain Markdown.
   Toggle, searchable…) on your app's tokens, so a SwiftUI app's mirror doesn't rebuild the platform. The system
   keyboards of each device come built in.
 - **Proposals**: changes kept apart, with versions to compare side by side and a handoff for whoever builds them.
+- **Walkthroughs**: a proposal as a few stories, step by step, in the Walkthrough panel: numbers beside the device
+  point at what to look at, each step reached by taps, typing, scrolls and swipes from the app as it opens, and a link
+  opens a step in its state. `npm run walk` checks every step in a real browser.
 - **Inspect, Layers, Components**: the component under the cursor with its props and tokens, the tree of components,
   and a gallery of every component and its states.
 - **Comments**: notes for the whole team, right on the screens, with emoji and @mentions told in Slack; every

@@ -52,4 +52,4 @@ export { RAIL_PARAM } from './design/overridableRegistry';
 
 // Proposals (proposals/<slug>/pages.tsx).
 export { overridable } from './design/overridable';
-export { proposal, type ProposalCode } from './proposals/types';
+export { proposal, type ProposalCode, type WalkAction, type WalkMark, type WalkStep, type WalkStory, type WalkTarget } from './proposals/types';

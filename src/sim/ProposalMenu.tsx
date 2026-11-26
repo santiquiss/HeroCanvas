@@ -1,8 +1,11 @@
 // The toolbar's design picker: Live, or a proposal (`?proposal=`). A dropdown of its own (not the browser's) so each
 // proposal shows what it is before it's picked, as a table: its code, its title (how many versions) over its summary,
 // its status, who made it and when; the picked one checked at the left. Newest first; the archived ones behind a switch at the bottom (they still open from a link).
-// Closes on Escape or a click outside; the arrows move between the rows, Enter picks. Designer UI, as CheckDropdown.
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
+// ui-sdk's Select (try-ui-library): opening, closing, the keyboard (typing a code jumps to it), focus and keeping the
+// list on screen are its; the table and its look are ours. Live's tickets open Linear, so they're links under the list,
+// not choices in it. Designer UI.
+import { useState } from 'react';
+import { Select, SelectContent, SelectGroup, SelectGroupLabel, SelectItem, SelectTrigger } from '@ui-sdk/react/select';
 import { Icon } from '../components/Icon';
 import { PROPOSALS } from '../proposals';
 import { ARCHIVED, STATUSES, type Proposal } from '../proposals/types';
@@ -27,48 +30,20 @@ function shortDate(iso: string): string {
   return d.toLocaleDateString(UI_LANGUAGE === 'es' ? 'es' : 'en-US', { month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) });
 }
 
+/** Live's value in the Select: no proposal. */
+const LIVE = 'live';
+
 export function ProposalMenu() {
   const [current, setCurrent] = useProposalParam();
   const active = PROPOSALS.find((p) => p.id === current);
-  const [open, setOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const root = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  const id = useId();
 
   const archived = PROPOSALS.filter((p) => p.meta.archived);
   // Newest first; the one picked stays listed even when archived.
   const shown = [...PROPOSALS].reverse().filter((p) => showArchived || !p.meta.archived || p.id === active?.id);
 
-  // Listeners only while open; the picked row (else Live) takes focus so the arrows start there.
-  useEffect(() => {
-    if (!open) return;
-    (list.current?.querySelector<HTMLElement>('[aria-selected="true"]') ?? list.current?.querySelector<HTMLElement>('[role="option"]'))?.focus();
-    const away = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
-    document.addEventListener('pointerdown', away);
-    return () => document.removeEventListener('pointerdown', away);
-  }, [open]);
-
-  const close = () => {
-    setOpen(false);
-    root.current?.querySelector<HTMLElement>('button')?.focus();
-  };
-  const pick = (pid: string | null) => {
-    setCurrent(pid);
-    close();
-  };
-  const onKey = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      const rows = [...(list.current?.querySelectorAll<HTMLElement>('[role="option"]') ?? [])];
-      const i = rows.indexOf(document.activeElement as HTMLElement);
-      rows[(i + (e.key === 'ArrowDown' ? 1 : rows.length - 1)) % rows.length]?.focus();
-    }
-  };
-
   return (
-    <div ref={root} className={styles.root} onKeyDown={open ? onKey : undefined}>
+    <div className={styles.root}>
       {/* Back to Live in one click, beside the proposal on screen. */}
       {active && (
         <button className={styles.back} title={t('Back to Live')} onClick={() => setCurrent(null)}>
@@ -76,25 +51,22 @@ export function ProposalMenu() {
           <span>{t('Live')}</span>
         </button>
       )}
-      <button
-        data-tour="proposals"
-        className={`${styles.trigger} ${active ? styles.triggerProposal : ''} ${open ? styles.triggerOpen : ''}`}
-        title={t("Design: what's live, or a proposal")}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={id}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {active ? <StatusDot status={active.meta.status} archived={active.meta.archived} /> : <Icon name={LIVE_ICON} size={16} />}
-        {active && <span className={styles.code}>{active.id}</span>}
-        <span className={styles.triggerTitle}>{active?.meta.title ?? t('Live')}</span>
-        <Icon name="expand_more" size={18} />
-      </button>
-      {open && (
-        <div ref={list} id={id} className={styles.menu} role="listbox" aria-label={t('Design')}>
+      <Select value={active?.id ?? LIVE} onValueChange={(v) => typeof v === 'string' && setCurrent(v === LIVE ? null : v)}>
+        <SelectTrigger
+          data-tour="proposals"
+          className={`${styles.trigger} ${active ? styles.triggerProposal : ''}`}
+          title={t("Design: what's live, or a proposal")}
+          aria-label={t('Design')}
+        >
+          {active ? <StatusDot status={active.meta.status} archived={active.meta.archived} /> : <Icon name={LIVE_ICON} size={16} />}
+          {active && <span className={styles.code}>{active.id}</span>}
+          <span className={styles.triggerTitle}>{active?.meta.title ?? t('Live')}</span>
+          <Icon name="expand_more" size={18} />
+        </SelectTrigger>
+        <SelectContent className={styles.menu} sideOffset={4} align="start">
           {/* Live on the table's grid, in one line: its check, its icon under the codes, its name and line under the titles. */}
-          <button role="option" aria-selected={!active} className={`${styles.row} ${styles.cols} ${styles.liveRow} ${!active ? styles.rowOn : ''}`} onClick={() => pick(null)}>
-            <Check on={!active} />
+          <SelectItem value={LIVE} label={t('Live')} className={`${styles.row} ${styles.cols} ${styles.liveRow}`}>
+            <Check />
             <span className={styles.codeCol}>
               <Icon name={LIVE_ICON} size={18} color="var(--ui-text-2)" />
             </span>
@@ -102,7 +74,7 @@ export function ProposalMenu() {
               <span className={styles.title}>{t('Live')}</span>
               <span className={styles.liveLine}>{t('What the app is today')}</span>
             </span>
-          </button>
+          </SelectItem>
           {/* No proposals to list: what one is and how to make it (or, all archived, where they are). */}
           {shown.length === 0 ? (
             <div className={surface.empty}>
@@ -117,46 +89,49 @@ export function ProposalMenu() {
               </span>
             </div>
           ) : (
-            <div className={`${styles.cols} ${styles.colHead}`} aria-hidden>
-              <span />
-              <span>{t('Code')}</span>
-              <span>{t('Proposal · {count}', { count: shown.length })}</span>
-              <span>{t('Status')}</span>
-              <span>{t('Created by')}</span>
-              <span>{t('Date')}</span>
-            </div>
+            <SelectGroup>
+              {/* The group's name is its title column's head; the others name the table's columns. */}
+              <SelectGroupLabel className={`${styles.cols} ${styles.colHead}`}>
+                <span aria-hidden />
+                <span aria-hidden>{t('Code')}</span>
+                <span>{t('Proposal · {count}', { count: shown.length })}</span>
+                <span aria-hidden>{t('Status')}</span>
+                <span aria-hidden>{t('Created by')}</span>
+                <span aria-hidden>{t('Date')}</span>
+              </SelectGroupLabel>
+              {shown.map((p) => {
+                const s = statusOf(p);
+                const versions = p.variants.length;
+                return (
+                  // Typing finds it by its code ("PS-18"), then its title.
+                  <SelectItem key={p.id} value={p.id} label={`${p.id} ${p.meta.title}`} className={`${styles.row} ${styles.cols}`}>
+                    <Check />
+                    <span className={styles.codeCol}>{p.id}</span>
+                    <span className={styles.what}>
+                      <span className={styles.title}>
+                        {p.meta.title}
+                        {versions > 0 && <span className={styles.versions}>{plural(versions, '{n} version', '{n} versions')}</span>}
+                      </span>
+                      {(p.meta.summary ?? p.meta.description) && <span className={styles.summary}>{p.meta.summary ?? p.meta.description}</span>}
+                    </span>
+                    <span className={styles.statusCol}>
+                      <span className={styles.status} style={{ color: s.id === 'handed-off' ? s.color : undefined }}>
+                        <StatusDot status={p.meta.status} archived={p.meta.archived} />
+                        <span>{s.label}</span>
+                      </span>
+                      {p.meta.ticket && <span className={styles.ticket}>{p.meta.ticket}</span>}
+                    </span>
+                    <span className={styles.muted}>{p.meta.author ?? '—'}</span>
+                    <span className={styles.muted}>{shortDate(p.meta.created)}</span>
+                  </SelectItem>
+                );
+              })}
+            </SelectGroup>
           )}
-          {shown.map((p) => {
-            const on = p.id === active?.id;
-            const s = statusOf(p);
-            const versions = p.variants.length;
-            return (
-              <button key={p.id} role="option" aria-selected={on} className={`${styles.row} ${styles.cols} ${on ? styles.rowOn : ''}`} onClick={() => pick(p.id)}>
-                <Check on={on} />
-                <span className={styles.codeCol}>{p.id}</span>
-                <span className={styles.what}>
-                  <span className={styles.title}>
-                    {p.meta.title}
-                    {versions > 0 && <span className={styles.versions}>{plural(versions, '{n} version', '{n} versions')}</span>}
-                  </span>
-                  {(p.meta.summary ?? p.meta.description) && <span className={styles.summary}>{p.meta.summary ?? p.meta.description}</span>}
-                </span>
-                <span className={styles.statusCol}>
-                  <span className={styles.status} style={{ color: s.id === 'handed-off' ? s.color : undefined }}>
-                    <StatusDot status={p.meta.status} archived={p.meta.archived} />
-                    <span>{s.label}</span>
-                  </span>
-                  {p.meta.ticket && <span className={styles.ticket}>{p.meta.ticket}</span>}
-                </span>
-                <span className={styles.muted}>{p.meta.author ?? '—'}</span>
-                <span className={styles.muted}>{shortDate(p.meta.created)}</span>
-              </button>
-            );
-          })}
-          {/* Live's own tickets (proposals/tickets.json), after the proposals: small changes to the app as it is, with no
-              proposal; a row opens the ticket. */}
+          {/* Live's own tickets (proposals/tickets.json): small changes to the app as it is, with no proposal. Each opens
+              its ticket, so they're links, not choices. */}
           {LIVE_TICKETS.length > 0 && (
-            <>
+            <div role="group" aria-label={t('Live tickets · {count}', { count: LIVE_TICKETS.length })}>
               <div className={`${styles.cols} ${styles.colHead}`} aria-hidden>
                 <span />
                 <span />
@@ -166,13 +141,13 @@ export function ProposalMenu() {
                 <span />
               </div>
               {LIVE_TICKETS.map((tk) => (
-                <button
+                <a
                   key={tk.ticket}
-                  role="option"
-                  aria-selected={false}
-                  className={`${styles.row} ${styles.cols}`}
+                  className={`${styles.row} ${styles.cols} ${styles.link}`}
+                  href={tk.url}
+                  target="_blank"
+                  rel="noopener"
                   title={tk.url ? t('Open {ticket}', { ticket: tk.ticket }) : tk.ticket}
-                  onClick={() => tk.url && window.open(tk.url, '_blank', 'noopener')}
                 >
                   <span className={styles.check} />
                   {/* A ticket, not a proposal's code: its id goes under its status, as a proposal's ticket does. */}
@@ -192,9 +167,9 @@ export function ProposalMenu() {
                   </span>
                   <span className={styles.muted}>{tk.author ?? '—'}</span>
                   <span className={styles.muted}>{shortDate(tk.created)}</span>
-                </button>
+                </a>
               ))}
-            </>
+            </div>
           )}
           {archived.length > 0 && (
             <button className={styles.footer} onClick={() => setShowArchived((a) => !a)}>
@@ -202,13 +177,17 @@ export function ProposalMenu() {
               <span>{showArchived ? t('Hide archived') : t('Show archived ({count})', { count: archived.length })}</span>
             </button>
           )}
-        </div>
-      )}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
 
-/** The picked row's check, in a column of its own that's always there: the rows don't move when it shows. */
-function Check({ on }: { on: boolean }) {
-  return <span className={styles.check}>{on && <Icon name="check" size={16} color="#0d99ff" />}</span>;
+/** The picked row's check, in a column of its own that's always there (shown on the selected item): the rows don't move. */
+function Check() {
+  return (
+    <span className={styles.check}>
+      <Icon name="check" size={16} color="#0d99ff" className={styles.checkIcon} />
+    </span>
+  );
 }

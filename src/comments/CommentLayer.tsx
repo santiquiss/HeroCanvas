@@ -409,6 +409,7 @@ function Composer({ onPost }: { onPost: (kind: CommentKind, author: string, body
           mention.track();
         }}
         onSelect={mention.track}
+        {...mention.fieldProps}
         onKeyDown={(e) => mention.onKeyDown(e) || sendOnEnter(() => void post())(e)}
       />
       {mention.list}

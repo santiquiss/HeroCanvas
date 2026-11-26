@@ -3,7 +3,8 @@
 // its layout rules), components changed (by this version or all) — each with its type's icon in the color of its
 // change and a way to go see it: Open a page, every place a component is (WhereRail, beside the canvas). HighlightButton,
 // beside Inspect, outlines them on the screens (`?changes=1`).
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui-sdk/react/popover';
 import { Icon } from '../components/Icon';
 import { ChangeCounts, CHANGE_ORDER, changeCounts } from '../design/ChangeCounts';
 import { CHANGE, HIGHLIGHT, type ChangeKind } from '../design/changes';
@@ -26,7 +27,6 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
   const p = PROPOSALS.find((x) => x.id === proposalId);
   const [variant] = useUrlState<string>(VARIANT_PARAM, '');
   const [open, setOpen] = useState(false);
-  const root = useRef<HTMLDivElement>(null);
   const nav = useNavRoot();
   const patch = useUrlPatch();
   const { openComponent } = useGalleryNav();
@@ -35,19 +35,6 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
   // Where the changed components are: built ahead, in idle time, once a proposal is on (or now, if it's opened first).
   const index = usePageIndex(proposalId ?? 'live', open || (proposalId ? 'idle' : false));
   const scanning = useScanProgress(proposalId ?? 'live');
-
-  // Listeners only while open.
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('pointerdown', away);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('pointerdown', away);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [open]);
 
   if (!p) return null;
   const c = proposalChanges(p, variant || null, BASE_PAGES);
@@ -78,13 +65,13 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
   };
 
   return (
-    <div ref={root} className={styles.changes}>
-      <button className={`${styles.chip} ${open ? styles.chipOpen : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} title={t('What this proposal changes')}>
+    // ui-sdk's Popover (try-ui-library): placing it, focus into it and back to the chip, Escape and a click outside.
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className={`${styles.chip} ${styles.changesChip}`} title={t('What this proposal changes')}>
         <Icon name="difference" size={18} />
         {total ? <ChangeCounts counts={count} /> : <span>{t('No changes')}</span>}
-      </button>
-      {open && (
-        <div className={styles.popover} role="dialog" aria-label={t('What changes')}>
+      </PopoverTrigger>
+      <PopoverContent className={styles.popover} side="bottom" align="start" sideOffset={8} aria-label={t('What changes')}>
           <div className={styles.popHead}>{t('What changes')}</div>
           {p.meta.summary?.trim() && <p className={styles.popSummary}>{p.meta.summary.trim()}</p>}
           {/* Where the components are is still being found: how far along. */}
@@ -169,9 +156,8 @@ export function ChangesMenu({ proposalId }: { proposalId: string | null }) {
               })}
             </Section>
           )}
-        </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 

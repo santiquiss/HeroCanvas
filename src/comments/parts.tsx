@@ -1,6 +1,7 @@
 // The pieces a thread is drawn with, the same on the canvas (beside its pin) and in the panel: avatars, a comment, the
 // thread's comments, the reply field (with its emoji and @mentions), resolve, and your own comment's ⋯ (edit, delete). Figma's comments are the model.
 import { useEffect, useRef, useState } from 'react';
+import { Menu, MenuContent, MenuItem, MenuTrigger } from '@ui-sdk/react/menu';
 import { Icon } from '../components/Icon';
 import { EmojiButton } from './EmojiButton';
 import { mentionsOf } from './mentions';
@@ -65,80 +66,86 @@ export function useMine(c: Comment): boolean {
 const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 /**
- * Your comment's ⋯: Edit, Delete (asked once more; a thread's first comment takes its replies). `hover`: shown when the
- * pointer is over its comment, as in Figma.
+ * Your comment's ⋯: Edit, Delete (asked once more, in the same menu; a thread's first comment takes its replies).
+ * `hover`: shown when the pointer is over its comment, as in Figma. ui-sdk's Menu (try-ui-library): the keyboard,
+ * dismissal, focus and the delete's wait (its item pending, the menu kept open with the error if it fails) are its.
  */
 export function OwnActions({ c, onEdit, hover = false }: { c: Comment; onEdit: () => void; hover?: boolean }) {
-  const [open, setOpen] = useState<'menu' | 'confirm' | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [confirm, setConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-  // A press anywhere else closes it.
+  // The item that had focus goes when the content swaps: the confirmation's Delete takes it, and Cancel gives it back.
+  const confirmDelete = useRef<HTMLDivElement>(null);
+  const askDelete = useRef<HTMLDivElement>(null);
+  const asked = useRef(false);
   useEffect(() => {
-    if (!open) return;
-    const away = (e: PointerEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(null);
-    };
-    window.addEventListener('pointerdown', away, true);
-    return () => window.removeEventListener('pointerdown', away, true);
-  }, [open]);
+    if (confirm) confirmDelete.current?.focus();
+    else if (asked.current) askDelete.current?.focus();
+    asked.current = confirm;
+  }, [confirm]);
   const remove = async () => {
-    setBusy(true);
     setError(null);
     try {
       await deleteComment(c);
     } catch (e) {
       setError(message(e));
-      setBusy(false);
+      throw e;
     }
   };
   return (
     <div
-      ref={ref}
       className={`${styles.own} ${hover && !open ? styles.ownHover : ''}`}
       onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape' && open) {
-          e.stopPropagation();
-          setOpen(null);
-        }
-      }}
+      // The menu's Escape is its own: not the thread's (which would close it too).
+      onKeyDown={(e) => open && e.key === 'Escape' && e.stopPropagation()}
     >
-      <button className={`${styles.iconBtn} ${styles.more}`} title={t('More')} aria-label={t('More')} aria-haspopup="menu" aria-expanded={!!open} onClick={() => setOpen(open ? null : 'menu')}>
-        <Icon name="more_horiz" size={18} />
-      </button>
-      {open === 'menu' && (
-        <div className={styles.menu} role="menu">
-          <button
-            role="menuitem"
-            onClick={() => {
-              setOpen(null);
-              onEdit();
-            }}
-          >
-            <Icon name="edit" size={16} />
-            <span>{t('Edit')}</span>
-          </button>
-          <button role="menuitem" className={styles.danger} onClick={() => setOpen('confirm')}>
-            <Icon name="delete" size={16} />
-            <span>{t('Delete')}</span>
-          </button>
-        </div>
-      )}
-      {open === 'confirm' && (
-        <div className={styles.menu} role="alertdialog" aria-label={t('Delete')}>
-          <span className={styles.menuNote}>{c.parentId ? t('Delete this comment?') : t('Delete this thread and its replies?')}</span>
-          {error && <span className={styles.error}>{error}</span>}
-          <div className={styles.menuBar}>
-            <button className={styles.plainBtn} onClick={() => setOpen(null)}>
-              {t('Cancel')}
-            </button>
-            <button className={styles.dangerBtn} disabled={busy} autoFocus onClick={() => void remove()}>
-              {t('Delete')}
-            </button>
-          </div>
-        </div>
-      )}
+      <Menu
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next) {
+            setConfirm(false);
+            setError(null);
+          }
+        }}
+      >
+        <MenuTrigger className={`${styles.iconBtn} ${styles.more}`} title={t('More')} aria-label={t('More')}>
+          <Icon name="more_horiz" size={18} />
+        </MenuTrigger>
+        <MenuContent className={styles.menu} align="end" sideOffset={4} aria-label={confirm ? t('Delete') : t('More')}>
+          {confirm ? (
+            <>
+              <span className={styles.menuNote}>{c.parentId ? t('Delete this comment?') : t('Delete this thread and its replies?')}</span>
+              {error && <span className={styles.error}>{error}</span>}
+              <div className={styles.menuBar}>
+                <MenuItem
+                  className={styles.plainBtn}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setConfirm(false);
+                  }}
+                >
+                  {t('Cancel')}
+                </MenuItem>
+                <MenuItem ref={confirmDelete} destructive className={styles.dangerBtn} onSelect={remove}>
+                  {t('Delete')}
+                </MenuItem>
+              </div>
+            </>
+          ) : (
+            <>
+              <MenuItem onSelect={onEdit}>
+                <Icon name="edit" size={16} />
+                <span>{t('Edit')}</span>
+              </MenuItem>
+              <MenuItem ref={askDelete} destructive className={styles.danger} closeOnSelect={false} onSelect={() => setConfirm(true)}>
+                <Icon name="delete" size={16} />
+                <span>{t('Delete')}</span>
+              </MenuItem>
+            </>
+          )}
+        </MenuContent>
+      </Menu>
     </div>
   );
 }
@@ -187,6 +194,7 @@ export function EditField({ c, onDone }: { c: Comment; onDone: () => void }) {
             mention.track();
           }}
           onSelect={mention.track}
+          {...mention.fieldProps}
           onKeyDown={(e) => mention.onKeyDown(e) || sendOnEnter(() => void save())(e)}
         />
         {mention.list}
@@ -276,6 +284,7 @@ export function ReplyField({ thread, autoFocus = false }: { thread: Thread; auto
               mention.track();
             }}
             onSelect={mention.track}
+            {...mention.fieldProps}
             onKeyDown={(e) => mention.onKeyDown(e) || sendOnEnter(() => void send())(e)}
           />
           {mention.list}

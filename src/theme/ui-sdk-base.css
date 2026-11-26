@@ -1,0 +1,60 @@
+/* What ui-sdk's parts need to behave, without its default look (@ui-sdk/core/web.css, which every one of ours
+   restyles): a part it hid stays hidden, a popup sits where it's placed (no margin or border of the browser's own popover),
+   a dialog is centered over the page, and text kept for screen readers stays out of sight. In its own layer, under
+   every style of ours. try-ui-library. */
+@layer ui-sdk {
+  [data-slot][hidden]:not([hidden='until-found']) {
+    display: none;
+  }
+
+  [data-slot] {
+    box-sizing: border-box;
+  }
+
+  [data-slot][hidden='until-found'] {
+    padding: 0;
+  }
+
+  [data-slot='visually-hidden'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  :is([data-slot='menu-content'], [data-slot='select-content'], [data-slot='popover-content']) {
+    max-height: var(--available-height);
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 0;
+    background: none;
+    color: inherit;
+    outline: none;
+  }
+
+  :is([data-slot='dialog-backdrop'], [data-slot='alert-dialog-backdrop']) {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  :is([data-slot='dialog-content'], [data-slot='alert-dialog-content']) {
+    position: fixed;
+    inset: 0;
+    width: fit-content;
+    max-width: calc(100vw - 2rem);
+    height: fit-content;
+    max-height: calc(100dvh - 2rem);
+    margin: auto;
+    padding: 0;
+    overflow-y: auto;
+    border: 0;
+    outline: none;
+  }
+}

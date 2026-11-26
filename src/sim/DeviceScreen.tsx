@@ -33,7 +33,7 @@ import { screenRegions } from './regions';
 import { boxInScreen, counterpartIn } from './anchor';
 import { ColumnBar, ColumnBarCtx, ColumnNavCtx, createColumnBar, PageOpenCtx, SIDE_NAV_ATTR } from './columnBar';
 import { DropDownLayer } from './DropDownLayer';
-import { useSim, type SheetSpec, type SnackbarSpec } from './SimContext';
+import { RESET_APP_EVENT, useSim, type SheetSpec, type SnackbarSpec } from './SimContext';
 import { isTextField, KeyboardInsetCtx, useKeyboardInset } from './keyboard';
 import { CornerStatusImage, HomeIndicator, LandscapeCamera, StatusBar } from './SystemChrome';
 import { pointerOf } from '../devices/devices';
@@ -243,9 +243,17 @@ function useCompactNav(nav: Nav, rail: boolean): Nav {
  */
 export function DeviceScreen(props: { preview?: boolean; overlays?: boolean }) {
   const nav = useCompactNav(useNavRoot(), useSim().layout.showRail);
+  // Put back as it opens (a walkthrough's step): the screen drawn anew, so nothing a page kept of its own (a sheet it
+  // opened, a switch, a scroll) is left from before.
+  const [fresh, setFresh] = useState(0);
+  useEffect(() => {
+    const reset = () => setFresh((n) => n + 1);
+    window.addEventListener(RESET_APP_EVENT, reset);
+    return () => window.removeEventListener(RESET_APP_EVENT, reset);
+  }, []);
   return (
     <NavCtx.Provider value={nav}>
-      <Screen {...props} />
+      <Screen key={fresh} {...props} />
     </NavCtx.Provider>
   );
 }
@@ -438,6 +446,9 @@ function Screen({ preview = false, overlays = !preview }: { preview?: boolean; o
         // The screen's root: where a tap's place is counted from (App Store Assets keeps the taps that opened a menu), and
         // what a still picture of it waits for (src/sim/screenStill.tsx).
         data-hc-screen=""
+        // The device that's selected (in a set, the last one touched; alone, the only one): where a walkthrough's
+        // numbers point, and its steps are done.
+        data-hc-active={preview ? undefined : ''}
         data-theme={theme}
         // The app's own theme (appConfig.themes): its tokens' block in app/theme.css.
         data-app-theme={appTheme?.id}

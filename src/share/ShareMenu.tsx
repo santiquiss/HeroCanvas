@@ -1,7 +1,8 @@
 // The toolbar's Share: a link to what's on screen (for the team: every state is in the URL), or a guest link, with
 // its own password and an end (src/share/gate.ts makes it). Guest links are made where the door is, the production
 // site: anywhere else (`npm run dev`) it offers to open this view there, its menu open.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui-sdk/react/popover';
 import { Icon } from '../components/Icon';
 import { t } from '../i18n/ui';
 import { APP_CONTROLS, DEFAULT_PERSONA, findPersona, PERSONA_PARAM, PERSONAS } from '../sim/persona';
@@ -139,7 +140,6 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
   const appOnly = appOnlyChecked && expands(device);
   const base = startOf(onScreen, persona, device, live);
   const start = appOnly ? withParams(base, { [REAL_PARAM]: '1' }) : base;
-  const root = useRef<HTMLDivElement>(null);
 
   // Arrived from another copy to make a guest link: the menu opens, the param leaves the URL.
   useEffect(() => {
@@ -153,17 +153,6 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
     // Once, on arrival.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('pointerdown', away);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('pointerdown', away);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [open]);
   useEffect(() => {
     if (!copied) return;
     const timer = setTimeout(() => setCopied(null), 1800);
@@ -191,13 +180,14 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
   const message = (m: Made) => [m.url, t('Works until {until}.', { until: formatUntil(m.expires) })].join('\n');
 
   return (
-    <div ref={root} className={styles.root}>
-      <button className={`${styles.share} ${secondary ? styles.secondaryShare : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="dialog" title={t('Share this view')} data-tour="share">
+    // ui-sdk's Popover (try-ui-library): placing it, focus into it and back to Share, Escape and a click outside (the
+    // persona's list inside it is its own popup, so picking there doesn't close this one).
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className={`${styles.share} ${secondary ? styles.secondaryShare : ''}`} title={t('Share this view')} data-tour="share">
         <Icon name="link" size={18} />
         {t('Share')}
-      </button>
-      {open && (
-        <div className={styles.menu} role="dialog" aria-label={t('Share')}>
+      </PopoverTrigger>
+      <PopoverContent className={styles.menu} side="bottom" align="end" sideOffset={6} aria-label={t('Share')}>
           {/* The team's link: what's on screen, for anyone with the team's password. */}
           <button className={styles.row} onClick={() => copy('view', window.location.href)}>
             <Icon name={copied === 'view' ? 'check' : 'link'} size={18} />
@@ -344,9 +334,8 @@ export function ShareMenu({ secondary }: { secondary?: boolean } = {}) {
               </>
             )}
           </div>
-        </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 

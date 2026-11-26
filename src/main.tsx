@@ -5,6 +5,8 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { NavProvider } from './nav/NavProvider';
 import { SimulatorShell } from './sim/SimulatorShell';
 import { t } from './i18n/ui';
+// What ui-sdk's parts need to behave (try-ui-library), without its default look: every one of ours is styled here.
+import './theme/ui-sdk-base.css';
 import './kit/tokens.css';
 import './theme/theme.css';
 // The tool's brand colors (herocanvas.config.ts, scripts/vite/brand.ts).

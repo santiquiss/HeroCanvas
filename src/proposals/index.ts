@@ -40,6 +40,7 @@ export const PROPOSALS: Proposal[] = Object.entries(metas)
       params: code?.params ?? {},
       widgets: code?.widgets ?? [],
       show: placesOf(code?.show),
+      walkthrough: code?.walkthrough ?? [],
       variants: Object.entries(code?.variants ?? {}).map(([vid, v]) => ({ id: vid, ...v })),
       config: configs[folder] ?? {},
       layout: code?.layout ?? {},

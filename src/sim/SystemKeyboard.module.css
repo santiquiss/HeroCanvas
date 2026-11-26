@@ -357,10 +357,10 @@
 }
 
 /* The step's Continue as the keyboard's action key (the text field's continue input action): the app's primary
-   button (a pill, its primary color, white label) in the return key's place; dimmed as a disabled
+   color and white label in the return key's place, rounded as the other keys (iOS's return key); dimmed as a disabled
    Button until the step can go on. */
 .key.action {
-  border-radius: 9999px;
+  border-radius: var(--kb-radius);
   background: var(--background-interactive-primary-default);
   color: var(--text-inverted-primary);
   font-size: 16px;
@@ -369,7 +369,6 @@
   box-shadow: none;
 }
 .ipad .key.action {
-  border-radius: var(--kb-radius);
   font-size: calc(var(--kb-key-h) * 0.3);
 }
 .key.actionOff {

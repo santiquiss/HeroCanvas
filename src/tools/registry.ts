@@ -14,6 +14,7 @@ import { ProposalPanel } from './ProposalPanel';
 import { ScenariosPanel } from './ScenariosPanel';
 import { TokensPanel } from './TokensPanel';
 import { ComponentInfoPanel, ComponentStateBadge } from './ComponentInfoPanel';
+import { WalkthroughPanel } from '../walkthrough/WalkthroughPanel';
 import { t } from '../i18n/ui';
 
 export interface ToolDef {
@@ -43,6 +44,8 @@ export const TOOLS: ToolDef[] = [
   { id: 'tokens', title: t('Tokens'), icon: 'palette', side: 'left', component: TokensPanel, modes: ['tokens'] },
   // The layers of what's on the canvas: a screen in the prototype, the component's examples in Components.
   { id: 'layers', title: t('Layers'), icon: 'layers', side: 'left', component: LayersPanel, modes: ['prototype', 'components'] },
+  // A proposal's guided tour: its states in order, walked on the screen.
+  { id: 'walkthrough', title: t('Walkthrough'), icon: 'tour', side: 'left', component: WalkthroughPanel, modes: ['prototype'] },
   // A component's page, in Components: what to know about it, then its props to read and to change.
   { id: 'info', title: t('Info'), icon: 'info', side: 'right', component: ComponentInfoPanel, modes: ['components'], badge: ComponentStateBadge },
   { id: 'props', title: t('Props'), icon: 'tune', side: 'right', component: ControlsPanel, modes: ['components'] },

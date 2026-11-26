@@ -1,6 +1,5 @@
 /* CheckDropdown: the designer's multi-select (its own UI, not the app's). */
 .root {
-  position: relative;
   min-width: 0;
 }
 .trigger {
@@ -18,7 +17,7 @@
   cursor: pointer;
 }
 .trigger:hover,
-.triggerOpen {
+.trigger[data-open] {
   background: var(--ui-bg-subtle);
 }
 .label {
@@ -45,11 +44,8 @@
 }
 .menu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  z-index: 10;
-  top: calc(100% + 4px);
-  left: 0;
-  min-width: 100%;
+  /* Placed by ui-sdk in the top layer, at least as wide as its button. */
+  min-width: var(--anchor-width);
   width: max-content;
   max-width: 280px;
   display: flex;
@@ -67,11 +63,25 @@
   font-size: 12px;
   cursor: pointer;
 }
-.option:hover {
+.option[data-highlighted] {
   background: var(--ui-hover);
 }
-.option input {
-  margin: 0;
+/* The option's checkbox, drawn from its state: empty, or filled with a check while selected. */
+.box {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border: 1px solid var(--ui-line-strong);
+  border-radius: 3px;
+  background: var(--ui-bg);
+  color: transparent;
+}
+.option[data-selected] .box {
+  border-color: #0d99ff;
+  background: #0d99ff;
+  color: #fff;
 }
 .optionLabel {
   flex: 1;

@@ -1,7 +1,8 @@
 // Video's Motion section: Loop (one motion, repeating) or Once (three rows, In, Middle and Out), each row a dropdown of
 // its motions (their paths as icons; each In and Out brings its own short fade) and one of its length. The clip is their sum; a recording sets the
 // Middle's. The designer's own UI (as CheckDropdown), not the app's.
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui-sdk/react/select';
 import { Icon } from '../components/Icon';
 import { EDGE_SECONDS, hasIn, hasOut, IN_STEPS, MID_SECONDS, MID_STEPS, OUT_STEPS, stepMotion, type Sequence, type Step } from './video/motion';
 import { MotionGlyph } from './video/MotionGlyph';
@@ -103,37 +104,28 @@ function Row<Id extends string>({
       <Dropdown
         label={t('{step} motion', { step: label })}
         across
+        value={value}
+        onPick={(id) => onPick(steps.find((x) => x.id === id)!)}
         trigger={
           <>
             <StepIcon step={step} middle={middle} faded={skipped} />
             <span className={`${styles.name} ${skipped ? styles.none : ''}`}>{step.label}</span>
           </>
         }
-      >
-        {(close) => (
-          <>
-            {steps.map((x) => (
-              <button
-                key={x.id}
-                role="option"
-                aria-selected={x.id === value}
-                className={`${styles.option} ${x.id === value ? styles.on : ''}`}
-                onClick={() => {
-                  onPick(x);
-                  close();
-                }}
-              >
-                <StepIcon step={x} middle={middle} faded={!x.offset && !middle} />
-                <span className={styles.optionText}>
-                  <span>{x.label}</span>
-                  <span className={styles.note}>{x.note}</span>
-                </span>
-                {x.id === value && <Icon name="check" size={16} color="#0d99ff" />}
-              </button>
-            ))}
-          </>
-        )}
-      </Dropdown>
+        options={steps.map((x) => ({
+          value: x.id,
+          label: x.label,
+          content: (
+            <>
+              <StepIcon step={x} middle={middle} faded={!x.offset && !middle} />
+              <span className={styles.optionText}>
+                <span>{x.label}</span>
+                <span className={styles.note}>{x.note}</span>
+              </span>
+            </>
+          ),
+        }))}
+      />
       {seconds == null ? (
         <span className={styles.length} aria-label={t('{step} length', { step: label })}>
           —
@@ -143,25 +135,15 @@ function Row<Id extends string>({
           {secs(seconds)}
         </span>
       ) : (
-        <Dropdown label={t('{step} length', { step: label })} narrow trigger={<span className={styles.name}>{secs(seconds)}</span>}>
-          {(close) =>
-            options.map((v) => (
-              <button
-                key={v}
-                role="option"
-                aria-selected={v === seconds}
-                className={`${styles.option} ${styles.short} ${v === seconds ? styles.on : ''}`}
-                onClick={() => {
-                  onSeconds(v);
-                  close();
-                }}
-              >
-                <span className={styles.optionText}>{secs(v)}</span>
-                {v === seconds && <Icon name="check" size={16} color="#0d99ff" />}
-              </button>
-            ))
-          }
-        </Dropdown>
+        <Dropdown
+          label={t('{step} length', { step: label })}
+          narrow
+          short
+          value={String(seconds)}
+          onPick={(v) => onSeconds(Number(v))}
+          trigger={<span className={styles.name}>{secs(seconds)}</span>}
+          options={options.map((v) => ({ value: String(v), label: secs(v), content: <span className={styles.optionText}>{secs(v)}</span> }))}
+        />
       )}
     </div>
   );
@@ -178,44 +160,49 @@ function StepIcon({ step, middle, faded }: { step: Step<string>; middle: boolean
 }
 
 /**
- * A button that opens a list under it. Closes on Escape or a click outside; the arrows move between its options.
- * `children` gets `close`, for an option to close it once picked.
+ * A button that opens a list of options under it: ui-sdk's Select (try-ui-library), its rows ours. The arrows, typing an
+ * option's name, Escape, a click outside and focus are its. `across`: the list spans the whole row (label to length).
  */
-function Dropdown({ label, trigger, narrow = false, across = false, children }: { label: string; trigger: ReactNode; narrow?: boolean; /** Its list across the whole row. */ across?: boolean; children: (close: () => void) => ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const root = useRef<HTMLDivElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    (list.current?.querySelector<HTMLElement>('[aria-selected="true"]') ?? list.current?.querySelector<HTMLElement>('button, input'))?.focus();
-    const away = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
-    document.addEventListener('pointerdown', away);
-    return () => document.removeEventListener('pointerdown', away);
-  }, [open]);
-  const close = () => {
-    setOpen(false);
-    root.current?.querySelector<HTMLElement>('button')?.focus();
-  };
-  const onKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      const items = [...(list.current?.querySelectorAll<HTMLElement>('[role="option"], input') ?? [])];
-      const i = items.indexOf(document.activeElement as HTMLElement);
-      items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus();
-    }
-  };
+function Dropdown({
+  label,
+  trigger,
+  value,
+  options,
+  onPick,
+  narrow = false,
+  across = false,
+  short = false,
+}: {
+  label: string;
+  trigger: ReactNode;
+  value: string;
+  options: { value: string; label: string; content: ReactNode }[];
+  onPick: (value: string) => void;
+  narrow?: boolean;
+  /** Its list across the whole row. */
+  across?: boolean;
+  /** Short options (a length): less padding. */
+  short?: boolean;
+}) {
+  const button = useRef<HTMLButtonElement>(null);
+  // Across: placed against the row it's in, as wide as it.
+  const row = across ? { getBoundingClientRect: () => (button.current?.closest(`.${styles.row}`) ?? button.current)!.getBoundingClientRect() } : undefined;
   return (
-    <div ref={root} className={`${styles.dropdown} ${narrow ? styles.narrow : ''} ${across ? styles.across : ''}`} onKeyDown={open ? onKey : undefined}>
-      <button className={`${styles.trigger} ${open ? styles.open : ''}`} aria-haspopup="listbox" aria-expanded={open} aria-label={label} onClick={() => setOpen((o) => !o)}>
-        {trigger}
-        <Icon name="expand_more" size={16} color="var(--ui-text-muted)" />
-      </button>
-      {open && (
-        <div ref={list} className={styles.menu} role="listbox" aria-label={label}>
-          {children(close)}
-        </div>
-      )}
+    <div className={`${styles.dropdown} ${narrow ? styles.narrow : ''}`}>
+      <Select value={value} onValueChange={(v) => typeof v === 'string' && onPick(v)}>
+        <SelectTrigger ref={button} className={styles.trigger} aria-label={label}>
+          {trigger}
+          <Icon name="expand_more" size={16} color="var(--ui-text-muted)" />
+        </SelectTrigger>
+        <SelectContent className={`${styles.menu} ${across ? styles.across : ''}`} anchor={row} side="bottom" align={narrow ? 'end' : 'start'} sideOffset={4} aria-label={label}>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value} label={o.label} className={`${styles.option} ${short ? styles.short : ''}`}>
+              {o.content}
+              <Icon name="check" size={16} color="#0d99ff" className={styles.check} />
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

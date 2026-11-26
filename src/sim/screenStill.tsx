@@ -22,7 +22,7 @@ export interface ScreenSpec {
 }
 
 /** The designer's own params: they change the canvas, not what a screen shows. */
-const DESIGNER_ONLY = new Set<string>(['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'rail', 'changes', 'where', 'capture', REAL_PARAM, SYSTEM_PARAM, BARE_PARAM, ...SHOT_PARAMS]);
+const DESIGNER_ONLY = new Set<string>(['device', 'devices', 'display', 'arrange', 'sort', 'compare', 'zoom', 'land', 'rail', 'changes', 'where', 'capture', 'walk', 'walkmarks', REAL_PARAM, SYSTEM_PARAM, BARE_PARAM, ...SHOT_PARAMS]);
 
 /**
  * What a thumbnail shows, as the site draws it alone: its page with its params, the scenario on the URL now (persona,

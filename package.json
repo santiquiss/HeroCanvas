@@ -17,9 +17,12 @@
     "update": "node scripts/update.mjs",
     "symbols": "node scripts/symbols.mjs",
     "assets": "node scripts/assets.mjs",
-    "texts": "node scripts/texts.mjs"
+    "texts": "node scripts/texts.mjs",
+    "walk": "node scripts/walk.mjs"
   },
   "dependencies": {
+    "@ui-sdk/core": "^0.1.0-beta.17",
+    "@ui-sdk/react": "^0.1.0-beta.17",
     "@vercel/functions": "^3.10.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

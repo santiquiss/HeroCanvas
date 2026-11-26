@@ -604,9 +604,6 @@
 }
 
 /* Scenarios: the persona in use, and a dropdown with the others (PersonaPicker) */
-.personaPicker {
-  position: relative;
-}
 .persona {
   width: 100%;
   display: flex;
@@ -626,32 +623,33 @@
   background: var(--ui-bg);
 }
 .personaTrigger:hover,
-.personaTriggerOpen {
+.personaTrigger[data-open] {
   border-color: var(--ui-line-strong);
 }
-/* A bit wider than the card it opens from; shadow only here, nothing under it scrolls or animates */
+/* A bit wider than the card it opens from (the trigger's width, --anchor-width, and 6 on each side); shadow only
+   here, nothing under it scrolls or animates. Placed by ui-sdk, in the top layer. */
 .personaMenu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  z-index: 10;
-  top: calc(100% + 6px);
-  left: -6px;
-  right: -6px;
+  width: calc(var(--anchor-width) + 12px);
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: min(460px, 70vh);
+  max-height: min(460px, 70vh, var(--available-height));
   overflow-y: auto;
   padding: 6px;
 }
-.personaMenu .persona:hover,
-.personaMenu .persona:focus-visible {
+.personaMenu .persona[data-highlighted] {
   background: var(--ui-bg-subtle);
   outline: none;
 }
-.personaOn,
-.personaMenu .personaOn:hover {
+.personaMenu .persona[data-selected] {
   background: var(--ui-hover);
+}
+.personaCheck {
+  visibility: hidden;
+}
+.persona[data-selected] .personaCheck {
+  visibility: visible;
 }
 .personaAvatar {
   width: 44px;
@@ -953,16 +951,13 @@
   margin-left: auto;
   color: var(--ui-text-subtle);
 }
+/* Placed by ui-sdk in the top layer, lined up with its button's end. */
 .tokenMenu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 20;
   display: flex;
   flex-direction: column;
-  width: max(100%, 220px);
-  max-height: 280px;
+  width: max(var(--anchor-width), 220px);
+  max-height: min(280px, var(--available-height));
   overflow-y: auto;
   padding: 4px;
 }
@@ -970,10 +965,8 @@
   padding: 6px;
   border-radius: 5px;
 }
-.tokenOption:hover {
-  background: var(--ui-blue-soft);
-}
-.tokenOptionOn {
+.tokenOption[data-highlighted],
+.tokenOption[data-selected] {
   background: var(--ui-blue-soft);
 }
 .swatch {

@@ -1,0 +1,298 @@
+/* The Walkthrough panel and its marks on the screens. */
+.empty {
+  margin: 0;
+  padding: 16px 12px;
+  font: 12px/18px Inter, system-ui, sans-serif;
+  color: var(--ui-text-muted);
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--ui-text-2);
+  cursor: pointer;
+}
+.iconButton:hover:not(:disabled) {
+  background: var(--ui-hover);
+}
+.iconButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.on {
+  background: var(--ui-blue-soft);
+  color: var(--ui-blue-text);
+}
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 8px 16px;
+}
+.current .text {
+  margin: 0;
+  font: 12px/18px Inter, system-ui, sans-serif;
+  color: var(--ui-text-2);
+}
+.marks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mark {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.markText {
+  font: 12px/18px Inter, system-ui, sans-serif;
+  color: var(--ui-text);
+}
+.nextHint {
+  color: var(--hc-hl, #ff2d95);
+}
+/* A mark's number, in the list and beside the device: the color of Highlight changes (ChangesOverlay's --hc-hl). */
+.badge {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--hc-hl, #ff2d95);
+  color: #fff;
+  font: 700 11px/1 Inter, system-ui, sans-serif;
+}
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Over everything in the canvas (the devices' system bars and keyboard, their headers, the add-a-device +). The
+     canvas is a stacking layer of its own (SimulatorShell's .canvas), so this stays under the toolbar's menus. */
+  z-index: 9999;
+  pointer-events: none;
+}
+/* The stories: a row each, its icon, its title over its line, and how many steps. */
+.story {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: var(--ui-bg-subtle);
+  box-shadow: inset 0 0 0 1px var(--ui-line);
+  color: var(--ui-text);
+  text-align: start;
+  cursor: pointer;
+}
+.story:hover {
+  background: var(--ui-hover);
+}
+.storyIcon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--ui-blue-soft);
+  color: var(--ui-blue-text);
+}
+.storyText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.storyTitle {
+  font: 600 12px/16px Inter, system-ui, sans-serif;
+}
+.storyLine {
+  font: 11px/15px Inter, system-ui, sans-serif;
+  color: var(--ui-text-muted);
+}
+.storyCount {
+  flex: none;
+  font: 500 11px/16px Inter, system-ui, sans-serif;
+  color: var(--ui-text-subtle);
+}
+/* A story's head: the way back to the list, over its title. */
+.head {
+  padding: 8px 10px 4px;
+}
+.back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: var(--ui-text-muted);
+  font: 500 11px/16px Inter, system-ui, sans-serif;
+  cursor: pointer;
+}
+.back:hover {
+  color: var(--ui-text);
+}
+.headTitle {
+  margin: 4px 0 0;
+  font: 600 13px/18px Inter, system-ui, sans-serif;
+  color: var(--ui-text);
+}
+/* A number beside the device, and its line to what it points at. */
+.beside {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.line polyline {
+  fill: none;
+  stroke: var(--hc-hl, #ff2d95);
+  stroke-width: 1.25;
+}
+.line circle {
+  fill: var(--hc-hl, #ff2d95);
+  stroke: #fff;
+  stroke-width: 1;
+}
+
+/* A story, one step at a time. Its head: the title with the numbers' switch, and the steps as segments. */
+.headRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.headRow .headTitle {
+  flex: 1;
+  margin: 0;
+}
+.segments {
+  display: flex;
+  gap: 4px;
+  margin: 10px 0 2px;
+}
+.segment {
+  flex: 1;
+  height: 12px;
+  padding: 4px 0;
+  border: none;
+  background: var(--ui-fill-strong);
+  background-clip: content-box;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.segmentOn {
+  background-color: var(--hc-hl, #ff2d95);
+}
+/* The step: a card of its own, under the head. */
+.card {
+  /* As tall as what it says; it scrolls when that's more than the panel. */
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 8px 10px 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--ui-bg-subtle);
+  box-shadow: inset 0 0 0 1px var(--ui-line);
+}
+.eyebrow {
+  font: 600 10px/14px Inter, system-ui, sans-serif;
+  color: var(--ui-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cardTitle {
+  margin: 2px 0 6px;
+  font: 600 15px/20px Inter, system-ui, sans-serif;
+  color: var(--ui-text);
+}
+.card .marks {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ui-line);
+  gap: 10px;
+}
+/* Back and Next, side by side at the panel's foot. */
+.foot {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding: 10px;
+}
+.footButton {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--ui-fill);
+  color: var(--ui-text);
+  font: 600 12px/16px Inter, system-ui, sans-serif;
+  cursor: pointer;
+}
+.footButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.footPrimary {
+  background: var(--ui-strong);
+  color: var(--ui-on-strong);
+}
+
+/* A step whose way in stopped at something not on the screen: what, and a way to try again. */
+.missing {
+  margin-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: wrap;
+  font: 12px/16px Inter, system-ui, sans-serif;
+  color: var(--ui-red-text);
+}
+.missing > span {
+  flex: 1;
+  min-width: 0;
+}
+.retry {
+  border: none;
+  background: none;
+  padding: 0;
+  font: 600 12px/16px Inter, system-ui, sans-serif;
+  color: var(--ui-blue-text);
+  cursor: pointer;
+}

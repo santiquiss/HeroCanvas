@@ -201,10 +201,7 @@
 }
 .menu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 3;
+  /* Placed by ui-sdk in the top layer, under the ⋯ and lined up with its end. */
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -228,8 +225,31 @@
   text-align: left;
   cursor: pointer;
 }
-.menu [role='menuitem']:hover {
+.menu [role='menuitem'][data-highlighted] {
   background: var(--ui-hover);
+  outline: none;
+}
+/* The confirmation's two items are buttons (Cancel, Delete), not rows. */
+.menuBar [role='menuitem'] {
+  height: 26px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.menuBar .plainBtn {
+  border: 1px solid var(--ui-line);
+  background: var(--ui-bg);
+}
+.menuBar .dangerBtn,
+.menuBar .dangerBtn[data-highlighted] {
+  background: #c4262c;
+  color: #ffffff;
+}
+.menuBar .dangerBtn[data-highlighted] {
+  box-shadow: 0 0 0 2px var(--ui-bg), 0 0 0 4px #c4262c;
+}
+.menuBar .dangerBtn[data-pending] {
+  opacity: 0.6;
+  cursor: default;
 }
 .menu .danger {
   color: var(--ui-red-text);
@@ -264,10 +284,7 @@
   background: #c4262c;
   color: #ffffff;
 }
-.dangerBtn:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
+
 
 /* Editing your comment: its text in the reply field's look, and how to leave it. */
 .editBox {
@@ -665,8 +682,7 @@
 }
 .emojiGrid {
   composes: surface from '../theme/surface.module.css';
-  position: fixed;
-  z-index: 1000;
+  /* Placed by ui-sdk in the top layer. */
   display: grid;
 }
 .emoji {
@@ -682,8 +698,7 @@
   line-height: 1;
   cursor: pointer;
 }
-.emoji:hover,
-.emoji:focus-visible {
+.emoji[data-highlighted] {
   background: var(--ui-hover);
   outline: none;
 }
@@ -691,8 +706,10 @@
 /* @mentions: the list a field opens on @ (Mentions), and a mention in a comment's text. */
 .mentionList {
   composes: surface from '../theme/surface.module.css';
-  position: fixed;
-  z-index: 1000;
+  /* A popover in the top layer, placed by ui-sdk's position: none of the browser's own inset, margin or border. */
+  inset: auto;
+  margin: 0;
+  border: none;
   display: flex;
   flex-direction: column;
   padding: 4px;

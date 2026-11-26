@@ -45,7 +45,7 @@
   cursor: pointer;
 }
 .trigger:hover,
-.triggerOpen {
+.trigger[data-open] {
   background: var(--ui-bg-subtle);
 }
 .triggerProposal,
@@ -86,13 +86,10 @@
 
 .menu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  z-index: 30;
-  top: calc(100% + 4px);
-  left: 0;
   width: 600px;
   max-width: calc(100vw - 24px);
-  max-height: min(560px, calc(100vh - 80px));
+  /* Placed by ui-sdk in the top layer: as tall as the room under the trigger lets it be. */
+  max-height: min(560px, var(--available-height));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -139,10 +136,16 @@
   text-align: left;
   cursor: pointer;
 }
-.row:hover,
-.row:focus-visible {
+.row[data-highlighted],
+a.row:hover,
+a.row:focus-visible {
   background: var(--ui-hover);
   outline: none;
+}
+/* A ticket's row is a link, drawn as the other rows. */
+.link {
+  color: inherit;
+  text-decoration: none;
 }
 /* Live: one line, centered (the icon, its name and its line level with each other). */
 .row.liveRow {
@@ -177,8 +180,17 @@
   /* .row's gap would set the columns' too: the header's, so they line up. */
   gap: 0 14px;
 }
-.rowOn {
+.row[data-selected] {
   background: var(--ui-bg-subtle);
+}
+.row[data-selected][data-highlighted] {
+  background: var(--ui-hover);
+}
+.checkIcon {
+  visibility: hidden;
+}
+.row[data-selected] .checkIcon {
+  visibility: visible;
 }
 .title {
   flex: 1;

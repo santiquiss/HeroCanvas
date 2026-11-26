@@ -8,7 +8,8 @@
 // that compares them; the components those versions replace change, navigation stays shared.
 import { systemBack } from './back';
 import { designLayout } from '../design/overridableRegistry';
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@ui-sdk/react/popover';
 import { Icon } from '../components/Icon';
 import { DEVICE_TYPES, DEVICES, findDevice, findDisplay, foldOf, keepsLandscape, landAfterSwitch } from '../devices/devices';
 import { supportsLandscape } from '../nav/screenConfig';
@@ -306,19 +307,8 @@ export function DeviceHeader({
     // `parts` is described by `key`.
   }, [key, room, !!grip, !!onRemove, !!source]);
 
+  // The ⋯'s panel: ui-sdk's Popover (try-ui-library), its rows ours (two of them hold a native select, so not a menu).
   const [menu, setMenu] = useState(false);
-  const root = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!menu) return;
-    const away = (e: globalThis.PointerEvent) => !root.current?.contains(e.target as Node) && setMenu(false);
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false);
-    document.addEventListener('pointerdown', away);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('pointerdown', away);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [menu]);
   const shown = hidden.length ? parts.filter((p) => !hidden.includes(p)) : parts;
   const closing = (f: () => void) => () => {
     f();
@@ -432,7 +422,7 @@ export function DeviceHeader({
   };
 
   return (
-    <div ref={root} className={`${styles.devHead} ${menu ? styles.devHeadOpen : ''} ${tight ? styles.devHeadTight : ''} ${className ?? ''}`} style={style} data-canvas-ui>
+    <div className={`${styles.devHead} ${menu ? styles.devHeadOpen : ''} ${tight ? styles.devHeadTight : ''} ${className ?? ''}`} style={style} data-canvas-ui>
       {grip && (
         <span className={styles.devGrip} title={t('Drag to reorder')} {...grip}>
           <Icon name="drag_indicator" size={16} />
@@ -453,20 +443,20 @@ export function DeviceHeader({
       )}
       {shown.map(chip)}
       {hidden.length > 0 && (
-        <button className={`${styles.devChip} ${menu ? styles.devChipOn : ''}`} title={t('More')} aria-haspopup="menu" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
-          <Icon name="more_horiz" size={16} />
-        </button>
+        <Popover open={menu} onOpenChange={setMenu}>
+          <PopoverTrigger className={`${styles.devChip} ${menu ? styles.devChipOn : ''}`} title={t('More')} aria-label={t('More')}>
+            <Icon name="more_horiz" size={16} />
+          </PopoverTrigger>
+          <PopoverContent className={styles.devMenu} side="bottom" align="end" sideOffset={6} aria-label={t('More')}>
+            {parts.filter((p) => hidden.includes(p)).map(row)}
+          </PopoverContent>
+        </Popover>
       )}
       {/* Remove, always shown and last of all. */}
       {onRemove && (
         <button className={styles.devChip} title={t('Remove')} onClick={onRemove}>
           <Icon name="close" size={16} />
         </button>
-      )}
-      {menu && hidden.length > 0 && (
-        <div className={styles.devMenu} role="menu">
-          {parts.filter((p) => hidden.includes(p)).map(row)}
-        </div>
       )}
       {/* Every part at its full width, unseen: what the header measures to know what fits. */}
       <div ref={measure} className={styles.devMeasure} aria-hidden inert>

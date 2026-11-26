@@ -6,6 +6,33 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.58.0 — 2026-11-26
+
+- **Walkthroughs: a proposal's guided tour** (`src/walkthrough`, the Walkthrough panel beside Pages and Layers): a
+  proposal's `walkthrough` (in its `pages.tsx`, usually from a `walkthrough.ts`) is a few stories, each a few steps;
+  numbers beside the device point at what to look at (a text as shown, `component:<Name>`, or `css:<selector>`). A
+  step's way in taps, long-presses, focuses a field and types with the system keyboard up, presses a key, scrolls and
+  swipes, always from the app as it opens (the screens drawn anew, every page's state cleared: `RESET_APP_EVENT`). A
+  link (`?walk=<step>`) or the browser's Back opens a step in its state; the panel says when one can't be reached. The
+  numbers sit in the canvas's own layer, follow the selected device in a set or All devices.
+- **`npm run walk`**: every walkthrough step checked in a real browser, from a link and by a real tap on the step
+  before (`--devices`, `--shots`, `--all`); a test checks each walkthrough as written.
+- **The designer's menus, lists and dialogs on ui-sdk** (`@ui-sdk/react`): the persona and proposal pickers, Inspect's
+  checks, a token's color, the theme switch, a comment's ⋯ and its emoji, @mentions (placed with `position()`), the
+  changes and Share popovers, a device bar's ⋯ and Capture's motion rows. Same look; the keyboard, focus, typing to
+  find, Escape and a click outside are the library's, the same everywhere. Its default look isn't used:
+  `src/theme/ui-sdk-base.css` (in `@layer ui-sdk`) keeps only what its parts need to behave.
+- **Esc in Capture closes an open list** instead of leaving Capture.
+- **The dev server serves text as UTF-8** (`scripts/vite/utf8.ts`): a spec's `.md` showed `Â·` for `·`.
+- **The system keyboard's Continue key** has the other keys' radius.
+
+**Contract**
+
+- New runtime dependencies, `@ui-sdk/core` and `@ui-sdk/react` (merged into your `package.json` by the update; run
+  `npm install`). A new script, `walk`.
+- `herocanvas` exports the walkthrough's types: `WalkStory`, `WalkStep`, `WalkAction`, `WalkTarget`, `WalkMark`. A
+  proposal may declare `walkthrough: WalkStory[]` beside its pages; nothing to adapt if it doesn't.
+
 ## 0.57.0 — 2026-11-19
 
 - **A proposal's spec** (`npm run spec -- <code>`, `scripts/spec.mjs`): the proposal as files anyone opens from a link

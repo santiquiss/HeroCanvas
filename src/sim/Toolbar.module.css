@@ -227,20 +227,15 @@
 }
 
 /* The changes chip and its popover (ChangesMenu). Counts and badges in the colors of change (design/changes). */
-.changes {
-  position: relative;
-}
-.chipOpen {
+.changesChip[data-open] {
   border-color: var(--ui-strong);
 }
+/* Placed by ui-sdk in the top layer, under its chip. */
 .popover {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 50;
   width: 420px;
-  max-height: min(560px, 70vh);
+  max-width: calc(100vw - 24px);
+  max-height: min(560px, 70vh, var(--available-height));
   overflow-y: auto;
   display: flex;
   flex-direction: column;

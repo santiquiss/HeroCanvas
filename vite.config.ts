@@ -8,6 +8,7 @@ import hcVersion from './src/version.json' with { type: 'json' }
 import hc from './herocanvas.config.ts'
 import { brand } from './scripts/vite/brand.ts'
 import { hcWriter } from './scripts/vite/hcWriter.ts'
+import { utf8 } from './scripts/vite/utf8.ts'
 import { projectAliases, projectById, projectsOf, takenCodes, type Project } from './scripts/vite/projects.ts'
 
 const ROOT = fileURLToPath(new URL('.', import.meta.url))
@@ -18,7 +19,7 @@ function projectConfig(project: Project): UserConfig {
   return {
     // hcWriter: the designer saves screen config / proposals to the project's files (dev server only). brand: the
     // tool's colors, from herocanvas.config.ts (or its logo). The first project's server and build bring the others.
-    plugins: [react(), hcWriter(project), brand(hc), ...(project.root ? [otherProjects()] : [])],
+    plugins: [utf8(), react(), hcWriter(project), brand(hc), ...(project.root ? [otherProjects()] : [])],
     // Relative: the built site works wherever it's served, at a domain's root or under a path (GitHub Pages'
     // user.github.io/repo). Public files are reached through import.meta.env.BASE_URL, never from `/`.
     base: './',

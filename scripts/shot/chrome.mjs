@@ -151,6 +151,13 @@ export async function newPage(cdp) {
       }
       throw new Error(`Timed out waiting for ${what}`);
     },
+    /** A click of the mouse at (x, y), CSS pixels of the page: the browser's own, as a person's (`isTrusted`). */
+    async click(x, y) {
+      const at = { x, y, button: 'left', clickCount: 1 };
+      await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y }, s);
+      await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...at }, s);
+      await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at }, s);
+    },
     viewport: (width, height, scale) => cdp.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: scale, mobile: false }, s),
     transparent: () => cdp.send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } }, s),
     reducedMotion: () => cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] }, s),

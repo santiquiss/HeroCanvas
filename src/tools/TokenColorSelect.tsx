@@ -1,8 +1,8 @@
 // Props' control for a color picked from the theme's tokens (options like `var(--app-surface)`):
 // each option as a swatch and a name to read — the one the code gives it (`appSurface` → "App
-// surface"), else its Figma path — with its group beside it. A native select can't draw a swatch, so it's a small
-// menu of our own.
-import { useEffect, useRef, useState } from 'react';
+// surface"), else its Figma path — with its group beside it. A native select can't draw a swatch: ui-sdk's Select
+// (try-ui-library), the rows ours. Typing a token's name jumps to it.
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui-sdk/react/select';
 import { Icon } from '../components/Icon';
 import { findToken, TOKEN_GROUPS } from '../design/tokenCatalog';
 import styles from './Panel.module.css';
@@ -39,20 +39,10 @@ const BY_VALUE = (() => {
 /** The token a raw color is (`rgb(233,19,95)` → background/accent), when it is one. */
 export const tokenForColor = (color: string): string | null => BY_VALUE.get(flat(color)) ?? null;
 
+/** None's value in the Select (its option is ''). */
+const NONE = 'none';
+
 export function TokenColorSelect({ value, options, onChange }: { value: string; options: string[]; onChange: (v: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const root = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: PointerEvent) => root.current?.contains(e.target as Node) || setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('pointerdown', close);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('pointerdown', close);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [open]);
   // The group only when the options mix them (Background and Text); one group says nothing.
   const showGroup = new Set(options.filter(Boolean).map((o) => tokenLabel(o).group)).size > 1;
   const row = (o: string) => {
@@ -73,30 +63,20 @@ export function TokenColorSelect({ value, options, onChange }: { value: string; 
     );
   };
   return (
-    <div ref={root} className={styles.tokenSelect}>
-      <button className={styles.tokenButton} aria-haspopup="listbox" aria-expanded={open} title={value ? tokenLabel(value).css : t('None')} onClick={() => setOpen(!open)}>
-        {row(value)}
-        <Icon name="expand_more" size={14} />
-      </button>
-      {open && (
-        <div className={styles.tokenMenu} role="listbox">
+    <div className={styles.tokenSelect}>
+      <Select value={value || NONE} onValueChange={(v) => typeof v === 'string' && onChange(v === NONE ? '' : v)}>
+        <SelectTrigger className={styles.tokenButton} title={value ? tokenLabel(value).css : t('None')} aria-label={value ? tokenLabel(value).name : t('None')}>
+          {row(value)}
+          <Icon name="expand_more" size={14} />
+        </SelectTrigger>
+        <SelectContent className={styles.tokenMenu} sideOffset={4} align="end">
           {options.map((o) => (
-            <button
-              key={o}
-              role="option"
-              aria-selected={o === value}
-              className={`${styles.tokenOption} ${o === value ? styles.tokenOptionOn : ''}`}
-              title={o ? tokenLabel(o).css : undefined}
-              onClick={() => {
-                onChange(o);
-                setOpen(false);
-              }}
-            >
+            <SelectItem key={o || NONE} value={o || NONE} label={o ? tokenLabel(o).name : t('None')} className={styles.tokenOption} title={o ? tokenLabel(o).css : undefined}>
               {row(o)}
-            </button>
+            </SelectItem>
           ))}
-        </div>
-      )}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

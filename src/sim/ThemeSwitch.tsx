@@ -1,8 +1,8 @@
 // The screens' theme, at the canvas's top right in the prototype, Flow and a component's examples: Light / Dark side
 // by side for an app with no themes of its own; with them (appConfig.themes), a dropdown of every one (THEME_MODES),
 // each with its page and accent. It changes the devices and the examples only; the canvas follows the interface's
-// theme (uiTheme).
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+// theme (uiTheme). The dropdown is ui-sdk's Select (try-ui-library), its rows ours.
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui-sdk/react/select';
 import { Icon } from '../components/Icon';
 import { modeSwatch } from '../design/tokenCatalog';
 import { modeIn, modeParams, THEME_MODES, type ThemeMode } from '../design/themeModes';
@@ -42,56 +42,31 @@ function Swatch({ mode }: { mode: ThemeMode }) {
 }
 
 function ThemeDropdown({ current, onPick, className }: { current: ThemeMode; onPick: (m: ThemeMode) => void; className: string }) {
-  const [open, setOpen] = useState(false);
-  const root = useRef<HTMLSpanElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  // Listeners only while open; the picked theme takes focus so the arrows start there.
-  useEffect(() => {
-    if (!open) return;
-    list.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus();
-    const away = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
-    document.addEventListener('pointerdown', away);
-    return () => document.removeEventListener('pointerdown', away);
-  }, [open]);
-  const onKey = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setOpen(false);
-      root.current?.querySelector<HTMLElement>('button')?.focus();
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      const rows = [...(list.current?.querySelectorAll<HTMLElement>('[role="option"]') ?? [])];
-      const i = rows.indexOf(document.activeElement as HTMLElement);
-      rows[(i + (e.key === 'ArrowDown' ? 1 : rows.length - 1)) % rows.length]?.focus();
-    }
-  };
   return (
-    <span ref={root} className={`${styles.dropdown} ${className}`} data-canvas-ui data-tour="screen-theme" onKeyDown={open ? onKey : undefined}>
-      <button className={styles.trigger} aria-haspopup="listbox" aria-expanded={open} aria-label={t('Theme: {theme}', { theme: current.label })} onClick={() => setOpen((o) => !o)}>
-        <Swatch mode={current} />
-        <span>{current.label}</span>
-        <Icon name="expand_more" size={16} />
-      </button>
-      {open && (
-        <div ref={list} className={styles.menu} role="listbox" aria-label={t('Theme')}>
+    <span className={`${styles.dropdown} ${className}`} data-canvas-ui data-tour="screen-theme">
+      <Select
+        value={current.id}
+        onValueChange={(id) => {
+          const m = THEME_MODES.find((x) => x.id === id);
+          if (m) onPick(m);
+        }}
+      >
+        <SelectTrigger className={styles.trigger} aria-label={t('Theme: {theme}', { theme: current.label })}>
+          <Swatch mode={current} />
+          <span>{current.label}</span>
+          <Icon name="expand_more" size={16} />
+        </SelectTrigger>
+        <SelectContent className={styles.menu} sideOffset={6} align="end" aria-label={t('Theme')}>
           {THEME_MODES.map((m) => (
-            <button
-              key={m.id}
-              role="option"
-              aria-selected={m.id === current.id}
-              className={styles.option}
-              onClick={() => {
-                onPick(m);
-                setOpen(false);
-              }}
-            >
+            <SelectItem key={m.id} value={m.id} label={m.label} className={styles.option}>
               <Swatch mode={m} />
               <span className={styles.optionLabel}>{m.label}</span>
               <Icon name={m.scheme === 'light' ? 'light_mode' : 'dark_mode'} size={14} className={styles.scheme} />
-              <Icon name="check" size={16} style={{ visibility: m.id === current.id ? 'visible' : 'hidden' }} />
-            </button>
+              <Icon name="check" size={16} className={styles.check} />
+            </SelectItem>
           ))}
-        </div>
-      )}
+        </SelectContent>
+      </Select>
     </span>
   );
 }

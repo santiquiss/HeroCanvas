@@ -48,10 +48,10 @@ export function ModeRail({ mode, onMode }: { mode: Mode; onMode: (m: Mode, extra
       );
     onMode(to === 'capture' ? 'prototype' : to, to === 'capture' ? { capture: '1' } : {});
   };
-  // Esc leaves Capture, back to the prototype.
+  // Esc leaves Capture, back to the prototype; not the Esc that closes a list or popup open in it (ui-sdk's).
   useEffect(() => {
     if (!capture) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !(e.target as HTMLElement).closest('input, textarea, select') && go('prototype');
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !e.defaultPrevented && !(e.target as HTMLElement).closest('input, textarea, select, [data-slot$="-content"]') && go('prototype');
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps

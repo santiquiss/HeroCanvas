@@ -231,6 +231,9 @@
   min-height: 0;
   position: relative;
   display: flex;
+  /* A stacking layer of its own: what's drawn over the devices (a walkthrough's numbers) tops everything in the canvas
+     and nothing outside it, so the toolbar's menus (Proposal) open over it. */
+  isolation: isolate;
 }
 
 /* Custom device sets (`?devices=`): a centered row, scrolling sideways when it doesn't fit. */
@@ -504,11 +507,9 @@
   z-index: 20;
   opacity: 1;
 }
+/* Placed by ui-sdk in the top layer, under the ⋯, lined up with its end. */
 .devMenu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
   min-width: 200px;
   max-width: 280px;
   padding: 4px;

@@ -1,6 +1,3 @@
-.root {
-  position: relative;
-}
 /* The toolbar's Share, in the brand (herocanvas.config.ts, or its logo's color): the one place the tool wears it. */
 .share {
   display: flex;
@@ -22,12 +19,9 @@
 .share:hover {
   background: var(--hc-brand-hover);
 }
+/* Placed by ui-sdk in the top layer, under Share, lined up with its end. */
 .menu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 200;
   width: 340px;
   max-width: calc(100vw - 24px);
   padding: 6px;

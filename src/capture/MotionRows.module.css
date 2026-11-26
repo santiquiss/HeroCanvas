@@ -46,16 +46,7 @@
   font-size: 11px;
 }
 .dropdown {
-  position: relative;
   min-width: 0;
-}
-/* The motion's list opens across the whole row (label to length): the panel is narrow. */
-.across {
-  position: static;
-}
-.across .menu {
-  right: 0;
-  width: auto;
 }
 .trigger {
   display: flex;
@@ -73,7 +64,7 @@
   cursor: pointer;
 }
 .trigger:hover,
-.trigger.open {
+.trigger[data-open] {
   background: var(--ui-bg-subtle);
 }
 .name {
@@ -103,14 +94,11 @@
   color: var(--ui-text-muted);
   font-size: 12px;
 }
+/* Placed by ui-sdk in the top layer, under its button (or its row, across). */
 .menu {
   composes: surface from '../theme/surface.module.css';
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 4px);
-  left: 0;
-  width: max(100%, 260px);
-  max-height: 340px;
+  width: max(var(--anchor-width), 260px);
+  max-height: min(340px, var(--available-height));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -118,10 +106,12 @@
   padding: 4px;
 }
 /* The length's list: as wide as its button, opening to the left (the panel's edge is on the right). */
+/* The motion's list opens across the whole row (label to length): the panel is narrow. */
+.menu.across {
+  width: var(--anchor-width);
+}
 .narrow .menu {
-  left: auto;
-  right: 0;
-  width: max(100%, 96px);
+  width: max(var(--anchor-width), 96px);
 }
 .option {
   display: flex;
@@ -137,12 +127,17 @@
   text-align: left;
   cursor: pointer;
 }
-.option:hover,
-.option:focus-visible {
+.option[data-highlighted] {
   background: var(--ui-hover);
   outline: none;
 }
-.option.on {
+.check {
+  visibility: hidden;
+}
+.option[data-selected] .check {
+  visibility: visible;
+}
+.option[data-selected] {
   background: var(--ui-bg-subtle);
   font-weight: 600;
 }
