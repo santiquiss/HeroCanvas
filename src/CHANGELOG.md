@@ -6,6 +6,12 @@ HeroCanvas's own versions (`src/version.json`, in the toolbar's ⓘ); each relea
 While in 0.x: the minor number (0.**Y**.0) goes up for new features or architecture changes; the patch number
 (0.Y.**Z**) for fixes, polish and small additions.
 
+## 0.58.1 — 2026-11-26
+
+- **With the side panel open, no page of the app's area takes the iPhone Duo's column** (#2): on the inner display in
+  landscape, a push or a cover opened after the panel took the column from the panel's page, so two closes showed. The
+  app's area ends beside the panel, so none of its layers is at the right edge (`src/sim/DeviceScreen.tsx`).
+
 ## 0.58.0 — 2026-11-26
 
 - **Walkthroughs: a proposal's guided tour** (`src/walkthrough`, the Walkthrough panel beside Pages and Layers): a
